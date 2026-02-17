@@ -75,6 +75,7 @@
   async function testCloudFunction () {
     try {
       const baseUrl = import.meta.env.VITE_FIREBASE_BASE_URL
+      console.log(baseUrl);
       const response = await fetch(baseUrl + '/helloWorld')
       const data = await response.json()
       console.log('Cloud Function response:', data)
