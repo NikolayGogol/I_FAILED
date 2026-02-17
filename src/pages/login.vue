@@ -74,15 +74,8 @@
 
   async function testCloudFunction () {
     try {
-      // Note: 'helloWorld' is an onRequest function, so we should fetch it via URL.
-      // However, if you want to call it via SDK, it should be an onCall function.
-      // For this example, we'll just fetch the URL.
-      // Replace with your actual function URL or use onCall if you change the function type.
-
-      // Assuming you want to test the 'helloWorld' function we created earlier:
-      // const baseUrl = import.meta.env.VITE_FIREBASE_BASE_URL || 'https://us-central1-ifailed-69373.cloudfunctions.net'
-      // const response = await fetch(`${baseUrl}/helloWorld`)
-      const response = await fetch('/api/helloWorld')
+      const baseUrl = import.meta.env.VITE_FIREBASE_BASE_URL
+      const response = await fetch(baseUrl + '/helloWorld')
       const data = await response.json()
       console.log('Cloud Function response:', data)
       alert(JSON.stringify(data))
