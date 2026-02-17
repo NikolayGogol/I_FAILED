@@ -61,7 +61,6 @@
 <script setup>
   import { useRouter } from 'vue-router'
   import { useAuthStore } from '@/stores/auth'
-  import { functions, httpsCallable } from '@/firebase'
 
   const router = useRouter()
   const authStore = useAuthStore()
@@ -81,7 +80,8 @@
       // Replace with your actual function URL or use onCall if you change the function type.
 
       // Assuming you want to test the 'helloWorld' function we created earlier:
-      const response = await fetch('https://us-central1-failed-9fe12.cloudfunctions.net/helloWorld')
+      const baseUrl = import.meta.env.VITE_FIREBASE_BASE_URL || 'https://us-central1-ifailed-69373.cloudfunctions.net'
+      const response = await fetch(`${baseUrl}/helloWorld`)
       const data = await response.json()
       console.log('Cloud Function response:', data)
       alert(JSON.stringify(data))
