@@ -21,6 +21,7 @@ jobs:
           echo "VITE_FIREBASE_MESSAGING_SENDER_ID=784812623031" >> .env
           echo "VITE_FIREBASE_APP_ID=1:784812623031:web:0376e6cb604866f71ff932" >> .env
           echo "VITE_FIREBASE_MEASUREMENT_ID=G-XVX1ET7T1D" >> .env
+          echo "VITE_FIREBASE_BASE_URL=https://us-central1-ifailed-69373.cloudfunctions.net" >> .env
       - name: Install and Build
         run: npm ci && npm run build
       - uses: FirebaseExtended/action-hosting-deploy@v0
