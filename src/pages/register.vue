@@ -113,10 +113,10 @@
 
             <v-select
               v-model="whyJoining"
-              density="comfortable"
               class="form-field"
-              hide-details="auto"
               clearable
+              density="comfortable"
+              hide-details="auto"
               item-title="title"
               item-value="value"
               :items="whyJoiningOptions"

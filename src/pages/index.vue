@@ -3,12 +3,12 @@
     <v-app-bar app color="white" flat>
       <v-container class="py-0 fill-height">
         <v-toolbar-title class="font-weight-bold">I FAILED</v-toolbar-title>
-        <v-spacer></v-spacer>
+        <v-spacer />
         <v-btn text>Home</v-btn>
         <v-btn text>Features</v-btn>
         <v-btn text>Pricing</v-btn>
         <v-btn text>Contact</v-btn>
-        <v-spacer></v-spacer>
+        <v-spacer />
         <div v-if="authStore.user">
           <v-btn text @click="handleLogout">Log out</v-btn>
         </div>
@@ -21,7 +21,7 @@
 
     <v-main>
       <v-container class="main-content" fluid>
-        <v-row align="center" justify="center" class="hero-section">
+        <v-row align="center" class="hero-section" justify="center">
           <v-col class="text-center" cols="12" md="8">
             <h1 class="main-title">This is a main title for a page</h1>
             <p class="main-subtitle">
