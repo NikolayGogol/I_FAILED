@@ -1,17 +1,14 @@
-/**
- * Import function triggers from their respective submodules:
- *
- * const {onCall} = require("firebase-functions/v2/https");
- * const {onDocumentWritten} = require("firebase-functions/v2/firestore");
- *
- * See a full list of supported triggers at https://firebase.google.com/docs/functions
- */
-
 const logger = require('firebase-functions/logger')
+// 1. Імпортуємо setGlobalOptions
+const { setGlobalOptions } = require('firebase-functions/v2')
 const { onRequest } = require('firebase-functions/v2/https')
 
-// Create and deploy your first functions
-// https://firebase.google.com/docs/functions/get-started
+// 2. Налаштовуємо глобальні опції для ВСІХ функцій у цьому файлі
+// invoker: 'public' автоматично додає роль allUsers при деплої
+setGlobalOptions({
+  region: 'us-central1', // краще вказати регіон явно
+  invoker: 'public',
+})
 
 exports.helloWorld = onRequest({ cors: true }, (request, response) => {
   console.log(2)
@@ -21,4 +18,9 @@ exports.helloWorld = onRequest({ cors: true }, (request, response) => {
     timestamp: new Date().toISOString(),
     query: request.query,
   })
+})
+
+// Будь-яка наступна функція також буде публічною автоматично
+exports.anotherFunction = onRequest({ cors: true }, (req, res) => {
+  res.send('I am also public thanks to global options!')
 })
