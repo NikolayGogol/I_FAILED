@@ -60,10 +60,12 @@
 
 <script setup>
   import { useRouter } from 'vue-router'
+  import { useToast } from 'vue-toastification'
   import { useAuthStore } from '@/stores/auth'
 
   const router = useRouter()
   const authStore = useAuthStore()
+  const toast = useToast()
 
   async function handleGoogleSignIn () {
     await authStore.signInWithGoogle()
@@ -74,15 +76,12 @@
 
   async function testCloudFunction () {
     try {
-      const baseUrl = import.meta.env.VITE_FIREBASE_BASE_URL
-      console.log(baseUrl);
-      const response = await fetch(baseUrl + '/helloWorld')
-      const data = await response.json()
+      const data = await authStore.testCloudFunction()
       console.log('Cloud Function response:', data)
-      alert(JSON.stringify(data))
+      toast.success(JSON.stringify(data))
     } catch (error) {
+      // Error is already handled in axios interceptor
       console.error('Error calling Cloud Function:', error)
-      alert('Error calling Cloud Function')
     }
   }
 </script>

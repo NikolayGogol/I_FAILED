@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import api from '@/axios'
 import { auth, provider, signInWithPopup } from '@/firebase'
 
 export const useAuthStore = defineStore('auth', {
@@ -28,6 +29,15 @@ export const useAuthStore = defineStore('auth', {
         this.user = null
       } catch (error) {
         console.error('Error signing out:', error)
+      }
+    },
+    async testCloudFunction () {
+      try {
+        const response = await api.get('/helloWorld')
+        return response.data
+      } catch (error) {
+        console.error('Error calling Cloud Function:', error)
+        throw error
       }
     },
   },
