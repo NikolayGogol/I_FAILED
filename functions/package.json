@@ -10,7 +10,7 @@
     "dev": "nodemon --exec firebase emulators:start --only functions"
   },
   "engines": {
-    "node": "18"
+    "node": "22"
   },
   "main": "index.js",
   "dependencies": {
