@@ -2,7 +2,7 @@
   <div class="main-page">
     <v-app-bar app color="white" flat>
       <v-container class="py-0 fill-height">
-        <v-toolbar-title class="font-weight-bold">I FAILED</v-toolbar-title>
+        <app-logo />
         <v-spacer />
         <v-btn text>Home</v-btn>
         <v-btn text>Features</v-btn>
@@ -10,7 +10,7 @@
         <v-btn text>Contact</v-btn>
         <v-spacer />
         <div v-if="authStore.user">
-          <v-btn text @click="handleLogout">Log out</v-btn>
+          <v-btn color="error" text @click="handleLogout">Log out</v-btn>
         </div>
         <div v-else>
           <v-btn text to="/login">Log in</v-btn>
@@ -88,6 +88,7 @@
 </template>
 
 <script setup>
+  import AppLogo from '@/components/AppLogo.vue'
   import { useAuthStore } from '@/stores/auth'
   import '@/styles/pages/index.scss'
 

@@ -100,9 +100,9 @@
   import { ref } from 'vue'
   import { useRouter } from 'vue-router'
   import { useToast } from 'vue-toastification'
-  import { useAuthStore } from '@/stores/auth'
-  import GoogleLoginButton from '@/components/GoogleLoginButton.vue'
   import FacebookLoginButton from '@/components/FacebookLoginButton.vue'
+  import GoogleLoginButton from '@/components/GoogleLoginButton.vue'
+  import { useAuthStore } from '@/stores/auth'
   import '@/styles/pages/login.scss'
 
   const router = useRouter()
