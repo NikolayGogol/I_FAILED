@@ -20,6 +20,7 @@
   import { useRouter } from 'vue-router'
   import { useToast } from 'vue-toastification'
   import { useAuthStore } from '@/stores/auth'
+  import '@/styles/components/social-buttons.scss'
 
   const router = useRouter()
   const authStore = useAuthStore()
