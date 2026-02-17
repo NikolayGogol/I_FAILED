@@ -1,26 +1,24 @@
-const logger = require('firebase-functions/logger')
-// 1. Імпортуємо setGlobalOptions
-const { setGlobalOptions } = require('firebase-functions/v2')
 const { onRequest } = require('firebase-functions/v2/https')
+const logger = require('firebase-functions/logger')
+const express = require('express')
+const cors = require('cors')
 
-// 2. Налаштовуємо глобальні опції для ВСІХ функцій у цьому файлі
-// invoker: 'public' автоматично додає роль allUsers при деплої
-setGlobalOptions({
-  region: 'us-central1', // краще вказати регіон явно
-  invoker: 'public',
-})
+const app = express()
 
-exports.helloWorld = onRequest({ cors: true }, (request, response) => {
-  console.log(2)
+// Automatically allow cross-origin requests
+app.use(cors({ origin: true }))
+
+app.get('/helloWorld', (req, res) => {
   logger.info('Hello logs!', { structuredData: true })
-  response.json({
+  res.json({
     message: 'Hello from Firebase!',
     timestamp: new Date().toISOString(),
-    query: request.query,
+    query: req.query,
   })
 })
 
-// Будь-яка наступна функція також буде публічною автоматично
-exports.anotherFunction = onRequest({ cors: true }, (req, res) => {
-  res.send('I am also public thanks to global options!')
+app.get('/anotherFunction', (req, res) => {
+  res.send('I am also public thanks to Express!')
 })
+
+exports.api = onRequest(app)

@@ -80,8 +80,9 @@
       // Replace with your actual function URL or use onCall if you change the function type.
 
       // Assuming you want to test the 'helloWorld' function we created earlier:
-      const baseUrl = import.meta.env.VITE_FIREBASE_BASE_URL || 'https://us-central1-ifailed-69373.cloudfunctions.net'
-      const response = await fetch(`${baseUrl}/helloWorld`)
+      // const baseUrl = import.meta.env.VITE_FIREBASE_BASE_URL || 'https://us-central1-ifailed-69373.cloudfunctions.net'
+      // const response = await fetch(`${baseUrl}/helloWorld`)
+      const response = await fetch('/api/helloWorld')
       const data = await response.json()
       console.log('Cloud Function response:', data)
       alert(JSON.stringify(data))

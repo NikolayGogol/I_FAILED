@@ -8,8 +8,8 @@
     ],
     "rewrites": [
       {
-        "source": "/helloWorld",
-        "function": "helloWorld"
+        "source": "/api/**",
+        "function": "api"
       },
       {
         "source": "**",
