@@ -74,7 +74,7 @@
   import { useRoute, useRouter } from 'vue-router'
   import { useToast } from 'vue-toastification'
   import { useAuthStore } from '@/stores/auth'
-  import './verify.scss'
+  import '@/styles/pages/verify.scss'
 
   const router = useRouter()
   const route = useRoute()

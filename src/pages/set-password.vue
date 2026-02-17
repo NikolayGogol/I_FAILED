@@ -71,7 +71,7 @@
   import { useRoute, useRouter } from 'vue-router'
   import { useToast } from 'vue-toastification'
   import { useAuthStore } from '@/stores/auth'
-  import './set-password.scss'
+  import '@/styles/pages/set-password.scss'
 
   const router = useRouter()
   const route = useRoute()

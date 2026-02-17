@@ -59,7 +59,7 @@
   import { ref } from 'vue'
   import { useRouter } from 'vue-router'
   import { useToast } from 'vue-toastification'
-  import './forgot-password.scss'
+  import '@/styles/pages/forgot-password.scss'
 
   const router = useRouter()
   const toast = useToast()

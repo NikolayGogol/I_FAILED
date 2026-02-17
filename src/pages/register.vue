@@ -147,7 +147,7 @@
   import { useRouter } from 'vue-router'
   import { useToast } from 'vue-toastification'
   import { useAuthStore } from '@/stores/auth'
-  import './register.scss'
+  import '@/styles/pages/register.scss'
 
   const router = useRouter()
   const authStore = useAuthStore()

@@ -132,7 +132,7 @@
   import { useRouter } from 'vue-router'
   import { useToast } from 'vue-toastification'
   import { useAuthStore } from '@/stores/auth'
-  import './login.scss'
+  import '@/styles/pages/login.scss'
 
   const router = useRouter()
   const authStore = useAuthStore()
