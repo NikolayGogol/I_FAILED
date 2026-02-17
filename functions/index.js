@@ -1,7 +1,7 @@
-const { onRequest } = require('firebase-functions/v2/https')
-const logger = require('firebase-functions/logger')
-const express = require('express')
 const cors = require('cors')
+const express = require('express')
+const logger = require('firebase-functions/logger')
+const { onRequest } = require('firebase-functions/v2/https')
 
 const app = express()
 
