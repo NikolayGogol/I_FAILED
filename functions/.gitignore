@@ -1,0 +1,14 @@
+# Compiled JavaScript files
+# Keep this if you are using TypeScript
+# *.js
+# *.js.map
+
+# TypeScript build artifacts
+# lib/
+
+# Node.js dependencies
+node_modules/
+
+# Firebase debug logs
+firebase-debug.log
+firebase-debug.*.log

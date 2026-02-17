@@ -1,0 +1,8 @@
+{
+  "projects": {
+    "default": "ifailed-69373",
+    "staging": "ifailed-69373"
+  },
+  "targets": {},
+  "etags": {}
+}
