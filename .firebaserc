@@ -3,6 +3,14 @@
     "default": "ifailed-69373",
     "staging": "ifailed-69373"
   },
-  "targets": {},
+  "targets": {
+    "ifailed-69373": {
+      "hosting": {
+        "ifailed": [
+          "ifailed-69373"
+        ]
+      }
+    }
+  },
   "etags": {}
 }

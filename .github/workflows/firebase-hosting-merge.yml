@@ -12,7 +12,12 @@ jobs:
     environment: .env
     steps:
       - uses: actions/checkout@v4
-      - name: Create .env file
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      - name: Create Frontend .env file
         run: |
           echo "VITE_FIREBASE_API_KEY=${{ vars.VITE_FIREBASE_API_KEY }}" >> .env
           echo "VITE_FIREBASE_AUTH_DOMAIN=${{ vars.VITE_FIREBASE_AUTH_DOMAIN }}" >> .env
@@ -22,13 +27,27 @@ jobs:
           echo "VITE_FIREBASE_APP_ID=${{ vars.VITE_FIREBASE_APP_ID }}" >> .env
           echo "VITE_FIREBASE_MEASUREMENT_ID=${{ vars.VITE_FIREBASE_MEASUREMENT_ID }}" >> .env
           echo "VITE_FIREBASE_BASE_URL=${{ vars.VITE_FIREBASE_BASE_URL }}" >> .env
+          echo "VITE_USERS_COLLECTION=${{ vars.VITE_USERS_COLLECTION }}" >> .env
+      
+      - name: Create Functions .env file
+        run: |
+          echo "EMAIL_USER=${{ vars.EMAIL_USER }}" >> functions/.env
+          echo "OTP_COLLECTION=${{ vars.OTP_COLLECTION }}" >> functions/.env
+          echo "USERS_COLLECTION=${{ vars.USERS_COLLECTION }}" >> functions/.env
+          echo "SG_EMAIL_APIKEY=${{ vars.SG_EMAIL_APIKEY }}" >> functions/.env
+
       - name: Install and Build Frontend
         run: npm ci && npm run build
+
       - name: Install Function Dependencies
-        run: cd functions && npm install
-      - uses: FirebaseExtended/action-hosting-deploy@v0
+        run: cd functions && npm ci
+
+      - name: Deploy to Firebase
+        uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_IFAILED_69373 }}
           channelId: live
           projectId: ifailed-69373
+          # Deploy both hosting and functions
+          target: ifailed

@@ -59,10 +59,12 @@
   import { ref } from 'vue'
   import { useRouter } from 'vue-router'
   import { useToast } from 'vue-toastification'
+  import { useAuthStore } from '@/stores/auth'
   import '@/styles/pages/forgot-password.scss'
 
   const router = useRouter()
   const toast = useToast()
+  const authStore = useAuthStore()
 
   const email = ref('')
   const loading = ref(false)

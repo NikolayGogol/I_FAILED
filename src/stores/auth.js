@@ -1,9 +1,11 @@
+import { doc, serverTimestamp, setDoc } from 'firebase/firestore'
 import { defineStore } from 'pinia'
 import api from '@/axios'
 import {
   auth,
   confirmPasswordReset,
   createUserWithEmailAndPassword,
+  db,
   facebookProvider,
   googleProvider,
   onAuthStateChanged,
@@ -11,7 +13,10 @@ import {
   signInWithEmailAndPassword,
   signInWithPopup,
   updatePassword,
+  updateProfile,
 } from '@/firebase'
+
+const USERS_COLLECTION = import.meta.env.VITE_USERS_COLLECTION
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -33,19 +38,26 @@ export const useAuthStore = defineStore('auth', {
         const result = await createUserWithEmailAndPassword(auth, email, password)
         this.user = result.user
 
-        // Update display name if provided
+        // Update display name in Auth profile
         if (displayName && this.user) {
-          await this.user.updateProfile({
+          await updateProfile(this.user, {
             displayName,
           })
         }
 
-        // TODO: Save whyJoining to Firestore user profile if needed
-        if (whyJoining) {
-          console.log('Why joining:', whyJoining)
+        // Create user document in Firestore
+        if (this.user) {
+          const userDocRef = doc(db, USERS_COLLECTION, this.user.uid)
+          await setDoc(userDocRef, {
+            uid: this.user.uid,
+            email: this.user.email,
+            displayName: displayName || '',
+            whyJoining: whyJoining || null,
+            createdAt: serverTimestamp(),
+          })
         }
 
-        console.log('User signed up:', this.user)
+        console.log('User signed up and profile created:', this.user)
         return result.user
       } catch (error) {
         console.error('Error signing up:', error)
@@ -53,7 +65,9 @@ export const useAuthStore = defineStore('auth', {
         throw error
       }
     },
-
+    async createAcc (payload) {
+      return await api.post('/createUser', payload)
+    },
     // Sign in with email and password
     async signInWithEmail (email, password) {
       this.error = null
@@ -219,17 +233,6 @@ export const useAuthStore = defineStore('auth', {
         'auth/user-token-expired': 'Your session has expired. Please sign in again',
       }
       return errorMessages[errorCode] || errorCode || 'An error occurred'
-    },
-
-    // Test Cloud Function
-    async testCloudFunction () {
-      try {
-        const response = await api.get('/helloWorld')
-        return response.data
-      } catch (error) {
-        console.error('Error calling Cloud Function:', error)
-        throw error
-      }
     },
   },
   persist: true,

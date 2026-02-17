@@ -10,7 +10,9 @@ import {
   signInWithEmailAndPassword,
   signInWithPopup,
   updatePassword,
+  updateProfile,
 } from 'firebase/auth'
+import { getFirestore } from 'firebase/firestore'
 import { getFunctions } from 'firebase/functions'
 
 const firebaseConfig = {
@@ -26,6 +28,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig)
 const auth = getAuth(app)
 const functions = getFunctions(app)
+const db = getFirestore(app)
 const googleProvider = new GoogleAuthProvider()
 const facebookProvider = new FacebookAuthProvider()
 
@@ -38,7 +41,7 @@ onAuthStateChanged(auth, user => {
   // Error handling is done in auth store
 })
 
-export { auth, facebookProvider, functions, googleProvider }
+export { auth, db, facebookProvider, functions, googleProvider }
 export {
   confirmPasswordReset,
   createUserWithEmailAndPassword,
@@ -47,5 +50,7 @@ export {
   signInWithEmailAndPassword,
   signInWithPopup,
   updatePassword,
+  updateProfile,
 } from 'firebase/auth'
+export { doc, serverTimestamp, setDoc } from 'firebase/firestore'
 export { httpsCallable } from 'firebase/functions'

@@ -1,9 +1,6 @@
 <template>
   <div class="register-page">
-    <div class="register-header">
-      <span class="register-title">Registration flow</span>
-      <span class="register-version">0.1.0. registration</span>
-    </div>
+    <div class="register-header" />
 
     <div class="register-container">
       <div class="register-left">
@@ -146,11 +143,17 @@
 
     loading.value = true
     try {
-      await authStore.signUpWithEmail(email.value, password.value, displayName.value, whyJoining.value)
-      if (authStore.user) {
-        toast.success('Account created successfully!')
-        router.push('/')
-      }
+      // await authStore.signUpWithEmail(email.value, password.value, displayName.value, whyJoining.value)
+      await authStore.createAcc({
+        email: email.value,
+        password: password.value,
+        displayName: displayName.value,
+        whyJoining: whyJoining.value,
+      })
+      // if (authStore.user) {
+      //   toast.success('Account created successfully!')
+      //   router.push('/')
+      // }
     } catch (error) {
       toast.error(authStore.error || 'Registration failed. Please try again.')
       console.error('Registration error:', error)
