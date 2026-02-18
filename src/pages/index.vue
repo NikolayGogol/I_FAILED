@@ -1,100 +1,149 @@
 <template>
-  <div class="main-page">
-    <v-app-bar app color="white" flat>
-      <v-container class="py-0 fill-height">
-        <app-logo />
-        <v-spacer />
-        <v-btn text>Home</v-btn>
-        <v-btn text>Features</v-btn>
-        <v-btn text>Pricing</v-btn>
-        <v-btn text>Contact</v-btn>
-        <v-spacer />
-        <div v-if="authStore.user">
-          <v-btn color="error" text @click="handleLogout">Log out</v-btn>
-        </div>
-        <div v-else>
-          <v-btn text to="/login">Log in</v-btn>
-          <v-btn class="get-started-btn" color="primary" depressed to="/register">Get started</v-btn>
-        </div>
-      </v-container>
-    </v-app-bar>
+  <div class="feed-page">
+    <main class="feed-shell">
+      <section class="feed-layout">
+        <!-- Left sidebar -->
+        <FeedSidebar :active-id="activeNav" />
 
-    <v-main>
-      <v-container class="main-content" fluid>
-        <v-row align="center" class="hero-section" justify="center">
-          <v-col class="text-center" cols="12" md="8">
-            <h1 class="main-title">This is a main title for a page</h1>
-            <p class="main-subtitle">
-              And this is a subtitle for a page, which is a little bit longer than the title.
+        <!-- Center feed -->
+        <section class="feed-main">
+          <!-- Tabs -->
+          <div class="feed-tabs">
+            <button
+              class="feed-tab"
+              :class="{ active: activeTab === 'latest' }"
+              @click="activeTab = 'latest'"
+            >
+              Latest
+            </button>
+            <button
+              class="feed-tab"
+              :class="{ active: activeTab === 'popular' }"
+              @click="activeTab = 'popular'"
+            >
+              Popular
+            </button>
+            <button
+              class="feed-tab"
+              :class="{ active: activeTab === 'forYou' }"
+              @click="activeTab = 'forYou'"
+            >
+              For You
+            </button>
+          </div>
+
+          <!-- Composer -->
+          <div class="composer-card ">
+            <v-btn
+              class="write-post-btn"
+              color="primary"
+              rounded="lg"
+              variant="outlined"
+            >
+              Write a post
+            </v-btn>
+          </div>
+
+          <!-- Posts -->
+          <div
+            v-for="post in posts"
+            :key="post.id"
+            class="post-card"
+          >
+            <header class="post-header">
+              <div class="post-avatar">
+                <span>{{ post.authorInitials }}</span>
+              </div>
+              <div class="post-author">
+                <div class="post-author-name">{{ post.author }}</div>
+                <div class="post-author-handle">@{{ post.handle }}</div>
+              </div>
+              <v-spacer />
+              <v-btn icon size="small" variant="text">
+                <v-icon>mdi-dots-horizontal</v-icon>
+              </v-btn>
+            </header>
+
+            <div class="post-tags">
+              <span
+                v-for="tag in post.tags"
+                :key="tag"
+                class="post-tag"
+              >
+                {{ tag }}
+              </span>
+            </div>
+
+            <h2 class="post-title">
+              {{ post.title }}
+            </h2>
+
+            <p class="post-body">
+              {{ post.excerpt }}
+              <button class="read-more">Read more</button>
             </p>
-            <v-btn class="get-started-main-btn" color="primary" large to="/register">Get started</v-btn>
-          </v-col>
-        </v-row>
 
-        <v-row class="features-section">
-          <v-col cols="12">
-            <h2 class="section-title text-center">Features</h2>
-          </v-col>
-          <v-col v-for="n in 3" :key="n" md="4">
-            <v-card class="feature-card" flat>
-              <v-card-title>Feature {{ n }}</v-card-title>
-              <v-card-text>
-                This is a description for feature {{ n }}. It explains what this feature is about.
-              </v-card-text>
-            </v-card>
-          </v-col>
-        </v-row>
+            <div class="post-chips">
+              <span
+                v-for="chip in post.chips"
+                :key="chip"
+                class="post-chip"
+              >
+                {{ chip }}
+              </span>
+            </div>
 
-        <v-row class="pricing-section">
-          <v-col cols="12">
-            <h2 class="section-title text-center">Pricing</h2>
-          </v-col>
-          <v-col v-for="n in 3" :key="n" md="4">
-            <v-card class="pricing-card" flat>
-              <v-card-title>Plan {{ n }}</v-card-title>
-              <v-card-text>
-                <p class="price-text">$ {{ n * 10 }} / month</p>
-                <v-btn block color="primary">Choose Plan</v-btn>
-              </v-card-text>
-            </v-card>
-          </v-col>
-        </v-row>
+            <div class="post-meta">
+              <div class="meta-item">
+                <span class="meta-label">Cost:</span>
+                <span>{{ post.cost }}</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">Recovery:</span>
+                <span>{{ post.recovery }}</span>
+              </div>
+            </div>
 
-        <v-row class="cta-section">
-          <v-col class="text-center" cols="12">
-            <h2 class="section-title">Ready to get started?</h2>
-            <p class="section-subtitle">Join us now and start your journey.</p>
-            <v-btn class="get-started-cta-btn" color="primary" large to="/register">Get started</v-btn>
-          </v-col>
-        </v-row>
-      </v-container>
-    </v-main>
+            <footer class="post-footer">
+              <button class="icon-btn">
+                <v-icon size="18">mdi-heart-outline</v-icon>
+                <span>{{ post.likes }}</span>
+              </button>
+              <button class="icon-btn">
+                <v-icon size="18">mdi-comment-outline</v-icon>
+                <span>{{ post.comments }}</span>
+              </button>
+              <button class="icon-btn">
+                <v-icon size="18">mdi-eye-outline</v-icon>
+                <span>{{ post.views }}</span>
+              </button>
+              <v-spacer />
+              <button class="icon-btn">
+                <v-icon size="18">mdi-bookmark-outline</v-icon>
+              </button>
+              <button class="icon-btn">
+                <v-icon size="18">mdi-share-variant</v-icon>
+              </button>
+            </footer>
+          </div>
+        </section>
 
-    <v-footer class="footer" color="grey lighten-4">
-      <v-container>
-        <v-row align="center">
-          <v-col cols="12" md="6">
-            <p>&copy; {{ new Date().getFullYear() }} I FAILED. All rights reserved.</p>
-          </v-col>
-          <v-col class="text-right" cols="12" md="6">
-            <v-btn icon><v-icon>mdi-facebook</v-icon></v-btn>
-            <v-btn icon><v-icon>mdi-twitter</v-icon></v-btn>
-            <v-btn icon><v-icon>mdi-linkedin</v-icon></v-btn>
-          </v-col>
-        </v-row>
-      </v-container>
-    </v-footer>
+        <!-- Right sidebar -->
+        <FeedRightbar />
+      </section>
+    </main>
   </div>
 </template>
 
 <script setup>
-  import AppLogo from '@/components/AppLogo.vue'
-  import { useAuthStore } from '@/stores/auth'
+  import { ref } from 'vue'
+  import FeedRightbar from '@/components/feed/FeedRightbar.vue'
+  import FeedSidebar from '@/components/feed/FeedSidebar.vue'
+  import { feedPosts } from '@/models/feed'
   import '@/styles/pages/index.scss'
 
-  const authStore = useAuthStore()
+  const activeTab = ref('latest')
+  const activeNav = ref('feed')
 
-  async function handleLogout () {
-    await authStore.logout()
-  }
+  const posts = ref(feedPosts)
 </script>

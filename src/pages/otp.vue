@@ -93,7 +93,7 @@
   const email = computed(() => route.query.email || '')
 
   // Auto-submit when code is complete
-  watch(isCodeComplete, (complete) => {
+  watch(isCodeComplete, complete => {
     if (complete && !loading.value) {
       handleVerify()
     }

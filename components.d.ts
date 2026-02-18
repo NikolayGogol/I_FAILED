@@ -14,6 +14,8 @@ declare module 'vue' {
     AppFooter: typeof import('./src/components/AppFooter.vue')['default']
     AppLogo: typeof import('./src/components/AppLogo.vue')['default']
     FacebookLoginButton: typeof import('./src/components/FacebookLoginButton.vue')['default']
+    FeedRightbar: typeof import('./src/components/feed/FeedRightbar.vue')['default']
+    FeedSidebar: typeof import('./src/components/feed/FeedSidebar.vue')['default']
     FormInput: typeof import('./src/components/FormInput.vue')['default']
     GoogleLoginButton: typeof import('./src/components/GoogleLoginButton.vue')['default']
     HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']

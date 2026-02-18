@@ -33,7 +33,7 @@ api.interceptors.response.use(
       toast.error(message)
     }
 
-    return Promise.reject(error)
+    throw error
   },
 )
 
