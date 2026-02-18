@@ -3,7 +3,7 @@
     <main class="feed-shell">
       <section class="feed-layout">
         <!-- Left sidebar -->
-        <FeedSidebar active-id="failureAge" />
+        <FeedSidebar active-id="failure-age" />
 
         <!-- Center feed -->
         <section class="feed-main">

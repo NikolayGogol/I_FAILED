@@ -4,8 +4,8 @@ export const feedNavItems = [
   { id: 'notifications', label: 'Notifications', icon: 'mdi-bell-outline' },
   { id: 'library', label: 'Library', icon: 'mdi-book-open-outline' },
   { id: 'premium', label: 'Premium', icon: 'mdi-star-outline' },
-  { id: 'failureResume', label: 'Failure Resume', icon: 'mdi-file-document-outline' },
-  { id: 'failureAge', label: 'Failure Age', icon: 'mdi-timer-sand' },
+  { id: 'failure-resume', label: 'Failure Resume', icon: 'mdi-file-document-outline' },
+  { id: 'failure-age', label: 'Failure Age', icon: 'mdi-timer-sand' },
 ]
 
 export const feedQuickStats = {

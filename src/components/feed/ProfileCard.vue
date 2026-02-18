@@ -3,7 +3,13 @@
     <div class="profile-top">
       <template v-if="currentUserName">
         <div class="profile-avatar">
-          <span>{{ currentUserInitials }}</span>
+          <v-img
+            v-if="currentUserPhoto"
+            :src="currentUserPhoto"
+            alt="Profile"
+            cover
+          />
+          <span v-else>{{ currentUserInitials }}</span>
         </div>
         <div class="profile-info">
           <div class="profile-name">
@@ -57,8 +63,10 @@
 
   const currentUserName = computed(() => authStore.user?.displayName)
   const currentUserHandle = computed(() => authStore.user?.email)
+  const currentUserPhoto = computed(() => authStore.user?.photoURL)
   const currentUserInitials = computed(() => {
     const name = currentUserName.value
+    if (!name) return ''
     const parts = name.split(' ')
     if (parts.length === 1) return parts[0].charAt(0).toUpperCase()
     return (parts[0].charAt(0) + parts[1].charAt(0)).toUpperCase()

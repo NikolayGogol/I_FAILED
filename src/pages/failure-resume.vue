@@ -3,7 +3,7 @@
     <main class="feed-shell">
       <section class="feed-layout">
         <!-- Left sidebar -->
-        <FeedSidebar active-id="failureResume" />
+        <FeedSidebar active-id="failure-resume" />
 
         <!-- Center feed -->
         <section class="feed-main">

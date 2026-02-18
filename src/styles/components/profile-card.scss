@@ -25,6 +25,12 @@
   font-size: 13px;
   font-weight: 600;
   color: $color-text-primary;
+  overflow: hidden; /* Ensure image doesn't overflow */
+
+  .v-img {
+    width: 100%;
+    height: 100%;
+  }
 }
 
 .profile-name {
