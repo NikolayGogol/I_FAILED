@@ -29,9 +29,10 @@
             <v-divider class="separator" />
           </div>
 
-          <v-form class="register-form-fields" @submit.prevent="handleRegister">
+          <v-form autocomplete="off" class="register-form-fields" @submit.prevent="handleRegister">
             <v-text-field
               v-model="email"
+              autocomplete="username"
               class="form-field"
               density="comfortable"
               hide-details="auto"
@@ -44,6 +45,7 @@
 
             <v-text-field
               v-model="password"
+              autocomplete="new-password"
               class="form-field"
               density="comfortable"
               hide-details="auto"
@@ -67,6 +69,7 @@
 
             <v-text-field
               v-model="displayName"
+              autocomplete="off"
               class="form-field"
               density="comfortable"
               hide-details="auto"
