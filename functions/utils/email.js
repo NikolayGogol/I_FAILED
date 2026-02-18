@@ -4,7 +4,25 @@ const logger = require('firebase-functions/logger')
 sgMail.setApiKey(process.env.SENDGRID_API_KEY)
 
 const FROM_EMAIL = process.env.EMAIL_USER
-const APP_NAME = 'I_FAILED' // Using project name as a default
+const APP_NAME = 'I_FAILED'
+
+async function sendVerificationEmail (email, verificationLink) {
+  const subject = `Verify your email for ${APP_NAME}`
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      <h2 style="color: #333;">Welcome to ${APP_NAME}!</h2>
+      <p>Please click the link below to verify your email address and complete your registration:</p>
+      <p style="text-align: center;">
+        <a href="${verificationLink}" style="background-color: #007BFF; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Verify Email</a>
+      </p>
+      <p style="font-size: 12px; color: #888;">If you did not request this, please ignore this email.</p>
+    </div>
+  `
+  const text = `
+    Welcome to ${APP_NAME}!\n\nPlease copy and paste the following link in your browser to verify your email address:\n\n${verificationLink}\n\nIf you did not request this, please ignore this email.
+  `
+  return sendEmail({ to: email, subject, html, text })
+}
 
 async function sendWelcomeEmail (email, displayName) {
   const subject = `Welcome to ${APP_NAME}!`
@@ -35,12 +53,12 @@ async function sendEmail ({ to, subject, html, text }) {
   const msg = {
     to,
     from: {
-        name: APP_NAME,
-        email: FROM_EMAIL
+      name: APP_NAME,
+      email: FROM_EMAIL,
     },
     subject,
     html,
-    text, // Plain text version of the email
+    text,
   }
 
   try {
@@ -53,4 +71,4 @@ async function sendEmail ({ to, subject, html, text }) {
   }
 }
 
-module.exports = { sendWelcomeEmail, sendEmail }
+module.exports = { sendWelcomeEmail, sendVerificationEmail, sendEmail }

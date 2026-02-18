@@ -4,12 +4,11 @@ import { useToast } from 'vue-toastification'
 const toast = useToast()
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_FIREBASE_BASE_URL || 'https://us-central1-ifailed-69373.cloudfunctions.net',
+  baseURL: import.meta.env.VITE_FIREBASE_BASE_URL || 'https://us-central1-ifailed-69373.cloudfunctions.net/api',
 })
 
 api.interceptors.request.use(
   config => {
-    // Тут можна додати токен авторизації, якщо потрібно
     return config
   },
   error => {
