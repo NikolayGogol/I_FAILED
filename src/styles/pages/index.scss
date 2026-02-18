@@ -1,5 +1,5 @@
-@import '../components/feed-sidebar.scss';
-@import '../components/feed-rightbar.scss';
+@use '../components/feed-sidebar.scss';
+@use '../components/feed-rightbar.scss';
 
 .feed-page {
   min-height: 100vh;

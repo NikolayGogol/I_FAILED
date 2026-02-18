@@ -1,0 +1,48 @@
+@use '../settings.scss' as *;
+
+.not-found-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: $color-background;
+  padding: $spacing-lg;
+  text-align: center;
+}
+
+.not-found-content {
+  max-width: 480px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.error-code {
+  font-size: 120px;
+  font-weight: 900;
+  color: $color-primary;
+  line-height: 1;
+  margin-bottom: $spacing-md;
+  opacity: 0.1;
+}
+
+.error-title {
+  font-size: 32px;
+  font-weight: 800;
+  color: $color-text-primary;
+  margin-bottom: $spacing-sm;
+}
+
+.error-message {
+  font-size: 16px;
+  color: $color-text-secondary;
+  margin-bottom: $spacing-xl;
+  line-height: 1.6;
+}
+
+.home-btn {
+  text-transform: none;
+  font-weight: 600;
+  letter-spacing: normal;
+}

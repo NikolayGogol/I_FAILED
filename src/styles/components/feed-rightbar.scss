@@ -1,4 +1,4 @@
-@import '../settings.scss';
+@use '../settings.scss' as *;
 
 /* Right sidebar */
 .feed-rightbar {

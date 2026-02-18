@@ -1,4 +1,4 @@
-@import '../settings.scss';
+@use '../settings.scss' as *;
 
 .right-card {
   background-color: $color-surface;
