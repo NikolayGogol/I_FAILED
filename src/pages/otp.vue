@@ -70,7 +70,7 @@
 </template>
 
 <script setup>
-  import { computed, nextTick, onMounted, ref } from 'vue'
+  import { computed, nextTick, onMounted, ref, watch } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { useToast } from 'vue-toastification'
   import { useAuthStore } from '@/stores/auth'
@@ -91,6 +91,13 @@
   })
 
   const email = computed(() => route.query.email || '')
+
+  // Auto-submit when code is complete
+  watch(isCodeComplete, (complete) => {
+    if (complete && !loading.value) {
+      handleVerify()
+    }
+  })
 
   function handleOtpInput (index, event) {
     const value = event.target.value.replace(/[^0-9]/g, '')
@@ -147,7 +154,7 @@
       const verificationCode = code.value.join('')
 
       // Verify OTP code via Cloud Function
-      const result = await authStore.verifyPasswordResetOTP(email.value, verificationCode)
+      await authStore.verifyPasswordResetOTP(email.value, verificationCode)
 
       toast.success('Code verified successfully!')
 

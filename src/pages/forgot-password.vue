@@ -76,7 +76,7 @@
       toast.success('Verification code sent to your email!')
       // Redirect to verify page with email
       setTimeout(() => {
-        router.push({ path: '/verify', query: { email: email.value } })
+        router.push({ path: '/otp', query: { email: email.value } })
       }, 1000)
     } catch (error) {
       toast.error(authStore.error || 'Failed to send verification code. Please try again.')

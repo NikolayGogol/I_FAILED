@@ -21,9 +21,9 @@ declare module 'vue-router/auto-routes' {
     '/': RouteRecordInfo<'/', '/', Record<never, never>, Record<never, never>>,
     '/forgot-password': RouteRecordInfo<'/forgot-password', '/forgot-password', Record<never, never>, Record<never, never>>,
     '/login': RouteRecordInfo<'/login', '/login', Record<never, never>, Record<never, never>>,
+    '/otp': RouteRecordInfo<'/otp', '/otp', Record<never, never>, Record<never, never>>,
     '/register': RouteRecordInfo<'/register', '/register', Record<never, never>, Record<never, never>>,
     '/set-password': RouteRecordInfo<'/set-password', '/set-password', Record<never, never>, Record<never, never>>,
-    '/verify': RouteRecordInfo<'/verify', '/verify', Record<never, never>, Record<never, never>>,
     '/verify-new-user': RouteRecordInfo<'/verify-new-user', '/verify-new-user', Record<never, never>, Record<never, never>>,
   }
 
@@ -50,16 +50,16 @@ declare module 'vue-router/auto-routes' {
       routes: '/login'
       views: never
     }
+    'src/pages/otp.vue': {
+      routes: '/otp'
+      views: never
+    }
     'src/pages/register.vue': {
       routes: '/register'
       views: never
     }
     'src/pages/set-password.vue': {
       routes: '/set-password'
-      views: never
-    }
-    'src/pages/verify.vue': {
-      routes: '/verify'
       views: never
     }
     'src/pages/verify-new-user.vue': {
