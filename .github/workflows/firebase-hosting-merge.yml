@@ -34,7 +34,7 @@ jobs:
           echo "EMAIL_USER=${{ vars.EMAIL_USER }}" >> functions/.env
           echo "OTP_COLLECTION=${{ vars.OTP_COLLECTION }}" >> functions/.env
           echo "USERS_COLLECTION=${{ vars.USERS_COLLECTION }}" >> functions/.env
-          echo "SG_EMAIL_APIKEY=${{ vars.SG_EMAIL_APIKEY }}" >> functions/.env
+          echo "SENDGRID_API_KEY=${{ vars.SENDGRID_API_KEY }}" >> functions/.env
 
       - name: Install and Build Frontend
         run: npm ci && npm run build
