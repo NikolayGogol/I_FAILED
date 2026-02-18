@@ -1,0 +1,65 @@
+@import '../settings.scss';
+
+.page-header {
+  margin-bottom: $spacing-lg;
+}
+.page-header h1 {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: $spacing-sm;
+  color: $color-text-primary;
+}
+.page-header p {
+  color: $color-text-secondary;
+}
+.premium-plans {
+  display: flex;
+  gap: $spacing-lg;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.plan-card {
+  background: $color-surface;
+  border-radius: $radius-xl;
+  padding: $spacing-lg;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+.plan-card h3 {
+  font-size: 20px;
+  font-weight: 700;
+  text-align: center;
+  color: $color-text-primary;
+}
+.plan-card .price {
+  font-size: 32px;
+  font-weight: 800;
+  text-align: center;
+  color: $color-text-primary;
+}
+.plan-card ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  flex-grow: 1;
+}
+.plan-card li {
+  margin-bottom: $spacing-sm;
+  font-size: 14px;
+  color: $color-text-secondary;
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+.plan-card li::before {
+  content: '✓';
+  color: #10b981;
+  font-weight: bold;
+}
+.plan-card.pro {
+  border: 2px solid $color-text-primary;
+  transform: scale(1.05);
+}

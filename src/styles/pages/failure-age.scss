@@ -1,0 +1,58 @@
+@import '../settings.scss';
+
+.page-header {
+  margin-bottom: $spacing-lg;
+}
+.page-header h1 {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: $spacing-sm;
+  color: $color-text-primary;
+}
+.page-header p {
+  color: $color-text-secondary;
+}
+.age-calculator {
+  background: $color-surface;
+  border-radius: $radius-xl;
+  padding: $spacing-xl;
+  box-shadow: $shadow-sm;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-lg;
+}
+.calculator-input {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+  width: 100%;
+  max-width: 300px;
+}
+.calculator-input label {
+  font-weight: 600;
+  color: $color-text-primary;
+}
+.calculator-input input {
+  padding: 12px;
+  border: 1px solid $color-border;
+  border-radius: $radius-sm;
+  font-size: 16px;
+}
+.calculator-result {
+  text-align: center;
+}
+.calculator-result p {
+  font-size: 18px;
+  color: $color-text-primary;
+}
+.calculator-result strong {
+  font-size: 32px;
+  color: $color-primary;
+  display: block;
+  margin: $spacing-sm 0;
+}
+.calculator-result .result-desc {
+  font-size: 14px;
+  color: $color-text-secondary;
+}

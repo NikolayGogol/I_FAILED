@@ -4,7 +4,6 @@
   import axios from '@/axios' // Assuming your axios instance is configured here
 
   const route = useRoute()
-  const router = useRouter()
   const loading = ref(true)
   const success = ref(false)
   const errorMessage = ref('')

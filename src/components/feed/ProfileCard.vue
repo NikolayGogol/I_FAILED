@@ -1,7 +1,7 @@
 <template>
   <section class="right-card profile-card">
     <div class="profile-top">
-      <template  v-if="currentUserName">
+      <template v-if="currentUserName">
         <div class="profile-avatar">
           <span>{{ currentUserInitials }}</span>
         </div>

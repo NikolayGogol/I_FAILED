@@ -19,9 +19,15 @@ declare module 'vue-router/auto-routes' {
    */
   export interface RouteNamedMap {
     '/': RouteRecordInfo<'/', '/', Record<never, never>, Record<never, never>>,
+    '/explore': RouteRecordInfo<'/explore', '/explore', Record<never, never>, Record<never, never>>,
+    '/failure-age': RouteRecordInfo<'/failure-age', '/failure-age', Record<never, never>, Record<never, never>>,
+    '/failure-resume': RouteRecordInfo<'/failure-resume', '/failure-resume', Record<never, never>, Record<never, never>>,
     '/forgot-password': RouteRecordInfo<'/forgot-password', '/forgot-password', Record<never, never>, Record<never, never>>,
+    '/library': RouteRecordInfo<'/library', '/library', Record<never, never>, Record<never, never>>,
     '/login': RouteRecordInfo<'/login', '/login', Record<never, never>, Record<never, never>>,
+    '/notifications': RouteRecordInfo<'/notifications', '/notifications', Record<never, never>, Record<never, never>>,
     '/otp': RouteRecordInfo<'/otp', '/otp', Record<never, never>, Record<never, never>>,
+    '/premium': RouteRecordInfo<'/premium', '/premium', Record<never, never>, Record<never, never>>,
     '/register': RouteRecordInfo<'/register', '/register', Record<never, never>, Record<never, never>>,
     '/set-password': RouteRecordInfo<'/set-password', '/set-password', Record<never, never>, Record<never, never>>,
     '/verify-new-user': RouteRecordInfo<'/verify-new-user', '/verify-new-user', Record<never, never>, Record<never, never>>,
@@ -42,16 +48,40 @@ declare module 'vue-router/auto-routes' {
       routes: '/'
       views: never
     }
+    'src/pages/explore.vue': {
+      routes: '/explore'
+      views: never
+    }
+    'src/pages/failure-age.vue': {
+      routes: '/failure-age'
+      views: never
+    }
+    'src/pages/failure-resume.vue': {
+      routes: '/failure-resume'
+      views: never
+    }
     'src/pages/forgot-password.vue': {
       routes: '/forgot-password'
+      views: never
+    }
+    'src/pages/library.vue': {
+      routes: '/library'
       views: never
     }
     'src/pages/login.vue': {
       routes: '/login'
       views: never
     }
+    'src/pages/notifications.vue': {
+      routes: '/notifications'
+      views: never
+    }
     'src/pages/otp.vue': {
       routes: '/otp'
+      views: never
+    }
+    'src/pages/premium.vue': {
+      routes: '/premium'
       views: never
     }
     'src/pages/register.vue': {

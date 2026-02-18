@@ -1,0 +1,39 @@
+@import '../settings.scss';
+
+.page-header {
+  margin-bottom: $spacing-lg;
+}
+.page-header h1 {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: $spacing-sm;
+  color: $color-text-primary;
+}
+.page-header p {
+  color: $color-text-secondary;
+}
+.resume-content {
+  background: $color-surface;
+  border-radius: $radius-xl;
+  padding: $spacing-lg;
+  box-shadow: $shadow-sm;
+}
+.resume-section {
+  margin-bottom: $spacing-lg;
+}
+.resume-section h2 {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  border-bottom: 1px solid $color-border;
+  padding-bottom: 8px;
+  color: $color-text-primary;
+}
+.resume-section ul {
+  list-style-type: disc;
+  padding-left: 20px;
+}
+.resume-section li {
+  margin-bottom: 8px;
+  color: $color-text-secondary;
+}

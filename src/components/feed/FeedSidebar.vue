@@ -6,17 +6,18 @@
 
     <nav class="sidebar-nav">
       <div class="sidebar-section">
-        <button
+        <router-link
           v-for="item in navItems"
           :key="item.id"
           class="nav-item"
           :class="{ active: item.id === activeId }"
+          :to="item.id === 'feed' ? '/' : '/' + item.id"
         >
           <v-icon class="nav-icon" size="18">
             {{ item.icon }}
           </v-icon>
           <span>{{ item.label }}</span>
-        </button>
+        </router-link>
       </div>
     </nav>
 
