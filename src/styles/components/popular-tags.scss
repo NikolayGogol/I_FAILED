@@ -1,0 +1,26 @@
+@import '../settings.scss';
+
+.right-card {
+  background-color: $color-surface;
+  border-radius: $radius-lg;
+  padding: 14px 16px;
+  box-shadow: $shadow-sm;
+}
+
+.right-card-header h3 {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 8px;
+  color: $color-text-primary;
+}
+
+.popular-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.popular-tag {
+  font-size: 13px;
+  color: $color-text-primary;
+}

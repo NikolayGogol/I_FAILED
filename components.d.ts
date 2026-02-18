@@ -19,7 +19,10 @@ declare module 'vue' {
     FormInput: typeof import('./src/components/FormInput.vue')['default']
     GoogleLoginButton: typeof import('./src/components/GoogleLoginButton.vue')['default']
     HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
+    PopularTags: typeof import('./src/components/feed/PopularTags.vue')['default']
+    ProfileCard: typeof import('./src/components/feed/ProfileCard.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    WhoToFollow: typeof import('./src/components/feed/WhoToFollow.vue')['default']
   }
 }
