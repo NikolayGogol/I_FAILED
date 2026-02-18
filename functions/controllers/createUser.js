@@ -1,8 +1,8 @@
+const crypto = require('node:crypto')
 const admin = require('firebase-admin')
 const { FieldValue, Timestamp } = require('firebase-admin/firestore')
 const logger = require('firebase-functions/logger')
 const { sendVerificationEmail } = require('../utils/email')
-const crypto = require('crypto')
 
 const db = admin.firestore()
 
