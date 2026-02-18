@@ -2,9 +2,12 @@ import { defineStore } from 'pinia'
 import api from '@/axios'
 import {
   auth,
+  browserLocalPersistence,
+  browserSessionPersistence,
   facebookProvider,
   googleProvider,
   onAuthStateChanged,
+  setPersistence,
   signInWithEmailAndPassword,
   signInWithPopup,
   updatePassword,
@@ -28,9 +31,11 @@ export const useAuthStore = defineStore('auth', {
       return await api.post('/createUser', payload)
     },
     // Sign in with email and password
-    async signInWithEmail (email, password) {
+    async signInWithEmail (email, password, rememberMe = false) {
       this.error = null
       try {
+        const persistence = rememberMe ? browserLocalPersistence : browserSessionPersistence
+        await setPersistence(auth, persistence)
         const result = await signInWithEmailAndPassword(auth, email, password)
         this.user = result.user
         console.log('User signed in:', this.user)

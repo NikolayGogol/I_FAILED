@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { useToast } from 'vue-toastification'
+import { useAuthStore } from '@/stores/auth'
 
 const toast = useToast()
 
@@ -21,9 +22,17 @@ api.interceptors.response.use(
   response => {
     return response
   },
-  error => {
+  async error => {
     const message = error.response?.data?.message || error.message || 'An error occurred'
-    toast.error(message)
+
+    if (error.response && error.response.status === 401) {
+      const authStore = useAuthStore()
+      toast.error('Session expired. Please login again.')
+      await authStore.logout()
+    } else {
+      toast.error(message)
+    }
+
     return Promise.reject(error)
   },
 )

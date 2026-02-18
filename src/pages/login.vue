@@ -121,7 +121,7 @@
   async function handleLogin () {
     loading.value = true
     try {
-      await authStore.signInWithEmail(email.value, password.value)
+      await authStore.signInWithEmail(email.value, password.value, rememberMe.value)
       if (authStore.user) {
         toast.success('Successfully signed in!')
         router.push('/')

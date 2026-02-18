@@ -1,5 +1,7 @@
 import { initializeApp } from 'firebase/app'
 import {
+  browserLocalPersistence,
+  browserSessionPersistence,
   confirmPasswordReset,
   createUserWithEmailAndPassword,
   FacebookAuthProvider,
@@ -7,6 +9,7 @@ import {
   GoogleAuthProvider,
   onAuthStateChanged,
   sendPasswordResetEmail,
+  setPersistence,
   signInWithEmailAndPassword,
   signInWithPopup,
   updatePassword,
@@ -43,10 +46,13 @@ onAuthStateChanged(auth, user => {
 
 export { auth, db, facebookProvider, functions, googleProvider }
 export {
+  browserLocalPersistence,
+  browserSessionPersistence,
   confirmPasswordReset,
   createUserWithEmailAndPassword,
   onAuthStateChanged,
   sendPasswordResetEmail,
+  setPersistence,
   signInWithEmailAndPassword,
   signInWithPopup,
   updatePassword,

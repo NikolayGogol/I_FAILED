@@ -36,7 +36,7 @@ router.isReady().then(() => {
 router.beforeEach((to, from, next) => {
   const authStore = useAuthStore()
   const loggedIn = authStore.user
-  const authRoutes = ['/login', '/register', '/forgot-password', '/verify', '/set-password']
+  const authRoutes = ['/login', '/register', '/forgot-password', '/otp', '/set-password']
 
   if (loggedIn && authRoutes.includes(to.path)) {
     next('/')
