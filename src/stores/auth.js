@@ -32,39 +32,6 @@ export const useAuthStore = defineStore('auth', {
     },
 
     // Sign up with email and password
-    async signUpWithEmail (email, password, displayName, whyJoining) {
-      this.error = null
-      try {
-        const result = await createUserWithEmailAndPassword(auth, email, password)
-        this.user = result.user
-
-        // Update display name in Auth profile
-        if (displayName && this.user) {
-          await updateProfile(this.user, {
-            displayName,
-          })
-        }
-
-        // Create user document in Firestore
-        if (this.user) {
-          const userDocRef = doc(db, USERS_COLLECTION, this.user.uid)
-          await setDoc(userDocRef, {
-            uid: this.user.uid,
-            email: this.user.email,
-            displayName: displayName || '',
-            whyJoining: whyJoining || null,
-            createdAt: serverTimestamp(),
-          })
-        }
-
-        console.log('User signed up and profile created:', this.user)
-        return result.user
-      } catch (error) {
-        console.error('Error signing up:', error)
-        this.error = this.getErrorMessage(error.code)
-        throw error
-      }
-    },
     async createAcc (payload) {
       return await api.post('/createUser', payload)
     },
@@ -112,94 +79,6 @@ export const useAuthStore = defineStore('auth', {
         throw error
       }
     },
-
-    // Send password reset email (Firebase default)
-    async sendPasswordResetEmail (email) {
-      this.error = null
-      try {
-        await sendPasswordResetEmail(auth, email)
-        console.log('Password reset email sent to:', email)
-        return true
-      } catch (error) {
-        console.error('Error sending password reset email:', error)
-        this.error = this.getErrorMessage(error.code)
-        throw error
-      }
-    },
-
-    // Send OTP code via Cloud Function
-    async sendPasswordResetOTP (email) {
-      this.error = null
-      try {
-        const response = await api.post('/sendPasswordResetOTP', { email })
-        console.log('OTP sent to:', email)
-        return response.data
-      } catch (error) {
-        console.error('Error sending OTP:', error)
-        this.error = error.response?.data?.error || 'Failed to send verification code'
-        throw error
-      }
-    },
-
-    // Confirm password reset with action code
-    async confirmPasswordReset (actionCode, newPassword) {
-      this.error = null
-      try {
-        await confirmPasswordReset(auth, actionCode, newPassword)
-        console.log('Password reset confirmed')
-        return true
-      } catch (error) {
-        console.error('Error confirming password reset:', error)
-        this.error = this.getErrorMessage(error.code)
-        throw error
-      }
-    },
-
-    // Update password (for authenticated users)
-    async updateUserPassword (newPassword) {
-      this.error = null
-      try {
-        if (!this.user) {
-          throw new Error('User must be authenticated')
-        }
-        await updatePassword(this.user, newPassword)
-        console.log('Password updated successfully')
-        return true
-      } catch (error) {
-        console.error('Error updating password:', error)
-        this.error = this.getErrorMessage(error.code)
-        throw error
-      }
-    },
-
-    // Verify password reset OTP code via Cloud Function
-    async verifyPasswordResetOTP (email, code) {
-      this.error = null
-      try {
-        const response = await api.post('/verifyPasswordResetOTP', { email, code })
-        console.log('OTP verified for:', email)
-        return response.data
-      } catch (error) {
-        console.error('Error verifying OTP:', error)
-        this.error = error.response?.data?.error || 'Invalid verification code'
-        throw error
-      }
-    },
-
-    // Reset password with verified OTP via Cloud Function
-    async resetPasswordWithOTP (email, code, newPassword) {
-      this.error = null
-      try {
-        const response = await api.post('/resetPasswordWithOTP', { email, code, newPassword })
-        console.log('Password reset successful for:', email)
-        return response.data
-      } catch (error) {
-        console.error('Error resetting password:', error)
-        this.error = error.response?.data?.error || 'Failed to reset password'
-        throw error
-      }
-    },
-
     // Logout
     async logout () {
       try {

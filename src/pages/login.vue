@@ -1,9 +1,6 @@
 <template>
   <div class="login-page">
-    <div class="login-header">
-      <span class="login-title">Login flow</span>
-      <span class="login-version">0.0.0. log in</span>
-    </div>
+    <div class="login-header" />
 
     <div class="login-container">
       <div class="login-left">
@@ -32,9 +29,14 @@
             <v-divider class="separator" />
           </div>
 
-          <v-form class="login-form-fields" @submit.prevent="handleLogin">
+          <v-form
+            autocomplete="off"
+            class="login-form-fields"
+            @submit.prevent="handleLogin"
+          >
             <v-text-field
               v-model="email"
+              autocomplete="one-time-code"
               class="form-field"
               density="comfortable"
               hide-details="auto"
@@ -47,6 +49,7 @@
 
             <v-text-field
               v-model="password"
+              autocomplete="new-password"
               class="form-field"
               density="comfortable"
               hide-details="auto"
