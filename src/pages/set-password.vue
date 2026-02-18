@@ -14,7 +14,7 @@
 
       <div class="set-password-right">
         <div class="set-password-form">
-          <router-link class="back-link" to="/verify">
+          <router-link class="back-link" to="/otp">
             <v-icon size="small">mdi-arrow-left</v-icon>
             Back
           </router-link>

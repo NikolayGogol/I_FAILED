@@ -1,22 +1,14 @@
-import { doc, serverTimestamp, setDoc } from 'firebase/firestore'
 import { defineStore } from 'pinia'
 import api from '@/axios'
 import {
   auth,
-  confirmPasswordReset,
-  createUserWithEmailAndPassword,
-  db,
   facebookProvider,
   googleProvider,
   onAuthStateChanged,
-  sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signInWithPopup,
   updatePassword,
-  updateProfile,
 } from '@/firebase'
-
-const USERS_COLLECTION = import.meta.env.VITE_USERS_COLLECTION
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
