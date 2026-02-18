@@ -92,6 +92,61 @@ export const useAuthStore = defineStore('auth', {
       }
     },
 
+    // Send password reset OTP
+    async sendPasswordResetOTP (email) {
+      this.error = null
+      try {
+        const response = await api.post('/forgotPassword', { email })
+        return response.data
+      } catch (error) {
+        console.error('Error sending password reset OTP:', error)
+        this.error = error.response?.data?.message || 'Failed to send verification code'
+        throw error
+      }
+    },
+
+    // Verify password reset OTP
+    async verifyPasswordResetOTP (email, code) {
+      this.error = null
+      try {
+        const response = await api.post('/verifyOTP', { email, code })
+        return response.data
+      } catch (error) {
+        console.error('Error verifying OTP:', error)
+        this.error = error.response?.data?.message || 'Invalid verification code'
+        throw error
+      }
+    },
+
+    // Reset password with OTP and new password
+    async resetPasswordWithOTP (email, code, newPassword) {
+      this.error = null
+      try {
+        const response = await api.post('/resetPassword', { email, code, password: newPassword })
+        return response.data
+      } catch (error) {
+        console.error('Error resetting password:', error)
+        this.error = error.response?.data?.message || 'Failed to reset password'
+        throw error
+      }
+    },
+
+    // Update password for currently logged in user
+    async updateUserPassword (newPassword) {
+      this.error = null
+      try {
+        if (!auth.currentUser) {
+          throw new Error('No user logged in')
+        }
+        await updatePassword(auth.currentUser, newPassword)
+        console.log('Password updated successfully')
+      } catch (error) {
+        console.error('Error updating password:', error)
+        this.error = this.getErrorMessage(error.code)
+        throw error
+      }
+    },
+
     // Get user-friendly error message
     getErrorMessage (errorCode) {
       const errorMessages = {

@@ -44,6 +44,25 @@ You are receiving this email because you signed up on ${APP_NAME}.
   return sendEmail({ to: email, subject, html, text })
 }
 
+async function sendOTPEmail (email, otp) {
+  const subject = `Your verification code for ${APP_NAME}`
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      <h2 style="color: #333;">Password Reset Request</h2>
+      <p>You requested to reset your password. Use the following code to proceed:</p>
+      <div style="background-color: #f4f4f4; padding: 20px; text-align: center; font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #007BFF; border-radius: 5px; margin: 20px 0;">
+        ${otp}
+      </div>
+      <p>This code will expire in 15 minutes.</p>
+      <p style="font-size: 12px; color: #888;">If you did not request this, please ignore this email.</p>
+    </div>
+  `
+  const text = `
+    Your verification code for ${APP_NAME} is: ${otp}\n\nThis code will expire in 15 minutes.\n\nIf you did not request this, please ignore this email.
+  `
+  return sendEmail({ to: email, subject, html, text })
+}
+
 async function sendEmail ({ to, subject, html, text }) {
   if (!process.env.SENDGRID_API_KEY || !FROM_EMAIL) {
     logger.error('SENDGRID_API_KEY or FROM_EMAIL is not set.')
@@ -71,4 +90,4 @@ async function sendEmail ({ to, subject, html, text }) {
   }
 }
 
-module.exports = { sendWelcomeEmail, sendVerificationEmail, sendEmail }
+module.exports = { sendWelcomeEmail, sendVerificationEmail, sendOTPEmail, sendEmail }
