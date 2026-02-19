@@ -10,7 +10,6 @@
           v-for="item in navItems"
           :key="item.id"
           class="nav-item"
-          :class="{ active: item.id === activeId }"
           :to="item.id === 'feed' ? '/' : '/' + item.id"
         >
           <v-icon class="nav-icon" size="18">

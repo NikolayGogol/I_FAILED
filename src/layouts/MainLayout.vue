@@ -1,23 +1,30 @@
 <script setup>
-  import { ref } from 'vue'
-
   import FeedRightbar from '@/components/feed/FeedRightbar.vue'
   import FeedSidebar from '@/components/feed/FeedSidebar.vue'
-  const activeNav = ref('feed')
-
 </script>
+
 <template>
   <v-app>
     <v-main>
       <v-container>
         <v-row>
-          <v-col cols="3">
-            <FeedSidebar :active-id="activeNav" />
+          <v-col
+            lg="3"
+            md="2"
+          >
+            <FeedSidebar />
           </v-col>
-          <v-col cols="6">
+          <v-col
+            cols="12"
+            lg="6"
+            md="8"
+          >
             <slot />
           </v-col>
-          <v-col cols="3">
+          <v-col
+            lg="3"
+            md="2"
+          >
             <FeedRightbar />
           </v-col>
         </v-row>
