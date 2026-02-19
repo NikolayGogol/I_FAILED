@@ -1,0 +1,6 @@
+@use '../settings.scss' as *;
+
+.profile-page {
+  min-height: 100vh;
+  padding-top: $spacing-md;
+}

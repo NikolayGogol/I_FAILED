@@ -1,42 +1,74 @@
 @use '../settings.scss' as *;
 
-.page-header {
-  margin-bottom: $spacing-lg;
-}
-.page-header h1 {
-  font-size: 24px;
-  font-weight: 700;
-  margin-bottom: $spacing-sm;
-  color: $color-text-primary;
-}
-.page-header p {
-  color: $color-text-secondary;
-}
-.explore-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: $spacing-md;
-}
-.explore-card {
-  background: $color-surface;
-  border-radius: $radius-md;
-  overflow: hidden;
-  box-shadow: $shadow-sm;
-}
-.explore-image-placeholder {
-  height: 120px;
-  background-color: $color-border;
-}
-.explore-content {
-  padding: 12px;
-}
-.explore-content h3 {
-  font-size: 16px;
-  font-weight: 600;
-  margin-bottom: 4px;
-  color: $color-text-primary;
-}
-.explore-content p {
-  font-size: 12px;
-  color: $color-text-secondary;
+.explore-page {
+  min-height: 100vh;
+  padding-top: $spacing-md;
+
+  .page-header {
+    margin-bottom: $spacing-lg;
+    text-align: center;
+
+    h1 {
+      font-size: 24px;
+      font-weight: bold;
+      color: $color-text-primary;
+      margin-bottom: $spacing-sm;
+    }
+
+    p {
+      color: $color-text-secondary;
+      font-size: 16px;
+    }
+  }
+
+  .explore-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: $spacing-lg;
+
+    .explore-card {
+      background-color: $color-surface;
+      border: 1px solid $color-border;
+      border-radius: $radius-lg;
+      overflow: hidden;
+      transition: transform 0.2s, box-shadow 0.2s;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: $shadow-lg;
+      }
+
+      .explore-image-placeholder {
+        height: 120px;
+        background-color: $color-accent-bg;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: $color-accent-text;
+      }
+
+      .explore-content {
+        padding: $spacing-md;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+
+        h3 {
+          font-size: 16px;
+          font-weight: bold;
+          color: $color-text-primary;
+          margin-bottom: $spacing-xs;
+        }
+
+        p {
+          color: $color-text-secondary;
+          font-size: 14px;
+          margin-top: auto;
+        }
+      }
+    }
+  }
 }

@@ -1,46 +1,73 @@
 @use '../settings.scss' as *;
 
-.page-header {
-  margin-bottom: $spacing-lg;
-}
-.page-header h1 {
-  font-size: 24px;
-  font-weight: 700;
-  margin-bottom: $spacing-sm;
-  color: $color-text-primary;
-}
-.page-header p {
-  color: $color-text-secondary;
-}
-.notifications-list {
-  display: flex;
-  flex-direction: column;
-  gap: $spacing-md;
-}
-.notification-item {
-  display: flex;
-  align-items: center;
-  gap: $spacing-md;
-  padding: $spacing-md;
-  background: $color-surface;
-  border-radius: $radius-md;
-  box-shadow: $shadow-sm;
-}
-.notification-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background-color: $color-accent-bg;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.notification-content p {
-  font-size: 14px;
-  margin-bottom: 4px;
-  color: $color-text-primary;
-}
-.notification-time {
-  font-size: 12px;
-  color: $color-text-tertiary;
+.notifications-page {
+  min-height: 100vh;
+  padding-top: $spacing-md;
+
+  .page-header {
+    margin-bottom: $spacing-lg;
+    text-align: center;
+
+    h1 {
+      font-size: 24px;
+      font-weight: bold;
+      color: $color-text-primary;
+      margin-bottom: $spacing-sm;
+    }
+
+    p {
+      color: $color-text-secondary;
+      font-size: 16px;
+    }
+  }
+
+  .notifications-list {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+
+    .notification-item {
+      background-color: $color-surface;
+      border: 1px solid $color-border;
+      border-radius: $radius-lg;
+      padding: $spacing-md;
+      display: flex;
+      align-items: flex-start;
+      transition: background-color 0.2s;
+      cursor: pointer;
+
+      &:hover {
+        background-color: rgba($color-background, 0.5);
+      }
+
+      .notification-icon {
+        margin-right: $spacing-md;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        background-color: $color-accent-bg;
+        border-radius: 50%;
+        color: $color-accent-text;
+        flex-shrink: 0;
+      }
+
+      .notification-content {
+        flex-grow: 1;
+
+        p {
+          color: $color-text-primary;
+          font-size: 14px;
+          margin-bottom: $spacing-xs;
+          line-height: 1.4;
+        }
+
+        .notification-time {
+          color: $color-text-secondary;
+          font-size: 12px;
+        }
+      }
+    }
+  }
 }

@@ -7,8 +7,8 @@
 </route>
 
 <template>
-  <div class="feed-page">
-    <section class="feed-main">
+  <div class="failure-resume-page">
+    <section class="failure-resume-main">
       <div class="page-header">
         <h1>Failure Resume</h1>
         <p>Document your journey and learn from setbacks.</p>
@@ -35,6 +35,5 @@
 </template>
 
 <script setup>
-  import '@/styles/pages/index.scss'
   import '@/styles/pages/failure-resume.scss'
 </script>

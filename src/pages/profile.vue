@@ -9,15 +9,13 @@
 
 <template>
   <div class="profile-page">
-    <div class="profile-main">
+    <section class="profile-main">
       <UserCard />
-    </div>
+    </section>
   </div>
 </template>
 
 <script setup>
   import UserCard from '@/components/profile/UserCard.vue'
+  import '@/styles/pages/profile.scss'
 </script>
-
-<style scoped>
-</style>

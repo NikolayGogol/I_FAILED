@@ -1,0 +1,17 @@
+@use '../../settings.scss' as *;
+
+.feed-rightbar {
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+
+  // Hide scrollbar for cleaner look
+  &::-webkit-scrollbar {
+    width: 0;
+    background: transparent;
+  }
+}

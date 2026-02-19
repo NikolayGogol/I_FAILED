@@ -1,0 +1,79 @@
+@use '../../settings.scss' as *;
+
+.profile-card {
+  background-color: $color-surface;
+  border: 1px solid $color-border;
+  border-radius: $radius-lg;
+  padding: $spacing-md;
+  margin-bottom: $spacing-lg;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+
+  .profile-top {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: $spacing-xs;
+    border-radius: $radius-md;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: $color-background;
+    }
+
+    .profile-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: $color-accent-bg;
+      color: $color-accent-text;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      overflow: hidden;
+      flex-shrink: 0;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+
+    .profile-info {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+
+      .profile-name {
+        font-weight: bold;
+        color: $color-text-primary;
+        font-size: 14px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .profile-handle {
+        color: $color-text-secondary;
+        font-size: 12px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+  }
+
+  .profile-search {
+    .v-field__outline__start,
+    .v-field__outline__end {
+      border-color: $color-border;
+    }
+
+    input {
+      font-size: 14px;
+    }
+  }
+}

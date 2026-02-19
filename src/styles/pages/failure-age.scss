@@ -1,58 +1,78 @@
 @use '../settings.scss' as *;
 
-.page-header {
-  margin-bottom: $spacing-lg;
-}
-.page-header h1 {
-  font-size: 24px;
-  font-weight: 700;
-  margin-bottom: $spacing-sm;
-  color: $color-text-primary;
-}
-.page-header p {
-  color: $color-text-secondary;
-}
-.age-calculator {
-  background: $color-surface;
-  border-radius: $radius-xl;
-  padding: $spacing-xl;
-  box-shadow: $shadow-sm;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: $spacing-lg;
-}
-.calculator-input {
-  display: flex;
-  flex-direction: column;
-  gap: $spacing-sm;
-  width: 100%;
-  max-width: 300px;
-}
-.calculator-input label {
-  font-weight: 600;
-  color: $color-text-primary;
-}
-.calculator-input input {
-  padding: 12px;
-  border: 1px solid $color-border;
-  border-radius: $radius-sm;
-  font-size: 16px;
-}
-.calculator-result {
-  text-align: center;
-}
-.calculator-result p {
-  font-size: 18px;
-  color: $color-text-primary;
-}
-.calculator-result strong {
-  font-size: 32px;
-  color: $color-primary;
-  display: block;
-  margin: $spacing-sm 0;
-}
-.calculator-result .result-desc {
-  font-size: 14px;
-  color: $color-text-secondary;
+.failure-age-page {
+  min-height: 100vh;
+  padding-top: $spacing-md;
+
+  .page-header {
+    margin-bottom: $spacing-lg;
+    text-align: center;
+
+    h1 {
+      font-size: 24px;
+      font-weight: bold;
+      color: $color-text-primary;
+      margin-bottom: $spacing-sm;
+    }
+
+    p {
+      color: $color-text-secondary;
+      font-size: 16px;
+    }
+  }
+
+  .age-calculator {
+    background-color: $color-surface;
+    border: 1px solid $color-border;
+    border-radius: $radius-lg;
+    padding: $spacing-xl;
+    box-shadow: $shadow-sm;
+    text-align: center;
+
+    .calculator-input {
+      margin-bottom: $spacing-xl;
+
+      label {
+        display: block;
+        margin-bottom: $spacing-sm;
+        font-weight: bold;
+        color: $color-text-primary;
+      }
+
+      input {
+        width: 100%;
+        max-width: 200px;
+        padding: $spacing-sm $spacing-md;
+        border: 1px solid $color-border;
+        border-radius: $radius-md;
+        font-size: 18px;
+        text-align: center;
+
+        &:focus {
+          outline: none;
+          border-color: $color-primary;
+        }
+      }
+    }
+
+    .calculator-result {
+      p {
+        font-size: 18px;
+        color: $color-text-primary;
+        margin-bottom: $spacing-sm;
+
+        strong {
+          font-size: 32px;
+          color: $color-accent-text;
+          display: block;
+          margin-top: $spacing-xs;
+        }
+      }
+
+      .result-desc {
+        font-size: 14px;
+        color: $color-text-secondary;
+      }
+    }
+  }
 }

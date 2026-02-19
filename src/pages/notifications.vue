@@ -7,8 +7,8 @@
 </route>
 
 <template>
-  <div class="feed-page">
-    <section class="feed-main">
+  <div class="notifications-page">
+    <section class="notifications-main">
       <div class="page-header">
         <h1>Notifications</h1>
         <p>Stay updated with your community interactions.</p>
@@ -30,6 +30,5 @@
 </template>
 
 <script setup>
-  import '@/styles/pages/index.scss'
   import '@/styles/pages/notifications.scss'
 </script>

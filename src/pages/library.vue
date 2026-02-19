@@ -7,8 +7,8 @@
 </route>
 
 <template>
-  <div class="feed-page">
-    <section class="feed-main">
+  <div class="library-page">
+    <section class="library-main">
       <div class="page-header">
         <h1>Library</h1>
         <p>Your saved posts and resources.</p>
@@ -31,6 +31,5 @@
 </template>
 
 <script setup>
-  import '@/styles/pages/index.scss'
   import '@/styles/pages/library.scss'
 </script>

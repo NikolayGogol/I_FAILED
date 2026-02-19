@@ -7,8 +7,8 @@
 </route>
 
 <template>
-  <div class="feed-page">
-    <section class="feed-main">
+  <div class="failure-age-page">
+    <section class="failure-age-main">
       <div class="page-header">
         <h1>Failure Age</h1>
         <p>Calculate your resilience and growth over time.</p>
@@ -29,6 +29,5 @@
 </template>
 
 <script setup>
-  import '@/styles/pages/index.scss'
   import '@/styles/pages/failure-age.scss'
 </script>

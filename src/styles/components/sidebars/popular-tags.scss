@@ -1,0 +1,44 @@
+@use '../../settings.scss' as *;
+
+.popular-card {
+  background-color: $color-surface;
+  border: 1px solid $color-border;
+  border-radius: $radius-lg;
+  padding: $spacing-md;
+  margin-bottom: $spacing-lg;
+
+  .right-card-header {
+    margin-bottom: $spacing-md;
+
+    h3 {
+      font-size: 18px;
+      font-weight: bold;
+      color: $color-text-primary;
+    }
+  }
+
+  .popular-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: $spacing-sm 0;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    border-radius: $radius-md;
+
+    &:hover {
+      background-color: $color-background;
+    }
+
+    .popular-tag {
+      font-weight: bold;
+      color: $color-text-primary;
+      font-size: 14px;
+      padding-left: $spacing-sm;
+    }
+
+    .v-btn {
+      color: $color-text-secondary;
+    }
+  }
+}

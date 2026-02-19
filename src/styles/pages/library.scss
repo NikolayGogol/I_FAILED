@@ -1,52 +1,81 @@
 @use '../settings.scss' as *;
 
-.page-header {
-  margin-bottom: $spacing-lg;
-}
-.page-header h1 {
-  font-size: 24px;
-  font-weight: 700;
-  margin-bottom: $spacing-sm;
-  color: $color-text-primary;
-}
-.page-header p {
-  color: $color-text-secondary;
-}
-.library-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: $spacing-md;
-}
-.library-card {
-  background: $color-surface;
-  border-radius: $radius-md;
-  padding: $spacing-md;
-  box-shadow: $shadow-sm;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-.library-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: $radius-sm;
-  background-color: $color-background;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.library-content h3 {
-  font-size: 16px;
-  font-weight: 600;
-  margin-bottom: 4px;
-  color: $color-text-primary;
-}
-.library-content p {
-  font-size: 13px;
-  color: $color-text-secondary;
-  margin-bottom: 8px;
-}
-.library-date {
-  font-size: 11px;
-  color: $color-text-tertiary;
+.library-page {
+  min-height: 100vh;
+  padding-top: $spacing-md;
+
+  .page-header {
+    margin-bottom: $spacing-lg;
+    text-align: center;
+
+    h1 {
+      font-size: 24px;
+      font-weight: bold;
+      color: $color-text-primary;
+      margin-bottom: $spacing-sm;
+    }
+
+    p {
+      color: $color-text-secondary;
+      font-size: 16px;
+    }
+  }
+
+  .library-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: $spacing-lg;
+
+    .library-card {
+      background-color: $color-surface;
+      border: 1px solid $color-border;
+      border-radius: $radius-lg;
+      padding: $spacing-lg;
+      display: flex;
+      align-items: flex-start;
+      transition: transform 0.2s, box-shadow 0.2s;
+      cursor: pointer;
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: $shadow-lg;
+      }
+
+      .library-icon {
+        margin-right: $spacing-md;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        background-color: $color-accent-bg;
+        border-radius: 50%;
+        color: $color-accent-text;
+        flex-shrink: 0;
+      }
+
+      .library-content {
+        flex-grow: 1;
+
+        h3 {
+          font-size: 16px;
+          font-weight: bold;
+          color: $color-text-primary;
+          margin-bottom: $spacing-xs;
+        }
+
+        p {
+          color: $color-text-secondary;
+          font-size: 14px;
+          margin-bottom: $spacing-sm;
+          line-height: 1.4;
+        }
+
+        .library-date {
+          color: $color-text-tertiary;
+          font-size: 12px;
+        }
+      }
+    }
+  }
 }

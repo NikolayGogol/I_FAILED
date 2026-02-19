@@ -7,8 +7,8 @@
 </route>
 
 <template>
-  <div class="feed-page">
-    <section class="feed-main">
+  <div class="premium-page">
+    <section class="premium-main">
       <div class="page-header">
         <h1>Premium</h1>
         <p>Unlock exclusive features and insights.</p>
@@ -40,6 +40,5 @@
 </template>
 
 <script setup>
-  import '@/styles/pages/index.scss'
   import '@/styles/pages/premium.scss'
 </script>

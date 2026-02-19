@@ -1,39 +1,71 @@
 @use '../settings.scss' as *;
 
-.page-header {
-  margin-bottom: $spacing-lg;
-}
-.page-header h1 {
-  font-size: 24px;
-  font-weight: 700;
-  margin-bottom: $spacing-sm;
-  color: $color-text-primary;
-}
-.page-header p {
-  color: $color-text-secondary;
-}
-.resume-content {
-  background: $color-surface;
-  border-radius: $radius-xl;
-  padding: $spacing-lg;
-  box-shadow: $shadow-sm;
-}
-.resume-section {
-  margin-bottom: $spacing-lg;
-}
-.resume-section h2 {
-  font-size: 18px;
-  font-weight: 600;
-  margin-bottom: 12px;
-  border-bottom: 1px solid $color-border;
-  padding-bottom: 8px;
-  color: $color-text-primary;
-}
-.resume-section ul {
-  list-style-type: disc;
-  padding-left: 20px;
-}
-.resume-section li {
-  margin-bottom: 8px;
-  color: $color-text-secondary;
+.failure-resume-page {
+  min-height: 100vh;
+  padding-top: $spacing-md;
+
+  .page-header {
+    margin-bottom: $spacing-lg;
+    text-align: center;
+
+    h1 {
+      font-size: 24px;
+      font-weight: bold;
+      color: $color-text-primary;
+      margin-bottom: $spacing-sm;
+    }
+
+    p {
+      color: $color-text-secondary;
+      font-size: 16px;
+    }
+  }
+
+  .resume-content {
+    background-color: $color-surface;
+    border: 1px solid $color-border;
+    border-radius: $radius-lg;
+    padding: $spacing-xl;
+    box-shadow: $shadow-sm;
+
+    .resume-section {
+      margin-bottom: $spacing-xl;
+      padding-left: $spacing-lg;
+      border-left: 2px solid $color-border;
+      position: relative;
+
+      &::before {
+        content: '';
+        position: absolute;
+        left: -6px;
+        top: 0;
+        width: 10px;
+        height: 10px;
+        background-color: $color-primary;
+        border-radius: 50%;
+      }
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      h2 {
+        font-size: 20px;
+        font-weight: bold;
+        color: $color-text-primary;
+        margin-bottom: $spacing-md;
+      }
+
+      ul {
+        list-style: disc;
+        padding-left: $spacing-lg;
+        color: $color-text-secondary;
+
+        li {
+          margin-bottom: $spacing-sm;
+          line-height: 1.5;
+        }
+      }
+    }
+  }
 }
