@@ -20,9 +20,12 @@
 
       <div class="explore-grid">
         <div v-for="i in 6" :key="i" class="explore-card">
-          <div class="explore-image-placeholder">
-            <v-icon size="48">mdi-image-outline</v-icon>
-          </div>
+          <v-img
+            aspect-ratio="1.19"
+            class="explore-image"
+            cover
+            src="https://picsum.photos/606/510"
+          />
           <div class="explore-content">
             <h3>Trending Topic {{ i }}</h3>
             <p>1.2k posts</p>
