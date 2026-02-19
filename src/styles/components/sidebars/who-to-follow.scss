@@ -1,3 +1,4 @@
+@use "sass:color";
 @use '../../settings.scss' as *;
 
 .follow-card {
@@ -87,7 +88,7 @@
 
     &:hover {
       text-decoration: underline;
-      color: darken($color-accent-text, 10%);
+      color: color.adjust($color-accent-text, $lightness: -10%);
     }
   }
 }

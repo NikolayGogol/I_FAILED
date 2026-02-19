@@ -15,7 +15,9 @@ export const useProfileStore = defineStore('profile', {
 
       try {
         const user = auth.currentUser
-        if (!user) throw new Error('No user logged in')
+        if (!user) {
+          throw new Error('No user logged in')
+        }
 
         // Photo upload logic commented out due to CORS issue
         /*

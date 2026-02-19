@@ -32,6 +32,7 @@ declare module 'vue-router/auto-routes' {
     '/profile': RouteRecordInfo<'/profile', '/profile', Record<never, never>, Record<never, never>>,
     '/register': RouteRecordInfo<'/register', '/register', Record<never, never>, Record<never, never>>,
     '/set-password': RouteRecordInfo<'/set-password', '/set-password', Record<never, never>, Record<never, never>>,
+    '/settings': RouteRecordInfo<'/settings', '/settings', Record<never, never>, Record<never, never>>,
     '/verify-new-user': RouteRecordInfo<'/verify-new-user', '/verify-new-user', Record<never, never>, Record<never, never>>,
   }
 
@@ -100,6 +101,10 @@ declare module 'vue-router/auto-routes' {
     }
     'src/pages/set-password.vue': {
       routes: '/set-password'
+      views: never
+    }
+    'src/pages/settings.vue': {
+      routes: '/settings'
       views: never
     }
     'src/pages/verify-new-user.vue': {

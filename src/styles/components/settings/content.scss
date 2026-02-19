@@ -1,0 +1,41 @@
+@use '../../settings.scss' as *;
+
+.settings-section {
+  background-color: $color-surface;
+  border: 1px solid $color-border;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+
+  h2 {
+    font-size: 20px;
+    font-weight: bold;
+    color: $color-text-primary;
+    margin-bottom: $spacing-lg;
+    padding-bottom: $spacing-md;
+    border-bottom: 1px solid $color-border;
+  }
+
+  .setting-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: $spacing-md 0;
+    border-bottom: 1px solid $color-border;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    label {
+      font-weight: bold;
+      color: $color-text-secondary;
+      flex-grow: 1;
+    }
+
+    input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+    }
+  }
+}
