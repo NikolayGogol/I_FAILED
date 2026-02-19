@@ -1,5 +1,5 @@
 export const feedNavItems = [
-  { id: 'feed', label: 'Feed', icon: 'mdi-home-outline' },
+  { id: 'sidebars', label: 'Feed', icon: 'mdi-home-outline' },
   { id: 'explore', label: 'Explore', icon: 'mdi-compass-outline' },
   { id: 'notifications', label: 'Notifications', icon: 'mdi-bell-outline' },
   { id: 'library', label: 'Library', icon: 'mdi-book-open-outline' },

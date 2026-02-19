@@ -1,6 +1,6 @@
 <script setup>
-  import FeedRightbar from '@/components/feed/FeedRightbar.vue'
-  import FeedSidebar from '@/components/feed/FeedSidebar.vue'
+  import Rightbar from '@/components/sidebars/Rightbar.vue'
+  import Sidebar from '@/components/sidebars/Sidebar.vue'
 </script>
 
 <template>
@@ -12,7 +12,7 @@
             lg="3"
             md="2"
           >
-            <FeedSidebar />
+            <Sidebar />
           </v-col>
           <v-col
             cols="12"
@@ -25,7 +25,7 @@
             lg="3"
             md="2"
           >
-            <FeedRightbar />
+            <Rightbar />
           </v-col>
         </v-row>
       </v-container>

@@ -20,7 +20,7 @@
 <script setup>
   import { ref } from 'vue'
   import { feedPopularTags } from '@/models/feed'
-  import '@/styles/components/popular-tags.scss'
+  import '@/styles/components/sidebars/popular-tags.scss'
 
   const popularTags = ref(feedPopularTags)
 </script>

@@ -32,7 +32,7 @@
 <script setup>
   import { ref } from 'vue'
   import { feedWhoToFollow } from '@/models/feed'
-  import '@/styles/components/who-to-follow.scss'
+  import '@/styles/components/sidebars/who-to-follow.scss'
 
   const whoToFollow = ref(feedWhoToFollow)
 </script>

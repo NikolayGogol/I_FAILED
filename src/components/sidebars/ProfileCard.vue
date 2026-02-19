@@ -2,7 +2,7 @@
   import { computed, ref } from 'vue'
   import { useRouter } from 'vue-router'
   import { useAuthStore } from '@/stores/auth'
-  import '@/styles/components/profile-card.scss'
+  import '@/styles/components/sidebars/profile-card.scss'
 
   const authStore = useAuthStore()
   const search = ref('')

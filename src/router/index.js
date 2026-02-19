@@ -45,7 +45,9 @@ router.beforeEach((to, from, next) => {
   const loggedIn = authStore.user
   const authRoutes = ['/login', '/register', '/forgot-password', '/otp', '/set-password']
 
-  if (loggedIn && authRoutes.includes(to.path)) {
+  if (to.meta.auth && !loggedIn) {
+    next('/login')
+  } else if (loggedIn && authRoutes.includes(to.path)) {
     next('/')
   } else {
     next()

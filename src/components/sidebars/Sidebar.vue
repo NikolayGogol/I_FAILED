@@ -1,3 +1,9 @@
+<script setup>
+  import { feedNavItems, feedQuickStats } from '@/models/feed'
+  import '@/styles/components/sidebars/sidebar.scss'
+  const navItems = feedNavItems
+  const quickStats = feedQuickStats
+</script>
 <template>
   <aside class="feed-sidebar">
     <div class="sidebar-logo">
@@ -10,7 +16,7 @@
           v-for="item in navItems"
           :key="item.id"
           class="nav-item"
-          :to="item.id === 'feed' ? '/' : '/' + item.id"
+          :to="item.id === 'sidebars' ? '/' : '/' + item.id"
         >
           <v-icon class="nav-icon" size="18">
             {{ item.icon }}
@@ -46,17 +52,3 @@
     </v-btn>
   </aside>
 </template>
-
-<script setup>
-  import { feedNavItems, feedQuickStats } from '@/models/feed'
-
-  defineProps({
-    activeId: {
-      type: String,
-      default: 'feed',
-    },
-  })
-
-  const navItems = feedNavItems
-  const quickStats = feedQuickStats
-</script>
