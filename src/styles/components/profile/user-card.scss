@@ -152,3 +152,30 @@
     }
   }
 }
+
+// Global styles for the edit profile dialog
+.edit-profile-card {
+  border-radius: $radius-lg !important;
+  padding: $spacing-md;
+
+  .v-card-title {
+    font-size: 20px;
+    font-weight: bold;
+    color: $color-text-primary;
+    padding-bottom: $spacing-md;
+  }
+
+  .v-card-text {
+    padding-top: $spacing-md;
+  }
+
+  .v-card-actions {
+    padding: $spacing-md;
+
+    .v-btn {
+      text-transform: none;
+      font-weight: bold;
+      border-radius: $radius-md;
+    }
+  }
+}

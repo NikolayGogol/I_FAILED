@@ -1,11 +1,19 @@
 <script setup>
   import { storeToRefs } from 'pinia'
-  import { computed } from 'vue'
+  import { computed, ref } from 'vue'
+  import { useToast } from 'vue-toastification'
   import { useAuthStore } from '@/stores/auth.js'
+  import { useProfileStore } from '@/stores/profile.js'
   import '@/styles/components/profile/user-card.scss'
 
-  const store = useAuthStore()
-  const { user } = storeToRefs(store)
+  const authStore = useAuthStore()
+  const profileStore = useProfileStore()
+  const toast = useToast()
+  const { user } = storeToRefs(authStore)
+
+  const dialog = ref(false)
+  const editName = ref('')
+  const loading = ref(false)
 
   const displayName = computed(() => user.value?.displayName || 'User')
   const email = computed(() => user.value?.email || '')
@@ -23,6 +31,32 @@
     }
     return 'Unknown'
   })
+
+  function openEditDialog () {
+    editName.value = user.value?.displayName || ''
+    dialog.value = true
+  }
+
+  async function saveProfile () {
+    if (!editName.value.trim()) {
+      toast.error('Name cannot be empty')
+      return
+    }
+
+    loading.value = true
+    try {
+      await profileStore.updateUserProfile({
+        displayName: editName.value,
+      })
+      toast.success('Profile updated successfully')
+      dialog.value = false
+    } catch (error) {
+      toast.error('Failed to update profile')
+      console.error(error)
+    } finally {
+      loading.value = false
+    }
+  }
 </script>
 
 <template>
@@ -41,7 +75,7 @@
       <div class="user-main-info">
         <div class="user-name-row">
           <h2>{{ displayName }}</h2>
-          <button class="edit-profile-btn">Edit profile</button>
+          <button class="edit-profile-btn" @click="openEditDialog">Edit profile</button>
         </div>
         <p class="user-email">{{ email }}</p>
         <p class="user-bio">Entrepreneur learning from startup failures. Sharing my journey to help others.</p>
@@ -81,6 +115,32 @@
         <span class="stat-label">Reactions Given</span>
       </div>
     </div>
+
+    <!-- Edit Profile Dialog -->
+    <v-dialog v-model="dialog" max-width="500">
+      <v-card class="edit-profile-card">
+        <v-card-title>Edit Profile</v-card-title>
+        <v-card-text>
+          <v-text-field
+            v-model="editName"
+            label="Display Name"
+            variant="outlined"
+          />
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn color="grey" variant="text" @click="dialog = false">Cancel</v-btn>
+          <v-btn
+            color="primary"
+            :loading="loading"
+            variant="text"
+            @click="saveProfile"
+          >
+            Save
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
