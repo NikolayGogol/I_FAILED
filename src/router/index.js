@@ -7,8 +7,8 @@
 // Composables
 import { createRouter, createWebHistory } from 'vue-router'
 import { routes } from 'vue-router/auto-routes'
-import { useAuthStore } from '@/stores/auth'
 import NotFound from '@/pages/404.vue'
+import { useAuthStore } from '@/stores/auth'
 
 // Add catch-all route for 404
 routes.push({

@@ -29,6 +29,7 @@ declare module 'vue-router/auto-routes' {
     '/notifications': RouteRecordInfo<'/notifications', '/notifications', Record<never, never>, Record<never, never>>,
     '/otp': RouteRecordInfo<'/otp', '/otp', Record<never, never>, Record<never, never>>,
     '/premium': RouteRecordInfo<'/premium', '/premium', Record<never, never>, Record<never, never>>,
+    '/profile': RouteRecordInfo<'/profile', '/profile', Record<never, never>, Record<never, never>>,
     '/register': RouteRecordInfo<'/register', '/register', Record<never, never>, Record<never, never>>,
     '/set-password': RouteRecordInfo<'/set-password', '/set-password', Record<never, never>, Record<never, never>>,
     '/verify-new-user': RouteRecordInfo<'/verify-new-user', '/verify-new-user', Record<never, never>, Record<never, never>>,
@@ -87,6 +88,10 @@ declare module 'vue-router/auto-routes' {
     }
     'src/pages/premium.vue': {
       routes: '/premium'
+      views: never
+    }
+    'src/pages/profile.vue': {
+      routes: '/profile'
       views: never
     }
     'src/pages/register.vue': {

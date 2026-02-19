@@ -51,7 +51,7 @@
 <script setup>
   import { feedNavItems, feedQuickStats } from '@/models/feed'
 
-  const props = defineProps({
+  defineProps({
     activeId: {
       type: String,
       default: 'feed',

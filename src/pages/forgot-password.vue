@@ -1,57 +1,48 @@
+<route lang="json">
+{
+  "meta": {
+    "layout": "AuthLayout"
+  }
+}
+</route>
+
 <template>
-  <div class="forgot-password-page">
-    <div class="forgot-password-header">
-      <span class="forgot-password-title">Forgot password flow</span>
-      <span class="forgot-password-version">0. forgot password</span>
+  <div class="forgot-password-form">
+    <router-link class="back-link" to="/login">
+      <v-icon size="small">mdi-arrow-left</v-icon>
+      Back
+    </router-link>
+
+    <h1 class="welcome-title">Forgot password?</h1>
+
+    <div class="reset-prompt">
+      <span>Lorem ipsum dolor sit amet, consectetur.</span>
     </div>
 
-    <div class="forgot-password-container">
-      <div class="forgot-password-left">
-        <div class="placeholder-image">
-          <!-- Placeholder for image/illustration -->
-        </div>
-      </div>
+    <v-form class="forgot-password-form-fields" @submit.prevent="handleSendCode">
+      <v-text-field
+        v-model="email"
+        class="form-field"
+        density="comfortable"
+        hide-details="auto"
+        label="Email"
+        placeholder="example@gmail.com"
+        required
+        type="email"
+        variant="outlined"
+      />
 
-      <div class="forgot-password-right">
-        <div class="forgot-password-form">
-          <router-link class="back-link" to="/login">
-            <v-icon size="small">mdi-arrow-left</v-icon>
-            Back
-          </router-link>
-
-          <h1 class="welcome-title">Forgot password?</h1>
-
-          <div class="reset-prompt">
-            <span>Lorem ipsum dolor sit amet, consectetur.</span>
-          </div>
-
-          <v-form class="forgot-password-form-fields" @submit.prevent="handleSendCode">
-            <v-text-field
-              v-model="email"
-              class="form-field"
-              density="comfortable"
-              hide-details="auto"
-              label="Email"
-              placeholder="example@gmail.com"
-              required
-              type="email"
-              variant="outlined"
-            />
-
-            <v-btn
-              block
-              class="send-code-btn"
-              :disabled="loading"
-              :loading="loading"
-              size="large"
-              type="submit"
-            >
-              Send code
-            </v-btn>
-          </v-form>
-        </div>
-      </div>
-    </div>
+      <v-btn
+        block
+        class="send-code-btn"
+        :disabled="loading"
+        :loading="loading"
+        size="large"
+        type="submit"
+      >
+        Send code
+      </v-btn>
+    </v-form>
   </div>
 </template>
 

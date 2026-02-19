@@ -1,101 +1,95 @@
+<route lang="json">
+{
+  "meta": {
+    "layout": "AuthLayout"
+  }
+}
+</route>
+
 <template>
-  <div class="login-page">
-    <div class="login-header" />
+  <div class="login-form">
+    <h1 class="welcome-title">Welcome!</h1>
 
-    <div class="login-container">
-      <div class="login-left">
-        <div class="placeholder-image">
-          <!-- Placeholder for image/illustration -->
-        </div>
-      </div>
-
-      <div class="login-right">
-        <div class="login-form">
-          <h1 class="welcome-title">Welcome!</h1>
-
-          <div class="signup-prompt">
-            <span>Don't have an account? </span>
-            <router-link class="join-link" to="/register">Join here</router-link>
-          </div>
-
-          <div class="social-buttons">
-            <google-login-button />
-            <facebook-login-button />
-          </div>
-
-          <div class="separator-wrapper">
-            <v-divider class="separator" />
-            <span class="separator-text">or</span>
-            <v-divider class="separator" />
-          </div>
-
-          <v-form
-            autocomplete="off"
-            class="login-form-fields"
-            @submit.prevent="handleLogin"
-          >
-            <v-text-field
-              v-model="email"
-              autocomplete="one-time-code"
-              class="form-field"
-              density="comfortable"
-              hide-details="auto"
-              label="Email"
-              placeholder="Enter email"
-              required
-              type="email"
-              variant="outlined"
-            />
-
-            <v-text-field
-              v-model="password"
-              autocomplete="new-password"
-              class="form-field"
-              density="comfortable"
-              hide-details="auto"
-              label="Password"
-              placeholder="Enter password"
-              required
-              :type="showPassword ? 'text' : 'password'"
-              variant="outlined"
-            >
-              <template #append-inner>
-                <v-btn
-                  icon
-                  size="small"
-                  variant="text"
-                  @click="showPassword = !showPassword"
-                >
-                  <v-icon>{{ showPassword ? 'mdi-eye' : 'mdi-eye-off' }}</v-icon>
-                </v-btn>
-              </template>
-            </v-text-field>
-
-            <div class="form-options">
-              <v-checkbox
-                v-model="rememberMe"
-                class="checkbox-field"
-                density="compact"
-                hide-details
-                label="Remember me"
-              />
-              <router-link class="forgot-link" to="/forgot-password">Forgot Password?</router-link>
-            </div>
-
-            <v-btn
-              block
-              class="login-btn"
-              :disabled="loading"
-              :loading="loading"
-              size="large"
-              type="submit"
-            >
-              Log in
-            </v-btn>
-          </v-form>
-        </div>
-      </div>
+    <div class="signup-prompt">
+      <span>Don't have an account? </span>
+      <router-link class="join-link" to="/register">Join here</router-link>
     </div>
+
+    <div class="social-buttons">
+      <google-login-button />
+      <facebook-login-button />
+    </div>
+
+    <div class="separator-wrapper">
+      <v-divider class="separator" />
+      <span class="separator-text">or</span>
+      <v-divider class="separator" />
+    </div>
+
+    <v-form
+      autocomplete="off"
+      class="login-form-fields"
+      @submit.prevent="handleLogin"
+    >
+      <v-text-field
+        v-model="email"
+        autocomplete="one-time-code"
+        class="form-field"
+        density="comfortable"
+        hide-details="auto"
+        label="Email"
+        placeholder="Enter email"
+        required
+        type="email"
+        variant="outlined"
+      />
+
+      <v-text-field
+        v-model="password"
+        autocomplete="new-password"
+        class="form-field"
+        density="comfortable"
+        hide-details="auto"
+        label="Password"
+        placeholder="Enter password"
+        required
+        :type="showPassword ? 'text' : 'password'"
+        variant="outlined"
+      >
+        <template #append-inner>
+          <v-btn
+            icon
+            size="small"
+            variant="text"
+            @click="showPassword = !showPassword"
+          >
+            <v-icon>{{ showPassword ? 'mdi-eye' : 'mdi-eye-off' }}</v-icon>
+          </v-btn>
+        </template>
+      </v-text-field>
+
+      <div class="form-options">
+        <v-checkbox
+          v-model="rememberMe"
+          class="checkbox-field"
+          density="compact"
+          hide-details
+          label="Remember me"
+        />
+        <router-link class="forgot-link" to="/forgot-password">Forgot Password?</router-link>
+      </div>
+
+      <v-btn
+        block
+        class="login-btn"
+        :disabled="loading"
+        :loading="loading"
+        size="large"
+        type="submit"
+      >
+        Log in
+      </v-btn>
+    </v-form>
   </div>
 </template>
 

@@ -1,71 +1,62 @@
+<route lang="json">
+{
+  "meta": {
+    "layout": "AuthLayout"
+  }
+}
+</route>
+
 <template>
-  <div class="verify-page">
-    <div class="verify-header">
-      <span class="verify-title">Forgot password flow</span>
-      <span class="verify-version">0.0.0. forgot password</span>
+  <div class="verify-form">
+    <router-link class="back-link" to="/forgot-password">
+      <v-icon size="small">mdi-arrow-left</v-icon>
+      Back
+    </router-link>
+
+    <h1 class="welcome-title">Enter verification code</h1>
+
+    <div class="verify-prompt">
+      <span>Lorem ipsum dolor sit amet, consectetur.</span>
     </div>
 
-    <div class="verify-container">
-      <div class="verify-left">
-        <div class="placeholder-image">
-          <!-- Placeholder for image/illustration -->
-        </div>
+    <v-form class="verify-form-fields" @submit.prevent="handleVerify">
+      <div class="otp-inputs">
+        <v-text-field
+          v-for="(digit, index) in code"
+          :key="index"
+          :ref="el => inputRefs[index] = el"
+          v-model="code[index]"
+          autocomplete="off"
+          class="otp-field"
+          density="comfortable"
+          hide-details
+          maxlength="1"
+          type="text"
+          variant="outlined"
+          @input="handleOtpInput(index, $event)"
+          @keydown="handleOtpKeydown(index, $event)"
+          @paste="handleOtpPaste"
+        />
       </div>
 
-      <div class="verify-right">
-        <div class="verify-form">
-          <router-link class="back-link" to="/forgot-password">
-            <v-icon size="small">mdi-arrow-left</v-icon>
-            Back
-          </router-link>
-
-          <h1 class="welcome-title">Enter verification code</h1>
-
-          <div class="verify-prompt">
-            <span>Lorem ipsum dolor sit amet, consectetur.</span>
-          </div>
-
-          <v-form class="verify-form-fields" @submit.prevent="handleVerify">
-            <div class="otp-inputs">
-              <v-text-field
-                v-for="(digit, index) in code"
-                :key="index"
-                :ref="el => inputRefs[index] = el"
-                v-model="code[index]"
-                autocomplete="off"
-                class="otp-field"
-                density="comfortable"
-                hide-details
-                maxlength="1"
-                type="text"
-                variant="outlined"
-                @input="handleOtpInput(index, $event)"
-                @keydown="handleOtpKeydown(index, $event)"
-                @paste="handleOtpPaste"
-              />
-            </div>
-
-            <div class="resend-code">
-              <span>Don't receive the code?</span>
-              <button class="resend-link" :disabled="resendLoading" type="button" @click="handleResendCode">
-                {{ resendLoading ? 'Sending...' : 'Send again' }}
-              </button>
-            </div>
-
-            <v-btn
-              block
-              class="confirm-btn"
-              :disabled="loading || !isCodeComplete"
-              :loading="loading"
-              size="large"
-              type="submit"
-            >
-              Confirm
-            </v-btn>
-          </v-form>
-        </div>
+      <div class="resend-code">
+        <span>Don't receive the code?</span>
+        <button class="resend-link" :disabled="resendLoading" type="button" @click="handleResendCode">
+          {{ resendLoading ? 'Sending...' : 'Send again' }}
+        </button>
       </div>
-    </div>
+
+      <v-btn
+        block
+        class="confirm-btn"
+        :disabled="loading || !isCodeComplete"
+        :loading="loading"
+        size="large"
+        type="submit"
+      >
+        Confirm
+      </v-btn>
+    </v-form>
   </div>
 </template>
 

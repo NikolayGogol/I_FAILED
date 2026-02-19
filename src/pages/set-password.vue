@@ -1,68 +1,59 @@
+<route lang="json">
+{
+  "meta": {
+    "layout": "AuthLayout"
+  }
+}
+</route>
+
 <template>
-  <div class="set-password-page">
-    <div class="set-password-header">
-      <span class="set-password-title">Forgot password flow</span>
-      <span class="set-password-version">0.0.0. forgot password</span>
+  <div class="set-password-form">
+    <router-link class="back-link" to="/otp">
+      <v-icon size="small">mdi-arrow-left</v-icon>
+      Back
+    </router-link>
+
+    <h1 class="welcome-title">Set password</h1>
+
+    <div class="set-password-prompt">
+      <span>Lorem ipsum dolor sit amet consectetur</span>
     </div>
 
-    <div class="set-password-container">
-      <div class="set-password-left">
-        <div class="placeholder-image">
-          <!-- Placeholder for image/illustration -->
-        </div>
-      </div>
+    <v-form class="set-password-form-fields" @submit.prevent="handleSetPassword">
+      <v-text-field
+        v-model="password"
+        class="form-field"
+        density="comfortable"
+        hide-details="auto"
+        label="Password"
+        placeholder="Enter new password"
+        required
+        :type="showPassword ? 'text' : 'password'"
+        variant="outlined"
+      >
+        <template #append-inner>
+          <v-btn
+            icon
+            size="small"
+            variant="text"
+            @click="showPassword = !showPassword"
+          >
+            <v-icon>{{ showPassword ? 'mdi-eye' : 'mdi-eye-off' }}</v-icon>
+          </v-btn>
+        </template>
+      </v-text-field>
 
-      <div class="set-password-right">
-        <div class="set-password-form">
-          <router-link class="back-link" to="/otp">
-            <v-icon size="small">mdi-arrow-left</v-icon>
-            Back
-          </router-link>
-
-          <h1 class="welcome-title">Set password</h1>
-
-          <div class="set-password-prompt">
-            <span>Lorem ipsum dolor sit amet consectetur</span>
-          </div>
-
-          <v-form class="set-password-form-fields" @submit.prevent="handleSetPassword">
-            <v-text-field
-              v-model="password"
-              class="form-field"
-              density="comfortable"
-              hide-details="auto"
-              label="Password"
-              placeholder="Enter new password"
-              required
-              :type="showPassword ? 'text' : 'password'"
-              variant="outlined"
-            >
-              <template #append-inner>
-                <v-btn
-                  icon
-                  size="small"
-                  variant="text"
-                  @click="showPassword = !showPassword"
-                >
-                  <v-icon>{{ showPassword ? 'mdi-eye' : 'mdi-eye-off' }}</v-icon>
-                </v-btn>
-              </template>
-            </v-text-field>
-
-            <v-btn
-              block
-              class="reset-password-btn"
-              :disabled="loading || !password"
-              :loading="loading"
-              size="large"
-              type="submit"
-            >
-              Reset password
-            </v-btn>
-          </v-form>
-        </div>
-      </div>
-    </div>
+      <v-btn
+        block
+        class="reset-password-btn"
+        :disabled="loading || !password"
+        :loading="loading"
+        size="large"
+        type="submit"
+      >
+        Reset password
+      </v-btn>
+    </v-form>
   </div>
 </template>
 
