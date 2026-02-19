@@ -79,6 +79,7 @@
         <v-list>
           <v-list-item
             v-for="(item, index) in items"
+            v-if="currentUserName"
             :key="index"
             :value="index"
             @click="goTo(item.path)"

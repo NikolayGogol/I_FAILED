@@ -7,8 +7,8 @@
 </route>
 
 <script setup>
-import '@/styles/pages/index.scss'
-import '@/styles/pages/explore.scss'
+  import '@/styles/pages/index.scss'
+  import '@/styles/pages/explore.scss'
 </script>
 <template>
   <div class="feed-page">
@@ -30,4 +30,3 @@ import '@/styles/pages/explore.scss'
     </section>
   </div>
 </template>
-
