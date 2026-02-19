@@ -1,0 +1,93 @@
+@use '../../settings.scss' as *;
+
+.feed-sidebar {
+  background-color: $color-surface;
+  border-right: 1px solid $color-border;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  padding: $spacing-lg;
+  position: sticky;
+  top: 0;
+
+  .sidebar-logo {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: $spacing-lg;
+    text-align: center;
+    flex-shrink: 0;
+
+    .logo-mark {
+      color: $color-primary;
+    }
+  }
+
+  .sidebar-nav {
+    .sidebar-section {
+      .nav-item {
+        align-items: center;
+        border-radius: $radius-md;
+        color: $color-text-secondary;
+        display: flex;
+        font-size: 16px;
+        margin-bottom: $spacing-sm;
+        padding: $spacing-sm $spacing-md;
+        text-decoration: none;
+        transition: background-color 0.3s;
+
+        .nav-icon {
+          margin-right: $spacing-md;
+        }
+
+        &:hover {
+          background-color: $color-background;
+        }
+
+        &.router-link-exact-active {
+          background-color: $color-accent-bg;
+          color: $color-accent-text;
+          font-weight: bold;
+
+          .nav-icon {
+            color: $color-accent-text;
+          }
+        }
+      }
+    }
+  }
+
+  .sidebar-card {
+    background-color: $color-background;
+    border: 1px solid $color-border;
+    border-radius: $radius-lg;
+    margin-bottom: $spacing-lg;
+    padding: $spacing-md;
+    flex-shrink: 0;
+
+    .sidebar-card-title {
+      font-size: 16px;
+      font-weight: bold;
+      margin-bottom: $spacing-md;
+      color: $color-text-primary;
+    }
+
+    .stat-row {
+      display: flex;
+      font-size: 14px;
+      justify-content: space-between;
+      margin-bottom: $spacing-sm;
+      color: $color-text-secondary;
+
+      .stat-value {
+        font-weight: bold;
+        color: $color-text-primary;
+      }
+    }
+  }
+
+  .create-post-btn {
+    flex-shrink: 0;
+    flex-grow: 0;
+    height: 44px !important;
+  }
+}
