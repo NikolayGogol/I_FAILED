@@ -1,0 +1,154 @@
+@use '../../settings.scss' as *;
+
+.post-card {
+  background-color: $color-surface;
+  border: 1px solid $color-border;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-lg;
+  cursor: pointer;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: rgba($color-background, 0.5);
+  }
+
+  .post-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: $spacing-md;
+
+    .post-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: $color-accent-bg;
+      color: $color-accent-text;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      margin-right: $spacing-sm;
+    }
+
+    .post-author {
+      .post-author-name {
+        font-weight: bold;
+        color: $color-text-primary;
+        font-size: 14px;
+      }
+
+      .post-author-handle {
+        color: $color-text-secondary;
+        font-size: 12px;
+      }
+    }
+  }
+
+  .post-tags {
+    margin-bottom: $spacing-xs;
+
+    .post-tag {
+      color: $color-accent-text;
+      font-size: 12px;
+      font-weight: bold;
+      margin-right: $spacing-sm;
+    }
+  }
+
+  .post-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: $color-text-primary;
+    margin-bottom: $spacing-sm;
+    line-height: 1.4;
+  }
+
+  .post-body {
+    color: $color-text-secondary;
+    font-size: 14px;
+    line-height: 1.5;
+    margin-bottom: $spacing-md;
+
+    .read-more {
+      color: $color-accent-text;
+      background: none;
+      border: none;
+      padding: 0;
+      font-weight: bold;
+      cursor: pointer;
+      margin-left: $spacing-xs;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  .post-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $spacing-xs;
+    margin-bottom: $spacing-md;
+
+    .post-chip {
+      background-color: $color-background;
+      color: $color-text-secondary;
+      padding: 4px 8px;
+      border-radius: $radius-md;
+      font-size: 12px;
+    }
+  }
+
+  .post-meta {
+    display: flex;
+    gap: $spacing-lg;
+    margin-bottom: $spacing-md;
+    padding: $spacing-sm;
+    background-color: $color-background;
+    border-radius: $radius-md;
+
+    .meta-item {
+      display: flex;
+      flex-direction: column;
+      font-size: 12px;
+
+      .meta-label {
+        color: $color-text-secondary;
+        margin-bottom: 2px;
+      }
+
+      span:not(.meta-label) {
+        font-weight: bold;
+        color: $color-text-primary;
+      }
+    }
+  }
+
+  .post-footer {
+    display: flex;
+    align-items: center;
+    border-top: 1px solid $color-border;
+    padding-top: $spacing-md;
+
+    .icon-btn {
+      display: flex;
+      align-items: center;
+      background: none;
+      border: none;
+      color: $color-text-secondary;
+      cursor: pointer;
+      margin-right: $spacing-lg;
+      transition: color 0.2s;
+
+      span {
+        margin-left: $spacing-xs;
+        font-size: 12px;
+      }
+
+      &:hover {
+        color: $color-primary;
+      }
+    }
+  }
+}

@@ -38,7 +38,6 @@ const facebookProvider = new FacebookAuthProvider()
 // Global error handler for Firebase Auth
 onAuthStateChanged(auth, user => {
   // You can handle auth state changes here
-  console.log('Auth state changed:', user)
 }, error => {
   console.error('Firebase Auth Error:', error)
   // Error handling is done in auth store

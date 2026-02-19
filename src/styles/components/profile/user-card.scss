@@ -1,0 +1,154 @@
+@use '../../settings.scss' as *;
+
+.user-card {
+  background-color: $color-surface;
+  border: 1px solid $color-border;
+  border-radius: $radius-lg;
+  padding: $spacing-xl;
+  margin-bottom: $spacing-lg;
+
+  .user-card-header {
+    display: flex;
+    gap: $spacing-lg;
+    margin-bottom: $spacing-lg;
+
+    .user-avatar {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background-color: $color-accent-bg;
+      color: $color-accent-text;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      font-weight: bold;
+      flex-shrink: 0;
+      overflow: hidden; // Ensure image is clipped to circle
+
+      .v-img {
+        width: 100%;
+        height: 100%;
+      }
+    }
+
+    .user-main-info {
+      flex-grow: 1;
+
+      .user-name-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: $spacing-xs;
+
+        h2 {
+          font-size: 24px;
+          font-weight: bold;
+          color: $color-text-primary;
+        }
+
+        .edit-profile-btn {
+          padding: $spacing-xs $spacing-md;
+          border: 1px solid $color-border;
+          border-radius: $radius-full;
+          background-color: transparent;
+          color: $color-text-primary;
+          font-weight: bold;
+          cursor: pointer;
+          transition: background-color 0.2s;
+
+          &:hover {
+            background-color: $color-background;
+          }
+        }
+      }
+
+      .user-email {
+        color: $color-text-secondary;
+        font-size: 14px;
+        margin-bottom: $spacing-md;
+      }
+
+      .user-bio {
+        color: $color-text-primary;
+        margin-bottom: $spacing-md;
+        line-height: 1.5;
+      }
+
+      .user-meta {
+        color: $color-text-secondary;
+        font-size: 14px;
+        margin-bottom: $spacing-md;
+        display: flex;
+        align-items: center;
+
+        .join-date {
+          display: flex;
+          align-items: center;
+
+          &::before {
+            content: '';
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2364748b'%3E%3Cpath d='M19,19H5V8H19M16,1V3H8V1H6V3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.11,3 19,3H18V1M17,12H12V17H17V12Z' /%3E%3C/svg%3E");
+            margin-right: $spacing-xs;
+          }
+        }
+      }
+
+      .user-stats {
+        display: flex;
+        gap: $spacing-lg;
+        margin-bottom: $spacing-md;
+        font-size: 14px;
+
+        span {
+          color: $color-text-secondary;
+
+          strong {
+            color: $color-text-primary;
+          }
+        }
+      }
+
+      .user-badge {
+        display: inline-block;
+        background-color: $color-accent-bg;
+        color: $color-accent-text;
+        padding: $spacing-xs $spacing-md;
+        border-radius: $radius-full;
+        font-size: 12px;
+        font-weight: bold;
+      }
+    }
+  }
+
+  .user-card-divider {
+    border: none;
+    border-top: 1px solid $color-border;
+    margin: $spacing-lg 0;
+  }
+
+  .user-activity-footer {
+    display: flex;
+    justify-content: space-around;
+    text-align: center;
+
+    .activity-stat {
+      display: flex;
+      flex-direction: column;
+
+      .stat-value {
+        font-size: 18px;
+        font-weight: bold;
+        color: $color-text-primary;
+      }
+
+      .stat-label {
+        font-size: 12px;
+        color: $color-text-secondary;
+      }
+    }
+  }
+}

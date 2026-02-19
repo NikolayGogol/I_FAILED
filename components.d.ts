@@ -20,6 +20,7 @@ declare module 'vue' {
     GoogleLoginButton: typeof import('./src/components/GoogleLoginButton.vue')['default']
     HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
     PopularTags: typeof import('./src/components/sidebars/PopularTags.vue')['default']
+    PostCard: typeof import('./src/components/feed/PostCard.vue')['default']
     ProfileCard: typeof import('./src/components/sidebars/ProfileCard.vue')['default']
     Rightbar: typeof import('./src/components/sidebars/Rightbar.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']

@@ -3,4 +3,94 @@
 .profile-page {
   min-height: 100vh;
   padding-top: $spacing-md;
+
+  .profile-main {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .content-feed {
+    margin-top: $spacing-lg;
+
+    .user-tabs {
+      display: flex;
+      border-bottom: 1px solid $color-border;
+      margin-bottom: $spacing-lg;
+
+      .tab-item {
+        padding: $spacing-md $spacing-lg;
+        background: none;
+        border: none;
+        border-bottom: 2px solid transparent;
+        color: $color-text-secondary;
+        font-weight: bold;
+        cursor: pointer;
+        transition: color 0.2s, border-color 0.2s;
+
+        &:hover {
+          color: $color-text-primary;
+        }
+
+        &.active {
+          color: $color-text-primary;
+          border-bottom-color: $color-primary;
+        }
+      }
+    }
+
+    .create-post-card {
+      background-color: $color-surface;
+      border: 1px solid $color-border;
+      border-radius: $radius-lg;
+      padding: $spacing-md;
+      margin-bottom: $spacing-lg;
+
+      .create-post-content {
+        display: flex;
+        align-items: center;
+        gap: $spacing-md;
+
+        .user-avatar-mini {
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          background-color: $color-accent-bg;
+          color: $color-accent-text;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: bold;
+          font-size: 14px;
+          flex-shrink: 0;
+        }
+
+        .post-input-placeholder {
+          flex-grow: 1;
+          color: $color-text-tertiary;
+          font-size: 14px;
+        }
+
+        .write-post-btn {
+          background-color: $color-primary;
+          color: $color-surface;
+          border: none;
+          border-radius: $radius-full;
+          padding: $spacing-xs $spacing-lg;
+          font-weight: bold;
+          cursor: pointer;
+          transition: background-color 0.2s;
+
+          &:hover {
+            background-color: $color-primary-hover;
+          }
+        }
+      }
+    }
+
+    .profile-posts {
+      display: flex;
+      flex-direction: column;
+      gap: $spacing-lg;
+    }
+  }
 }
