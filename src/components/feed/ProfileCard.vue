@@ -77,18 +77,19 @@
 
         </template>
         <v-list>
-          <v-list-item
-            v-for="(item, index) in items"
-            v-if="currentUserName"
-            :key="index"
-            :value="index"
-            @click="goTo(item.path)"
-          >
-            <v-list-item-title>
-              <v-icon :icon="item.icon" />
-              {{ item.title }}
-            </v-list-item-title>
-          </v-list-item>
+          <template v-if="currentUserName">
+            <v-list-item
+              v-for="(item, index) in items"
+              :key="index"
+              :value="index"
+              @click="goTo(item.path)"
+            >
+              <v-list-item-title>
+                <v-icon :icon="item.icon" />
+                {{ item.title }}
+              </v-list-item-title>
+            </v-list-item>
+          </template>
           <v-list-item
             v-if="authStore.user"
             @click="handleLogout"
