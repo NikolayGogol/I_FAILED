@@ -3,11 +3,11 @@
     <h2>Content & Activity</h2>
     <div class="setting-item">
       <label>Autoplay Videos</label>
-      <input type="checkbox" checked />
+      <input checked type="checkbox">
     </div>
     <div class="setting-item">
       <label>Show Sensitive Content</label>
-      <input type="checkbox" />
+      <input type="checkbox">
     </div>
   </div>
 </template>

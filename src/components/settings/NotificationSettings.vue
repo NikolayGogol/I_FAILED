@@ -3,11 +3,11 @@
     <h2>Notifications</h2>
     <div class="setting-item">
       <label>Email Notifications</label>
-      <input type="checkbox" checked />
+      <input checked type="checkbox">
     </div>
     <div class="setting-item">
       <label>Push Notifications</label>
-      <input type="checkbox" />
+      <input type="checkbox">
     </div>
   </div>
 </template>

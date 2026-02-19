@@ -10,7 +10,7 @@
     </div>
     <div class="setting-item">
       <label>Search Engine Indexing</label>
-      <input type="checkbox" checked />
+      <input checked type="checkbox">
     </div>
   </div>
 </template>

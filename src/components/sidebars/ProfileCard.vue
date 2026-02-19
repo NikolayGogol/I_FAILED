@@ -6,6 +6,7 @@
 
   const authStore = useAuthStore()
   const search = ref('')
+  const logoutDialog = ref(false)
   const items = [
     {
       title: 'Profile',
@@ -35,9 +36,16 @@
     return (parts[0].charAt(0) + parts[1].charAt(0)).toUpperCase()
   })
 
-  async function handleLogout () {
-    await authStore.logout()
+  function handleLogout () {
+    logoutDialog.value = true
   }
+
+  async function confirmLogout () {
+    await authStore.logout()
+    logoutDialog.value = false
+    router.push('/login')
+  }
+
   function goTo (path) {
     router.push(path)
   }
@@ -122,5 +130,20 @@
       prepend-inner-icon="mdi-magnify"
       variant="outlined"
     />
+
+    <!-- Logout Confirmation Dialog -->
+    <v-dialog v-model="logoutDialog" max-width="400">
+      <v-card class="logout-dialog-card">
+        <v-card-title>Sign out?</v-card-title>
+        <v-card-text>
+          Are you sure you want to sign out?
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn color="grey" variant="text" @click="logoutDialog = false">Cancel</v-btn>
+          <v-btn color="error" variant="text" @click="confirmLogout">Sign out</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </section>
 </template>
