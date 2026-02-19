@@ -46,7 +46,7 @@
 <template>
   <section class="right-card profile-card">
     <div class="profile-top w-100">
-      <v-menu class="w-100" open-on-hover>
+      <v-menu class="w-100" content-class="profile-menu" open-on-hover>
         <template #activator="{ props }">
           <div class="d-flex align-center justify-between w-100" v-bind="props">
             <template v-if="currentUserName">
@@ -92,6 +92,7 @@
           </template>
           <v-list-item
             v-if="authStore.user"
+            class="text-error"
             @click="handleLogout"
           >
             <v-list-item-title>

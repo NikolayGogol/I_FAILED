@@ -77,3 +77,51 @@
     }
   }
 }
+
+// Global styles for the menu content
+.profile-menu {
+  .v-list {
+    padding: $spacing-xs;
+    border-radius: $radius-md;
+    background-color: $color-surface;
+    border: 1px solid $color-border;
+    box-shadow: $shadow-lg;
+
+    .v-list-item {
+      border-radius: $radius-sm;
+      min-height: 40px;
+      margin-bottom: 2px;
+      color: $color-text-primary;
+
+      &:hover {
+        background-color: $color-background;
+        color: $color-primary;
+      }
+
+      .v-list-item-title {
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: $spacing-sm;
+
+        .v-icon {
+          font-size: 18px;
+          color: $color-text-secondary;
+        }
+      }
+
+      &.text-error {
+        color: $color-error;
+
+        &:hover {
+          background-color: rgba($color-error, 0.1);
+          color: $color-error;
+        }
+
+        .v-list-item-title .v-icon {
+          color: $color-error;
+        }
+      }
+    }
+  }
+}
