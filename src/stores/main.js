@@ -1,4 +1,4 @@
-import { collection, getDocs, orderBy, query } from 'firebase/firestore'
+import { collection, getDocs, query } from 'firebase/firestore' // Removed orderBy
 import { defineStore } from 'pinia'
 import { db } from '@/firebase'
 
@@ -6,17 +6,35 @@ import { db } from '@/firebase'
 const collection_db = import.meta.env.VITE_POST_COLLECTION
 
 export const useMainStore = defineStore('main', {
-  state: () => ({}),
+  state: () => ({
+    totalPosts: 0,
+  }),
   actions: {
     async getFeeds () {
       const posts = []
-      const q = query(collection(db, collection_db), orderBy('createAt', 'desc'))
+      // Fetch documents without server-side sorting
+      const q = query(collection(db, collection_db))
       const querySnapshot = await getDocs(q)
+
+      this.totalPosts = querySnapshot.size
+
       for (const doc of querySnapshot.docs) {
-        // Add the document ID to the post object
         posts.push({ id: doc.id, ...doc.data() })
       }
+
+      // Sort the posts on the client-side
+      posts.sort((a, b) => {
+        const dateA = a.createdAt?.toDate() || 0
+        const dateB = b.createdAt?.toDate() || 0
+        return dateB - dateA // Sort descending
+      })
+
       return posts
     },
+  },
+  persist: {
+    key: 'main-store',
+    storage: localStorage,
+    paths: ['totalPosts'],
   },
 })

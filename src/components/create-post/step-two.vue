@@ -10,17 +10,13 @@
 
   const store = useCreatePostStore()
 
-  const imageRules = [
-    value => {
-      return !value || value.every(file => file.type.startsWith('image/')) || 'Only images are allowed'
-    },
-  ]
 </script>
 
 <template>
   <div class="step-two">
     <h2 class="step-title">Failure Details</h2>
     <p class="step-subtitle">Tell us what happened</p>
+    <pre>{{store.stepTwo.images}}</pre>
     <UploadFile v-model="store.stepTwo.images" class="mb-6" multiple :quality="20" />
     <div class="form-group">
       <label class="form-label">Title *</label>
