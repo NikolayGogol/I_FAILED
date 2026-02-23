@@ -1,61 +1,71 @@
 <script setup>
+  import DatePickerInput from '@/components/DatePickerInput.vue'
+  import { useCreatePostStore } from '@/stores/create-post'
+  import '@/styles/components/form-input.scss'
+  import '@/styles/components/create-post/step-five.scss'
 
+  const store = useCreatePostStore()
 </script>
 
 <template>
-  <div>
+  <div class="step-five">
+    <h2 class="step-title">Privacy & Posting</h2>
 
-    <v-card-title class="text-h5 font-weight-bold pt-0 px-0 mb-6">Privacy & Posting</v-card-title>
-
-    <v-sheet class="pa-4 mb-4 d-flex align-center justify-space-between bg-grey-lighten-5 border-light" rounded="lg">
+    <div class="setting-row">
       <div>
-        <div class="text-subtitle-2 font-weight-bold">Post as Anonymous</div>
-        <div class="text-caption text-grey">Hide your identity on this post</div>
+        <div class="setting-title">Post as Anonymous</div>
+        <div class="setting-desc">Hide your identity on this post</div>
       </div>
-      <v-switch color="primary" density="compact" hide-details inset />
-    </v-sheet>
-
-    <div class="mb-6">
-      <label class="text-subtitle-2 font-weight-bold mb-1 d-block">Visibility</label>
-      <v-select
-        append-inner-icon="mdi-chevron-down"
-        hide-details
-        placeholder="Choose an option"
-        rounded="lg"
-        variant="outlined"
-      />
-    </div>
-
-    <v-sheet class="pa-4 mb-4 d-flex align-center justify-space-between bg-grey-lighten-5 border-light" rounded="lg">
-      <div class="text-subtitle-2 font-weight-bold">Allow comments</div>
       <v-switch
+        v-model="store.stepFive.isAnonymous"
         color="primary"
         density="compact"
         hide-details
         inset
-        model-value="true"
       />
-    </v-sheet>
+    </div>
 
-    <v-sheet class="pa-4 mb-6 d-flex align-center justify-space-between bg-grey-lighten-5 border-light" rounded="lg">
-      <div class="text-subtitle-2 font-weight-bold">Enable trigger warning</div>
-      <v-switch color="primary" density="compact" hide-details inset />
-    </v-sheet>
-
-    <div>
-      <label class="text-subtitle-2 font-weight-bold mb-1 d-block">Schedule post (optional)</label>
-      <v-text-field
-        append-inner-icon="mdi-calendar-blank-outline"
+    <div class="form-group">
+      <label class="form-label">Visibility</label>
+      <v-select
+        v-model="store.stepFive.visibility"
+        append-inner-icon="mdi-chevron-down"
+        class="form-input"
         hide-details
-        placeholder="Select date"
-        rounded="lg"
+        :items="['Public', 'Followers Only', 'Private']"
+        placeholder="Choose an option"
         variant="outlined"
       />
     </div>
 
+    <div class="setting-row">
+      <div class="setting-title">Allow comments</div>
+      <v-switch
+        v-model="store.stepFive.allowComments"
+        color="primary"
+        density="compact"
+        hide-details
+        inset
+      />
+    </div>
+
+    <div class="setting-row">
+      <div class="setting-title">Enable trigger warning</div>
+      <v-switch
+        v-model="store.stepFive.enableTriggerWarning"
+        color="primary"
+        density="compact"
+        hide-details
+        inset
+      />
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Schedule post (optional)</label>
+      <DatePickerInput
+        v-model="store.stepFive.scheduleDate"
+        placeholder="Select date"
+      />
+    </div>
   </div>
 </template>
-
-<style scoped>
-
-</style>

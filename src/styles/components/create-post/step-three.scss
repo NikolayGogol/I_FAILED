@@ -1,0 +1,48 @@
+.step-three {
+  .step-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #333;
+  }
+
+  .step-subtitle {
+    font-size: 1rem;
+    color: #666;
+    margin-bottom: 24px;
+  }
+
+  .form-group {
+    margin-bottom: 24px;
+
+    .form-label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 8px;
+    }
+
+    .form-input {
+      width: 100%;
+    }
+
+    // Quill editor customization
+    .ql-container {
+      border-bottom-left-radius: 8px;
+      border-bottom-right-radius: 8px;
+      font-family: inherit;
+      font-size: 1rem;
+    }
+
+    .ql-toolbar {
+      border-top-left-radius: 8px;
+      border-top-right-radius: 8px;
+      background-color: #f9f9f9;
+    }
+
+    .ql-editor {
+      min-height: 120px;
+    }
+  }
+}

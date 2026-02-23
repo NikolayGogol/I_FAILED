@@ -1,53 +1,59 @@
 <script setup>
-  import { ref } from 'vue'
+  import { useCreatePostStore } from '@/stores/create-post'
+  import '@/styles/components/create-post/step-one.scss'
+
+  const store = useCreatePostStore()
 
   const categories = [
-    'Business/Career',
-    'Relationships',
-    'Finance',
-    'Health/Wellness',
-    'Education/Learning',
-    'Parenting/Family',
-    'Personal Goals',
-    'Everyday Life',
-    'Other',
+    { id: 'business', label: 'Business/Career' },
+    { id: 'relationships', label: 'Relationships' },
+    { id: 'finance', label: 'Finance' },
+    { id: 'health', label: 'Health/Wellness' },
+    { id: 'education', label: 'Education/Learning' },
+    { id: 'parenting', label: 'Parenting/Family' },
+    { id: 'personal', label: 'Personal Goals' },
+    { id: 'life', label: 'Everyday Life' },
+    { id: 'other', label: 'Other' },
   ]
-  const selectedCategory = ref('Business/Career')
 
+  function isSelected (categoryId) {
+    return store.stepOne.selectedCategories.some(c => c.id === categoryId)
+  }
+
+  function toggleCategory (category) {
+    const index = store.stepOne.selectedCategories.findIndex(c => c.id === category.id)
+    if (index === -1) {
+      store.stepOne.selectedCategories.push(category)
+    } else {
+      store.stepOne.selectedCategories.splice(index, 1)
+    }
+  }
 </script>
 
 <template>
-  <div>
-    <h2 class="text-h6 font-weight-bold mb-4">Category Selection</h2>
-    <p class="text-body-2 text-grey-darken-1 mb-6">What area of life did this failure occur in?</p>
+  <div class="step-one">
+    <h2 class="step-title">Category Selection</h2>
+    <p class="step-subtitle">What area of life did this failure occur in? (Select all that apply)</p>
 
-    <v-row>
+    <v-row class="categories-grid">
       <v-col
         v-for="category in categories"
-        :key="category"
+        :key="category.id"
         cols="12"
+        md="4"
         sm="6"
       >
-        <v-card
-          :class="[
-            'pa-4 rounded-lg cursor-pointer border transition-swing',
-            selectedCategory === category ? 'bg-blue-grey-lighten-4 border-blue-grey-darken-1' : 'bg-white'
-          ]"
-          variant="outlined"
-          @click="selectedCategory = category"
+        <div
+          class="category-card"
+          :class="{ active: isSelected(category.id) }"
+          @click="toggleCategory(category)"
         >
-          <div class="d-flex align-center justify-space-between">
-            <span :class="selectedCategory === category ? 'font-weight-bold text-blue-grey-darken-3' : ''">
-              {{ category }}
-            </span>
-            <v-icon v-if="selectedCategory === category" color="blue-grey-darken-3" size="small">mdi-check-circle</v-icon>
+          <div class="category-content">
+            <span class="category-name">{{ category.label }}</span>
+            <v-icon v-if="isSelected(category.id)" class="check-icon" size="small">mdi-check-circle</v-icon>
           </div>
-        </v-card>
+        </div>
       </v-col>
     </v-row>
   </div>
 </template>
-
-<style scoped>
-
-</style>

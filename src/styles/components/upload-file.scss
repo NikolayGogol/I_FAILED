@@ -1,0 +1,42 @@
+@use '../global/colors' as *;
+@use '../global/fonts' as *;
+
+.upload-file-wrapper {
+  height: 270px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed #cecece;
+  border-radius: 12px;
+  background-color: #f8fafc;
+  transition: all 0.3s ease;
+  cursor: pointer;
+
+  &:hover {
+    border-color: $primary;
+    background-color: #f1f5f9;
+  }
+
+  label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    color: $text-secondary;
+    font-size: 1rem;
+    font-weight: 500;
+
+    .v-icon {
+      font-size: 48px;
+      color: $primary;
+      margin-bottom: 12px;
+    }
+
+    p {
+      margin-top: 8px;
+      font-size: 0.8rem;
+      color: #94a3b8;
+    }
+  }
+}

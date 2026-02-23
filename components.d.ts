@@ -15,6 +15,7 @@ declare module 'vue' {
     AppFooter: typeof import('./src/components/AppFooter.vue')['default']
     AppLogo: typeof import('./src/components/AppLogo.vue')['default']
     ContentSettings: typeof import('./src/components/settings/ContentSettings.vue')['default']
+    DatePickerInput: typeof import('./src/components/DatePickerInput.vue')['default']
     FacebookLoginButton: typeof import('./src/components/FacebookLoginButton.vue')['default']
     FeedRightbar: typeof import('./src/components/sidebars/FeedRightbar.vue')['default']
     FeedSidebar: typeof import('./src/components/sidebars/FeedSidebar.vue')['default']
@@ -38,6 +39,7 @@ declare module 'vue' {
     StepOne: typeof import('./src/components/create-post/step-one.vue')['default']
     StepThree: typeof import('./src/components/create-post/step-three.vue')['default']
     StepTwo: typeof import('./src/components/create-post/step-two.vue')['default']
+    UploadFile: typeof import('./src/components/UploadFile.vue')['default']
     UserCard: typeof import('./src/components/profile/UserCard.vue')['default']
     WhoToFollow: typeof import('./src/components/sidebars/WhoToFollow.vue')['default']
   }
