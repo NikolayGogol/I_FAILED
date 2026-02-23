@@ -47,6 +47,7 @@
       class="create-post-btn"
       color="primary"
       height="44"
+      to="/create-post"
     >
       Create post
     </v-btn>
