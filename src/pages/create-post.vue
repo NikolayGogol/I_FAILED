@@ -81,12 +81,10 @@
         >
           Back
         </v-btn>
-        <v-spacer />
         <v-btn
           append-icon="mdi-arrow-right"
           class="next-btn"
           color="primary"
-          size="large"
           variant="flat"
           @click="step < 5 ? step++ : null"
         >

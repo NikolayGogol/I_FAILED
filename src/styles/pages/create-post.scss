@@ -10,7 +10,6 @@
     width: 100%;
     max-width: 800px;
     background-color: #fff;
-    border-radius: 16px;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 
     .header-section {
@@ -69,56 +68,6 @@
       align-items: center;
       padding-top: 24px;
       border-top: 1px solid #e2e8f0;
-
-      .prev-btn {
-        border-color: #e2e8f0;
-        color: $text-secondary;
-        text-transform: none;
-        font-weight: 600;
-        letter-spacing: 0.5px;
-
-        &:hover {
-          background-color: #f8fafc;
-          border-color: #cbd5e1;
-        }
-      }
-
-      .next-btn {
-        text-transform: none;
-        font-weight: 600;
-        letter-spacing: 0.5px;
-        padding-left: 32px;
-        padding-right: 32px;
-        box-shadow: 0 4px 6px -1px rgba(var(--v-theme-primary), 0.3);
-      }
-    }
-  }
-}
-
-@media (max-width: 600px) {
-  .create-post-page {
-    padding: 16px;
-
-    .create-post-card {
-      padding: 24px;
-
-      .header-section {
-        flex-direction: column;
-
-        .back-btn {
-          margin-bottom: 16px;
-          margin-left: -12px;
-        }
-      }
-
-      .action-buttons {
-        flex-direction: column-reverse;
-        gap: 16px;
-
-        .next-btn, .prev-btn {
-          width: 100%;
-        }
-      }
     }
   }
 }

@@ -1,6 +1,39 @@
 <script setup>
+  import { ref } from 'vue'
+  import FormInput from '@/components/FormInput.vue'
+  import { useCreatePostStore } from '@/stores/create-post'
   import '@/styles/components/form-input.scss'
   import '@/styles/components/create-post/step-four.scss'
+
+  const store = useCreatePostStore()
+  const newTag = ref('')
+
+  const recoveryTimeOptions = ['1 week', '1 month', '6 months', '1 year', '> 1 year']
+  const emotionTags = [
+    { label: 'Painful', emoji: '😔', value: 'painful' },
+    { label: 'Learning', emoji: '💡', value: 'learning' },
+    { label: 'Embarrassing', emoji: '😳', value: 'embarrassing' },
+    { label: 'Funny', emoji: '😂', value: 'funny' },
+    { label: 'Sad', emoji: '😢', value: 'sad' },
+    { label: 'Angry', emoji: '😠', value: 'angry' },
+    { label: 'Frustrating', emoji: '😤', value: 'frustrating' },
+    { label: 'Relieved', emoji: '😌', value: 'relieved' },
+    { label: 'Hopeful', emoji: '🤞', value: 'hopeful' },
+    { label: 'Scary', emoji: '😱', value: 'scary' },
+    { label: 'Regret', emoji: '😞', value: 'regret' },
+    { label: 'Growth', emoji: '🌱', value: 'growth' },
+  ]
+
+  function addTag() {
+    if (newTag.value.trim()) {
+      store.stepFour.tags.push(newTag.value.trim())
+      newTag.value = ''
+    }
+  }
+
+  function removeTag(index) {
+    store.stepFour.tags.splice(index, 1)
+  }
 </script>
 
 <template>
@@ -10,21 +43,22 @@
 
     <div class="form-group">
       <label class="form-label">Cost (optional)</label>
-      <v-text-field
+      <FormInput
+        v-model="store.stepFour.cost"
         class="form-input"
-        hide-details
         placeholder="Monetary or time, e.g., $5,000 or 6 months of time"
-        variant="outlined"
       />
     </div>
 
     <div class="form-group">
       <label class="form-label">Recovery time</label>
       <v-select
+        v-model="store.stepFour.recoveryTime"
         append-inner-icon="mdi-chevron-down"
-        class="form-input"
-        hide-details
-        :items="['1 week', '1 month', '6 months']"
+        class="form-field"
+        density="comfortable"
+        hide-details="auto"
+        :items="recoveryTimeOptions"
         placeholder="Choose an option"
         variant="outlined"
       />
@@ -33,15 +67,22 @@
     <div class="form-group">
       <label class="form-label">Emotion Tags</label>
       <p class="form-hint">You can choose max 3 tags</p>
-      <v-chip-group class="emotion-tags" filter multiple>
-        <v-chip class="emotion-chip" variant="outlined">
-          <span class="me-1">😔</span> Painful
-        </v-chip>
-        <v-chip class="emotion-chip" variant="outlined">
-          <span class="me-1">💡</span> Learning
-        </v-chip>
-        <v-chip class="emotion-chip" variant="outlined">
-          <span class="me-1">😳</span> Embarrassing
+      <v-chip-group
+        v-model="store.stepFour.emotionTags"
+        class="emotion-tags"
+        column
+        filter
+        multiple
+      >
+        <v-chip
+          v-for="tag in emotionTags"
+          :key="tag.value"
+          class="emotion-chip"
+          filter-icon="mdi-check"
+          :value="tag.value"
+          variant="outlined"
+        >
+          <span class="me-1">{{ tag.emoji }}</span> {{ tag.label }}
         </v-chip>
       </v-chip-group>
     </div>
@@ -50,22 +91,32 @@
       <label class="form-label">Tags</label>
       <p class="form-hint">Suggested from popular tags</p>
 
-      <div class="tags-container">
-        <v-chip class="tag-chip" closable>Business</v-chip>
-        <v-chip class="tag-chip" closable>Finance</v-chip>
+      <div v-if="store.stepFour.tags.length > 0" class="tags-container">
+        <v-chip
+          v-for="(tag, index) in store.stepFour.tags"
+          :key="index"
+          class="tag-chip"
+          closable
+          @click:close="removeTag(index)"
+        >
+          {{ tag }}
+        </v-chip>
       </div>
 
       <div class="add-tag-wrapper">
-        <v-text-field
-          class="add-tag-input form-input"
-          density="comfortable"
-          hide-details
+        <FormInput
+          v-model="newTag"
+          class="add-tag-input"
           placeholder="Add tag"
-          variant="outlined"
+          @keydown.enter.prevent="addTag"
         />
         <v-btn
           class="add-tag-btn"
+          color="primary"
           elevation="0"
+          height="44"
+          variant="flat"
+          @click="addTag"
         >
           Add
         </v-btn>

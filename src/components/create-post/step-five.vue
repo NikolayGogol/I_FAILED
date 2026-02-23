@@ -30,7 +30,7 @@
       <v-select
         v-model="store.stepFive.visibility"
         append-inner-icon="mdi-chevron-down"
-        class="form-input"
+        class="form-input form-field"
         hide-details
         :items="['Public', 'Followers Only', 'Private']"
         placeholder="Choose an option"
