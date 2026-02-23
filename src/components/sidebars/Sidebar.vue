@@ -1,8 +1,17 @@
 <script setup>
   import { feedNavItems, feedQuickStats } from '@/models/feed'
+  import { useMainStore } from '@/stores/main.js'
   import '@/styles/components/sidebars/sidebar.scss'
+  import {ref} from "vue";
   const navItems = feedNavItems
   const quickStats = feedQuickStats
+  const totalPosts = ref(0)
+  //
+  const { getFeeds } = useMainStore()
+  //
+  getFeeds().then(res => {
+    totalPosts.value = res.length
+  })
 </script>
 <template>
   <aside class="feed-sidebar">
@@ -30,7 +39,7 @@
       <h3 class="sidebar-card-title">Quick Stats</h3>
       <div class="stat-row">
         <span>Total Posts</span>
-        <span class="stat-value">{{ quickStats.totalPosts.toLocaleString() }}</span>
+        <span class="stat-value">{{ totalPosts }}</span>
       </div>
       <div class="stat-row">
         <span>Active Users</span>
