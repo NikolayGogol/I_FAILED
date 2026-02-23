@@ -1,20 +1,9 @@
 <script setup>
+  import { categories } from '@/models/categories.js'
   import { useCreatePostStore } from '@/stores/create-post'
   import '@/styles/components/create-post/step-one.scss'
 
   const store = useCreatePostStore()
-
-  const categories = [
-    { id: 'business', label: 'Business/Career' },
-    { id: 'relationships', label: 'Relationships' },
-    { id: 'finance', label: 'Finance' },
-    { id: 'health', label: 'Health/Wellness' },
-    { id: 'education', label: 'Education/Learning' },
-    { id: 'parenting', label: 'Parenting/Family' },
-    { id: 'personal', label: 'Personal Goals' },
-    { id: 'life', label: 'Everyday Life' },
-    { id: 'other', label: 'Other' },
-  ]
 
   function isSelected (categoryId) {
     return store.stepOne.selectedCategories.some(c => c.id === categoryId)

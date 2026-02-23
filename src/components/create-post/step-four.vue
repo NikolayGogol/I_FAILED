@@ -1,6 +1,7 @@
 <script setup>
   import { ref } from 'vue'
   import FormInput from '@/components/FormInput.vue'
+  import { emotionTags, recoveryTimeOptions } from '@/models/categories.js'
   import { useCreatePostStore } from '@/stores/create-post'
   import '@/styles/components/form-input.scss'
   import '@/styles/components/create-post/step-four.scss'
@@ -8,30 +9,14 @@
   const store = useCreatePostStore()
   const newTag = ref('')
 
-  const recoveryTimeOptions = ['1 week', '1 month', '6 months', '1 year', '> 1 year']
-  const emotionTags = [
-    { label: 'Painful', emoji: '😔', value: 'painful' },
-    { label: 'Learning', emoji: '💡', value: 'learning' },
-    { label: 'Embarrassing', emoji: '😳', value: 'embarrassing' },
-    { label: 'Funny', emoji: '😂', value: 'funny' },
-    { label: 'Sad', emoji: '😢', value: 'sad' },
-    { label: 'Angry', emoji: '😠', value: 'angry' },
-    { label: 'Frustrating', emoji: '😤', value: 'frustrating' },
-    { label: 'Relieved', emoji: '😌', value: 'relieved' },
-    { label: 'Hopeful', emoji: '🤞', value: 'hopeful' },
-    { label: 'Scary', emoji: '😱', value: 'scary' },
-    { label: 'Regret', emoji: '😞', value: 'regret' },
-    { label: 'Growth', emoji: '🌱', value: 'growth' },
-  ]
-
-  function addTag() {
+  function addTag () {
     if (newTag.value.trim()) {
       store.stepFour.tags.push(newTag.value.trim())
       newTag.value = ''
     }
   }
 
-  function removeTag(index) {
+  function removeTag (index) {
     store.stepFour.tags.splice(index, 1)
   }
 </script>
@@ -58,28 +43,31 @@
         class="form-field"
         density="comfortable"
         hide-details="auto"
+        item-title="title"
+        item-value="value"
         :items="recoveryTimeOptions"
         placeholder="Choose an option"
+        return-object
         variant="outlined"
       />
     </div>
 
     <div class="form-group">
       <label class="form-label">Emotion Tags</label>
-      <p class="form-hint">You can choose max 3 tags</p>
       <v-chip-group
         v-model="store.stepFour.emotionTags"
         class="emotion-tags"
         column
         filter
         multiple
+        return-object
       >
         <v-chip
           v-for="tag in emotionTags"
           :key="tag.value"
           class="emotion-chip"
           filter-icon="mdi-check"
-          :value="tag.value"
+          :value="tag"
           variant="outlined"
         >
           <span class="me-1">{{ tag.emoji }}</span> {{ tag.label }}
@@ -90,7 +78,6 @@
     <div class="form-group">
       <label class="form-label">Tags</label>
       <p class="form-hint">Suggested from popular tags</p>
-
       <div v-if="store.stepFour.tags.length > 0" class="tags-container">
         <v-chip
           v-for="(tag, index) in store.stepFour.tags"

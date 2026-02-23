@@ -30,6 +30,7 @@ jobs:
           echo "VITE_FIREBASE_MEASUREMENT_ID=${{ vars.VITE_FIREBASE_MEASUREMENT_ID }}" >> .env
           echo "VITE_FIREBASE_BASE_URL=${{ vars.VITE_FIREBASE_BASE_URL }}" >> .env
           echo "VITE_USERS_COLLECTION=${{ vars.VITE_USERS_COLLECTION }}" >> .env
+          echo "VITE_POST_COLLECTION=${{ vars.VITE_POST_COLLECTION }}" >> .env
 
       - name: Install and Build Frontend
         run: npm ci && npm run build

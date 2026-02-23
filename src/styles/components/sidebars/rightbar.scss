@@ -7,8 +7,7 @@
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: $spacing-lg;
-
+  justify-content: flex-start;
   // Hide scrollbar for cleaner look
   &::-webkit-scrollbar {
     width: 0;

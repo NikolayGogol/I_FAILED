@@ -61,7 +61,7 @@
       // If it's just a URL string or unknown structure
       return {
         url: item.url || item,
-        size: item.size ? formatSize(item.size) : '',
+        size: item.size > 0 ? formatSize(item.size) : '',
       }
     })
   }, { immediate: true })
@@ -83,7 +83,7 @@
             size: compressedFile.size,
             file: compressedFile,
             type: compressedFile.type,
-            format: compressedFile.type.split('/')[1] || ''
+            format: compressedFile.type.split('/')[1] || '',
           }
 
           resolve(fileObject)
@@ -171,7 +171,7 @@
             :width="multiple ? 100 : '100%'"
           >
             <v-img class="fill-height" cover :src="item.url">
-              <div v-if="item.size" class="image-size-badge">
+              <div v-if="item.size > 0" class="image-size-badge">
                 {{ item.size }}
               </div>
             </v-img>
