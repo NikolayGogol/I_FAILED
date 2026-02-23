@@ -1,4 +1,4 @@
-import { collection, getDocs } from 'firebase/firestore'
+import { collection, getDocs, orderBy, query } from 'firebase/firestore'
 import { defineStore } from 'pinia'
 import { db } from '@/firebase'
 
@@ -10,7 +10,8 @@ export const useMainStore = defineStore('main', {
   actions: {
     async getFeeds () {
       const posts = []
-      const querySnapshot = await getDocs(collection(db, collection_db))
+      const q = query(collection(db, collection_db), orderBy('createAt', 'desc'))
+      const querySnapshot = await getDocs(q)
       for (const doc of querySnapshot.docs) {
         // Add the document ID to the post object
         posts.push({ id: doc.id, ...doc.data() })

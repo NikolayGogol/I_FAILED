@@ -20,6 +20,10 @@
   const likeCount = ref(p.post.likes || 0)
   const isLiking = ref(false) // To disable the button during the request
 
+  const userInitial = computed(() => {
+    return p.post.user?.displayName?.charAt(0).toUpperCase() || ''
+  })
+
   onMounted(() => {
     const currentUser = auth.currentUser
     if (currentUser && p.post.likedBy?.includes(currentUser.uid)) {
@@ -70,15 +74,14 @@
 
     isLiking.value = false
   }
-
-  console.log(p.post)
 </script>
 
 <template>
   <div class="post-card">
     <header class="post-header">
       <div class="post-avatar">
-        <!--        <span>{{ post.user.photoURL }}</span>-->
+        <img v-if="post.user.photoURL" alt="User avatar" :src="post.user.photoURL">
+        <span v-else>{{ userInitial }}</span>
       </div>
       <div class="post-author">
         <div class="post-author-name">{{ post.user.displayName }}</div>
@@ -120,7 +123,7 @@
     <div class="post-meta">
       <div class="meta-item">
         <span class="meta-label">Cost:</span>
-        <span>$ {{ post.stepFour.cost }}</span>
+        <span>{{ post.stepFour.cost }}</span>
       </div>
       <div class="meta-item">
         <span class="meta-label">Recovery:</span>
@@ -133,7 +136,7 @@
         <v-icon size="18">{{ isLiked ? 'mdi-heart' : 'mdi-heart-outline' }}</v-icon>
         <span>{{ likeCount }}</span>
       </button>
-      <button v-if="post.stepFive.allowComments" class="icon-btn">
+      <button class="icon-btn">
         <v-icon size="18">mdi-comment-outline</v-icon>
         <span>{{ post.comments }}</span>
       </button>
