@@ -1,6 +1,14 @@
 <script setup>
 
+  import { useRouter } from 'vue-router'
   import Sidebar from '@/components/sidebars/Sidebar.vue'
+  const flag = sessionStorage.getItem('post-success-created')
+  const router = useRouter()
+  if (flag) {
+    sessionStorage.removeItem('post-success-created')
+  } else {
+    router.push('/')
+  }
 </script>
 
 <template>

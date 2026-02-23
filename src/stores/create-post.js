@@ -73,6 +73,10 @@ export const useCreatePostStore = defineStore('createPost', {
         stepFive: this.stepFive,
         createAt: new Date(),
         uid: authStore.user?.uid,
+        user: {
+          displayName: authStore.user?.displayName,
+          photoURL: authStore.user?.photoURL,
+        },
       }
       console.log(obj2send)
       try {
@@ -92,6 +96,10 @@ export const useCreatePostStore = defineStore('createPost', {
         stepFive: this.stepFive,
         createAt: new Date(),
         uid: authStore.user?.uid,
+        user: {
+          displayName: authStore.user?.displayName,
+          photoURL: authStore.user?.photoURL,
+        },
       }
       console.log(obj2send)
       try {

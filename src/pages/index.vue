@@ -5,6 +5,21 @@
 }
 }
 </route>
+<script setup>
+  import { ref } from 'vue'
+  import PostCard from '@/components/feed/PostCard.vue'
+  import { useMainStore } from '@/stores/main.js'
+  import '@/styles/pages/index.scss'
+  const { getFeeds } = useMainStore()
+  const activeTab = ref('latest')
+  const posts = ref([])
+  //
+  getFeeds()
+    .then(res => {
+      posts.value = res
+    })
+
+</script>
 <template>
   <div class="feed-page">
     <section class="feed-main">
@@ -54,14 +69,3 @@
     </section>
   </div>
 </template>
-
-<script setup>
-  import { ref } from 'vue'
-  import PostCard from '@/components/feed/PostCard.vue'
-  import { feedPosts } from '@/models/feed'
-  import '@/styles/pages/index.scss'
-
-  const activeTab = ref('latest')
-
-  const posts = ref(feedPosts)
-</script>
