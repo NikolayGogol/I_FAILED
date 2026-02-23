@@ -1,7 +1,7 @@
 <script setup>
   import { computed, onMounted, ref } from 'vue'
   import { auth } from '@/firebase'
-  import { usePostCardStore } from '@/stores/postCardStore'
+  import { usePostCardStore } from '@/stores/post-card.js'
   import '@/styles/components/feed/post-card.scss'
 
   const p = defineProps({
