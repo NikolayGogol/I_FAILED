@@ -3,37 +3,79 @@
     <header class="right-card-header">
       <h3 class="font-weight-semibold">Who to follow</h3>
     </header>
-    <div
-      v-for="person in whoToFollow"
-      :key="person.id"
-      class="follow-row py-2"
-    >
-      <div
-        class="follow-avatar mr-3"
-        :style="{ backgroundColor: getRandomColor() }"
-      >
-        <span>{{ person.initials }}</span>
-      </div>
-      <div class="follow-info">
-        <div class="follow-name">{{ person.name }}</div>
-        <div class="follow-handle">{{ person.handle }}</div>
-      </div>
-      <v-spacer />
-      <div
-        class="follow-btn"
-      >
-        Follow
-      </div>
+    <div v-if="usersStore.loading">
+      <!-- You can add a loading skeleton here -->
+      <p>Loading...</p>
     </div>
+    <div v-else-if="usersStore.error">
+      <p class="text-error">{{ usersStore.error }}</p>
+    </div>
+    <template v-else>
+      <div
+        v-for="user in randomUsers"
+        :key="user.id"
+        class="follow-row py-2"
+      >
+        <div
+          class="follow-avatar mr-3"
+          :style="{ backgroundColor: getRandomColor() }"
+        >
+          <img v-if="user.photoURL" :src="user.photoURL" alt="User avatar">
+          <span v-else>{{ getInitials(user.displayName) }}</span>
+        </div>
+        <div class="follow-info">
+          <div class="follow-name">
+            {{ user.displayName }}
+            <v-tooltip
+              activator="parent"
+              content-class="custom-tooltip"
+              location="top"
+            >{{ user.displayName }}</v-tooltip>
+          </div>
+          <div class="follow-handle">
+            @{{ user.displayName?.replace(/\s/g, '') || 'user' }}
+            <v-tooltip
+              activator="parent"
+              content-class="custom-tooltip"
+              location="bottom"
+            >@{{ user.displayName?.replace(/\s/g, '') || 'user' }}</v-tooltip>
+          </div>
+        </div>
+        <v-spacer />
+        <div
+          class="follow-btn"
+        >
+          Follow
+        </div>
+      </div>
+    </template>
   </section>
 </template>
 
 <script setup>
-  import { ref } from 'vue'
-  import { feedWhoToFollow } from '@/models/feed'
+  import { computed, onMounted } from 'vue'
+  import { useUsersStore } from '@/stores/users'
+  import { useAuthStore } from '@/stores/auth'
   import '@/styles/components/sidebars/who-to-follow.scss'
 
-  const whoToFollow = ref(feedWhoToFollow)
+  const usersStore = useUsersStore()
+  const authStore = useAuthStore()
+
+  onMounted(() => {
+    usersStore.fetchAllUsers()
+  })
+
+  const filteredUsers = computed(() => {
+    if (!authStore.user) {
+      return usersStore.users
+    }
+    return usersStore.users.filter(user => user.id !== authStore.user.uid)
+  })
+
+  const randomUsers = computed(() => {
+    // Shuffle the array and take the first 5
+    return filteredUsers.value.sort(() => 0.5 - Math.random()).slice(0, 5)
+  })
 
   const backgroundColors = [
     '#ffcdd2', '#f8bbd0', '#e1bee7', '#d1c4e9', '#c5cae9',
@@ -45,5 +87,14 @@
   function getRandomColor () {
     const randomIndex = Math.floor(Math.random() * backgroundColors.length)
     return backgroundColors[randomIndex]
+  }
+
+  function getInitials (name) {
+    if (!name) return ''
+    const parts = name.split(' ')
+    if (parts.length === 1) {
+      return parts[0].charAt(0).toUpperCase()
+    }
+    return (parts[0].charAt(0) + (parts[1]?.charAt(0) || '')).toUpperCase()
   }
 </script>

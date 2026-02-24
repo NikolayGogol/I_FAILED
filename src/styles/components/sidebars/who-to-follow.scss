@@ -28,12 +28,29 @@
       height: 44px;
       color: $color-surface;
       font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    .follow-info {
+      min-width: 0; // Important for ellipsis to work in a flex container
+      margin-left: $spacing-sm;
+    }
+
+    .follow-name, .follow-handle {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .follow-name {
       font-weight: 600;
       font-size: 16px;
       color: $color-text-primary;
+    }
+
+    .follow-handle {
+      font-size: 14px;
+      color: $color-text-secondary;
     }
 
     .follow-btn {
@@ -44,6 +61,7 @@
       cursor: pointer;
       padding: $spacing-sm $spacing-md;
       font-weight: 600;
+      margin-left: $spacing-md;
     }
   }
 }
