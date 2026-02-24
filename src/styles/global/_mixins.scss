@@ -1,0 +1,27 @@
+// Breakpoints
+$breakpoint-xs: 576px;
+$breakpoint-sm: 768px;
+$breakpoint-md: 992px;
+$breakpoint-lg: 1200px;
+$breakpoint-xl: 1400px;
+
+// Mixin for min-width
+@mixin media-up($breakpoint) {
+  @media (min-width: $breakpoint) {
+    @content;
+  }
+}
+
+// Mixin for max-width
+@mixin media-down($breakpoint) {
+  @media (max-width: ($breakpoint - 1)) {
+    @content;
+  }
+}
+
+// Mixin for a specific range
+@mixin media-between($min, $max) {
+  @media (min-width: $min) and (max-width: ($max - 1)) {
+    @content;
+  }
+}

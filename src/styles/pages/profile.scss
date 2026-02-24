@@ -7,6 +7,7 @@
   .profile-main {
     max-width: 800px;
     margin: 0 auto;
+    padding: 0 $spacing-md;
   }
 
   .content-feed {
@@ -18,7 +19,7 @@
       margin-bottom: $spacing-lg;
 
       .tab-item {
-        padding: $spacing-md $spacing-lg;
+        padding: $spacing-md;
         background: none;
         border: none;
         border-bottom: 2px solid transparent;
@@ -26,6 +27,13 @@
         font-weight: bold;
         cursor: pointer;
         transition: color 0.2s, border-color 0.2s;
+        flex-grow: 1;
+        text-align: center;
+
+        @include media-up($breakpoint-sm) {
+          flex-grow: 0;
+          padding: $spacing-md $spacing-lg;
+        }
 
         &:hover {
           color: $color-text-primary;

@@ -1,8 +1,15 @@
 @use '../../settings.scss' as *;
 
 .feed-sidebar {
-  position: sticky;
-  top: $spacing-md;
+  // Common styles for both mobile and desktop
+  padding: $spacing-md;
+
+  .mobile-profile-card {
+    margin-bottom: $spacing-lg;
+    @include media-up($breakpoint-lg) {
+      display: none; // Hide on large screens where Rightbar is visible
+    }
+  }
 
   .logo-mark {
     img {
@@ -18,9 +25,11 @@
         text-decoration: none;
         display: flex;
         align-items: center;
+        padding: $spacing-sm 0;
 
         &.router-link-active {
           color: $color-primary;
+          font-weight: 600;
         }
       }
     }
@@ -64,5 +73,12 @@
       font-weight: 600;
       font-size: 16px;
     }
+  }
+
+  // Desktop-specific adjustments
+  @include media-up($breakpoint-md) {
+    position: sticky;
+    top: $spacing-md;
+    padding: 0; // Reset padding for desktop layout
   }
 }

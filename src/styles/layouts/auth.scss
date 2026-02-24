@@ -2,15 +2,30 @@
 
 .auth-layout {
   position: relative;
+  padding: $spacing-lg;
+
+  @include media-up($breakpoint-md) {
+    padding: 0;
+  }
 
   .auth-logo{
     position: absolute;
-    top: $spacing-xl;
-    left: $spacing-xl;
+    top: $spacing-md;
+    left: $spacing-md;
+
+    @include media-up($breakpoint-md) {
+      top: $spacing-xl;
+      left: $spacing-xl;
+    }
   }
   h1 {
-    font-size: 64px;
-    line-height: 72px;
+    font-size: 48px;
+    line-height: 56px;
+
+    @include media-up($breakpoint-md) {
+      font-size: 64px;
+      line-height: 72px;
+    }
 
     span {
       color: $color-primary;
@@ -19,11 +34,19 @@
 
   .description {
     color: $color-text-secondary;
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 400;
+
+    @include media-up($breakpoint-md) {
+      font-size: 20px;
+    }
   }
 
   p.description {
-    margin-bottom: $spacing-xl * 1.5;
+    margin-bottom: $spacing-xl;
+
+    @include media-up($breakpoint-md) {
+      margin-bottom: $spacing-xl * 1.5;
+    }
   }
 }

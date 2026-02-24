@@ -116,7 +116,7 @@
 }
 
 // Responsive adjustments
-@media (max-width: 768px) {
+@include media-down($breakpoint-sm) {
   .settings-wrapper {
     flex-direction: column;
 

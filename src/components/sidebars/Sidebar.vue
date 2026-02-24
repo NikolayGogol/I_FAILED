@@ -1,6 +1,7 @@
 <script setup>
   import { ref } from 'vue'
   import { useRouter } from 'vue-router'
+  import ProfileCard from '@/components/sidebars/ProfileCard.vue'
   import { feedNavItems, feedQuickStats } from '@/models/feed'
   import { useMainStore } from '@/stores/main.js'
   import '@/styles/components/sidebars/sidebar.scss'
@@ -18,6 +19,8 @@
 </script>
 <template>
   <aside class="feed-sidebar">
+    <ProfileCard class="mobile-profile-card" />
+
     <div class="sidebar-logo">
       <span class="logo-mark cursor-pointer" @click="router.push('/')">
         <img alt="" src="../../assets/Logo.png">

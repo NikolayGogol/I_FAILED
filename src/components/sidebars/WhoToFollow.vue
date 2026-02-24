@@ -12,16 +12,15 @@
     </div>
     <template v-else>
       <div
-        v-for="user in randomUsers"
+        v-for="user in sortedUsers"
         :key="user.id"
         class="follow-row py-2"
       >
         <div
           class="follow-avatar mr-3"
-          :style="{ backgroundColor: getRandomColor() }"
         >
-          <img v-if="user.photoURL" :src="user.photoURL" alt="User avatar">
-          <span v-else>{{ getInitials(user.displayName) }}</span>
+          <img v-if="user.photoURL" :src="user.photoURL" alt="User avatar" class="avatar-image">
+          <span v-else :style="{ backgroundColor: getRandomColor() }" class="avatar-initials">{{ getInitials(user.displayName) }}</span>
         </div>
         <div class="follow-info">
           <div class="follow-name">
@@ -72,9 +71,16 @@
     return whoToFollowStore.users.filter(user => user.id !== authStore.user.uid)
   })
 
-  const randomUsers = computed(() => {
-    // Shuffle the array and take the first 5
-    return filteredUsers.value.sort(() => 0.5 - Math.random()).slice(0, 5)
+  const sortedUsers = computed(() => {
+    const usersWithAvatars = filteredUsers.value.filter(user => user.photoURL)
+    const usersWithoutAvatars = filteredUsers.value.filter(user => !user.photoURL)
+
+    // Shuffle both lists independently
+    const shuffledWithAvatars = usersWithAvatars.sort(() => 0.5 - Math.random())
+    const shuffledWithoutAvatars = usersWithoutAvatars.sort(() => 0.5 - Math.random())
+
+    // Combine and take the first 5
+    return [...shuffledWithAvatars, ...shuffledWithoutAvatars].slice(0, 5)
   })
 
   const backgroundColors = [

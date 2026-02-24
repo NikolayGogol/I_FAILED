@@ -1,16 +1,20 @@
 @use '../../settings.scss' as *;
 
 .feed-rightbar {
-  height: 100vh;
-  position: sticky;
-  top: $spacing-md;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  // Hide scrollbar for cleaner look
-  &::-webkit-scrollbar {
-    width: 0;
-    background: transparent;
+  display: none; // Hidden by default on mobile
+
+  @include media-up($breakpoint-lg) {
+    display: flex; // Visible on large screens and up
+    height: 100vh;
+    position: sticky;
+    top: $spacing-md;
+    overflow-y: auto;
+    flex-direction: column;
+    justify-content: flex-start;
+    // Hide scrollbar for cleaner look
+    &::-webkit-scrollbar {
+      width: 0;
+      background: transparent;
+    }
   }
 }

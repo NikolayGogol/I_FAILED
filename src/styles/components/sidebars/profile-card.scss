@@ -87,3 +87,32 @@
     }
   }
 }
+
+// Styles for the logout dialog
+.logout-dialog-card {
+  border-radius: $radius-lg !important;
+  padding: $spacing-md;
+  background-color: $color-surface;
+
+  .v-card-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: $color-text-primary;
+    padding: $spacing-sm $spacing-md;
+  }
+
+  .v-card-text {
+    color: $color-text-secondary;
+    padding: 0 $spacing-md $spacing-md;
+  }
+
+  .v-card-actions {
+    padding: 0 $spacing-md $spacing-sm;
+
+    .v-btn {
+      text-transform: none;
+      font-weight: 600;
+      border-radius: $radius-md;
+    }
+  }
+}

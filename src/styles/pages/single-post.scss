@@ -3,10 +3,16 @@
 .single-post-page {
   max-width: 800px;
   margin: 0 auto;
-  padding: $spacing-xl;
+  padding: $spacing-md;
   background-color: $color-surface;
-  border-radius: $radius-lg;
-  border: 1px solid $color-border;
+  border-radius: 0;
+  border: none;
+
+  @include media-up($breakpoint-sm) {
+    padding: $spacing-xl;
+    border-radius: $radius-lg;
+    border: 1px solid $color-border;
+  }
 
   &__header {
     display: flex;
@@ -23,21 +29,30 @@
   }
 
   &__title {
-    font-size: 2.5rem;
+    font-size: 1.8rem;
     font-weight: bold;
     color: $color-text-primary;
     line-height: 1.2;
-    margin-bottom: $spacing-xl;
+    margin-bottom: $spacing-lg;
+
+    @include media-up($breakpoint-sm) {
+      font-size: 2.5rem;
+      margin-bottom: $spacing-xl;
+    }
   }
 
   &__section {
     margin-bottom: $spacing-lg;
 
     h2 {
-      font-size: 1.25rem;
+      font-size: 1.1rem;
       font-weight: bold;
       margin-bottom: $spacing-sm;
       color: $color-text-primary;
+
+      @include media-up($breakpoint-sm) {
+        font-size: 1.25rem;
+      }
     }
 
     .text-body-1 {
@@ -52,17 +67,25 @@
   }
 
   &__learning {
-    padding: $spacing-lg;
+    padding: $spacing-md;
     border-radius: $radius-lg;
     margin-bottom: $spacing-lg;
     border: 1px dashed $color-primary !important;
     background-color: rgba($color-primary, 0.03);
 
+    @include media-up($breakpoint-sm) {
+      padding: $spacing-lg;
+    }
+
     h2 {
-      font-size: 1.25rem;
+      font-size: 1.1rem;
       font-weight: bold;
       margin-bottom: $spacing-sm;
       color: $color-text-primary;
+
+      @include media-up($breakpoint-sm) {
+        font-size: 1.25rem;
+      }
     }
 
     div, ul {
@@ -133,10 +156,14 @@
     margin-top: $spacing-xl;
 
     h3 {
-      font-size: 1.5rem;
+      font-size: 1.25rem;
       font-weight: bold;
       margin-bottom: $spacing-lg;
       color: $color-text-primary;
+
+      @include media-up($breakpoint-sm) {
+        font-size: 1.5rem;
+      }
     }
 
     .comment-input-section {
@@ -220,8 +247,12 @@
       }
 
       &__replies {
-        margin-left: 56px; // Keep this for alignment with avatar
+        margin-left: 40px;
         margin-top: $spacing-md;
+
+        @include media-up($breakpoint-sm) {
+          margin-left: 56px;
+        }
 
         .reply-item {
           margin-bottom: $spacing-md;
