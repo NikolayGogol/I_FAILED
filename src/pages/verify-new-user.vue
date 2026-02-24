@@ -30,9 +30,9 @@
     try {
       const response = await axios.post('/verifyUser', { token })
       if (response.data.status === 'success') {
-        success.value = true
         sessionStorage.setItem('congrats', 'true')
-        router.put('/congrats')
+        await router.push('/congrats')
+        success.value = true
       } else {
         errorMessage.value = response.data.message || 'Verification failed.'
       }
