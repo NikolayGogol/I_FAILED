@@ -47,6 +47,6 @@ export const usePostCardStore = defineStore('postCard', {
         console.error('Error getting comment count:', error)
         return 0
       }
-    }
+    },
   },
 })

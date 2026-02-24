@@ -12,16 +12,12 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     AccountSettings: typeof import('./src/components/settings/AccountSettings.vue')['default']
-    AppFooter: typeof import('./src/components/AppFooter.vue')['default']
     AppLogo: typeof import('./src/components/AppLogo.vue')['default']
     ContentSettings: typeof import('./src/components/settings/ContentSettings.vue')['default']
     DatePickerInput: typeof import('./src/components/DatePickerInput.vue')['default']
     FacebookLoginButton: typeof import('./src/components/FacebookLoginButton.vue')['default']
-    FeedRightbar: typeof import('./src/components/sidebars/FeedRightbar.vue')['default']
-    FeedSidebar: typeof import('./src/components/sidebars/FeedSidebar.vue')['default']
     FormInput: typeof import('./src/components/FormInput.vue')['default']
     GoogleLoginButton: typeof import('./src/components/GoogleLoginButton.vue')['default']
-    HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
     HelpSettings: typeof import('./src/components/settings/HelpSettings.vue')['default']
     NotificationSettings: typeof import('./src/components/settings/NotificationSettings.vue')['default']
     PopularTags: typeof import('./src/components/sidebars/PopularTags.vue')['default']

@@ -142,7 +142,13 @@
         <div class="text-caption text-grey">18 days ago</div>
       </div>
       <v-spacer />
-      <v-chip v-if="post.stepOne?.selectedCategories?.[0]?.label" class="mr-2" color="blue-grey-darken-4" label size="small">{{ post.stepOne.selectedCategories[0].label }}</v-chip>
+      <v-chip
+        v-if="post.stepOne?.selectedCategories?.[0]?.label"
+        class="mr-2"
+        color="blue-grey-darken-4"
+        label
+        size="small"
+      >{{ post.stepOne.selectedCategories[0].label }}</v-chip>
       <div class="text-caption text-grey d-flex align-center">
         <v-icon class="mr-1" size="small">mdi-eye-outline</v-icon>
         {{ post.views || 0 }}

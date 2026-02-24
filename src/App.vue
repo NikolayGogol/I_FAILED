@@ -9,6 +9,7 @@
   import { useRoute } from 'vue-router'
   import AuthLayout from '@/layouts/AuthLayout.vue'
   import MainLayout from '@/layouts/MainLayout.vue'
+  import MainMinLayout from '@/layouts/MainMinLayout.vue'
   import { useAuthStore } from '@/stores/auth'
 
   const route = useRoute()
@@ -17,9 +18,11 @@
   const layouts = {
     AuthLayout,
     MainLayout,
+    MainMinLayout,
   }
 
   const layout = computed(() => {
+    console.log(route.meta.layout)
     return layouts[route.meta.layout] || 'div'
   })
 
