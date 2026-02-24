@@ -22,7 +22,6 @@
   }
 
   const layout = computed(() => {
-    console.log(route.meta.layout)
     return layouts[route.meta.layout] || 'div'
   })
 
