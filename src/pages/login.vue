@@ -8,19 +8,27 @@
 
 <template>
   <div class="login-form">
-    <h1 class="welcome-title">Welcome!</h1>
-
-    <div class="signup-prompt">
+    <h1 class="welcome-title font-weight-semibold text-center">Welcome!</h1>
+    <div class="signup-prompt text-center">
       <span>Don't have an account? </span>
-      <router-link class="join-link" to="/register">Join here</router-link>
+      <router-link
+        class="join-link"
+        to="/register"
+      >Join here</router-link>
     </div>
 
-    <div class="social-buttons">
-      <google-login-button />
-      <facebook-login-button />
+    <div class="social-buttons mt-4">
+      <v-row>
+        <v-col>
+          <google-login-button />
+        </v-col>
+        <v-col>
+          <facebook-login-button />
+        </v-col>
+      </v-row>
     </div>
 
-    <div class="separator-wrapper">
+    <div class="separator-wrapper d-flex align-center my-6">
       <v-divider class="separator" />
       <span class="separator-text">or</span>
       <v-divider class="separator" />
@@ -31,7 +39,7 @@
       class="login-form-fields"
       @submit.prevent="handleLogin"
     >
-      <v-text-field
+      <form-input
         v-model="email"
         autocomplete="one-time-code"
         class="form-field"
@@ -44,10 +52,10 @@
         variant="outlined"
       />
 
-      <v-text-field
+      <form-input
         v-model="password"
         autocomplete="new-password"
-        class="form-field"
+        class="form-field mt-4"
         density="comfortable"
         hide-details="auto"
         label="Password"
@@ -66,29 +74,32 @@
             <v-icon>{{ showPassword ? 'mdi-eye' : 'mdi-eye-off' }}</v-icon>
           </v-btn>
         </template>
-      </v-text-field>
+      </form-input>
 
-      <div class="form-options">
+      <div class="form-options d-flex align-center justify-space-between my-6">
         <v-checkbox
           v-model="rememberMe"
           class="checkbox-field"
+          color="primary"
           density="compact"
           hide-details
           label="Remember me"
         />
-        <router-link class="forgot-link" to="/forgot-password">Forgot Password?</router-link>
+        <router-link class="forgot-link text-primary" to="/forgot-password">Forgot Password?</router-link>
       </div>
 
-      <v-btn
-        block
-        class="login-btn"
-        :disabled="loading"
-        :loading="loading"
-        size="large"
-        type="submit"
-      >
-        Log in
-      </v-btn>
+      <div class="d-flex justify-center">
+        <v-btn
+          class="login-btn rounded-lg"
+          color="primary"
+          :disabled="loading"
+          :loading="loading"
+          size="large"
+          type="submit"
+        >
+          Log in
+        </v-btn>
+      </div>
     </v-form>
   </div>
 </template>

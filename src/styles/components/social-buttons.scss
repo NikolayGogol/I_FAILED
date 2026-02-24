@@ -1,38 +1,12 @@
 @use '../global/colors' as *;
 @use '../global/fonts' as *;
 
-.social-btn.v-btn {
-  border: 1px solid $border !important;
-  border-radius: 8px !important;
-  background-color: $surface !important;
-  color: $text-secondary !important;
-  text-transform: none !important;
-  font-weight: 500 !important;
-  letter-spacing: normal !important;
-  box-shadow: none !important;
-  min-height: 44px !important;
-}
-
-.social-btn.v-btn:hover:not(.v-btn--disabled) {
-  background-color: $background !important;
-  border-color: $border-hover !important;
-}
-
-.social-btn.facebook-btn.v-btn {
-  background-color: $facebook !important;
-  border-color: $facebook !important;
-  color: $surface !important;
-}
-
-.social-btn.facebook-btn.v-btn:hover:not(.v-btn--disabled) {
-  background-color: $facebook-dark !important;
-  border-color: $facebook-dark !important;
-}
-
-.social-icon {
-  flex-shrink: 0;
-}
-
-.social-btn .v-btn__prepend {
-  margin-inline-end: 12px !important;
+.social-btn {
+  border: 1px solid #DCDCD8;
+  border-radius: 12px;
+  padding: 15px 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
 }

@@ -10,10 +10,18 @@ import { createVuetify } from 'vuetify'
 import '@mdi/font/css/materialdesignicons.css'
 
 import 'vuetify/styles'
-
+const myCustomTheme = {
+  dark: false,
+  colors: {
+    primary: '#D65A1F',
+  },
+}
 // https://vuetifyjs.com/en/introduction/why-vuetify/#feature-guides
 export default createVuetify({
   theme: {
-    defaultTheme: 'light',
+    defaultTheme: 'myCustomTheme',
+    themes: {
+      myCustomTheme,
+    },
   },
 })

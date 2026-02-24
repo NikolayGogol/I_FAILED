@@ -24,3 +24,10 @@
 .form-field .v-field--focused .v-field__outline {
   color: $primary !important;
 }
+
+.label {
+  color: $text-primary;
+  font-size: 14px;
+  line-height: 20px;
+  margin-bottom: 8px;
+}

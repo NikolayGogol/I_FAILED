@@ -1,0 +1,29 @@
+@use '../global/colors' as *;
+
+.auth-layout {
+  position: relative;
+
+  .auth-logo{
+    position: absolute;
+    top: 40px;
+    left: 40px;
+  }
+  h1 {
+    font-size: 64px;
+    line-height: 72px;
+
+    span {
+      color: $primary;
+    }
+  }
+
+  .description {
+    color: $text-secondary;
+    font-size: 20px;
+    font-weight: 400;
+  }
+
+  p.description {
+    margin-bottom: 48px;
+  }
+}

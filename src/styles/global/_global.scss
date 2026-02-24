@@ -1,2 +1,12 @@
 @use 'colors';
 @use 'fonts';
+
+* {
+  font-family: "Poppins", sans-serif;
+  font-style: normal;
+  font-weight: 400;
+}
+
+.v-application {
+  background-color: #F8F8F7;
+}
