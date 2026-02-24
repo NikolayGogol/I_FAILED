@@ -8,6 +8,7 @@
   import { computed, onMounted } from 'vue'
   import { useRoute } from 'vue-router'
   import AuthLayout from '@/layouts/AuthLayout.vue'
+  import AuthMinLayout from '@/layouts/AuthMinLayout.vue'
   import MainLayout from '@/layouts/MainLayout.vue'
   import MainMinLayout from '@/layouts/MainMinLayout.vue'
   import { useAuthStore } from '@/stores/auth'
@@ -19,6 +20,7 @@
     AuthLayout,
     MainLayout,
     MainMinLayout,
+    AuthMinLayout,
   }
 
   const layout = computed(() => {

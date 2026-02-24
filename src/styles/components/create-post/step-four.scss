@@ -1,17 +1,17 @@
-@use '../../global/colors' as *;
-@use '../../global/fonts' as *;
+@use '../../settings.scss' as *;
+@use '../../global/fonts.scss' as *;
 
 .step-four {
   .step-title {
     font-size: 1.5rem;
     font-weight: 600;
     margin-bottom: 8px;
-    color: #333;
+    color: $color-text-primary;
   }
 
   .step-subtitle {
     font-size: 1rem;
-    color: #666;
+    color: $color-text-secondary;
     margin-bottom: 24px;
   }
 
@@ -22,13 +22,13 @@
       display: block;
       font-size: 0.9rem;
       font-weight: 600;
-      color: #333;
+      color: $color-text-primary;
       margin-bottom: 8px;
     }
 
     .form-hint {
       font-size: 0.8rem;
-      color: #888;
+      color: $color-text-tertiary;
       margin-bottom: 8px;
     }
 
@@ -42,15 +42,15 @@
       gap: 8px;
 
       .emotion-chip {
-        border-color: #e0e0e0;
-        color: #555;
+        border-color: $color-border;
+        color: $color-text-secondary;
         font-weight: 500;
         border-radius: 8px;
 
         &.v-chip--selected {
-          background-color: rgba($primary, 0.1);
-          border-color: $primary;
-          color: $primary;
+          background-color: rgba($color-primary, 0.1);
+          border-color: $color-primary;
+          color: $color-primary;
         }
       }
     }
@@ -62,8 +62,8 @@
       margin-bottom: 12px;
 
       .tag-chip {
-        background-color: #f1f5f9;
-        color: #333;
+        background-color: $color-background;
+        color: $color-text-primary;
         font-weight: 500;
         border-radius: 6px;
       }

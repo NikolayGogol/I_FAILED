@@ -1,4 +1,4 @@
-@use '../global/colors' as *;
+@use '../settings.scss' as *;
 @use '../global/fonts' as *;
 
 .form-field .v-field {
@@ -13,21 +13,30 @@
 .form-field .v-label {
   font-size: $font-size-sm !important;
   font-weight: 500 !important;
-  color: $text-secondary !important;
+  color: $color-text-secondary !important;
 }
 
 .form-field .v-field__outline {
   --v-field-border-opacity: 1;
-  color: $border !important;
+  color: $color-border !important;
 }
 
 .form-field .v-field--focused .v-field__outline {
-  color: $primary !important;
+  color: $color-primary !important;
 }
 
 .label {
-  color: $text-primary;
+  color: $color-text-primary;
   font-size: 14px;
   line-height: 20px;
   margin-bottom: 8px;
+}
+
+.v-input__details {
+  background-color: transparent;
+}
+
+.v-field__input {
+  background-color: white;
+  border-radius: 12px;
 }

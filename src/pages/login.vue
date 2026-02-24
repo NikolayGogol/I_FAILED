@@ -35,6 +35,7 @@
     </div>
 
     <v-form
+      ref="form"
       autocomplete="off"
       class="login-form-fields"
       @submit.prevent="handleLogin"
@@ -48,6 +49,7 @@
         label="Email"
         placeholder="Enter email"
         required
+        :rules="emailRules"
         type="email"
         variant="outlined"
       />
@@ -61,20 +63,10 @@
         label="Password"
         placeholder="Enter password"
         required
-        :type="showPassword ? 'text' : 'password'"
+        :rules="passwordRules"
+        type="password"
         variant="outlined"
-      >
-        <template #append-inner>
-          <v-btn
-            icon
-            size="small"
-            variant="text"
-            @click="showPassword = !showPassword"
-          >
-            <v-icon>{{ showPassword ? 'mdi-eye' : 'mdi-eye-off' }}</v-icon>
-          </v-btn>
-        </template>
-      </form-input>
+      />
 
       <div class="form-options d-flex align-center justify-space-between my-6">
         <v-checkbox
@@ -109,6 +101,7 @@
   import { useRouter } from 'vue-router'
   import { useToast } from 'vue-toastification'
   import FacebookLoginButton from '@/components/FacebookLoginButton.vue'
+  import FormInput from '@/components/FormInput.vue'
   import GoogleLoginButton from '@/components/GoogleLoginButton.vue'
   import { useAuthStore } from '@/stores/auth'
   import '@/styles/pages/login.scss'
@@ -117,13 +110,26 @@
   const authStore = useAuthStore()
   const toast = useToast()
 
+  const form = ref(null)
   const email = ref('')
   const password = ref('')
-  const showPassword = ref(false)
   const rememberMe = ref(false)
   const loading = ref(false)
 
+  const emailRules = [
+    v => !!v || 'Email is required',
+    v => /.+@.+\..+/.test(v) || 'E-mail must be valid',
+  ]
+
+  const passwordRules = [
+    v => !!v || 'Password is required',
+    v => v.length >= 6 || 'Password must be at least 6 characters',
+  ]
+
   async function handleLogin () {
+    const { valid } = await form.value.validate()
+    if (!valid) return
+
     loading.value = true
     try {
       await authStore.signInWithEmail(email.value, password.value, rememberMe.value)

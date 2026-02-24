@@ -10,6 +10,7 @@
   import { ref } from 'vue'
   import { useToast } from 'vue-toastification'
   import FacebookLoginButton from '@/components/FacebookLoginButton.vue'
+  import FormInput from '@/components/FormInput.vue'
   import GoogleLoginButton from '@/components/GoogleLoginButton.vue'
   import { useAuthStore } from '@/stores/auth'
   import '@/styles/pages/register.scss'
@@ -17,26 +18,38 @@
   const authStore = useAuthStore()
   const toast = useToast()
 
+  const form = ref(null)
   const email = ref('')
   const password = ref('')
   const displayName = ref('')
   const whyJoining = ref(null)
-  const showPassword = ref(false)
   const loading = ref(false)
   const isSend = ref(false)
 
   const whyJoiningOptions = [
-    { title: 'Personal use', value: 'personal' },
-    { title: 'Work / Business', value: 'work' },
-    { title: 'Learning', value: 'learning' },
-    { title: 'Other', value: 'other' },
+    'Personal use',
+    'Work / Business',
+    'Learning',
+    'Other',
+  ]
+
+  const emailRules = [
+    v => !!v || 'Email is required',
+    v => /.+@.+\..+/.test(v) || 'E-mail must be valid',
+  ]
+
+  const passwordRules = [
+    v => !!v || 'Password is required',
+    v => v.length >= 6 || 'Password must be at least 6 characters',
+  ]
+
+  const nameRules = [
+    v => !!v || 'Name is required',
   ]
 
   async function handleRegister () {
-    if (password.value.length < 6) {
-      toast.error('Password must be at least 6 characters long')
-      return
-    }
+    const { valid } = await form.value.validate()
+    if (!valid) return
 
     loading.value = true
     try {
@@ -58,99 +71,101 @@
 
 <template>
   <div v-if="!isSend" class="register-form">
-    <h1 class="welcome-title">Sign up</h1>
+    <h1 class="welcome-title font-weight-semibold text-center">Sign up</h1>
 
-    <div class="signin-prompt">
+    <div class="auth-prompt text-center">
       <span>Already have an account? </span>
-      <router-link class="join-link" to="/login">Log in</router-link>
+      <router-link class="auth-link" to="/login">Log in</router-link>
     </div>
 
-    <div class="social-buttons">
-      <google-login-button>Sign up with Google</google-login-button>
-      <facebook-login-button>Sign up with Facebook</facebook-login-button>
+    <div class="social-buttons mt-4">
+      <v-row>
+        <v-col>
+          <google-login-button />
+        </v-col>
+        <v-col>
+          <facebook-login-button />
+        </v-col>
+      </v-row>
     </div>
 
-    <div class="separator-wrapper">
+    <div class="separator-wrapper d-flex align-center my-6">
       <v-divider class="separator" />
       <span class="separator-text">or</span>
       <v-divider class="separator" />
     </div>
 
-    <v-form autocomplete="off" class="register-form-fields" @submit.prevent="handleRegister">
-      <v-text-field
+    <v-form
+      ref="form"
+      autocomplete="off"
+      class="register-form-fields"
+      @submit.prevent="handleRegister"
+    >
+      <form-input
         v-model="email"
         autocomplete="username"
-        class="form-field"
         density="comfortable"
         hide-details="auto"
         label="Email"
         placeholder="Enter email"
         required
+        :rules="emailRules"
         type="email"
         variant="outlined"
       />
 
-      <v-text-field
+      <form-input
         v-model="password"
         autocomplete="new-password"
-        class="form-field"
         density="comfortable"
         hide-details="auto"
         label="Password"
         placeholder="Enter password"
         required
-        :type="showPassword ? 'text' : 'password'"
+        :rules="passwordRules"
+        type="password"
         variant="outlined"
-      >
-        <template #append-inner>
-          <v-btn
-            icon
-            size="small"
-            variant="text"
-            @click="showPassword = !showPassword"
-          >
-            <v-icon>{{ showPassword ? 'mdi-eye' : 'mdi-eye-off' }}</v-icon>
-          </v-btn>
-        </template>
-      </v-text-field>
+      />
 
-      <v-text-field
+      <form-input
         v-model="displayName"
         autocomplete="off"
-        class="form-field"
         density="comfortable"
         hide-details="auto"
         label="Display Name"
         placeholder="User123"
         required
+        :rules="nameRules"
         type="text"
         variant="outlined"
       />
 
-      <v-select
-        v-model="whyJoining"
-        class="form-field"
-        clearable
-        density="comfortable"
-        hide-details="auto"
-        item-title="title"
-        item-value="value"
-        :items="whyJoiningOptions"
-        label="Why joining?"
-        placeholder="Choose an option"
-        variant="outlined"
-      />
+      <div>
+        <label class="label d-block mb-2 text-body-2 text-high-emphasis">Why joining?</label>
+        <v-select
+          v-model="whyJoining"
+          clearable
+          color="primary"
+          density="comfortable"
+          hide-details="auto"
+          :items="whyJoiningOptions"
+          placeholder="Choose an option"
+          variant="outlined"
+        />
+      </div>
 
-      <v-btn
-        block
-        class="register-btn"
-        :disabled="loading"
-        :loading="loading"
-        size="large"
-        type="submit"
-      >
-        Sign Up
-      </v-btn>
+      <div class="d-flex justify-center mt-10">
+        <v-btn
+          class="register-btn rounded-lg"
+          color="primary"
+          :disabled="loading"
+          :loading="loading"
+          size="large"
+          type="submit"
+        >
+          Sign Up
+        </v-btn>
+      </div>
     </v-form>
   </div>
   <div v-else class="d-flex flex-column align-center justify-center text-center">

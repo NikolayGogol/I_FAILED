@@ -4,10 +4,12 @@
     <v-text-field
       class="form-field"
       density="comfortable"
+      :error-messages="errorMessages"
       hide-details="auto"
       :model-value="modelValue"
       :placeholder="placeholder"
       :required="required"
+      :rules="rules"
       :type="isPassword ? (showPassword ? 'text' : 'password') : type"
       variant="outlined"
       @update:model-value="emit('update:modelValue', $event)"
@@ -50,6 +52,14 @@
     required: {
       type: Boolean,
       default: false,
+    },
+    rules: {
+      type: Array,
+      default: () => [],
+    },
+    errorMessages: {
+      type: [String, Array],
+      default: '',
     },
   })
 

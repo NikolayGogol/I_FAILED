@@ -1,4 +1,4 @@
-@use '../global/colors' as *;
+@use '../settings.scss' as *;
 
 .auth-layout {
   position: relative;
@@ -13,12 +13,12 @@
     line-height: 72px;
 
     span {
-      color: $primary;
+      color: $color-primary;
     }
   }
 
   .description {
-    color: $text-secondary;
+    color: $color-text-secondary;
     font-size: 20px;
     font-weight: 400;
   }

@@ -1,7 +1,7 @@
 <route lang="json">
 {
   "meta": {
-    "layout": "AuthLayout"
+    "layout": "AuthMinLayout"
   }
 }
 </route>
@@ -13,14 +13,14 @@
       Back
     </router-link>
 
-    <h1 class="welcome-title">Forgot password?</h1>
+    <h1 class="welcome-title font-weight-semibold">Forgot password?</h1>
 
     <div class="reset-prompt">
       <span>Lorem ipsum dolor sit amet, consectetur.</span>
     </div>
 
-    <v-form class="forgot-password-form-fields" @submit.prevent="handleSendCode">
-      <v-text-field
+    <v-form ref="form" class="forgot-password-form-fields" @submit.prevent="handleSendCode">
+      <form-input
         v-model="email"
         class="form-field"
         density="comfortable"
@@ -28,20 +28,23 @@
         label="Email"
         placeholder="example@gmail.com"
         required
+        :rules="emailRules"
         type="email"
         variant="outlined"
       />
 
-      <v-btn
-        block
-        class="send-code-btn"
-        :disabled="loading"
-        :loading="loading"
-        size="large"
-        type="submit"
-      >
-        Send code
-      </v-btn>
+      <div class="d-flex justify-center mt-10">
+        <v-btn
+          class="send-code-btn rounded-lg"
+          color="primary"
+          :disabled="loading"
+          :loading="loading"
+          size="large"
+          type="submit"
+        >
+          Send code
+        </v-btn>
+      </div>
     </v-form>
   </div>
 </template>
@@ -50,6 +53,7 @@
   import { ref } from 'vue'
   import { useRouter } from 'vue-router'
   import { useToast } from 'vue-toastification'
+  import FormInput from '@/components/FormInput.vue'
   import { useAuthStore } from '@/stores/auth'
   import '@/styles/pages/forgot-password.scss'
 
@@ -57,10 +61,19 @@
   const toast = useToast()
   const authStore = useAuthStore()
 
+  const form = ref(null)
   const email = ref('')
   const loading = ref(false)
 
+  const emailRules = [
+    v => !!v || 'Email is required',
+    v => /.+@.+\..+/.test(v) || 'E-mail must be valid',
+  ]
+
   async function handleSendCode () {
+    const { valid } = await form.value.validate()
+    if (!valid) return
+
     loading.value = true
     try {
       await authStore.sendPasswordResetOTP(email.value)

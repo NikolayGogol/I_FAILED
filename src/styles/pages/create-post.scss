@@ -1,5 +1,5 @@
-@use '../global/colors' as *;
-@use '../global/fonts' as *;
+@use '../settings.scss' as *;
+@use '../global/fonts.scss' as *;
 
 .create-post-page {
   display: flex;
@@ -9,7 +9,7 @@
   .create-post-card {
     width: 100%;
     max-width: 800px;
-    background-color: #fff;
+    background-color: $color-surface;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 
     .header-section {
@@ -20,21 +20,21 @@
       .back-btn {
         margin-right: 16px;
         margin-top: 4px;
-        color: $text-secondary;
+        color: $color-text-secondary;
       }
 
       .title-wrapper {
         .page-title {
           font-size: 2rem;
           font-weight: 700;
-          color: $text-primary;
+          color: $color-text-primary;
           margin-bottom: 8px;
           line-height: 1.2;
         }
 
         .page-subtitle {
           font-size: 1rem;
-          color: $text-secondary;
+          color: $color-text-secondary;
         }
       }
     }
@@ -48,12 +48,12 @@
         margin-bottom: 8px;
         font-size: 0.875rem;
         font-weight: 500;
-        color: $text-secondary;
+        color: $color-text-secondary;
       }
 
       .progress-bar {
         border-radius: 4px;
-        background-color: #e2e8f0;
+        background-color: $color-border;
       }
     }
 
@@ -67,7 +67,7 @@
       justify-content: space-between;
       align-items: center;
       padding-top: 24px;
-      border-top: 1px solid #e2e8f0;
+      border-top: 1px solid $color-border;
     }
   }
 }

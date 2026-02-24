@@ -1,0 +1,73 @@
+@use '../settings.scss' as *;
+
+.verify-new-user-form {
+  max-width: 600px;
+  width: 100%;
+  margin: 0 auto;
+  text-align: center;
+
+  .back-link {
+    color: $color-text-secondary;
+    font-size: 16px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: $spacing-xs;
+    margin-bottom: $spacing-xl;
+  }
+
+  .welcome-title {
+    color: $color-text-primary;
+    margin-top: $spacing-xl * 1.5;
+    margin-bottom: $spacing-lg;
+    font-weight: 600;
+  }
+
+  .verify-prompt {
+    color: $color-text-secondary;
+    font-size: 18px;
+    margin-bottom: $spacing-xl * 1.5;
+  }
+
+  .v-progress-circular {
+    margin-top: $spacing-lg;
+    margin-bottom: $spacing-md;
+  }
+
+  .v-alert {
+    text-align: left;
+    border-radius: $radius-md;
+    padding: $spacing-md;
+    font-size: 1rem;
+
+    &.v-alert--success {
+      background-color: lighten($color-accent-bg, 5%);
+      color: $color-accent-text;
+      border-left: 4px solid $color-accent-text;
+    }
+
+    &.v-alert--error {
+      background-color: lighten($color-error, 40%);
+      color: darken($color-error, 10%);
+      border-left: 4px solid darken($color-error, 10%);
+    }
+
+    .v-alert__icon {
+      color: inherit;
+    }
+
+    a {
+      color: $color-primary;
+      text-decoration: none;
+      font-weight: bold;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  .login-btn {
+    margin-top: $spacing-lg;
+  }
+}

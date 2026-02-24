@@ -36,6 +36,13 @@ export default defineConfig({
       },
     }),
   ],
+  css: {
+    preprocessorOptions: {
+      scss: {
+        additionalData: `@use "@/styles/global/_global.scss" as *;`,
+      },
+    },
+  },
   optimizeDeps: {
     exclude: [
       'vuetify',

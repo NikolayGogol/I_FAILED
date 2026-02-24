@@ -1,5 +1,5 @@
-@use '../global/colors' as *;
-@use '../global/fonts' as *;
+@use '../settings.scss' as *;
+@use '../global/fonts.scss' as *;
 
 .upload-file-wrapper {
   height: 270px;
@@ -7,14 +7,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px dashed #cecece;
+  border: 1px dashed $color-border;
   border-radius: 12px;
-  background-color: #f8fafc;
+  background-color: $color-background;
   transition: all 0.3s ease;
   cursor: pointer;
 
   &:hover {
-    border-color: $primary;
+    border-color: $color-primary;
     background-color: #f1f5f9;
   }
 
@@ -23,20 +23,20 @@
     flex-direction: column;
     align-items: center;
     cursor: pointer;
-    color: $text-secondary;
+    color: $color-text-secondary;
     font-size: 1rem;
     font-weight: 500;
 
     .v-icon {
       font-size: 48px;
-      color: $primary;
+      color: $color-primary;
       margin-bottom: 12px;
     }
 
     p {
       margin-top: 8px;
       font-size: 0.8rem;
-      color: #94a3b8;
+      color: $color-text-tertiary;
     }
   }
 }
