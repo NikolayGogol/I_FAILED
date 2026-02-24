@@ -55,7 +55,7 @@
 
     <div v-else>
       <v-alert
-        v-if="!success"
+        v-if="success"
         class="mb-4"
         icon="mdi-check-circle"
         prominent
