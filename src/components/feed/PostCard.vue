@@ -1,9 +1,9 @@
 <script setup>
   import { computed, onMounted, ref } from 'vue'
+  import { useRouter } from 'vue-router'
   import { auth } from '@/firebase'
   import { usePostCardStore } from '@/stores/post-card.js'
   import '@/styles/components/feed/post-card.scss'
-  import {useRouter} from "vue-router";
 
   const p = defineProps({
     post: {
@@ -20,16 +20,18 @@
   const isLiked = ref(false)
   const likeCount = ref(p.post.likes || 0)
   const isLiking = ref(false) // To disable the button during the request
+  const commentCount = ref(0)
 
   const userInitial = computed(() => {
     return p.post.user?.displayName?.charAt(0).toUpperCase() || ''
   })
 
-  onMounted(() => {
+  onMounted(async () => {
     const currentUser = auth.currentUser
     if (currentUser && p.post.likedBy?.includes(currentUser.uid)) {
       isLiked.value = true
     }
+    commentCount.value = await postCardStore.getCommentCount(p.post.id)
   })
 
   const truncatedBody = computed(() => {
@@ -82,7 +84,7 @@
 </script>
 
 <template>
-  <div class="post-card">
+  <div v-if="post" class="post-card">
     <header class="post-header" @click="openPost">
       <div class="post-avatar">
         <img v-if="post.user.photoURL" alt="User avatar" :src="post.user.photoURL">
@@ -132,7 +134,7 @@
       </div>
       <div class="meta-item">
         <span class="meta-label">Recovery:</span>
-        <span>{{ post.stepFour.recoveryTime.title }}</span>
+        <span>{{ post.stepFour?.recoveryTime?.title }}</span>
       </div>
     </div>
 
@@ -143,7 +145,7 @@
       </button>
       <button class="icon-btn">
         <v-icon size="18">mdi-comment-outline</v-icon>
-        <span>{{ post.comments }}</span>
+        <span>{{ commentCount }}</span>
       </button>
       <button class="icon-btn">
         <v-icon size="18">mdi-eye-outline</v-icon>

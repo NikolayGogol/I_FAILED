@@ -1,4 +1,4 @@
-import { collection, getDocs, query } from 'firebase/firestore' // Removed orderBy
+import { collection, getDocs, query } from 'firebase/firestore'
 import { defineStore } from 'pinia'
 import { db } from '@/firebase'
 

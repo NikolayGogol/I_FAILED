@@ -1,4 +1,4 @@
-import { arrayRemove, arrayUnion, doc, increment, updateDoc } from 'firebase/firestore'
+import { arrayRemove, arrayUnion, collection, doc, getCountFromServer, increment, query, updateDoc, where } from 'firebase/firestore'
 import { defineStore } from 'pinia'
 import { auth, db } from '@/firebase'
 
@@ -38,5 +38,15 @@ export const usePostCardStore = defineStore('postCard', {
         return { success: false, error: error.message }
       }
     },
+    async getCommentCount (postId) {
+      try {
+        const q = query(collection(db, 'comments'), where('postId', '==', postId))
+        const snapshot = await getCountFromServer(q)
+        return snapshot.data().count
+      } catch (error) {
+        console.error('Error getting comment count:', error)
+        return 0
+      }
+    }
   },
 })
