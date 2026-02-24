@@ -101,13 +101,7 @@
     </header>
 
     <div class="post-tags">
-      <span
-        v-for="tag in post.stepFour.tags"
-        :key="tag"
-        class="post-tag"
-      >
-        {{ tag }}
-      </span>
+     <span>{{ post.stepOne.selectedCategories.map(el => el.label).join(' / ') }}</span>
     </div>
 
     <h2 class="post-title">
@@ -123,17 +117,18 @@
         :key="chip"
         class="post-chip"
       >
+        {{ chip.emoji }}
         {{ chip.label }}
       </span>
     </div>
 
     <div class="post-meta">
       <div class="meta-item">
-        <span class="meta-label">Cost:</span>
-        <span>{{ post.stepFour.cost }}</span>
+        <span class="meta-label">💰    Cost:</span>
+        <span>$ {{ post.stepFour.cost }}</span>
       </div>
       <div class="meta-item">
-        <span class="meta-label">Recovery:</span>
+        <span class="meta-label">⏱️   Recovery:</span>
         <span>{{ post.stepFour?.recoveryTime?.title }}</span>
       </div>
     </div>

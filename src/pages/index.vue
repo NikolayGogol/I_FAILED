@@ -49,15 +49,15 @@
       </div>
 
       <!-- Composer -->
-      <div class="composer-card ">
-        <v-btn
-          class="write-post-btn"
-          color="primary"
-          rounded="lg"
-          variant="outlined"
+      <div class="composer-card mb-6">
+        <div
+          class="write-post-btn font-weight-semibold"
         >
           Write a post
-        </v-btn>
+        </div>
+        <div class="composer-filter">
+          <v-icon icon="mdi-filter-variant" />
+        </div>
       </div>
 
       <!-- Posts -->
