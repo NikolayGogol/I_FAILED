@@ -1,3 +1,55 @@
+<script setup>
+  import { computed, onMounted } from 'vue'
+  import { useAuthStore } from '@/stores/auth'
+  import { useWhoToFollowStore } from '@/stores/who-to-follow'
+  import '@/styles/components/sidebars/who-to-follow.scss'
+
+  const whoToFollowStore = useWhoToFollowStore()
+  const authStore = useAuthStore()
+
+  onMounted(() => {
+    whoToFollowStore.fetchAllUsers()
+  })
+
+  const filteredUsers = computed(() => {
+    if (!authStore.user) {
+      return whoToFollowStore.users
+    }
+    return whoToFollowStore.users.filter(user => user.id !== authStore.user.uid)
+  })
+
+  const sortedUsers = computed(() => {
+    const usersWithAvatars = filteredUsers.value.filter(user => user.photoURL)
+    const usersWithoutAvatars = filteredUsers.value.filter(user => !user.photoURL)
+
+    // Shuffle both lists independently
+    const shuffledWithAvatars = usersWithAvatars.toSorted(() => 0.5 - Math.random())
+    const shuffledWithoutAvatars = usersWithoutAvatars.toSorted(() => 0.5 - Math.random())
+    // Combine and take the first 5
+    return [...shuffledWithAvatars, ...shuffledWithoutAvatars].slice(0, 5)
+  })
+
+  const backgroundColors = [
+    '#ffcdd2', '#f8bbd0', '#e1bee7', '#d1c4e9', '#c5cae9',
+    '#bbdefb', '#b3e5fc', '#b2ebf2', '#b2dfdb', '#c8e6c9',
+    '#dcedc8', '#f0f4c3', '#fff9c4', '#ffecb3', '#ffe0b2',
+    '#ffccbc', '#d7ccc8', '#cfd8dc',
+  ]
+
+  function getRandomColor () {
+    const randomIndex = Math.floor(Math.random() * backgroundColors.length)
+    return backgroundColors[randomIndex]
+  }
+
+  function getInitials (name) {
+    if (!name) return ''
+    const parts = name.split(' ')
+    if (parts.length === 1) {
+      return parts[0].charAt(0).toUpperCase()
+    }
+    return (parts[0].charAt(0) + (parts[1]?.charAt(0) || '')).toUpperCase()
+  }
+</script>
 <template>
   <section class="right-card follow-card">
     <header class="right-card-header">
@@ -50,57 +102,3 @@
     </template>
   </section>
 </template>
-
-<script setup>
-  import { computed, onMounted } from 'vue'
-  import { useAuthStore } from '@/stores/auth'
-  import { useWhoToFollowStore } from '@/stores/who-to-follow'
-  import '@/styles/components/sidebars/who-to-follow.scss'
-
-  const whoToFollowStore = useWhoToFollowStore()
-  const authStore = useAuthStore()
-
-  onMounted(() => {
-    whoToFollowStore.fetchAllUsers()
-  })
-
-  const filteredUsers = computed(() => {
-    if (!authStore.user) {
-      return whoToFollowStore.users
-    }
-    return whoToFollowStore.users.filter(user => user.id !== authStore.user.uid)
-  })
-
-  const sortedUsers = computed(() => {
-    const usersWithAvatars = filteredUsers.value.filter(user => user.photoURL)
-    const usersWithoutAvatars = filteredUsers.value.filter(user => !user.photoURL)
-
-    // Shuffle both lists independently
-    const shuffledWithAvatars = usersWithAvatars.sort(() => 0.5 - Math.random())
-    const shuffledWithoutAvatars = usersWithoutAvatars.sort(() => 0.5 - Math.random())
-
-    // Combine and take the first 5
-    return [...shuffledWithAvatars, ...shuffledWithoutAvatars].slice(0, 5)
-  })
-
-  const backgroundColors = [
-    '#ffcdd2', '#f8bbd0', '#e1bee7', '#d1c4e9', '#c5cae9',
-    '#bbdefb', '#b3e5fc', '#b2ebf2', '#b2dfdb', '#c8e6c9',
-    '#dcedc8', '#f0f4c3', '#fff9c4', '#ffecb3', '#ffe0b2',
-    '#ffccbc', '#d7ccc8', '#cfd8dc',
-  ]
-
-  function getRandomColor () {
-    const randomIndex = Math.floor(Math.random() * backgroundColors.length)
-    return backgroundColors[randomIndex]
-  }
-
-  function getInitials (name) {
-    if (!name) return ''
-    const parts = name.split(' ')
-    if (parts.length === 1) {
-      return parts[0].charAt(0).toUpperCase()
-    }
-    return (parts[0].charAt(0) + (parts[1]?.charAt(0) || '')).toUpperCase()
-  }
-</script>
