@@ -21,12 +21,7 @@
   const sortedUsers = computed(() => {
     const usersWithAvatars = filteredUsers.value.filter(user => user.photoURL)
     const usersWithoutAvatars = filteredUsers.value.filter(user => !user.photoURL)
-
-    // Shuffle both lists independently
-    const shuffledWithAvatars = usersWithAvatars.toSorted(() => 0.5 - Math.random())
-    const shuffledWithoutAvatars = usersWithoutAvatars.toSorted(() => 0.5 - Math.random())
-    // Combine and take the first 5
-    return [...shuffledWithAvatars, ...shuffledWithoutAvatars].slice(0, 5)
+    return [...usersWithAvatars, ...usersWithoutAvatars].slice(0, 5)
   })
 
   const backgroundColors = [
