@@ -20,6 +20,8 @@ declare module 'vue-router/auto-routes' {
   export interface RouteNamedMap {
     '/': RouteRecordInfo<'/', '/', Record<never, never>, Record<never, never>>,
     '/404': RouteRecordInfo<'/404', '/404', Record<never, never>, Record<never, never>>,
+    '/check-inbox': RouteRecordInfo<'/check-inbox', '/check-inbox', Record<never, never>, Record<never, never>>,
+    '/congrats': RouteRecordInfo<'/congrats', '/congrats', Record<never, never>, Record<never, never>>,
     '/create-post': RouteRecordInfo<'/create-post', '/create-post', Record<never, never>, Record<never, never>>,
     '/explore': RouteRecordInfo<'/explore', '/explore', Record<never, never>, Record<never, never>>,
     '/failure-age': RouteRecordInfo<'/failure-age', '/failure-age', Record<never, never>, Record<never, never>>,
@@ -56,6 +58,14 @@ declare module 'vue-router/auto-routes' {
     }
     'src/pages/404.vue': {
       routes: '/404'
+      views: never
+    }
+    'src/pages/check-inbox.vue': {
+      routes: '/check-inbox'
+      views: never
+    }
+    'src/pages/congrats.vue': {
+      routes: '/congrats'
       views: never
     }
     'src/pages/create-post.vue': {

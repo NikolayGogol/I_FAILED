@@ -31,6 +31,8 @@
       const response = await axios.post('/verifyUser', { token })
       if (response.data.status === 'success') {
         success.value = true
+        sessionStorage.setItem('congrats', 'true')
+        router.put('/congrats')
       } else {
         errorMessage.value = response.data.message || 'Verification failed.'
       }
@@ -53,7 +55,7 @@
 
     <div v-else>
       <v-alert
-        v-if="success"
+        v-if="!success"
         class="mb-4"
         icon="mdi-check-circle"
         prominent
@@ -70,17 +72,6 @@
       >
         {{ errorMessage || 'Failed to verify your email. The link might be invalid or expired.' }}
       </v-alert>
-
-      <div class="d-flex justify-center mt-6">
-        <v-btn
-          class="login-btn rounded-lg"
-          color="primary"
-          size="large"
-          @click="router.push('/login')"
-        >
-          Go to Login
-        </v-btn>
-      </div>
     </div>
   </div>
 </template>

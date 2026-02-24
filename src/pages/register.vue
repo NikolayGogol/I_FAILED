@@ -8,6 +8,7 @@
 
 <script setup>
   import { ref } from 'vue'
+  import { useRouter } from 'vue-router'
   import { useToast } from 'vue-toastification'
   import FacebookLoginButton from '@/components/FacebookLoginButton.vue'
   import FormInput from '@/components/FormInput.vue'
@@ -17,6 +18,7 @@
 
   const authStore = useAuthStore()
   const toast = useToast()
+  const router = useRouter()
 
   const form = ref(null)
   const email = ref('')
@@ -24,7 +26,6 @@
   const displayName = ref('')
   const whyJoining = ref(null)
   const loading = ref(false)
-  const isSend = ref(false)
 
   const whyJoiningOptions = [
     'Personal use',
@@ -53,13 +54,20 @@
 
     loading.value = true
     try {
-      await authStore.createAcc({
+      const response = await authStore.createAcc({
         email: email.value,
         password: password.value,
         displayName: displayName.value,
         whyJoining: whyJoining.value,
       })
-      isSend.value = true
+      if (response.data.status === 'success' && response.data.verificationToken) {
+        router.push({
+          path: '/check-inbox',
+          query: { email: email.value, token: response.data.verificationToken },
+        })
+      } else {
+        toast.error(response.data.message || 'Registration failed. Please try again.')
+      }
     } catch (error) {
       toast.error(authStore.error || 'Registration failed. Please try again.')
       console.error('Registration error:', error)
@@ -70,7 +78,7 @@
 </script>
 
 <template>
-  <div v-if="!isSend" class="register-form">
+  <div class="register-form">
     <h1 class="welcome-title font-weight-semibold text-center">Sign up</h1>
 
     <div class="auth-prompt text-center">
@@ -167,17 +175,5 @@
         </v-btn>
       </div>
     </v-form>
-  </div>
-  <div v-else class="d-flex flex-column align-center justify-center text-center">
-    <div class="d-flex justify-start mb-3 w-100">
-      <div class="d-flex align-center cursor-pointer" @click="isSend = false">
-        <v-icon class="mr-2" size="small">mdi-arrow-left</v-icon>
-        Back
-      </div>
-    </div>
-    <div class="placeholder-image" style="width: 100%; max-width: 300px; height: auto; aspect-ratio: 440 / 238;" />
-    <h1 class="mt-2">Check your inbox</h1>
-    <p>Click on the link we sent to {{ email }} to finish your registration</p>
-    <p>Didn’t receive the email? <b class="cursor-pointer" @click="handleRegister">Send again</b></p>
   </div>
 </template>

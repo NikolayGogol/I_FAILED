@@ -1,0 +1,51 @@
+@use '../settings.scss' as *;
+
+.check-inbox-message {
+  max-width: 600px;
+  width: 100%;
+  margin: 0 auto;
+  text-align: center;
+
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: $spacing-xs;
+    color: $color-text-secondary;
+    cursor: pointer;
+    margin-bottom: $spacing-xl;
+  }
+
+  .placeholder-image {
+    width: 100%;
+    max-width: 300px;
+    height: auto;
+    aspect-ratio: 440 / 238;
+    background-color: $color-background;
+    border: 1px solid $color-border;
+    border-radius: $radius-lg;
+    margin: 0 auto $spacing-lg;
+  }
+
+  .welcome-title {
+    font-size: 2rem;
+    font-weight: 600;
+    color: $color-text-primary;
+    margin-bottom: $spacing-md;
+  }
+
+  .prompt-text {
+    color: $color-text-secondary;
+    margin-bottom: $spacing-sm;
+
+    .resend-link {
+      color: $color-primary;
+      font-weight: bold;
+      cursor: pointer;
+
+      &.disabled {
+        color: $color-text-tertiary;
+        cursor: not-allowed;
+      }
+    }
+  }
+}

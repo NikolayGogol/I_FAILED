@@ -79,7 +79,7 @@
   const toast = useToast()
   const authStore = useAuthStore()
 
-  const code = ref(Array(6).fill(''))
+  const code = ref(Array.from({ length: 6 }).fill(''))
   const inputRefs = ref([])
   const loading = ref(false)
   const resendLoading = ref(false)
@@ -128,9 +128,9 @@
     event.preventDefault()
     const pastedData = event.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6)
 
-    pastedData.split('').forEach((char, index) => {
+    for (const [index, char] of pastedData.split('').entries()) {
       code.value[index] = char
-    })
+    }
 
     const nextIndex = Math.min(pastedData.length, 5)
     nextTick(() => {
@@ -152,11 +152,11 @@
       // to pass to the next step for security.
       router.push({
         path: '/set-password',
-        query: { email: email.value, code: verificationCode }
+        query: { email: email.value, code: verificationCode },
       })
-    } catch (error) {
+    } catch {
       toast.error(authStore.error || 'Invalid code. Please try again.')
-      code.value = Array(6).fill('')
+      code.value = Array.from({ length: 6 }).fill('')
       inputRefs.value[0]?.focus()
     } finally {
       loading.value = false
@@ -170,9 +170,9 @@
     try {
       await authStore.sendPasswordResetOTP(email.value)
       toast.success('Code resent successfully!')
-      code.value = Array(6).fill('')
+      code.value = Array.from({ length: 6 }).fill('')
       inputRefs.value[0]?.focus()
-    } catch (error) {
+    } catch {
       toast.error(authStore.error || 'Failed to resend code.')
     } finally {
       resendLoading.value = false

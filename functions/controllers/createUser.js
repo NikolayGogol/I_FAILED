@@ -21,7 +21,8 @@ exports.createUser = async (req, res) => {
     expiresAtDate.setHours(expiresAtDate.getHours() + 24)
 
     // Store user data temporarily
-    await db.collection(process.env.PENDING_USERS).doc(verificationToken).set({
+    const pendingUserRef = db.collection(process.env.PENDING_USERS).doc(verificationToken)
+    await pendingUserRef.set({
       email,
       password,
       displayName,
@@ -33,7 +34,8 @@ exports.createUser = async (req, res) => {
     const verificationLink = `${process.env.VERIFY_LINK}/verify-new-user?token=${verificationToken}`
     await sendVerificationEmail(email, verificationLink)
 
-    return res.status(200).json({ status: 'success', message: 'Verification email sent.' })
+    // Return the token, which can be used to identify the pending user
+    return res.status(200).json({ status: 'success', message: 'Verification email sent.', verificationToken })
   } catch (error) {
     logger.error('Error in registration process:', error)
     res.status(500).json({ error: 'Failed to start registration', message: error.message })

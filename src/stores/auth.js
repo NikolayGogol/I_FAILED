@@ -144,6 +144,23 @@ export const useAuthStore = defineStore('auth', {
       }
     },
 
+    // Resend verification email
+    async resendVerificationEmail (token) {
+      this.error = null
+      if (!token) {
+        this.error = 'Verification token is missing.'
+        throw new Error(this.error)
+      }
+      try {
+        const response = await api.post('/resendVerificationEmail', { token })
+        return response.data
+      } catch (error) {
+        console.error('Error resending verification email:', error)
+        this.error = error.response?.data?.message || 'Failed to resend verification email'
+        throw error
+      }
+    },
+
     // Get user-friendly error message
     getErrorMessage (errorCode) {
       const errorMessages = {
