@@ -2,12 +2,10 @@
 
 .feed-page {
   min-height: 100vh;
-  padding-top: $spacing-md;
 
   .feed-tabs {
     display: flex;
     border-bottom: 1px solid $color-border;
-    background-color: $color-surface;
     position: sticky;
     top: 0;
     z-index: 10;
@@ -15,44 +13,27 @@
 
     .feed-tab {
       flex: 1;
-      padding: $spacing-md;
+      padding: 10px;
       text-align: center;
-      font-weight: bold;
       color: $color-text-secondary;
       background: none;
       border: none;
       cursor: pointer;
       transition: color 0.2s, background-color 0.2s;
       border-bottom: 3px solid transparent;
+      font-size: 14px;
 
       &:hover {
-        background-color: $color-background;
-        color: $color-text-primary;
+        color: $color-primary;
+        border-bottom-color: $color-primary;
+        font-weight: bold;
       }
 
       &.active {
-        color: $color-text-primary;
+        color: $color-primary;
         border-bottom-color: $color-primary;
+        font-weight: bold;
       }
-    }
-  }
-
-  .composer-card {
-    background-color: $color-surface;
-    border: 1px solid $color-border;
-    border-radius: $radius-lg;
-    padding: $spacing-md;
-    margin-bottom: $spacing-lg;
-    display: flex;
-    align-items: center;
-
-    .write-post-btn {
-      width: 100%;
-      text-transform: none;
-      justify-content: flex-start;
-      padding-left: $spacing-md;
-      color: $color-text-secondary;
-      border-color: $color-border;
     }
   }
 }
