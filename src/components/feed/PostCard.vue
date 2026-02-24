@@ -3,6 +3,7 @@
   import { auth } from '@/firebase'
   import { usePostCardStore } from '@/stores/post-card.js'
   import '@/styles/components/feed/post-card.scss'
+  import {useRouter} from "vue-router";
 
   const p = defineProps({
     post: {
@@ -12,7 +13,7 @@
   })
 
   const postCardStore = usePostCardStore()
-
+  const router = useRouter()
   const isExpanded = ref(false)
   const maxLength = 200
 
@@ -74,11 +75,15 @@
 
     isLiking.value = false
   }
+
+  function openPost () {
+    router.push(`/post/${p.post.id}`)
+  }
 </script>
 
 <template>
   <div class="post-card">
-    <header class="post-header">
+    <header class="post-header" @click="openPost">
       <div class="post-avatar">
         <img v-if="post.user.photoURL" alt="User avatar" :src="post.user.photoURL">
         <span v-else>{{ userInitial }}</span>

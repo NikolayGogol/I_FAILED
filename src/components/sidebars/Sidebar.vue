@@ -1,8 +1,8 @@
 <script setup>
+  import { ref } from 'vue'
   import { feedNavItems, feedQuickStats } from '@/models/feed'
   import { useMainStore } from '@/stores/main.js'
   import '@/styles/components/sidebars/sidebar.scss'
-  import {ref} from "vue";
   const navItems = feedNavItems
   const quickStats = feedQuickStats
   const totalPosts = ref(0)

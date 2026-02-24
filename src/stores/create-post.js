@@ -127,7 +127,9 @@ export const useCreatePostStore = defineStore('createPost', {
         if (imagesToUpload && imagesToUpload.length > 0) {
           const uploadPromises = imagesToUpload.map(imageObject => {
             const imageFile = imageObject.file
-            if (!imageFile) return Promise.resolve(null)
+            if (!imageFile) {
+              return Promise.resolve(null)
+            }
 
             const storageRef = ref(storage, `posts/${postId}/${Date.now()}_${imageObject.name}`)
             return uploadBytes(storageRef, imageFile).then(snapshot => getDownloadURL(snapshot.ref))
