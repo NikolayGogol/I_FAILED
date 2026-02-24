@@ -2,7 +2,7 @@ import { collection, getDocs } from 'firebase/firestore'
 import { defineStore } from 'pinia'
 import { db } from '@/firebase'
 
-export const useUsersStore = defineStore('users', {
+export const useWhoToFollowStore = defineStore('whoToFollow', {
   state: () => ({
     users: [],
     loading: false,

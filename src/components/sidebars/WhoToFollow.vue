@@ -3,12 +3,12 @@
     <header class="right-card-header">
       <h3 class="font-weight-semibold">Who to follow</h3>
     </header>
-    <div v-if="usersStore.loading">
+    <div v-if="whoToFollowStore.loading">
       <!-- You can add a loading skeleton here -->
       <p>Loading...</p>
     </div>
-    <div v-else-if="usersStore.error">
-      <p class="text-error">{{ usersStore.error }}</p>
+    <div v-else-if="whoToFollowStore.error">
+      <p class="text-error">{{ whoToFollowStore.error }}</p>
     </div>
     <template v-else>
       <div
@@ -54,22 +54,22 @@
 
 <script setup>
   import { computed, onMounted } from 'vue'
-  import { useUsersStore } from '@/stores/users'
+  import { useWhoToFollowStore } from '@/stores/who-to-follow'
   import { useAuthStore } from '@/stores/auth'
   import '@/styles/components/sidebars/who-to-follow.scss'
 
-  const usersStore = useUsersStore()
+  const whoToFollowStore = useWhoToFollowStore()
   const authStore = useAuthStore()
 
   onMounted(() => {
-    usersStore.fetchAllUsers()
+    whoToFollowStore.fetchAllUsers()
   })
 
   const filteredUsers = computed(() => {
     if (!authStore.user) {
-      return usersStore.users
+      return whoToFollowStore.users
     }
-    return usersStore.users.filter(user => user.id !== authStore.user.uid)
+    return whoToFollowStore.users.filter(user => user.id !== authStore.user.uid)
   })
 
   const randomUsers = computed(() => {
