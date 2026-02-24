@@ -4,6 +4,7 @@
   max-width: 600px;
   width: 100%;
   margin: 0 auto;
+  padding: $spacing-xl $spacing-md;
 
   .back-link {
     color: $color-text-secondary;
@@ -20,29 +21,49 @@
   .welcome-title {
     text-align: center;
     color: $color-text-primary;
-    margin-top: $spacing-xl * 1.5;
-    margin-bottom: $spacing-lg;
+    margin-top: $spacing-xl;
+    margin-bottom: $spacing-md;
+    font-size: 24px;
+    line-height: 1.3;
+
+    @include media-up($breakpoint-sm) {
+      font-size: 32px;
+      margin-top: $spacing-xl * 1.5;
+      margin-bottom: $spacing-lg;
+    }
   }
 
   .verify-prompt {
     text-align: center;
     color: $color-text-secondary;
-    font-size: 18px;
-    margin-bottom: $spacing-xl * 1.5;
+    font-size: 16px;
+    margin-bottom: $spacing-xl;
+
+    @include media-up($breakpoint-sm) {
+      font-size: 18px;
+      margin-bottom: $spacing-xl * 1.5;
+    }
   }
 
-  .v-input {
-    width: 50px;
-    flex: none;
-  }
+  .otp-inputs {
+    gap: $spacing-sm;
+    justify-content: center;
 
-  .v-input__control {
-    width: 50px;
-  }
+    .otp-field {
+      width: 40px;
+      height: 50px;
 
+      @include media-up($breakpoint-sm) {
+        width: 50px;
+        height: 60px;
+      }
+    }
+  }
 
   .resend-code {
+    margin-top: $spacing-lg;
     margin-bottom: $spacing-lg;
+    text-align: center;
 
     .resend-link {
       background: none;
@@ -61,5 +82,9 @@
 
   .confirm-btn {
     margin-top: $spacing-lg;
+    width: 100%;
+    @include media-up($breakpoint-sm) {
+      width: auto;
+    }
   }
 }

@@ -19,8 +19,8 @@
         <div
           class="follow-avatar mr-3"
         >
-          <img v-if="user.photoURL" :src="user.photoURL" alt="User avatar" class="avatar-image">
-          <span v-else :style="{ backgroundColor: getRandomColor() }" class="avatar-initials">{{ getInitials(user.displayName) }}</span>
+          <img v-if="user.photoURL" alt="User avatar" class="avatar-image" :src="user.photoURL">
+          <span v-else class="avatar-initials" :style="{ backgroundColor: getRandomColor() }">{{ getInitials(user.displayName) }}</span>
         </div>
         <div class="follow-info">
           <div class="follow-name">
@@ -53,8 +53,8 @@
 
 <script setup>
   import { computed, onMounted } from 'vue'
-  import { useWhoToFollowStore } from '@/stores/who-to-follow'
   import { useAuthStore } from '@/stores/auth'
+  import { useWhoToFollowStore } from '@/stores/who-to-follow'
   import '@/styles/components/sidebars/who-to-follow.scss'
 
   const whoToFollowStore = useWhoToFollowStore()

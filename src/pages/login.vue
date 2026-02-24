@@ -9,10 +9,10 @@
 <template>
   <div class="login-form">
     <h1 class="welcome-title font-weight-semibold text-center">Welcome!</h1>
-    <div class="signup-prompt text-center">
+    <div class="auth-prompt text-center">
       <span>Don't have an account? </span>
       <router-link
-        class="join-link"
+        class="auth-link"
         to="/register"
       >Join here</router-link>
     </div>

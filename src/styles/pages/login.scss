@@ -4,24 +4,38 @@
   max-width: 600px;
   width: 100%;
   margin: 0 auto;
-
+  padding: $spacing-md;
 
   .welcome-title {
     color: $color-text-primary;
-    font-size: 48px;
+    font-size: 32px;
+    text-align: center;
+    margin-bottom: $spacing-sm;
+
+    @include media-up($breakpoint-sm) {
+      font-size: 48px;
+      text-align: left;
+    }
   }
 
-  .signup-prompt {
-    span {
-      color: $color-text-secondary;
+  .auth-prompt { // Changed from signup-prompt for consistency
+    text-align: center;
+    font-size: 14px;
+    margin-bottom: $spacing-lg;
+
+    @include media-up($breakpoint-sm) {
+      text-align: left;
       font-size: 18px;
-      margin-right: $spacing-md;
     }
 
-    a {
+    span {
+      color: $color-text-secondary;
+    }
+
+    .auth-link { // Changed from join-link
       color: $color-primary;
-      font-size: 18px;
       text-decoration: none;
+      font-weight: 400;
 
       &:hover {
         text-decoration: underline;
@@ -29,11 +43,42 @@
     }
   }
 
+  .social-buttons {
+    .v-row {
+      flex-direction: column;
+      @include media-up($breakpoint-sm) {
+        flex-direction: row;
+      }
+    }
+  }
+
+  .separator-wrapper {
+    margin: $spacing-lg 0;
+  }
+
   .separator-text {
-    width: 50px;
-    text-align: center;
-    display: block;
+    padding: 0 $spacing-md;
     color: $color-text-tertiary;
     font-size: 14px;
+  }
+
+  .form-options {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: $spacing-md;
+    margin: $spacing-lg 0;
+
+    @include media-up($breakpoint-sm) {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+    }
+  }
+
+  .login-btn {
+    width: 100%;
+    @include media-up($breakpoint-sm) {
+      width: auto;
+    }
   }
 }

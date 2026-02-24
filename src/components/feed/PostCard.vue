@@ -101,7 +101,7 @@
     </header>
 
     <div class="post-tags">
-     <span>{{ post.stepOne.selectedCategories.map(el => el.label).join(' / ') }}</span>
+      <span>{{ post.stepOne.selectedCategories.map(el => el.label).join(' / ') }}</span>
     </div>
 
     <h2 class="post-title">

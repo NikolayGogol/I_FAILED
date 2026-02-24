@@ -1,8 +1,8 @@
 <script setup>
   import { ref } from 'vue'
+  import { useDisplay } from 'vuetify'
   import Rightbar from '@/components/sidebars/Rightbar.vue'
   import Sidebar from '@/components/sidebars/Sidebar.vue'
-  import { useDisplay } from 'vuetify'
 
   const drawer = ref(false)
   const { mdAndUp } = useDisplay()
@@ -15,7 +15,7 @@
       <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
       <v-toolbar-title>
         <router-link to="/">
-          <img src="@/assets/Logo.png" alt="Logo" style="height: 32px; vertical-align: middle;">
+          <img alt="Logo" src="@/assets/Logo.png" style="height: 32px; vertical-align: middle;">
         </router-link>
       </v-toolbar-title>
       <v-spacer />
