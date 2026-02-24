@@ -1,11 +1,14 @@
 <script setup>
   import { ref } from 'vue'
+  import { useRouter } from 'vue-router'
   import { feedNavItems, feedQuickStats } from '@/models/feed'
   import { useMainStore } from '@/stores/main.js'
   import '@/styles/components/sidebars/sidebar.scss'
+
   const navItems = feedNavItems
   const quickStats = feedQuickStats
   const totalPosts = ref(0)
+  const router = useRouter()
   //
   const { getFeeds } = useMainStore()
   //
@@ -16,18 +19,20 @@
 <template>
   <aside class="feed-sidebar">
     <div class="sidebar-logo">
-      <span class="logo-mark">ifailed</span>
+      <span class="logo-mark cursor-pointer" @click="router.push('/')">
+        <img alt="" src="../../assets/Logo.png">
+      </span>
     </div>
 
     <nav class="sidebar-nav">
-      <div class="sidebar-section">
+      <div class="sidebar-section d-flex flex-column">
         <router-link
           v-for="item in navItems"
           :key="item.id"
-          class="nav-item"
+          class="nav-item py-2"
           :to="item.id === 'sidebars' ? '/' : '/' + item.id"
         >
-          <v-icon class="nav-icon" size="18">
+          <v-icon class="nav-icon mr-2" size="25">
             {{ item.icon }}
           </v-icon>
           <span>{{ item.label }}</span>
@@ -36,29 +41,28 @@
     </nav>
 
     <section class="sidebar-card quick-stats">
-      <h3 class="sidebar-card-title">Quick Stats</h3>
+      <h3 class="sidebar-card-title font-weight-semibold">Quick Stats</h3>
       <div class="stat-row">
         <span>Total Posts</span>
-        <span class="stat-value">{{ totalPosts }}</span>
+        <span class="stat-value font-weight-bold">{{ totalPosts }}</span>
       </div>
       <div class="stat-row">
         <span>Active Users</span>
-        <span class="stat-value">{{ quickStats.activeUsers.toLocaleString() }}</span>
+        <span class="stat-value font-weight-bold">{{ quickStats.activeUsers.toLocaleString() }}</span>
       </div>
       <div class="stat-row">
         <span>Lessons Shared</span>
-        <span class="stat-value">{{ quickStats.lessonsShared.toLocaleString() }}</span>
+        <span class="stat-value font-weight-bold">{{ quickStats.lessonsShared.toLocaleString() }}</span>
       </div>
     </section>
 
     <v-btn
-      block
-      class="create-post-btn"
+      class="create-post-btn rounded-lg w-100"
       color="primary"
       height="44"
       to="/create-post"
     >
-      Create post
+      + Create post
     </v-btn>
   </aside>
 </template>

@@ -71,9 +71,6 @@
                 <div class="profile-name">
                   {{ currentUserName }}
                 </div>
-                <div class="profile-handle">
-                  {{ currentUserHandle }}
-                </div>
               </div>
             </template>
             <v-spacer />
@@ -121,7 +118,7 @@
       </v-menu>
     </div>
 
-    <v-text-field
+    <form-input
       v-model="search"
       class="profile-search"
       density="compact"

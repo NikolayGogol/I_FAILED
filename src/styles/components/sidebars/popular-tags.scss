@@ -5,15 +5,12 @@
   border: 1px solid $color-border;
   border-radius: $radius-lg;
   padding: $spacing-md;
-  margin-bottom: $spacing-lg;
+  margin-top: 24px;
 
   .right-card-header {
-    margin-bottom: $spacing-md;
-
     h3 {
-      font-size: 18px;
-      font-weight: bold;
       color: $color-text-primary;
+      font-size: 20px;
     }
   }
 
@@ -21,24 +18,36 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: $spacing-sm 0;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    border-radius: $radius-md;
-
-    &:hover {
-      background-color: $color-background;
-    }
 
     .popular-tag {
-      font-weight: bold;
-      color: $color-text-primary;
+      color: #454541;
       font-size: 14px;
-      padding-left: $spacing-sm;
+      text-decoration: underline;
     }
 
-    .v-btn {
-      color: $color-text-secondary;
+    i {
+      cursor: pointer;
+      color: #454541;
+    }
+  }
+
+  + .footer-link {
+    margin-top: 16px;
+    display: flex;
+    flex-wrap: wrap;
+
+    a {
+      text-decoration: none;
+      white-space: nowrap;
+      color: #808079;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+
+      &:before {
+        content: '•';
+        margin-right: 5px;
+      }
     }
   }
 }

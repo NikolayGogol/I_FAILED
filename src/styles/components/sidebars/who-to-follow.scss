@@ -2,93 +2,48 @@
 @use '../../settings.scss' as *;
 
 .follow-card {
-  background-color: $color-surface;
-  border: 1px solid $color-border;
-  border-radius: $radius-lg;
-  padding: $spacing-md;
-  margin-bottom: $spacing-lg;
+  margin-top: 24px;
+  background-color: white;
+  border: 1px solid #DCDCD8;
+  padding: 24px 20px;
+  border-radius: 12px;
 
   .right-card-header {
-    margin-bottom: $spacing-md;
-
     h3 {
-      font-size: 18px;
-      font-weight: bold;
-      color: $color-text-primary;
+      color: #1C1C1B;
+      font-size: 20px;
     }
   }
 
   .follow-row {
     display: flex;
     align-items: center;
-    margin-bottom: $spacing-md;
-    padding-bottom: $spacing-sm;
-    border-bottom: 1px solid transparent; // Placeholder for potential separator
-
-    &:last-child {
-      margin-bottom: 0;
-    }
 
     .follow-avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background-color: $color-accent-bg;
-      color: $color-accent-text;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: bold;
-      margin-right: $spacing-sm;
-      flex-shrink: 0;
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      color: white;
+      font-size: 16px;
     }
 
-    .follow-info {
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      margin-right: $spacing-sm;
-
-      .follow-name {
-        font-weight: bold;
-        color: $color-text-primary;
-        font-size: 14px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-
-      .follow-handle {
-        color: $color-text-secondary;
-        font-size: 12px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
+    .follow-name {
+      font-weight: 600;
+      font-size: 16px;
+      color: #1C1C1B;
     }
 
     .follow-btn {
-      font-size: 12px;
-      text-transform: none;
-      border-radius: $radius-full;
-      padding: 0 $spacing-md;
-    }
-  }
-
-  .show-more-btn {
-    width: 100%;
-    text-align: left;
-    color: $color-accent-text;
-    font-size: 14px;
-    padding: $spacing-sm 0;
-    background: none;
-    border: none;
-    cursor: pointer;
-    transition: color 0.2s;
-
-    &:hover {
-      text-decoration: underline;
-      color: color.adjust($color-accent-text, $lightness: -10%);
+      color: #D65A1F;
+      font-size: 14px;
+      border: 1px solid #DCDCD8;
+      border-radius: 8px;
+      cursor: pointer;
+      padding: 8px 20px;
+      font-weight: 600;
     }
   }
 }

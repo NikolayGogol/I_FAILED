@@ -1,17 +1,11 @@
 <template>
   <div>
-    <label class="label" for="">{{ label }}</label>
+    <label v-if="$attrs.label" class="label">{{ $attrs.label }}</label>
     <v-text-field
       class="form-field"
-      density="comfortable"
-      :error-messages="errorMessages"
-      hide-details="auto"
+      v-bind="filteredAttrs"
       :model-value="modelValue"
-      :placeholder="placeholder"
-      :required="required"
-      :rules="rules"
-      :type="isPassword ? (showPassword ? 'text' : 'password') : type"
-      variant="outlined"
+      :type="isPassword ? (showPassword ? 'text' : 'password') : $attrs.type || 'text'"
       @update:model-value="emit('update:modelValue', $event)"
     >
       <template v-if="isPassword" #append-inner>
@@ -29,43 +23,32 @@
 </template>
 
 <script setup>
-  import { computed, ref } from 'vue'
+  import { computed, ref, useAttrs } from 'vue'
   import '@/styles/components/form-input.scss'
 
-  const props = defineProps({
+  defineOptions({
+    inheritAttrs: false,
+  })
+
+  defineProps({
     modelValue: {
       type: String,
       required: true,
     },
-    label: {
-      type: String,
-      default: '',
-    },
-    placeholder: {
-      type: String,
-      default: '',
-    },
-    type: {
-      type: String,
-      default: 'text',
-    },
-    required: {
-      type: Boolean,
-      default: false,
-    },
-    rules: {
-      type: Array,
-      default: () => [],
-    },
-    errorMessages: {
-      type: [String, Array],
-      default: '',
-    },
   })
 
   const emit = defineEmits(['update:modelValue'])
+  const attrs = useAttrs()
 
   const showPassword = ref(false)
 
-  const isPassword = computed(() => props.type === 'password')
+  const isPassword = computed(() => attrs.type === 'password')
+
+  // We have a custom <label> element, so we don't want to pass the 'label'
+  // prop to v-text-field, which would render its own label.
+  const filteredAttrs = computed(() => {
+    const newAttrs = { ...attrs }
+    delete newAttrs.label
+    return newAttrs
+  })
 </script>
