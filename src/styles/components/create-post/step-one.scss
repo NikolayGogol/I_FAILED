@@ -1,38 +1,40 @@
+@use '../../settings.scss' as *;
+
 .step-one {
   .step-title {
     font-size: 1.5rem;
     font-weight: 600;
-    margin-bottom: 8px;
-    color: #333;
+    margin-bottom: $spacing-sm;
+    color: $color-text-primary;
   }
 
   .step-subtitle {
     font-size: 1rem;
-    color: #666;
-    margin-bottom: 24px;
+    color: $color-text-secondary;
+    margin-bottom: $spacing-lg;
   }
 
   .categories-grid {
     .category-card {
-      border: 1px solid #e0e0e0;
-      border-radius: 8px;
-      padding: 16px;
+      border: 1px solid $color-border;
+      border-radius: $radius-sm;
+      padding: $spacing-md;
       cursor: pointer;
       transition: all 0.2s ease;
-      background-color: white;
+      background-color: $color-surface;
       height: 100%;
 
       &:hover {
-        border-color: #1976d2;
-        background-color: #f5f9ff;
+        border-color: $color-primary;
+        background-color: $color-background;
       }
 
       &.active {
-        border-color: #1976d2;
-        background-color: #e3f2fd;
+        border-color: $color-primary;
+        background-color: $color-accent-bg;
 
         .category-name {
-          color: #1976d2;
+          color: $color-primary;
           font-weight: 600;
         }
       }
@@ -45,13 +47,13 @@
 
         .category-name {
           font-size: 0.9rem;
-          color: #333;
+          color: $color-text-primary;
           line-height: 1.2;
         }
 
         .check-icon {
-          color: #1976d2;
-          margin-left: 8px;
+          color: $color-primary;
+          margin-left: $spacing-sm;
         }
       }
     }

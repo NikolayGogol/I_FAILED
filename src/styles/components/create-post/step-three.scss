@@ -1,26 +1,28 @@
+@use '../../settings.scss' as *;
+
 .step-three {
   .step-title {
     font-size: 1.5rem;
     font-weight: 600;
-    margin-bottom: 8px;
-    color: #333;
+    margin-bottom: $spacing-sm;
+    color: $color-text-primary;
   }
 
   .step-subtitle {
     font-size: 1rem;
-    color: #666;
-    margin-bottom: 24px;
+    color: $color-text-secondary;
+    margin-bottom: $spacing-lg;
   }
 
   .form-group {
-    margin-bottom: 24px;
+    margin-bottom: $spacing-lg;
 
     .form-label {
       display: block;
       font-size: 0.9rem;
       font-weight: 600;
-      color: #333;
-      margin-bottom: 8px;
+      color: $color-text-primary;
+      margin-bottom: $spacing-sm;
     }
 
     .form-input {
@@ -29,16 +31,16 @@
 
     // Quill editor customization
     .ql-container {
-      border-bottom-left-radius: 8px;
-      border-bottom-right-radius: 8px;
+      border-bottom-left-radius: $radius-sm;
+      border-bottom-right-radius: $radius-sm;
       font-family: inherit;
       font-size: 1rem;
     }
 
     .ql-toolbar {
-      border-top-left-radius: 8px;
-      border-top-right-radius: 8px;
-      background-color: #f9f9f9;
+      border-top-left-radius: $radius-sm;
+      border-top-right-radius: $radius-sm;
+      background-color: $color-background;
     }
 
     .ql-editor {

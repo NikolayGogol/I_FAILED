@@ -1,4 +1,4 @@
-@use 'colors';
+@use '../settings.scss' as *;
 @use 'fonts';
 
 * {
@@ -8,5 +8,5 @@
 }
 
 .v-application {
-  background-color: #F8F8F7;
+  background-color: $color-background;
 }

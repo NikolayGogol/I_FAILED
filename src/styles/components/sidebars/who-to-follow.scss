@@ -2,15 +2,15 @@
 @use '../../settings.scss' as *;
 
 .follow-card {
-  margin-top: 24px;
-  background-color: white;
-  border: 1px solid #DCDCD8;
-  padding: 24px 20px;
-  border-radius: 12px;
+  margin-top: $spacing-lg;
+  background-color: $color-surface;
+  border: 1px solid $color-border;
+  padding: $spacing-lg $spacing-md;
+  border-radius: $radius-md;
 
   .right-card-header {
     h3 {
-      color: #1C1C1B;
+      color: $color-text-primary;
       font-size: 20px;
     }
   }
@@ -23,26 +23,26 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      border-radius: 50%;
+      border-radius: $radius-full;
       width: 44px;
       height: 44px;
-      color: white;
+      color: $color-surface;
       font-size: 16px;
     }
 
     .follow-name {
       font-weight: 600;
       font-size: 16px;
-      color: #1C1C1B;
+      color: $color-text-primary;
     }
 
     .follow-btn {
-      color: #D65A1F;
+      color: $color-primary;
       font-size: 14px;
-      border: 1px solid #DCDCD8;
-      border-radius: 8px;
+      border: 1px solid $color-border;
+      border-radius: $radius-sm;
       cursor: pointer;
-      padding: 8px 20px;
+      padding: $spacing-sm $spacing-md;
       font-weight: 600;
     }
   }

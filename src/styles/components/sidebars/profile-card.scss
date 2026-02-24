@@ -2,10 +2,11 @@
 
 .profile-card {
   .profile-top {
-    background-color: white;
-    border: 1px solid #DCDCD8;
-    padding: 15px;
-    border-radius: 12px;
+    background-color: $color-surface;
+    border: 1px solid $color-border;
+    padding: $spacing-md;
+    border-radius: $radius-md;
+    cursor: pointer;
   }
 
   .profile-avatar {
@@ -13,7 +14,7 @@
     height: 44px;
 
     img {
-      border-radius: 50%;
+      border-radius: $radius-full;
     }
 
     span {
@@ -22,15 +23,67 @@
       justify-content: center;
       width: 44px;
       height: 44px;
-      border-radius: 50%;
-      background-color: #D27D33;
-      color: white;
+      border-radius: $radius-full;
+      background-color: $color-primary;
+      color: $color-surface;
       font-size: 16px;
     }
   }
 
+  .profile-info {
+    .profile-name {
+      font-weight: 600;
+      color: $color-text-primary;
+    }
+  }
+
   .profile-search {
-    margin-top: 24px;
+    margin-top: $spacing-lg;
   }
 }
 
+// Styles for the v-menu content
+.profile-menu {
+  .v-list {
+    background-color: $color-surface;
+    border: 1px solid $color-border;
+    border-radius: $radius-md;
+    box-shadow: $shadow-sm;
+    padding: $spacing-xs;
+
+    .v-list-item {
+      cursor: pointer;
+      border-radius: $radius-sm;
+      margin: $spacing-xs;
+
+      .v-list-item-title {
+        display: flex;
+        align-items: center;
+        gap: $spacing-sm;
+        font-size: 14px;
+        color: $color-text-secondary;
+      }
+
+      &:hover {
+        background-color: $color-background;
+      }
+
+      &.v-list-item--active {
+        background-color: $color-accent-bg;
+        .v-list-item-title {
+          color: $color-accent-text;
+          font-weight: bold;
+        }
+      }
+
+      &.text-error {
+        .v-list-item-title {
+          color: $color-error;
+        }
+        &:hover {
+          background-color: rgba($color-error, 0.05);
+        }
+      }
+    }
+  }
+}

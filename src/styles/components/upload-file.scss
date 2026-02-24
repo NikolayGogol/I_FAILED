@@ -8,14 +8,14 @@
   align-items: center;
   justify-content: center;
   border: 1px dashed $color-border;
-  border-radius: 12px;
+  border-radius: $radius-md;
   background-color: $color-background;
   transition: all 0.3s ease;
   cursor: pointer;
 
   &:hover {
     border-color: $color-primary;
-    background-color: #f1f5f9;
+    background-color: darken($color-background, 3%);
   }
 
   label {
@@ -30,11 +30,11 @@
     .v-icon {
       font-size: 48px;
       color: $color-primary;
-      margin-bottom: 12px;
+      margin-bottom: $spacing-md;
     }
 
     p {
-      margin-top: 8px;
+      margin-top: $spacing-sm;
       font-size: 0.8rem;
       color: $color-text-tertiary;
     }

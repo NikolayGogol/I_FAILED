@@ -3,7 +3,7 @@
 .feed-rightbar {
   height: 100vh;
   position: sticky;
-  top: 15px;
+  top: $spacing-md;
   overflow-y: auto;
   display: flex;
   flex-direction: column;

@@ -5,25 +5,25 @@
   .step-title {
     font-size: 1.5rem;
     font-weight: 600;
-    margin-bottom: 8px;
+    margin-bottom: $spacing-sm;
     color: $color-text-primary;
   }
 
   .step-subtitle {
     font-size: 1rem;
     color: $color-text-secondary;
-    margin-bottom: 24px;
+    margin-bottom: $spacing-lg;
   }
 
   .form-group {
-    margin-bottom: 24px;
+    margin-bottom: $spacing-lg;
 
     .form-label {
       display: block;
       font-size: 0.9rem;
       font-weight: 600;
       color: $color-text-primary;
-      margin-bottom: 8px;
+      margin-bottom: $spacing-sm;
     }
 
     .form-input {
@@ -32,8 +32,8 @@
 
     .ql-toolbar {
       border: 1px solid $color-border;
-      border-top-left-radius: 8px;
-      border-top-right-radius: 8px;
+      border-top-left-radius: $radius-sm;
+      border-top-right-radius: $radius-sm;
       background-color: $color-background;
       border-bottom: 1px solid $color-border;
     }
@@ -41,8 +41,8 @@
     .ql-container {
       border: 1px solid $color-border;
       border-top: none;
-      border-bottom-left-radius: 8px;
-      border-bottom-right-radius: 8px;
+      border-bottom-left-radius: $radius-sm;
+      border-bottom-right-radius: $radius-sm;
       background-color: $color-surface;
       font-family: inherit;
 
@@ -50,7 +50,7 @@
         min-height: 150px;
         font-size: 1rem;
         line-height: 1.6;
-        padding: 16px;
+        padding: $spacing-md;
 
         &.ql-blank::before {
           color: $color-text-tertiary;
@@ -64,7 +64,7 @@
 /* Date Picker Menu Styles - Global scope might be needed if menu is attached to body */
 .date-picker-menu {
   .v-date-picker {
-    border-radius: 8px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    border-radius: $radius-sm;
+    box-shadow: $shadow-sm;
   }
 }

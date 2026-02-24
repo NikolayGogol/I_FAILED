@@ -15,7 +15,7 @@
     span {
       color: $color-text-secondary;
       font-size: 18px;
-      margin-right: 15px;
+      margin-right: $spacing-md;
     }
 
     a {
@@ -33,7 +33,7 @@
     width: 50px;
     text-align: center;
     display: block;
-    color: #808079;
+    color: $color-text-tertiary;
     font-size: 14px;
   }
 }

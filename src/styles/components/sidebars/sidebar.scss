@@ -2,7 +2,7 @@
 
 .feed-sidebar {
   position: sticky;
-  top: 15px;
+  top: $spacing-md;
 
   .logo-mark {
     img {
@@ -13,28 +13,28 @@
   .sidebar-nav {
     .sidebar-section {
       .nav-item {
-        color: #808079;
+        color: $color-text-tertiary;
         font-size: 16px;
         text-decoration: none;
         display: flex;
         align-items: center;
 
         &.router-link-active {
-          color: #6E240F;
+          color: $color-primary;
         }
       }
     }
   }
 
   .quick-stats {
-    background-color: white;
-    border: 1px solid #DCDCD8;
-    border-radius: 8px;
-    padding: 15px;
-    margin-top: 24px;
+    background-color: $color-surface;
+    border: 1px solid $color-border;
+    border-radius: $radius-sm;
+    padding: $spacing-md;
+    margin-top: $spacing-lg;
 
     .sidebar-card-title {
-      color: #1C1C1B;
+      color: $color-text-primary;
       font-size: 16px;
     }
 
@@ -42,15 +42,15 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding-top: 5px;
-      padding-bottom: 5px;
+      padding-top: $spacing-xs;
+      padding-bottom: $spacing-xs;
 
       span {
-        color: #808079;
+        color: $color-text-tertiary;
         font-size: 14px;
 
         &.stat-value {
-          color: #1C1C1B;
+          color: $color-text-primary;
         }
       }
     }
@@ -58,7 +58,7 @@
 
   .create-post-btn {
     text-transform: none;
-    margin-top: 24px;
+    margin-top: $spacing-lg;
 
     .v-btn__content {
       font-weight: 600;

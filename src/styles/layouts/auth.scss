@@ -5,8 +5,8 @@
 
   .auth-logo{
     position: absolute;
-    top: 40px;
-    left: 40px;
+    top: $spacing-xl;
+    left: $spacing-xl;
   }
   h1 {
     font-size: 64px;
@@ -24,6 +24,6 @@
   }
 
   p.description {
-    margin-bottom: 48px;
+    margin-bottom: $spacing-xl * 1.5;
   }
 }

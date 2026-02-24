@@ -20,7 +20,7 @@
     .auth-link {
       color: $color-primary;
       text-decoration: none;
-      margin-left: 15px;
+      margin-left: $spacing-md;
 
       &:hover {
         text-decoration: underline;

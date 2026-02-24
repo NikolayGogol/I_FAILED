@@ -213,14 +213,14 @@
           }
 
           .v-icon {
-            margin-right: 4px;
+            margin-right: $spacing-xs;
             font-size: 1.1rem;
           }
         }
       }
 
       &__replies {
-        margin-left: 56px;
+        margin-left: 56px; // Keep this for alignment with avatar
         margin-top: $spacing-md;
 
         .reply-item {
