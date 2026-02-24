@@ -145,11 +145,4 @@ export const feedPosts = [
   },
 ]
 
-export const feedWhoToFollow = [
-  { id: 1, name: 'Sarah Chen', handle: '23.5', initials: 'SC' },
-  { id: 2, name: 'Alex Kim', handle: '18.2', initials: 'AK' },
-  { id: 3, name: 'Jordan Lee', handle: '15.9', initials: 'JL' },
-  { id: 4, name: 'Taylor Fox', handle: '12.3', initials: 'TF' },
-]
-
 export const feedPopularTags = ['startup', 'validation', 'failure', 'learning']
