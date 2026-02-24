@@ -1,5 +1,6 @@
 @use '../settings.scss' as *;
 @use '../global/fonts.scss' as *;
+@use 'sass:color';
 
 .upload-file-wrapper {
   height: 270px;
@@ -15,7 +16,7 @@
 
   &:hover {
     border-color: $color-primary;
-    background-color: darken($color-background, 3%);
+    background-color: color.adjust($color-background, $lightness: -3%);
   }
 
   label {
