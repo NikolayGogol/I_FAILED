@@ -4,7 +4,7 @@
 <template>
   <v-app>
     <v-main class="auth-layout px-6 py-6">
-      <img class="auth-logo" src="../assets/Logo.png">
+      <img class="auth-logo cursor-pointer" src="../assets/Logo.png" @click="$router.push('/')">
       <v-row class="h-100">
         <v-col class="d-flex flex-column align-center justify-center">
           <h1 class="font-weight-semibold"><b>You are <span>not alone.</span></b></h1>
