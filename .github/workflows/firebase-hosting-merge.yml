@@ -32,6 +32,7 @@ jobs:
           echo "VITE_USERS_COLLECTION=${{ vars.VITE_USERS_COLLECTION }}" >> .env
           echo "VITE_POST_COLLECTION=${{ vars.VITE_POST_COLLECTION }}" >> .env
           echo "VITE_COMMENTS=${{ vars.VITE_COMMENTS }}" >> .env
+          echo "VITE_POST_COLLECTION_SCEDULED=${{ vars.VITE_POST_COLLECTION_SCEDULED }}" >> .env
 
       - name: Install and Build Frontend
         run: npm ci && npm run build
@@ -70,6 +71,7 @@ jobs:
           echo "PENDING_USERS=${{ vars.PENDING_USERS }}" >> functions/.env
           echo "VERIFY_LINK=${{ vars.VERIFY_LINK }}" >> functions/.env
           echo "POST_COLLECTION=${{ vars.POST_COLLECTION }}" >> functions/.env
+          echo "POST_COLLECTION_SCEDULED=${{ vars.POST_COLLECTION_SCEDULED }}" >> functions/.env
 
       - name: Install Function Dependencies
         run: cd functions && npm ci

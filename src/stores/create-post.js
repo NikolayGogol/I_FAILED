@@ -7,6 +7,7 @@ import { storage } from '@/firebase' // Explicitly import storage
 import { useAuthStore } from '@/stores/auth.js'
 
 const collection_db = import.meta.env.VITE_POST_COLLECTION
+const collection_db_scheduled = import.meta.env.VITE_POST_COLLECTION_SCEDULED
 
 export const useCreatePostStore = defineStore('createPost', {
   state: () => ({
@@ -52,8 +53,6 @@ export const useCreatePostStore = defineStore('createPost', {
 
       // 1. Prepare initial post data, ensuring stepTwo.images is empty for now
       const scheduleDate = this.stepFive.scheduleDate
-      const isScheduled = !!scheduleDate
-
       const postData = {
         stepOne: this.stepOne,
         stepTwo: { ...this.stepTwo, images: [] },
@@ -61,9 +60,9 @@ export const useCreatePostStore = defineStore('createPost', {
         stepFour: this.stepFour,
         stepFive: this.stepFive,
         createdAt: serverTimestamp(),
-        status: isScheduled ? 'scheduled' : 'published',
-        scheduledAt: isScheduled ? new Date(scheduleDate) : null,
-        publishedAt: isScheduled ? null : serverTimestamp(),
+        status: scheduleDate ? 'scheduled' : 'published',
+        scheduledAt: scheduleDate ? new Date(scheduleDate) : null,
+        publishedAt: scheduleDate ? null : serverTimestamp(),
         uid: authStore.user.uid,
         user: {
           displayName: authStore.user.displayName,
@@ -77,7 +76,9 @@ export const useCreatePostStore = defineStore('createPost', {
 
       try {
         // 2. Create the document in Firestore to get a unique ID
-        const docRef = await addDoc(collection(db, collection_db), postData)
+        // If scheduled, save to 'scheduledPosts' collection, otherwise to main collection
+        const targetCollection = scheduleDate ? collection_db_scheduled : collection_db
+        const docRef = await addDoc(collection(db, targetCollection), postData)
         const postId = docRef.id
 
         // 3. Upload images to Firebase Storage
@@ -91,6 +92,7 @@ export const useCreatePostStore = defineStore('createPost', {
               return Promise.resolve(null)
             }
 
+            // Use the same storage path structure regardless of collection
             const storageRef = ref(storage, `posts/${postId}/${Date.now()}_${imageObject.name}`)
             return uploadBytes(storageRef, imageFile).then(snapshot => getDownloadURL(snapshot.ref))
           })

@@ -4,10 +4,12 @@ const { onSchedule } = require('firebase-functions/v2/scheduler')
 exports.publishScheduledPosts = onSchedule('every 10 minutes', async event => {
   const db = admin.firestore()
   const now = admin.firestore.Timestamp.now()
+  const scheduledCollection = process.env.POST_COLLECTION_SCEDULED
+  const publishedCollection = process.env.POST_COLLECTION
 
   try {
-    const snapshot = await db.collection(process.env.POST_COLLECTION)
-      .where('status', '==', 'scheduled')
+    // Query for scheduled posts that are due
+    const snapshot = await db.collection(scheduledCollection)
       .where('scheduledAt', '<=', now)
       .get()
 
@@ -17,13 +19,27 @@ exports.publishScheduledPosts = onSchedule('every 10 minutes', async event => {
     }
 
     const batch = db.batch()
-    for (const doc of snapshot.docs) {
-      batch.update(doc.ref, {
+
+    snapshot.docs.forEach(doc => {
+      const postData = doc.data()
+
+      // Prepare data for the published collection
+      const publishedData = {
+        ...postData,
         status: 'published',
         publishedAt: now,
-        scheduledAt: admin.firestore.FieldValue.delete(),
-      })
-    }
+      }
+
+      // Remove scheduledAt field
+      delete publishedData.scheduledAt
+
+      // Create a new document in the published collection with the same ID
+      const newDocRef = db.collection(publishedCollection).doc(doc.id)
+      batch.set(newDocRef, publishedData)
+
+      // Delete the document from the scheduled collection
+      batch.delete(doc.ref)
+    })
 
     await batch.commit()
     console.log(`Successfully published ${snapshot.size} posts.`)
