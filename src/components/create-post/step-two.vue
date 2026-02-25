@@ -8,6 +8,7 @@
   import '@vueup/vue-quill/dist/vue-quill.snow.css'
   import '@/styles/components/form-input.scss'
   import '@/styles/components/create-post/step-two.scss'
+  import {VueDatePicker} from "@vuepic/vue-datepicker";
 
   const store = useCreatePostStore()
   //
@@ -57,6 +58,7 @@
       <label class="form-label">When did it happen? *</label>
       <DatePickerInput
         v-model="store.stepTwo.date"
+        :max-date="new Date()"
         :enable-time="false"
         placeholder="Select date"
       />
