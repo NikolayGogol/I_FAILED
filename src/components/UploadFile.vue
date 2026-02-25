@@ -20,6 +20,10 @@
       default: 80, // Default quality 80%
       validator: value => value > 0 && value <= 100,
     },
+    maxFiles: {
+      type: Number,
+      default: 3, // Default max files
+    },
   })
 
   const emit = defineEmits(['update:modelValue'])
@@ -104,6 +108,14 @@
 
         if (props.multiple) {
           const currentFiles = props.modelValue || []
+
+          // Check if adding new files exceeds the limit
+          if (currentFiles.length + processedFiles.length > props.maxFiles) {
+            toast.error(`You can only upload a maximum of ${props.maxFiles} files.`)
+            event.target.value = ''
+            return
+          }
+
           const newFiles = []
           let duplicateCount = 0
 
@@ -186,7 +198,7 @@
           </v-card>
         </v-col>
 
-        <v-col v-if="multiple" cols="auto">
+        <v-col v-if="multiple && previewItems.length < maxFiles" cols="auto">
           <label
             class="add-more-btn d-flex flex-column align-center justify-center cursor-pointer"
             for="input-file-add"
@@ -201,7 +213,7 @@
     <div v-else class="d-flex flex-column align-center justify-center cursor-pointer full-height">
       <v-icon class="mb-3" color="primary" icon="mdi-camera-outline" size="48" />
       <span class="text-body-1 font-weight-medium upload-title">Upload images</span>
-      <p class="text-caption text-medium-emphasis upload-sub-title">You can upload max 3 photos</p>
+      <p class="text-caption text-medium-emphasis upload-sub-title">You can upload max {{ maxFiles }} photos</p>
       <label class="upload-btn rounded-lg font-weight-semibold" for="input-file">+ Upload image</label>
     </div>
     <input

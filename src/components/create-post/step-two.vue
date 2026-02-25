@@ -1,5 +1,6 @@
 <script setup>
   import { QuillEditor } from '@vueup/vue-quill'
+  import { watch } from 'vue'
   import DatePickerInput from '@/components/DatePickerInput.vue'
   import FormInput from '@/components/FormInput.vue'
   import UploadFile from '@/components/UploadFile.vue'
@@ -9,7 +10,18 @@
   import '@/styles/components/create-post/step-two.scss'
 
   const store = useCreatePostStore()
-
+  //
+  const emit = defineEmits(['isValid'])
+  watch(() => store.stepTwo, value => {
+    if (value.title && (value.description && value.description !== '<p><br></p>') && value.date) {
+      // eslint-disable-next-line vue/custom-event-name-casing
+      emit('isValid', true)
+    } else emit(
+      // eslint-disable-next-line vue/custom-event-name-casing
+      'isValid',
+      false,
+    )
+  }, { deep: true, immediate: true })
 </script>
 
 <template>
@@ -17,7 +29,13 @@
     <h2 class="step-title">Failure Details</h2>
     <p class="step-subtitle">Tell us what happened</p>
     <div class="label">Images</div>
-    <UploadFile v-model="store.stepTwo.images" class="mb-6" multiple :quality="20" />
+    <UploadFile
+      v-model="store.stepTwo.images"
+      class="mb-6"
+      :max-files="5"
+      multiple
+      :quality="20"
+    />
     <div class="form-group">
       <label class="form-label">Title *</label>
       <FormInput

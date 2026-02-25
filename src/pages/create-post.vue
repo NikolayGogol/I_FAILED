@@ -47,6 +47,10 @@
       isLoading.value = false
     })
   }
+  function nextStep () {
+    step.value++
+    isValid.value = false
+  }
 </script>
 
 <template>
@@ -84,7 +88,7 @@
           <step-one @is-valid="isValid = $event" />
         </v-window-item>
         <v-window-item :value="2">
-          <step-two />
+          <step-two @is-valid="isValid = $event" />
         </v-window-item>
         <v-window-item :value="3">
           <step-three />
@@ -125,7 +129,7 @@
           :disabled="!isValid"
           :loading="isLoading"
           variant="flat"
-          @click="step < 5 ? step++ : submit()"
+          @click="step < 5 ? nextStep() : submit()"
         >
           {{ step === 5 ? 'Publish' : 'Next' }}
         </v-btn>

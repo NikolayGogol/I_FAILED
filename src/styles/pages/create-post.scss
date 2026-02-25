@@ -49,5 +49,9 @@
     border: 1px solid $color-border;
     border-radius: 0 0 $radius-md $radius-md;
     border-top: 0;
+
+    button {
+      text-transform: unset;
+    }
   }
 }
