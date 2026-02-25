@@ -1,12 +1,16 @@
 import { defineStore } from 'pinia'
-import api from '@/axios'
 import {
   auth,
   browserLocalPersistence,
   browserSessionPersistence,
+  db,
+  doc,
   facebookProvider,
+  getDoc,
   googleProvider,
   onAuthStateChanged,
+  serverTimestamp,
+  setDoc,
   setPersistence,
   signInWithEmailAndPassword,
   signInWithPopup,
@@ -58,6 +62,30 @@ const getSerializableUser = (user) => {
   }
 }
 
+// Function to save user to Firestore
+const saveUserToFirestore = async (user) => {
+  if (!user) {
+    return
+  }
+  const userRef = doc(db, 'users', user.uid)
+  const userDoc = await getDoc(userRef)
+
+  const userData = {
+    email: user.email,
+    displayName: user.displayName,
+    photoURL: user.photoURL,
+    lastLoginAt: serverTimestamp(),
+  }
+
+  if (!userDoc.exists()) {
+    // New user, add createdAt
+    userData.createdAt = serverTimestamp()
+  }
+
+  // Use setDoc with merge: true to create or update
+  await setDoc(userRef, userData, { merge: true })
+}
+
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     user: null,
@@ -66,14 +94,23 @@ export const useAuthStore = defineStore('auth', {
   actions: {
     // Initialize auth state listener
     initAuthListener () {
-      onAuthStateChanged(auth, (user) => {
-        this.user = getSerializableUser(user)
+      onAuthStateChanged(auth, async (user) => {
+        const serializableUser = getSerializableUser(user)
+        this.user = serializableUser
+        if (serializableUser) {
+          await saveUserToFirestore(serializableUser)
+        }
       })
     },
 
     // Sign up with email and password
     async createAcc (payload) {
-      return await api.post('/createUser', payload)
+      // This now only needs to call the client-side Firebase method
+      const { email, password, displayName } = payload
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password)
+      await updateProfile(userCredential.user, { displayName })
+      // The onAuthStateChanged listener will handle the rest
+      return userCredential
     },
     // Sign in with email and password
     async signInWithEmail (email, password, rememberMe = false) {
@@ -82,10 +119,8 @@ export const useAuthStore = defineStore('auth', {
         const persistence = rememberMe ? browserLocalPersistence : browserSessionPersistence
         await setPersistence(auth, persistence)
         const result = await signInWithEmailAndPassword(auth, email, password)
-        const serializableUser = getSerializableUser(result.user)
-        this.user = serializableUser
-        console.log('User signed in:', serializableUser)
-        return serializableUser
+        // onAuthStateChanged will handle user saving
+        return getSerializableUser(result.user)
       } catch (error) {
         console.error('Error signing in:', error)
         this.error = this.getErrorMessage(error.code)
@@ -103,10 +138,8 @@ export const useAuthStore = defineStore('auth', {
           prompt: 'select_account',
         })
         const result = await signInWithPopup(auth, googleProvider)
-        const serializableUser = getSerializableUser(result.user)
-        this.user = serializableUser
-        console.log('User signed in with Google:', serializableUser)
-        return serializableUser
+        // onAuthStateChanged will handle user saving
+        return getSerializableUser(result.user)
       } catch (error) {
         console.error('Error signing in with Google:', error)
         this.error = this.getErrorMessage(error.code)
@@ -125,11 +158,8 @@ export const useAuthStore = defineStore('auth', {
         })
 
         const result = await signInWithPopup(auth, facebookProvider)
-        const serializableUser = getSerializableUser(result.user)
-        this.user = serializableUser
-        console.log('User signed in with Facebook:', serializableUser)
-
-        return serializableUser
+        // onAuthStateChanged will handle user saving
+        return getSerializableUser(result.user)
       } catch (error) {
         console.error('Error signing in with Facebook:', error)
         this.error = this.getErrorMessage(error.code)
@@ -153,37 +183,10 @@ export const useAuthStore = defineStore('auth', {
     async sendPasswordResetOTP (email) {
       this.error = null
       try {
-        const response = await api.post('/forgotPassword', { email })
-        return response.data
+        await sendPasswordResetEmail(auth, email)
       } catch (error) {
-        console.error('Error sending password reset OTP:', error)
-        this.error = error.response?.data?.message || 'Failed to send verification code'
-        throw error
-      }
-    },
-
-    // Verify password reset OTP
-    async verifyPasswordResetOTP (email, code) {
-      this.error = null
-      try {
-        const response = await api.post('/verifyOTP', { email, code })
-        return response.data
-      } catch (error) {
-        console.error('Error verifying OTP:', error)
-        this.error = error.response?.data?.message || 'Invalid verification code'
-        throw error
-      }
-    },
-
-    // Reset password with OTP and new password
-    async resetPasswordWithOTP (email, code, newPassword) {
-      this.error = null
-      try {
-        const response = await api.post('/resetPassword', { email, code, password: newPassword })
-        return response.data
-      } catch (error) {
-        console.error('Error resetting password:', error)
-        this.error = error.response?.data?.message || 'Failed to reset password'
+        console.error('Error sending password reset email:', error)
+        this.error = this.getErrorMessage(error.code)
         throw error
       }
     },
@@ -200,23 +203,6 @@ export const useAuthStore = defineStore('auth', {
       } catch (error) {
         console.error('Error updating password:', error)
         this.error = this.getErrorMessage(error.code)
-        throw error
-      }
-    },
-
-    // Resend verification email
-    async resendVerificationEmail (token) {
-      this.error = null
-      if (!token) {
-        this.error = 'Verification token is missing.'
-        throw new Error(this.error)
-      }
-      try {
-        const response = await api.post('/resendVerificationEmail', { token })
-        return response.data
-      } catch (error) {
-        console.error('Error resending verification email:', error)
-        this.error = error.response?.data?.message || 'Failed to resend verification email'
         throw error
       }
     },

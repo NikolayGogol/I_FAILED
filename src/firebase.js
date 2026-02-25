@@ -59,6 +59,6 @@ export {
   updatePassword,
   updateProfile,
 } from 'firebase/auth'
-export { doc, serverTimestamp, setDoc } from 'firebase/firestore'
+export { doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore'
 export { httpsCallable } from 'firebase/functions'
 export { getDownloadURL, ref, uploadBytes } from 'firebase/storage'
