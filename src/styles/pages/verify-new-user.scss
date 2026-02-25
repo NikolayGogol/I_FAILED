@@ -42,13 +42,13 @@
     font-size: 1rem;
 
     &.v-alert--success {
-      background-color: lighten($color-accent-bg, 5%);
+      background-color: color.adjust($color-accent-bg, $lightness: 5%);
       color: $color-accent-text;
       border-left: 4px solid $color-accent-text;
     }
 
     &.v-alert--error {
-      background-color: lighten($color-error, 40%);
+      background-color: color.adjust($color-error, $lightness: 40%);
       color: color.adjust($color-error, $lightness: -10%);
       border-left: 4px solid color.adjust($color-error, $lightness: -10%);
     }
