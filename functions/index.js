@@ -8,6 +8,7 @@ admin.initializeApp()
 
 const authRoutes = require('./routes/auth')
 const userRoutes = require('./routes/users')
+const { publishScheduledPosts } = require('./scheduled/publish-posts')
 
 const app = express()
 
@@ -26,3 +27,6 @@ app.use(userRoutes)
 
 // Export the API as a single Cloud Function
 exports.api = onRequest(app)
+
+// Export the scheduled function
+exports.publishScheduledPosts = publishScheduledPosts

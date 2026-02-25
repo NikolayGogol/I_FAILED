@@ -51,6 +51,9 @@ export const useCreatePostStore = defineStore('createPost', {
       }
 
       // 1. Prepare initial post data, ensuring stepTwo.images is empty for now
+      const scheduleDate = this.stepFive.scheduleDate
+      const isScheduled = !!scheduleDate
+
       const postData = {
         stepOne: this.stepOne,
         stepTwo: { ...this.stepTwo, images: [] },
@@ -58,6 +61,9 @@ export const useCreatePostStore = defineStore('createPost', {
         stepFour: this.stepFour,
         stepFive: this.stepFive,
         createdAt: serverTimestamp(),
+        status: isScheduled ? 'scheduled' : 'published',
+        scheduledAt: isScheduled ? new Date(scheduleDate) : null,
+        publishedAt: isScheduled ? null : serverTimestamp(),
         uid: authStore.user.uid,
         user: {
           displayName: authStore.user.displayName,
