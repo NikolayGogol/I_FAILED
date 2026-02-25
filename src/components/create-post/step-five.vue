@@ -11,7 +11,7 @@
   <div class="step-five">
     <h2 class="step-title">Privacy & Posting</h2>
 
-    <div class="setting-row">
+    <div class="setting-row bg-secondary pa-2 rounded-lg">
       <div>
         <div class="setting-title">Post as Anonymous</div>
         <div class="setting-desc">Hide your identity on this post</div>
@@ -25,12 +25,12 @@
       />
     </div>
 
-    <div class="form-group">
+    <div class="form-group my-4">
       <label class="form-label">Visibility</label>
       <v-select
         v-model="store.stepFive.visibility"
-        append-inner-icon="mdi-chevron-down"
-        class="form-input form-field"
+        class="form-input form-field select"
+        color="primary"
         hide-details
         :items="['Public', 'Followers Only', 'Private']"
         placeholder="Choose an option"
@@ -38,7 +38,7 @@
       />
     </div>
 
-    <div class="setting-row">
+    <div class="setting-row bg-secondary pa-2 rounded-lg">
       <div class="setting-title">Allow comments</div>
       <v-switch
         v-model="store.stepFive.allowComments"
@@ -49,7 +49,7 @@
       />
     </div>
 
-    <div class="setting-row">
+    <div class="setting-row bg-secondary mt-4 pa-2 rounded-lg">
       <div class="setting-title">Enable trigger warning</div>
       <v-switch
         v-model="store.stepFive.enableTriggerWarning"
@@ -60,10 +60,11 @@
       />
     </div>
 
-    <div class="form-group">
+    <div class="form-group mt-6">
       <label class="form-label">Schedule post (optional)</label>
       <DatePickerInput
         v-model="store.stepFive.scheduleDate"
+        class="date-picker"
         placeholder="Select date"
       />
     </div>

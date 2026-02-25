@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="w-100">
     <label v-if="$attrs.label" class="label">{{ $attrs.label }}</label>
     <v-text-field
       class="form-field"

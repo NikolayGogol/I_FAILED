@@ -20,23 +20,13 @@
 
   const router = useRouter()
   const step = ref(1)
-  const { createFakePost, createPost } = useCreatePostStore()
+  const { createPost } = useCreatePostStore()
   const isLoading = ref(false)
   //
   const progress = computed(() => {
     return (step.value / 5) * 100
   })
   const isValid = ref(false)
-
-  function fakePost () {
-    isLoading.value = true
-    createFakePost().then(() => {
-      router.push('/post-success-created')
-      sessionStorage.setItem('post-success-created', 'true')
-    }).finally(() => {
-      isLoading.value = false
-    })
-  }
 
   function submit () {
     isLoading.value = true
@@ -91,13 +81,13 @@
           <step-two @is-valid="isValid = $event" />
         </v-window-item>
         <v-window-item :value="3">
-          <step-three />
+          <step-three @is-valid="isValid = $event" />
         </v-window-item>
         <v-window-item :value="4">
-          <step-four />
+          <step-four @is-valid="isValid = $event" />
         </v-window-item>
         <v-window-item :value="5">
-          <step-five />
+          <step-five @is-valid="isValid = $event" />
         </v-window-item>
       </v-window>
 
@@ -110,17 +100,6 @@
           @click="step--"
         >
           Back
-        </v-btn>
-        <v-btn
-          v-if="step === 5"
-          append-icon="mdi-arrow-right"
-          class="next-btn rounded-lg"
-          color="primary"
-          :loading="isLoading"
-          variant="flat"
-          @click="fakePost"
-        >
-          create fake post
         </v-btn>
         <v-btn
           append-icon="mdi-arrow-right"

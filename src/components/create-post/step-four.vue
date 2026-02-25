@@ -1,5 +1,6 @@
 <script setup>
   import { ref } from 'vue'
+  import { useToast } from 'vue-toastification'
   import FormInput from '@/components/FormInput.vue'
   import { emotionTags, recoveryTimeOptions } from '@/models/categories.js'
   import { useCreatePostStore } from '@/stores/create-post'
@@ -7,9 +8,16 @@
   import '@/styles/components/create-post/step-four.scss'
 
   const store = useCreatePostStore()
+  const toast = useToast()
+  const emit = defineEmits(['isValid'])
   const newTag = ref('')
+  emit('isValid', true)
 
   function addTag () {
+    if (!newTag.value.trim()) {
+      toast.error('You can not add empty tag')
+      return
+    }
     if (newTag.value.trim()) {
       store.stepFour.tags.push(newTag.value.trim())
       newTag.value = ''
@@ -18,6 +26,14 @@
 
   function removeTag (index) {
     store.stepFour.tags.splice(index, 1)
+  }
+
+  function handleEmotionChange (val) {
+    if (val.length > 3) {
+      // Remove the last added item if more than 3 are selected
+      store.stepFour.emotionTags = val.slice(0, 3)
+      toast.warning('You can choose max 3 emotion tags')
+    }
   }
 </script>
 
@@ -39,8 +55,7 @@
       <label class="form-label">Recovery time</label>
       <v-select
         v-model="store.stepFour.recoveryTime"
-        append-inner-icon="mdi-chevron-down"
-        class="form-field"
+        class="form-field select"
         density="comfortable"
         hide-details="auto"
         item-title="title"
@@ -52,8 +67,9 @@
       />
     </div>
 
-    <div class="form-group">
+    <div class="form-group mt-6">
       <label class="form-label">Emotion Tags</label>
+      <p class="form-hint">You can choose max 3 tags</p>
       <v-chip-group
         v-model="store.stepFour.emotionTags"
         class="emotion-tags"
@@ -61,6 +77,7 @@
         filter
         multiple
         return-object
+        @update:model-value="handleEmotionChange"
       >
         <v-chip
           v-for="tag in emotionTags"
@@ -75,10 +92,10 @@
       </v-chip-group>
     </div>
 
-    <div class="form-group">
+    <div class="form-group mt-6">
       <label class="form-label">Tags</label>
       <p class="form-hint">Suggested from popular tags</p>
-      <div v-if="store.stepFour.tags.length > 0" class="tags-container">
+      <div v-if="store.stepFour.tags.length > 0" class="tags-container my-3">
         <v-chip
           v-for="(tag, index) in store.stepFour.tags"
           :key="index"
@@ -90,23 +107,21 @@
         </v-chip>
       </div>
 
-      <div class="add-tag-wrapper">
+      <div class="add-tag-wrapper w-100 d-flex align-center">
         <FormInput
           v-model="newTag"
           class="add-tag-input"
+          hide-details
           placeholder="Add tag"
-          @keydown.enter.prevent="addTag"
+          @keyup.enter="addTag"
         />
-        <v-btn
+        <div
           class="add-tag-btn"
-          color="primary"
-          elevation="0"
-          height="44"
-          variant="flat"
+          :class="{disabled: !newTag}"
           @click="addTag"
         >
           Add
-        </v-btn>
+        </div>
       </div>
     </div>
   </div>

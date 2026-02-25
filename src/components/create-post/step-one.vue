@@ -1,4 +1,5 @@
 <script setup>
+  import { watch } from 'vue'
   import { categories } from '@/models/categories.js'
   import { useCreatePostStore } from '@/stores/create-post'
   import '@/styles/components/create-post/step-one.scss'
@@ -16,12 +17,13 @@
     } else {
       store.stepOne.selectedCategories.splice(index, 1)
     }
-    if (store.stepOne.selectedCategories.length > 0) {
-      emit('isValid', true)
-    } else {
-      emit('isValid', false)
-    }
   }
+  watch(() => store.stepOne, value => {
+    // eslint-disable-next-line vue/custom-event-name-casing
+    if (value.selectedCategories.length > 0) emit('isValid', true)
+    // eslint-disable-next-line vue/custom-event-name-casing
+    else emit('isValid', false)
+  }, { deep: true, immediate: true })
 </script>
 
 <template>

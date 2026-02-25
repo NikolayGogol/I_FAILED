@@ -2,9 +2,9 @@ import { addDoc, collection, serverTimestamp, updateDoc } from 'firebase/firesto
 import { defineStore } from 'pinia'
 import { useFirestore } from 'vuefire'
 import { getDownloadURL, ref, uploadBytes } from '@/firebase' // Correctly import storage from your firebase setup
+// eslint-disable-next-line import/no-duplicates
 import { storage } from '@/firebase' // Explicitly import storage
 import { useAuthStore } from '@/stores/auth.js'
-import { fakeStepFour, fakeStepOne, fakeStepThree, fakeStepTwo } from '@/utils/faker.js'
 
 const collection_db = import.meta.env.VITE_POST_COLLECTION
 
@@ -42,52 +42,6 @@ export const useCreatePostStore = defineStore('createPost', {
     },
   }),
   actions: {
-    async createFakePost () {
-      // This function is not modified to upload images as per the request.
-      // It will continue to create posts without images.
-      const authStore = useAuthStore()
-      const db = useFirestore()
-      this.stepOne.selectedCategories = fakeStepOne()
-
-      const step2 = await fakeStepTwo()
-      this.stepTwo.title = step2.title
-      this.stepTwo.description = step2.description
-      this.stepTwo.howDidItFeel = step2.howDidItFeel
-      this.stepTwo.whatWentWrong = step2.whatWentWrong
-      this.stepTwo.date = step2.date
-      this.stepTwo.images = step2.images
-
-      const step3 = fakeStepThree()
-      this.stepThree.whatILearned = step3.whatILearned
-      this.stepThree.keyTakeaways = step3.keyTakeaways
-      this.stepThree.whatIdDoDifferently = step3.whatIdDoDifferently
-      this.stepThree.advice = step3.advice
-
-      const step4 = fakeStepFour()
-      this.stepFour.cost = step4.cost
-      this.stepFour.recoveryTime = step4.recoveryTime
-      this.stepFour.emotionTags = step4.emotionTags
-      this.stepFour.tags = step4.tags
-
-      const obj2send = {
-        stepOne: this.stepOne,
-        stepTwo: { ...this.stepTwo, images: [] }, // Exclude raw File objects
-        stepThree: this.stepThree,
-        stepFour: this.stepFour,
-        stepFive: this.stepFive,
-        createdAt: serverTimestamp(),
-        uid: authStore.user?.uid,
-        user: {
-          displayName: authStore.user?.displayName,
-          photoURL: authStore.user?.photoURL,
-        },
-      }
-      try {
-        return await addDoc(collection(db, collection_db), obj2send)
-      } catch (error) {
-        return `Error adding document:', ${error}`
-      }
-    },
     async createPost () {
       const authStore = useAuthStore()
       const db = useFirestore()

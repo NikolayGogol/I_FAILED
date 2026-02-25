@@ -2,80 +2,54 @@
 @use '../../global/fonts.scss' as *;
 
 .step-five {
+  background-color: $color-surface;
+  border: 1px solid $color-border;
+  border-radius: $radius-md $radius-md 0 0;
+  border-bottom: 0;
+  padding: 24px;
+  margin-top: 24px;
+
   .step-title {
-    font-size: 1.5rem;
+    font-size: 20px;
     font-weight: 600;
-    margin-bottom: $spacing-lg;
+    margin-bottom: $spacing-sm;
     color: $color-text-primary;
+  }
+
+  .step-subtitle {
+    font-size: 1rem;
+    color: #808079;
+    margin-bottom: $spacing-lg;
+  }
+
+  label {
+    color: #1C1C1B;
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+
+  .v-field__input {
+    border: none;
+  }
+
+  .select, .form-field {
+    border: 1px solid $color-border;
+    border-radius: $radius-md;
   }
 
   .setting-row {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    padding: $spacing-md 0;
-    border-bottom: 1px solid $color-border;
-
-    &:last-child {
-      border-bottom: none;
-    }
+    justify-content: space-between;
 
     .setting-title {
-      font-size: 1rem;
-      font-weight: 600;
-      color: $color-text-primary;
+      color: #1C1C1B;
+      font-size: 16px;
     }
 
     .setting-desc {
-      font-size: 0.85rem;
-      color: $color-text-secondary;
-      margin-top: $spacing-xs;
-    }
-  }
-
-  .form-group {
-    margin-top: $spacing-lg;
-    margin-bottom: $spacing-lg;
-
-    .form-label {
-      display: block;
-      font-size: 0.9rem;
-      font-weight: 600;
-      color: $color-text-primary;
-      margin-bottom: $spacing-sm;
-    }
-
-    .form-input {
-      width: 100%;
-    }
-
-    .ql-toolbar {
-      border: 1px solid $color-border;
-      border-top-left-radius: $radius-sm;
-      border-top-right-radius: $radius-sm;
-      background-color: $color-background;
-      border-bottom: 1px solid $color-border;
-    }
-
-    .ql-container {
-      border: 1px solid $color-border;
-      border-top: none;
-      border-bottom-left-radius: $radius-sm;
-      border-bottom-right-radius: $radius-sm;
-      background-color: $color-surface;
-      font-family: inherit;
-
-      .ql-editor {
-        min-height: 150px;
-        font-size: 1rem;
-        line-height: 1.6;
-        padding: $spacing-md;
-
-        &.ql-blank::before {
-          color: $color-text-tertiary;
-          font-style: italic;
-        }
-      }
+      color: #808079;
+      font-size: 14px;
     }
   }
 }

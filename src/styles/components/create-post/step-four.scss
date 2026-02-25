@@ -2,8 +2,15 @@
 @use '../../global/fonts.scss' as *;
 
 .step-four {
+  background-color: $color-surface;
+  border: 1px solid $color-border;
+  border-radius: $radius-md $radius-md 0 0;
+  border-bottom: 0;
+  padding: 24px;
+  margin-top: 24px;
+
   .step-title {
-    font-size: 1.5rem;
+    font-size: 20px;
     font-weight: 600;
     margin-bottom: $spacing-sm;
     color: $color-text-primary;
@@ -11,79 +18,71 @@
 
   .step-subtitle {
     font-size: 1rem;
-    color: $color-text-secondary;
+    color: #808079;
     margin-bottom: $spacing-lg;
   }
 
-  .form-group {
-    margin-bottom: $spacing-lg;
+  label {
+    color: #1C1C1B;
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
 
-    .form-label {
-      display: block;
-      font-size: 0.9rem;
-      font-weight: 600;
-      color: $color-text-primary;
-      margin-bottom: $spacing-sm;
+  .form-hint {
+    color: #808079;
+    font-size: 12px;
+  }
+
+  .select {
+    .v-field {
+      border: 1px solid $color-border;
     }
 
-    .form-hint {
-      font-size: 0.8rem;
-      color: $color-text-tertiary;
-      margin-bottom: $spacing-sm;
-    }
-
-    .form-input {
-      width: 100%;
-    }
-
-    .emotion-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: $spacing-sm;
-
-      .emotion-chip {
-        border-color: $color-border;
-        color: $color-text-secondary;
-        font-weight: 500;
-        border-radius: $radius-sm;
-
-        &.v-chip--selected {
-          background-color: rgba($color-primary, 0.1);
-          border-color: $color-primary;
-          color: $color-primary;
-        }
-      }
-    }
-
-    .tags-container {
-      display: flex;
-      flex-wrap: wrap;
-      gap: $spacing-sm;
-      margin-bottom: $spacing-md;
-
-      .tag-chip {
-        background-color: $color-background;
-        color: $color-text-primary;
-        font-weight: 500;
-        border-radius: $radius-sm;
-      }
-    }
-
-    .add-tag-wrapper {
-      display: flex;
-      gap: $spacing-sm;
-      align-items: flex-start;
-
-      .add-tag-input {
-        flex-grow: 1;
-      }
-
-      .add-tag-btn {
-        height: 44px;
-        text-transform: none;
-        font-weight: 600;
-        border-radius: $radius-sm;
-      }
+    .v-field__input {
+      border: none;
     }
   }
+
+  .v-chip--variant-outlined {
+    border: 1px solid $color-border;
+  }
+
+  .v-chip--selected {
+    background-color: #F9EAD5;
+    color: #6E240F;
+  }
+
+  .v-chip__filter {
+    display: none;
+  }
+
+  .v-chip__content {
+    font-size: 12px;
+  }
+
+  .add-tag-btn {
+    background-color: $color-surface;
+    border: 1px solid $color-border;
+    border-radius: $radius-md;
+    color: $color-primary;
+    height: 100%;
+    font-weight: 700;
+    font-size: 16px;
+    padding: 12px 20px;
+    margin-left: 8px;
+    cursor: pointer;
+
+    &.disabled {
+      opacity: .7;
+      pointer-events: none;
+    }
+  }
+
+  .tag-chip {
+    background-color: $color-primary;
+    color: white;
+    border-radius: $radius-xs;
+
+  }
+
 }
