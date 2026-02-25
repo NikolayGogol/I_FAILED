@@ -66,9 +66,17 @@ export const useAuthStore = defineStore('auth', {
     async signInWithFacebook () {
       this.error = null
       try {
+        facebookProvider.addScope('email')
+        facebookProvider.addScope('public_profile')
+        facebookProvider.setCustomParameters({
+          display: 'popup',
+        })
+
         const result = await signInWithPopup(auth, facebookProvider)
+
         this.user = result.user
         console.log('User signed in with Facebook:', this.user)
+
         return result.user
       } catch (error) {
         console.error('Error signing in with Facebook:', error)

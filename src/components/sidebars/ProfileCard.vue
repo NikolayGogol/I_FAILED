@@ -22,7 +22,6 @@
   const router = useRouter()
   //
   const currentUserName = computed(() => authStore.user?.displayName)
-  const currentUserHandle = computed(() => authStore.user?.email)
   const currentUserPhoto = computed(() => authStore.user?.photoURL)
   const currentUserInitials = computed(() => {
     const name = currentUserName.value

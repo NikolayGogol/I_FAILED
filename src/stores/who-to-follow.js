@@ -9,7 +9,9 @@ export const useWhoToFollowStore = defineStore('whoToFollow', {
   }),
   actions: {
     async fetchAllUsers () {
-      if (this.users.length) return
+      if (this.users.length > 0) {
+        return
+      }
 
       this.loading = true
       this.error = null
