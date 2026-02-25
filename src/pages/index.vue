@@ -9,8 +9,10 @@
   import { computed, ref } from 'vue'
   import PostCard from '@/components/feed/PostCard.vue'
   import { useMainStore } from '@/stores/main.js'
+  import { useAuthStore } from '@/stores/auth.js'
   import '@/styles/pages/index.scss'
   const { getFeeds } = useMainStore()
+  const authStore = useAuthStore()
   const activeTab = ref(1)
   const posts = ref([])
   const tabs = [
@@ -31,6 +33,13 @@
   const sortedPosts = computed(() => {
     if (activeTab.value === 2) {
       return [...posts.value].toSorted((a, b) => b.views - a.views)
+    }
+    if (activeTab.value === 3) {
+      const following = authStore.user?.following || []
+      const followingPosts = posts.value.filter(post => following.includes(post.user.uid))
+      const otherPosts = posts.value.filter(post => !following.includes(post.user.uid))
+      otherPosts.sort((a, b) => (b.likes || 0) - (a.likes || 0))
+      return [...followingPosts, ...otherPosts]
     }
     return posts.value
   })
