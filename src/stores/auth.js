@@ -39,7 +39,7 @@ function getSerializableUser (user) {
     lastLoginAt,
   } = user
 
-  // If the root email is missing, try to get it from the provider data
+  // Robustly get the email from provider data if it's missing at the root
   let finalEmail = email
   if (!finalEmail && providerData && providerData.length > 0) {
     const providerWithEmail = providerData.find(p => p.email)
@@ -56,11 +56,11 @@ function getSerializableUser (user) {
     emailVerified,
     isAnonymous,
     providerData,
-    stsTokenManager: {
+    stsTokenManager: stsTokenManager ? {
       refreshToken: stsTokenManager.refreshToken,
       accessToken: stsTokenManager.accessToken,
       expirationTime: stsTokenManager.expirationTime,
-    },
+    } : null,
     createdAt,
     lastLoginAt,
   }
@@ -68,13 +68,12 @@ function getSerializableUser (user) {
 
 // Function to save user to Firestore
 async function saveUserToFirestore (user) {
-  if (!user) {
+  if (!user || !user.uid) {
     return
   }
   const userRef = doc(db, 'users', user.uid)
   const userDoc = await getDoc(userRef)
 
-  // Get the primary provider ID
   const providerId = user.providerData && user.providerData.length > 0
     ? user.providerData[0].providerId
     : 'password'
@@ -83,16 +82,14 @@ async function saveUserToFirestore (user) {
     email: user.email,
     displayName: user.displayName,
     photoURL: user.photoURL,
-    providerId, // Add provider information
+    providerId,
     lastLoginAt: serverTimestamp(),
   }
 
   if (!userDoc.exists()) {
-    // New user, add createdAt
     userData.createdAt = serverTimestamp()
   }
 
-  // Use setDoc with merge: true to create or update
   await setDoc(userRef, userData, { merge: true })
 }
 
@@ -104,9 +101,8 @@ export const useAuthStore = defineStore('auth', {
     error: null,
   }),
   actions: {
-    // Initialize auth state listener
     initAuthListener () {
-      onAuthStateChanged(auth, user => {
+      onAuthStateChanged(auth, (user) => {
         if (unsubscribeFromUserDoc) {
           unsubscribeFromUserDoc()
           unsubscribeFromUserDoc = null
@@ -116,10 +112,12 @@ export const useAuthStore = defineStore('auth', {
           const authData = getSerializableUser(user)
           const userRef = doc(db, 'users', user.uid)
 
-          unsubscribeFromUserDoc = onSnapshot(userRef, docSnapshot => {
+          unsubscribeFromUserDoc = onSnapshot(userRef, (docSnapshot) => {
             if (docSnapshot.exists()) {
+              // Merge auth data with Firestore data
               this.user = { ...authData, ...docSnapshot.data() }
             } else {
+              // If doc doesn't exist, it might be a new user, save it.
               this.user = authData
               saveUserToFirestore(authData)
             }
@@ -130,43 +128,37 @@ export const useAuthStore = defineStore('auth', {
       })
     },
 
-    // Sign up with email and password
     async createAcc (payload) {
-      // This now only needs to call the client-side Firebase method
       const { email, password, displayName } = payload
       const userCredential = await createUserWithEmailAndPassword(auth, email, password)
       await updateProfile(userCredential.user, { displayName })
-      // The onAuthStateChanged listener will handle the rest
+      // onAuthStateChanged will handle saving the user to Firestore
       return userCredential
     },
-    // Sign in with email and password
+
     async signInWithEmail (email, password, rememberMe = false) {
       this.error = null
-      try {
-        const persistence = rememberMe ? browserLocalPersistence : browserSessionPersistence
-        await setPersistence(auth, persistence)
-        const result = await signInWithEmailAndPassword(auth, email, password)
-        // onAuthStateChanged will handle user saving
-        return getSerializableUser(result.user)
-      } catch (error) {
-        console.error('Error signing in:', error)
-        this.error = this.getErrorMessage(error.code)
-        throw error
-      }
+      const persistence = rememberMe ? browserLocalPersistence : browserSessionPersistence
+      await setPersistence(auth, persistence)
+      const result = await signInWithEmailAndPassword(auth, email, password)
+      return getSerializableUser(result.user)
     },
 
-    // Sign in with Google
     async signInWithGoogle () {
       this.error = null
       try {
         googleProvider.addScope('profile')
         googleProvider.addScope('email')
-        googleProvider.setCustomParameters({
-          prompt: 'select_account',
-        })
+        googleProvider.setCustomParameters({ prompt: 'select_account' })
+
         const result = await signInWithPopup(auth, googleProvider)
-        // onAuthStateChanged will handle user saving
-        return getSerializableUser(result.user)
+        const serializableUser = getSerializableUser(result.user)
+
+        // Explicitly save the user to Firestore immediately after sign-in
+        await saveUserToFirestore(serializableUser)
+
+        // The onAuthStateChanged listener will then pick up the user and sync the state
+        return serializableUser
       } catch (error) {
         console.error('Error signing in with Google:', error)
         this.error = this.getErrorMessage(error.code)
@@ -174,71 +166,46 @@ export const useAuthStore = defineStore('auth', {
       }
     },
 
-    // Sign in with Facebook
     async signInWithFacebook () {
       this.error = null
       try {
         facebookProvider.addScope('email')
         facebookProvider.addScope('public_profile')
-        facebookProvider.setCustomParameters({
-          display: 'popup',
-        })
+        facebookProvider.setCustomParameters({ display: 'popup' })
 
         const result = await signInWithPopup(auth, facebookProvider)
-        // onAuthStateChanged will handle user saving
-        return getSerializableUser(result.user)
+        const serializableUser = getSerializableUser(result.user)
+
+        await saveUserToFirestore(serializableUser)
+
+        return serializableUser
       } catch (error) {
         console.error('Error signing in with Facebook:', error)
         this.error = this.getErrorMessage(error.code)
         throw error
       }
     },
-    // Logout
+
     async logout () {
-      try {
-        if (unsubscribeFromUserDoc) {
-          unsubscribeFromUserDoc()
-          unsubscribeFromUserDoc = null
-        }
-        await auth.signOut()
-        this.user = null
-        console.log('User logged out')
-      } catch (error) {
-        console.error('Error signing out:', error)
-        this.error = this.getErrorMessage(error.code)
-        throw error
+      if (unsubscribeFromUserDoc) {
+        unsubscribeFromUserDoc()
+        unsubscribeFromUserDoc = null
       }
+      await auth.signOut()
+      this.user = null
     },
 
-    // Send password reset OTP
     async sendPasswordResetOTP (email) {
       this.error = null
-      try {
-        await sendPasswordResetEmail(auth, email)
-      } catch (error) {
-        console.error('Error sending password reset email:', error)
-        this.error = this.getErrorMessage(error.code)
-        throw error
-      }
+      await sendPasswordResetEmail(auth, email)
     },
 
-    // Update password for currently logged in user
     async updateUserPassword (newPassword) {
       this.error = null
-      try {
-        if (!auth.currentUser) {
-          throw new Error('No user logged in')
-        }
-        await updatePassword(auth.currentUser, newPassword)
-        console.log('Password updated successfully')
-      } catch (error) {
-        console.error('Error updating password:', error)
-        this.error = this.getErrorMessage(error.code)
-        throw error
-      }
+      if (!auth.currentUser) throw new Error('No user logged in')
+      await updatePassword(auth.currentUser, newPassword)
     },
 
-    // Get user-friendly error message
     getErrorMessage (errorCode) {
       const errorMessages = {
         'auth/email-already-in-use': 'This email is already registered',
@@ -253,11 +220,8 @@ export const useAuthStore = defineStore('auth', {
         'auth/network-request-failed': 'Network error. Please check your connection',
         'auth/popup-closed-by-user': 'Sign-in popup was closed',
         'auth/cancelled-popup-request': 'Only one popup request is allowed at a time',
-        'auth/expired-action-code': 'The action code has expired',
-        'auth/invalid-action-code': 'The action code is invalid',
-        'auth/user-token-expired': 'Your session has expired. Please sign in again',
       }
-      return errorMessages[errorCode] || errorCode || 'An error occurred'
+      return errorMessages[errorCode] || 'An error occurred'
     },
   },
   persist: true,
