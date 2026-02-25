@@ -8,9 +8,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px dashed $color-border;
+  border: 3px dashed $color-border;
   border-radius: $radius-md;
-  background-color: $color-background;
   transition: all 0.3s ease;
   cursor: pointer;
 
@@ -19,25 +18,24 @@
     background-color: color.adjust($color-background, $lightness: -3%);
   }
 
-  label {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+
+  .upload-title {
+    font-size: 14px;
+    color: $color-text-primary;
+  }
+
+  .upload-sub-title {
+    color: #808079;
+    font-size: 12px;
+    margin-top: 0;
+  }
+
+  .upload-btn {
+    background-color: $color-primary;
+    color: white;
+    padding: 12px 24px;
+    font-size: 16px;
+    margin-top: 24px;
     cursor: pointer;
-    color: $color-text-secondary;
-    font-size: 1rem;
-    font-weight: 500;
-
-    .v-icon {
-      font-size: 48px;
-      color: $color-primary;
-      margin-bottom: $spacing-md;
-    }
-
-    p {
-      margin-top: $spacing-sm;
-      font-size: 0.8rem;
-      color: $color-text-tertiary;
-    }
   }
 }

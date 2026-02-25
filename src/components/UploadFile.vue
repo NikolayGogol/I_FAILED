@@ -171,7 +171,7 @@
             :width="multiple ? 100 : '100%'"
           >
             <v-img class="fill-height" cover :src="item.url">
-              <div v-if="item.size > 0" class="image-size-badge">
+              <div class="image-size-badge">
                 {{ item.size }}
               </div>
             </v-img>
@@ -198,12 +198,12 @@
       </v-row>
     </v-container>
 
-    <label v-else class="d-flex flex-column align-center justify-center cursor-pointer full-height" for="input-file">
-      <v-icon class="mb-3" color="primary" icon="mdi-camera-plus-outline" size="48" />
-      <span class="text-body-1 font-weight-medium">Upload images</span>
-      <p class="text-caption text-medium-emphasis mt-2">recommended size 1200x1100 px</p>
-    </label>
-
+    <div v-else class="d-flex flex-column align-center justify-center cursor-pointer full-height">
+      <v-icon class="mb-3" color="primary" icon="mdi-camera-outline" size="48" />
+      <span class="text-body-1 font-weight-medium upload-title">Upload images</span>
+      <p class="text-caption text-medium-emphasis upload-sub-title">You can upload max 3 photos</p>
+      <label class="upload-btn rounded-lg font-weight-semibold" for="input-file">+ Upload image</label>
+    </div>
     <input
       id="input-file"
       :accept="'image/*'"

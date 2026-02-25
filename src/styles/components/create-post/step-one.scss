@@ -1,6 +1,13 @@
 @use '../../settings.scss' as *;
 
 .step-one {
+  background-color: $color-surface;
+  border: 1px solid $color-border;
+  border-radius: $radius-md $radius-md 0 0;
+  border-bottom: 0;
+  padding: 24px;
+  margin-top: 24px;
+
   .step-title {
     font-size: 1.5rem;
     font-weight: 600;
@@ -10,7 +17,7 @@
 
   .step-subtitle {
     font-size: 1rem;
-    color: $color-text-secondary;
+    color: #808079;
     margin-bottom: $spacing-lg;
   }
 
@@ -25,16 +32,21 @@
       height: 100%;
 
       &:hover {
-        border-color: $color-primary;
-        background-color: $color-background;
+        background-color: #F9EAD5;
+        border-color: #F9EAD5;
+
+        .category-name {
+          color: #6E240F !important;
+          font-weight: 600;
+        }
       }
 
       &.active {
-        border-color: $color-primary;
-        background-color: $color-accent-bg;
+        background-color: #F9EAD5;
+        border-color: #F9EAD5;
 
         .category-name {
-          color: $color-primary;
+          color: #6E240F !important;
           font-weight: 600;
         }
       }

@@ -16,35 +16,37 @@
   <div class="step-two">
     <h2 class="step-title">Failure Details</h2>
     <p class="step-subtitle">Tell us what happened</p>
+    <div class="label">Images</div>
     <UploadFile v-model="store.stepTwo.images" class="mb-6" multiple :quality="20" />
     <div class="form-group">
       <label class="form-label">Title *</label>
       <FormInput
         v-model="store.stepTwo.title"
         class="form-input"
+        hide-details="auto"
         maxlength="100"
         persistent-counter
         placeholder="A brief, clear description of what happened"
       />
     </div>
 
-    <div class="form-group">
+    <div class="form-group mt-6">
       <label class="form-label">What happened? *</label>
       <QuillEditor v-model:content="store.stepTwo.description" content-type="html" theme="snow" />
     </div>
 
-    <div class="form-group">
+    <div class="form-group mt-6">
       <label class="form-label">When did it happen? *</label>
       <DatePickerInput
         v-model="store.stepTwo.date"
         placeholder="Select date"
       />
     </div>
-    <div class="form-group">
+    <div class="form-group mt-6">
       <label class="form-label">What went wrong?</label>
       <QuillEditor v-model:content="store.stepTwo.whatWentWrong" content-type="html" theme="snow" />
     </div>
-    <div class="form-group">
+    <div class="form-group mt-6">
       <label class="form-label">How did it feel?</label>
       <QuillEditor v-model:content="store.stepTwo.howDidItFeel" content-type="html" theme="snow" />
     </div>

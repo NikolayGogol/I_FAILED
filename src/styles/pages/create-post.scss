@@ -1,104 +1,53 @@
-@use '../settings.scss' as *;
-@use '../global/fonts.scss' as *;
+@use '../settings' as *;
 
 .create-post-page {
-  display: flex;
-  justify-content: center;
-  min-height: 100vh;
-  padding: $spacing-md;
-
-  @include media-up($breakpoint-sm) {
-    padding: 0;
+  .back-btn {
+    margin-left: -20px;
+    color: #1C1C1B;
   }
 
-  .create-post-card {
-    width: 100%;
-    max-width: 800px;
-    background-color: $color-surface;
-    box-shadow: $shadow-sm;
-    padding: $spacing-md;
-
-    @include media-up($breakpoint-sm) {
-      padding: $spacing-xl;
+  .title-wrapper {
+    .page-title {
+      font-weight: 700;
+      font-size: 32px;
+      color: #1C1C1B;
+      line-height: normal;
     }
 
-    .header-section {
+    .page-subtitle {
+      color: #808079;
+      font-size: 16px;
+    }
+  }
+
+  .progress-section {
+    margin-top: 24px;
+
+    .progress-info {
       display: flex;
-      align-items: flex-start;
-      margin-bottom: $spacing-lg;
-
-      @include media-up($breakpoint-sm) {
-        margin-bottom: $spacing-xl;
-      }
-
-      .back-btn {
-        margin-right: $spacing-md;
-        margin-top: $spacing-xs;
-        color: $color-text-secondary;
-      }
-
-      .title-wrapper {
-        .page-title {
-          font-size: 1.5rem;
-          font-weight: 700;
-          color: $color-text-primary;
-          margin-bottom: $spacing-sm;
-          line-height: 1.2;
-
-          @include media-up($breakpoint-sm) {
-            font-size: 2rem;
-          }
-        }
-
-        .page-subtitle {
-          font-size: 0.9rem;
-          color: $color-text-secondary;
-
-          @include media-up($breakpoint-sm) {
-            font-size: 1rem;
-          }
-        }
-      }
-    }
-
-    .progress-section {
-      margin-bottom: $spacing-lg;
-
-      @include media-up($breakpoint-sm) {
-        margin-bottom: $spacing-xl * 1.25;
-      }
-
-      .progress-info {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: $spacing-sm;
-        font-size: 0.875rem;
-        font-weight: 500;
-        color: $color-text-secondary;
-      }
-
-      .progress-bar {
-        border-radius: $spacing-xs;
-        background-color: $color-border;
-      }
-    }
-
-    .step-content {
-      margin-bottom: $spacing-lg;
-      min-height: 250px;
-
-      @include media-up($breakpoint-sm) {
-        margin-bottom: $spacing-xl * 1.25;
-        min-height: 300px;
-      }
-    }
-
-    .action-buttons {
-      display: flex;
-      justify-content: space-between;
       align-items: center;
-      padding-top: $spacing-lg;
-      border-top: 1px solid $color-border;
+      justify-content: space-between;
+
+      .step-counter {
+        color: #808079;
+        font-size: 14px;
+      }
+
+      .progress-percentage {
+        color: #454541;
+        font-size: 14px;
+      }
     }
+  }
+
+  .action-buttons {
+    background-color: white;
+    padding: 0 24px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid $color-border;
+    border-radius: 0 0 $radius-md $radius-md;
+    border-top: 0;
   }
 }
