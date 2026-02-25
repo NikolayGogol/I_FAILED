@@ -62,11 +62,14 @@
     display: inline-block;
     margin-bottom: $spacing-xs;
 
-    .post-tag {
+    span {
       color: $color-primary;
       font-size: 12px;
       font-weight: 600;
       margin-right: $spacing-sm;
+      background-color: #F9EAD5;
+      padding: 5px 10px;
+      border-radius: $radius-sm;
     }
   }
 
