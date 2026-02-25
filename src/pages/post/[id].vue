@@ -161,12 +161,12 @@
       {{ post.stepTwo?.title }}
     </h1>
 
-    <section class="single-post-page__section mb-6">
+    <section v-if="post.stepTwo?.description" class="single-post-page__section mb-6">
       <h2 class="text-h6 font-weight-bold mb-2">What Happened</h2>
       <div class="text-body-1 text-grey-darken-2" v-html="post.stepTwo?.description" />
     </section>
 
-    <section class="single-post-page__section mb-6">
+    <section v-if="post.stepTwo?.whatWentWrong" class="single-post-page__section mb-6">
       <h2 class="text-h6 font-weight-bold mb-2">What Went Wrong</h2>
       <div class="text-body-1 text-grey-darken-2 italic" v-html="post.stepTwo?.whatWentWrong" />
     </section>
@@ -183,15 +183,15 @@
     </v-card>
 
     <div class="single-post-page__stats bg-grey-lighten-5 pa-4 rounded-lg mb-8">
-      <div class="d-flex mb-2">
+      <div v-if="post.stepFour?.cost" class="d-flex mb-2">
         <v-icon class="mr-2" color="grey">mdi-currency-usd</v-icon>
         <span class="font-weight-bold mr-2">Cost:</span>$ {{ post.stepFour?.cost }}
       </div>
-      <div class="d-flex mb-2">
+      <div v-if="post.stepFour?.recoveryTime" class="d-flex mb-2">
         <v-icon class="mr-2" color="grey">mdi-history</v-icon>
         <span class="font-weight-bold mr-2">Recovery Time:</span> {{ post.stepFour?.recoveryTime?.title }}
       </div>
-      <div class="mt-4">
+      <div v-if="post.stepFour?.emotionTags.length" class="mt-4">
         <v-chip
           v-for="(chip, index) in post.stepFour?.emotionTags"
           :key="index"
@@ -202,7 +202,13 @@
         > {{ chip.emoji }} {{ chip.label }}</v-chip>
       </div>
     </div>
-
+    <img
+      v-for="img in post.stepTwo.images"
+      :key="img"
+      :alt="img"
+      class="w-100"
+      :src="img"
+    >
     <v-divider class="mb-6" />
     <div class="text-center mb-4 font-weight-bold">React to This Story</div>
     <v-row class="single-post-page__reactions mb-8" dense justify="center">
