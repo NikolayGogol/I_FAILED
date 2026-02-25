@@ -38,7 +38,7 @@
       :quality="20"
     />
     <div class="form-group">
-      <label class="form-label">Title *</label>
+      <label class="form-label">Title <span class="text-error">*</span></label>
       <FormInput
         v-model="store.stepTwo.title"
         class="form-input"
@@ -50,12 +50,12 @@
     </div>
 
     <div class="form-group mt-6">
-      <label class="form-label">What happened? *</label>
+      <label class="form-label">What happened? <span class="text-error">*</span></label>
       <QuillEditor v-model:content="store.stepTwo.description" content-type="html" theme="snow" />
     </div>
 
     <div class="form-group mt-6">
-      <label class="form-label">When did it happen? *</label>
+      <label class="form-label">When did it happen? <span class="text-error">*</span></label>
       <DatePickerInput
         v-model="store.stepTwo.date"
         :enable-time="false"

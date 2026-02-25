@@ -27,7 +27,7 @@
     <p class="step-subtitle">Share what you learned from this experience</p>
 
     <div class="form-group">
-      <label class="form-label">What I learned *</label>
+      <label class="form-label">What I learned <span class="text-error">*</span></label>
       <FormInput
         v-model="store.stepThree.whatILearned"
         class="form-input"

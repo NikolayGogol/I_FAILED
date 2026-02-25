@@ -29,6 +29,14 @@
       type: Date,
       default: null,
     },
+    minutesGridStep: {
+      type: Number,
+      default: 1,
+    },
+    minutesIncrement: {
+      type: Number,
+      default: 1,
+    },
   })
 
   const emit = defineEmits(['update:modelValue'])
@@ -37,6 +45,16 @@
     get: () => props.modelValue,
     set: val => emit('update:modelValue', val),
   })
+  function handleDateUpdate (modelData) {
+    if (!modelData) return
+
+    const d = new Date(modelData)
+    const minutes = d.getMinutes()
+    const roundedMinutes = Math.round(minutes / 10) * 10
+    d.setMinutes(roundedMinutes)
+    d.setSeconds(0)
+    emit('update:modelValue', d)
+  }
 </script>
 
 <template>
@@ -50,8 +68,15 @@
       input-class-name="dp-custom-input"
       :max-date="maxDate"
       :min-date="minDate"
+      :minutes-grid-step="minutesGridStep"
+      :minutes-increment="minutesIncrement"
       :placeholder="placeholder"
-      :time-config="{ enableTimePicker: enableTime }"
+      :time-config="{
+        enableTimePicker: enableTime,
+        minutesIncrement,
+        minutesGridStep
+      }"
+      @update:model-value="handleDateUpdate"
     >
       <template #input-icon>
         <v-icon class="input-icon" icon="mdi-calendar-blank-outline" size="small" />

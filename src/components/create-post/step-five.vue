@@ -72,6 +72,8 @@
         class="date-picker"
         enable-time
         :min-date="new Date()"
+        :minutes-grid-step="10"
+        :minutes-increment="10"
         placeholder="Select date and time"
       />
     </div>

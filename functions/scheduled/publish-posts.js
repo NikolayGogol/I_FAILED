@@ -2,7 +2,7 @@ const admin = require('firebase-admin')
 const { onSchedule } = require('firebase-functions/v2/scheduler')
 
 exports.publishScheduledPosts = onSchedule({
-  schedule: 'every 1 minutes',
+  schedule: 'every 10 minutes',
   timeZone: 'Europe/Kiev', // Set your timezone
 }, async event => {
   const db = admin.firestore()

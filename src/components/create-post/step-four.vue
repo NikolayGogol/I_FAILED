@@ -94,7 +94,7 @@
 
     <div class="form-group mt-6">
       <label class="form-label">Tags</label>
-      <p class="form-hint">Suggested from popular tags</p>
+      <p class="form-hint mb-3">Suggested from popular tags</p>
       <div v-if="store.stepFour.tags.length > 0" class="tags-container my-3">
         <v-chip
           v-for="(tag, index) in store.stepFour.tags"
