@@ -11,6 +11,7 @@
   const toast = useToast()
   const emit = defineEmits(['isValid'])
   const newTag = ref('')
+  // eslint-disable-next-line vue/custom-event-name-casing
   emit('isValid', true)
 
   function addTag () {

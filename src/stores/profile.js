@@ -8,7 +8,7 @@ export const useProfileStore = defineStore('profile', {
     error: null,
   }),
   actions: {
-    async updateUserProfile ({ displayName, photoFile }) {
+    async updateUserProfile ({ displayName }) {
       this.loading = true
       this.error = null
       const authStore = useAuthStore()

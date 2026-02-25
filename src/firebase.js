@@ -1,4 +1,5 @@
 import { initializeApp } from 'firebase/app'
+/* eslint-disable */
 import {
   browserLocalPersistence,
   browserSessionPersistence,
@@ -39,6 +40,7 @@ const facebookProvider = new FacebookAuthProvider()
 
 // Global error handler for Firebase Auth
 onAuthStateChanged(auth, user => {
+  console.log(user)
   // You can handle auth state changes here
 }, error => {
   console.error('Firebase Auth Error:', error)
@@ -46,6 +48,7 @@ onAuthStateChanged(auth, user => {
 })
 
 export { auth, db, facebookProvider, functions, googleProvider, storage }
+ 
 export {
   browserLocalPersistence,
   browserSessionPersistence,
@@ -59,6 +62,7 @@ export {
   updatePassword,
   updateProfile,
 } from 'firebase/auth'
+/* eslint-enable */
 export { doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore'
 export { httpsCallable } from 'firebase/functions'
 export { getDownloadURL, ref, uploadBytes } from 'firebase/storage'

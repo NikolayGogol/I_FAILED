@@ -1,3 +1,4 @@
+import { sendPasswordResetEmail } from 'firebase/auth'
 import { onSnapshot } from 'firebase/firestore'
 import { defineStore } from 'pinia'
 import {

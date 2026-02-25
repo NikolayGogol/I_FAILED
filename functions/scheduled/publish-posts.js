@@ -5,6 +5,7 @@ exports.publishScheduledPosts = onSchedule({
   schedule: 'every 10 minutes',
   timeZone: 'Europe/Kiev', // Set your timezone
 }, async event => {
+  console.log(event)
   const db = admin.firestore()
   const now = admin.firestore.Timestamp.now()
   const scheduledCollection = process.env.POST_COLLECTION_SCEDULED || 'scheduledPosts'

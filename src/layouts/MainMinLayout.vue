@@ -1,5 +1,4 @@
 <script setup>
-  import Rightbar from '@/components/sidebars/Rightbar.vue'
   import Sidebar from '@/components/sidebars/Sidebar.vue'
 </script>
 

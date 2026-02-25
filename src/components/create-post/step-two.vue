@@ -1,5 +1,4 @@
 <script setup>
-  import { VueDatePicker } from '@vuepic/vue-datepicker'
   import { QuillEditor } from '@vueup/vue-quill'
   import { watch } from 'vue'
   import DatePickerInput from '@/components/DatePickerInput.vue'

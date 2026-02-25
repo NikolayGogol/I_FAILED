@@ -19,6 +19,7 @@ export const usePostCardStore = defineStore('postCard', {
       const uid = auth.currentUser.uid
 
       try {
+        // eslint-disable-next-line unicorn/prefer-ternary
         if (liked) {
           // User wants to like the post
           await updateDoc(postRef, {
