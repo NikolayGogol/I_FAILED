@@ -1,5 +1,5 @@
 const admin = require('firebase-admin')
-const {onSchedule} = require('firebase-functions/v2/scheduler')
+const { onSchedule } = require('firebase-functions/v2/scheduler')
 
 exports.publishScheduledPosts = onSchedule('every 1 minutes', async event => {
   const db = admin.firestore()
@@ -19,7 +19,7 @@ exports.publishScheduledPosts = onSchedule('every 1 minutes', async event => {
 
     const batch = db.batch()
 
-    snapshot.docs.forEach(doc => {
+    for (const doc of snapshot.docs) {
       const postData = doc.data()
 
       // Prepare data for the published collection
@@ -38,7 +38,7 @@ exports.publishScheduledPosts = onSchedule('every 1 minutes', async event => {
 
       // Delete the document from the scheduled collection
       batch.delete(doc.ref)
-    })
+    }
 
     await batch.commit()
     console.log(`Successfully published ${snapshot.size} posts.`)
