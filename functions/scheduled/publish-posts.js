@@ -1,18 +1,17 @@
 const admin = require('firebase-admin')
-const { onSchedule } = require('firebase-functions/v2/scheduler')
+const {onSchedule} = require('firebase-functions/v2/scheduler')
 
-exports.publishScheduledPosts = onSchedule('every 10 minutes', async event => {
+exports.publishScheduledPosts = onSchedule('every 1 minutes', async event => {
   const db = admin.firestore()
   const now = admin.firestore.Timestamp.now()
-  const scheduledCollection = process.env.POST_COLLECTION_SCEDULED
-  const publishedCollection = process.env.POST_COLLECTION
+  const scheduledCollection = process.env.POST_COLLECTION_SCEDULED || 'scheduledPosts'
+  const publishedCollection = process.env.POST_COLLECTION || 'posts'
 
   try {
     // Query for scheduled posts that are due
     const snapshot = await db.collection(scheduledCollection)
       .where('scheduledAt', '<=', now)
       .get()
-
     if (snapshot.empty) {
       console.log('No scheduled posts to publish.')
       return
