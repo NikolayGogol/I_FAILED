@@ -18,6 +18,7 @@ import {
   updatePassword,
   updateProfile,
 } from '@/firebase'
+import { onSnapshot } from 'firebase/firestore'
 
 // Helper function to extract serializable user data
 const getSerializableUser = (user) => {
@@ -94,6 +95,8 @@ const saveUserToFirestore = async (user) => {
   await setDoc(userRef, userData, { merge: true })
 }
 
+let unsubscribeFromUserDoc = null
+
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     user: null,
@@ -102,11 +105,26 @@ export const useAuthStore = defineStore('auth', {
   actions: {
     // Initialize auth state listener
     initAuthListener () {
-      onAuthStateChanged(auth, async (user) => {
-        const serializableUser = getSerializableUser(user)
-        this.user = serializableUser
-        if (serializableUser) {
-          await saveUserToFirestore(serializableUser)
+      onAuthStateChanged(auth, (user) => {
+        if (unsubscribeFromUserDoc) {
+          unsubscribeFromUserDoc()
+          unsubscribeFromUserDoc = null
+        }
+
+        if (user) {
+          const authData = getSerializableUser(user)
+          const userRef = doc(db, 'users', user.uid)
+
+          unsubscribeFromUserDoc = onSnapshot(userRef, (docSnapshot) => {
+            if (docSnapshot.exists()) {
+              this.user = { ...authData, ...docSnapshot.data() }
+            } else {
+              this.user = authData
+              saveUserToFirestore(authData)
+            }
+          })
+        } else {
+          this.user = null
         }
       })
     },
@@ -177,6 +195,10 @@ export const useAuthStore = defineStore('auth', {
     // Logout
     async logout () {
       try {
+        if (unsubscribeFromUserDoc) {
+          unsubscribeFromUserDoc()
+          unsubscribeFromUserDoc = null
+        }
         await auth.signOut()
         this.user = null
         console.log('User logged out')

@@ -44,6 +44,19 @@
     }
     return (parts[0].charAt(0) + (parts[1]?.charAt(0) || '')).toUpperCase()
   }
+
+  function isFollowing (userId) {
+    if (!authStore.user || !authStore.user.following) return false
+    return authStore.user.following.includes(userId)
+  }
+
+  function handleFollowClick (userId) {
+    if (isFollowing(userId)) {
+      whoToFollowStore.unfollowUser(userId)
+    } else {
+      whoToFollowStore.followUser(userId)
+    }
+  }
 </script>
 <template>
   <section class="right-card follow-card">
@@ -90,8 +103,9 @@
         <v-spacer />
         <div
           class="follow-btn"
+          @click="handleFollowClick(user.id)"
         >
-          Follow
+          {{ isFollowing(user.id) ? 'Unfollow' : 'Follow' }}
         </div>
       </div>
     </template>

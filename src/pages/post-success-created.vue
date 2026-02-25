@@ -16,6 +16,9 @@
   } else {
     router.push('/')
   }
+  setTimeout(() => {
+    router.push('/')
+  }, 5000)
 </script>
 
 <template>

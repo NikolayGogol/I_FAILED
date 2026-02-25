@@ -50,11 +50,11 @@
       </div>
       <div class="stat-row">
         <span>Active Users</span>
-        <span class="stat-value font-weight-bold">{{ quickStats.activeUsers.toLocaleString() }}</span>
+        <span class="stat-value font-weight-bold">0</span>
       </div>
       <div class="stat-row">
         <span>Lessons Shared</span>
-        <span class="stat-value font-weight-bold">{{ quickStats.lessonsShared.toLocaleString() }}</span>
+        <span class="stat-value font-weight-bold">0</span>
       </div>
     </section>
 
