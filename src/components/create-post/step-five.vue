@@ -5,6 +5,11 @@
   import '@/styles/components/create-post/step-five.scss'
 
   const store = useCreatePostStore()
+  const emit = defineEmits(['isValid'])
+  //
+  // eslint-disable-next-line vue/custom-event-name-casing
+  emit('isValid', true)
+
 </script>
 
 <template>
@@ -65,7 +70,8 @@
       <DatePickerInput
         v-model="store.stepFive.scheduleDate"
         class="date-picker"
-        placeholder="Select date"
+        enable-time
+        placeholder="Select date and time"
       />
     </div>
   </div>

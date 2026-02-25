@@ -1,7 +1,8 @@
 <script setup>
-  import { computed, ref } from 'vue'
-  import { useDate } from 'vuetify'
-  import '@/styles/components/form-input.scss'
+  import { VueDatePicker } from '@vuepic/vue-datepicker'
+  import { computed } from 'vue'
+  import '@vuepic/vue-datepicker/dist/main.css'
+  import '@/styles/components/date-picker.scss'
 
   const props = defineProps({
     modelValue: {
@@ -16,56 +17,35 @@
       type: String,
       default: 'Select date',
     },
+    enableTime: {
+      type: Boolean,
+      default: true,
+    },
   })
 
   const emit = defineEmits(['update:modelValue'])
 
-  const menu = ref(false)
-  const date = ref(props.modelValue ? new Date(props.modelValue) : null)
-  const adapter = useDate()
-
-  const formattedDate = computed(() => {
-    if (!date.value) return ''
-    return adapter.format(date.value, 'keyboardDate')
+  const date = computed({
+    get: () => props.modelValue,
+    set: val => emit('update:modelValue', val),
   })
-
-  function updateDate (newDate) {
-    date.value = newDate
-    emit('update:modelValue', newDate)
-    menu.value = false
-  }
 </script>
 
 <template>
-  <v-menu
-    v-model="menu"
-    :close-on-content-click="false"
-    content-class="date-picker-menu"
-    location="bottom start"
-    min-width="auto"
-  >
-    <template #activator="{ props: menuProps }">
-      <v-text-field
-        v-bind="menuProps"
-        append-inner-icon="mdi-calendar-blank-outline"
-        class="form-field"
-        density="comfortable"
-        hide-details="auto"
-        :label="label"
-        :model-value="formattedDate"
-        :placeholder="placeholder"
-        readonly
-        variant="outlined"
-      />
-    </template>
-    <v-date-picker
+  <div class="date-picker-wrapper">
+    <label v-if="label" class="label">{{ label }}</label>
+    <VueDatePicker
       v-model="date"
-      color="primary"
-      @update:model-value="updateDate"
-    />
-  </v-menu>
+      auto-apply
+      :clearable="false"
+      :format="enableTime ? 'MM/dd/yyyy HH:mm' : 'MM/dd/yyyy'"
+      input-class-name="dp-custom-input"
+      :placeholder="placeholder"
+      :time-config="{ enableTimePicker: enableTime }"
+    >
+      <template #input-icon>
+        <v-icon class="input-icon" icon="mdi-calendar-blank-outline" size="small" />
+      </template>
+    </VueDatePicker>
+  </div>
 </template>
-
-<style scoped>
-/* Inherit styles from form-input if needed, or rely on global styles */
-</style>

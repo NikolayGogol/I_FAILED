@@ -57,6 +57,7 @@
       <label class="form-label">When did it happen? *</label>
       <DatePickerInput
         v-model="store.stepTwo.date"
+        :enable-time="false"
         placeholder="Select date"
       />
     </div>
