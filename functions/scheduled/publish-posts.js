@@ -35,6 +35,7 @@ exports.publishScheduledPosts = onSchedule({
         ...postData,
         status: 'published',
         publishedAt: now,
+        createdAt: now,
       }
 
       // Remove scheduledAt field
