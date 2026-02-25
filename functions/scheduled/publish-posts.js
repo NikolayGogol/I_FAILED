@@ -27,7 +27,7 @@ exports.publishScheduledPosts = onSchedule({
 
     const batch = db.batch()
 
-    snapshot.docs.forEach(doc => {
+    for (const doc of snapshot.docs) {
       const postData = doc.data()
 
       // Prepare data for the published collection
@@ -46,7 +46,7 @@ exports.publishScheduledPosts = onSchedule({
 
       // Delete the document from the scheduled collection
       batch.delete(doc.ref)
-    })
+    }
 
     await batch.commit()
     console.log(`Successfully published ${snapshot.size} posts.`)

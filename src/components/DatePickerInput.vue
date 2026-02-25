@@ -21,6 +21,14 @@
       type: Boolean,
       default: true,
     },
+    maxDate: {
+      type: Date,
+      default: null,
+    },
+    minDate: {
+      type: Date,
+      default: null,
+    },
   })
 
   const emit = defineEmits(['update:modelValue'])
@@ -40,6 +48,8 @@
       :clearable="false"
       :format="enableTime ? 'MM/dd/yyyy HH:mm' : 'MM/dd/yyyy'"
       input-class-name="dp-custom-input"
+      :max-date="maxDate"
+      :min-date="minDate"
       :placeholder="placeholder"
       :time-config="{ enableTimePicker: enableTime }"
     >

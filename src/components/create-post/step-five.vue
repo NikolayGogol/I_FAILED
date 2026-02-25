@@ -71,6 +71,7 @@
         v-model="store.stepFive.scheduleDate"
         class="date-picker"
         enable-time
+        :min-date="new Date()"
         placeholder="Select date and time"
       />
     </div>

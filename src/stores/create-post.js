@@ -1,13 +1,14 @@
 import { addDoc, collection, serverTimestamp, updateDoc } from 'firebase/firestore'
 import { defineStore } from 'pinia'
 import { useFirestore } from 'vuefire'
+// eslint-disable-next-line import/no-duplicates
 import { getDownloadURL, ref, uploadBytes } from '@/firebase' // Correctly import storage from your firebase setup
 // eslint-disable-next-line import/no-duplicates
 import { storage } from '@/firebase' // Explicitly import storage
 import { useAuthStore } from '@/stores/auth.js'
 
 const collection_db = import.meta.env.VITE_POST_COLLECTION
-const collection_db_scheduled = import.meta.env.VITE_POST_COLLECTION_SCEDULED
+const collection_db_scheduled = import.meta.env.VITE_POST_COLLECTION_SCEDULED || 'scheduledPosts'
 
 export const useCreatePostStore = defineStore('createPost', {
   state: () => ({
@@ -43,6 +44,38 @@ export const useCreatePostStore = defineStore('createPost', {
     },
   }),
   actions: {
+    resetState () {
+      this.stepOne = {
+        selectedCategories: [],
+      }
+      this.stepTwo = {
+        title: '',
+        description: '',
+        date: null,
+        whatWentWrong: '',
+        howDidItFeel: '',
+        images: [],
+      }
+      this.stepThree = {
+        whatILearned: '',
+        keyTakeaways: '',
+        whatIdDoDifferently: '',
+        advice: '',
+      }
+      this.stepFour = {
+        cost: '',
+        recoveryTime: null,
+        emotionTags: [],
+        tags: [],
+      }
+      this.stepFive = {
+        isAnonymous: false,
+        visibility: 'Public',
+        allowComments: true,
+        enableTriggerWarning: false,
+        scheduleDate: null,
+      }
+    },
     async createPost () {
       const authStore = useAuthStore()
       const db = useFirestore()
@@ -53,6 +86,8 @@ export const useCreatePostStore = defineStore('createPost', {
 
       // 1. Prepare initial post data, ensuring stepTwo.images is empty for now
       const scheduleDate = this.stepFive.scheduleDate
+      const isScheduled = !!scheduleDate
+
       const postData = {
         stepOne: this.stepOne,
         stepTwo: { ...this.stepTwo, images: [] },
@@ -60,9 +95,9 @@ export const useCreatePostStore = defineStore('createPost', {
         stepFour: this.stepFour,
         stepFive: this.stepFive,
         createdAt: serverTimestamp(),
-        status: scheduleDate ? 'scheduled' : 'published',
-        scheduledAt: scheduleDate ? new Date(scheduleDate) : null,
-        publishedAt: scheduleDate ? null : serverTimestamp(),
+        status: isScheduled ? 'scheduled' : 'published',
+        scheduledAt: isScheduled ? new Date(scheduleDate) : null,
+        publishedAt: isScheduled ? null : serverTimestamp(),
         uid: authStore.user.uid,
         user: {
           displayName: authStore.user.displayName,
@@ -77,7 +112,7 @@ export const useCreatePostStore = defineStore('createPost', {
       try {
         // 2. Create the document in Firestore to get a unique ID
         // If scheduled, save to 'scheduledPosts' collection, otherwise to main collection
-        const targetCollection = scheduleDate ? collection_db_scheduled : collection_db
+        const targetCollection = isScheduled ? collection_db_scheduled : collection_db
         const docRef = await addDoc(collection(db, targetCollection), postData)
         const postId = docRef.id
 
@@ -106,6 +141,9 @@ export const useCreatePostStore = defineStore('createPost', {
           // **FIX:** Use dot notation to update the nested 'images' array within 'stepTwo'
           await updateDoc(docRef, { 'stepTwo.images': imageUrls })
         }
+
+        // Reset the store state after successful creation
+        this.resetState()
 
         return { success: true, postId }
       } catch (error) {
