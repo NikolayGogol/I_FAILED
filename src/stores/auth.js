@@ -13,6 +13,51 @@ import {
   updatePassword,
 } from '@/firebase'
 
+// Helper function to extract serializable user data
+const getSerializableUser = (user) => {
+  if (!user) {
+    return null
+  }
+  const {
+    uid,
+    email,
+    displayName,
+    photoURL,
+    emailVerified,
+    isAnonymous,
+    providerData,
+    stsTokenManager,
+    createdAt,
+    lastLoginAt,
+  } = user
+
+  // If the root email is missing, try to get it from the provider data
+  let finalEmail = email
+  if (!finalEmail && providerData && providerData.length > 0) {
+    const providerWithEmail = providerData.find(p => p.email)
+    if (providerWithEmail) {
+      finalEmail = providerWithEmail.email
+    }
+  }
+
+  return {
+    uid,
+    email: finalEmail,
+    displayName,
+    photoURL,
+    emailVerified,
+    isAnonymous,
+    providerData,
+    stsTokenManager: {
+      refreshToken: stsTokenManager.refreshToken,
+      accessToken: stsTokenManager.accessToken,
+      expirationTime: stsTokenManager.expirationTime,
+    },
+    createdAt,
+    lastLoginAt,
+  }
+}
+
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     user: null,
@@ -21,8 +66,8 @@ export const useAuthStore = defineStore('auth', {
   actions: {
     // Initialize auth state listener
     initAuthListener () {
-      onAuthStateChanged(auth, user => {
-        this.user = user
+      onAuthStateChanged(auth, (user) => {
+        this.user = getSerializableUser(user)
       })
     },
 
@@ -37,9 +82,10 @@ export const useAuthStore = defineStore('auth', {
         const persistence = rememberMe ? browserLocalPersistence : browserSessionPersistence
         await setPersistence(auth, persistence)
         const result = await signInWithEmailAndPassword(auth, email, password)
-        this.user = result.user
-        console.log('User signed in:', this.user)
-        return result.user
+        const serializableUser = getSerializableUser(result.user)
+        this.user = serializableUser
+        console.log('User signed in:', serializableUser)
+        return serializableUser
       } catch (error) {
         console.error('Error signing in:', error)
         this.error = this.getErrorMessage(error.code)
@@ -51,10 +97,16 @@ export const useAuthStore = defineStore('auth', {
     async signInWithGoogle () {
       this.error = null
       try {
+        googleProvider.addScope('profile')
+        googleProvider.addScope('email')
+        googleProvider.setCustomParameters({
+          prompt: 'select_account',
+        })
         const result = await signInWithPopup(auth, googleProvider)
-        this.user = result.user
-        console.log('User signed in with Google:', this.user)
-        return result.user
+        const serializableUser = getSerializableUser(result.user)
+        this.user = serializableUser
+        console.log('User signed in with Google:', serializableUser)
+        return serializableUser
       } catch (error) {
         console.error('Error signing in with Google:', error)
         this.error = this.getErrorMessage(error.code)
@@ -73,11 +125,11 @@ export const useAuthStore = defineStore('auth', {
         })
 
         const result = await signInWithPopup(auth, facebookProvider)
+        const serializableUser = getSerializableUser(result.user)
+        this.user = serializableUser
+        console.log('User signed in with Facebook:', serializableUser)
 
-        this.user = result.user
-        console.log('User signed in with Facebook:', this.user)
-
-        return result.user
+        return serializableUser
       } catch (error) {
         console.error('Error signing in with Facebook:', error)
         this.error = this.getErrorMessage(error.code)
