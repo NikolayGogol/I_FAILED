@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
-import api from '@/axios'
+import { collection, getDocs, limit, query } from 'firebase/firestore'
+import { db } from '@/firebase'
 
 export const useWhoToFollowStore = defineStore('whoToFollow', {
   state: () => ({
@@ -16,8 +17,10 @@ export const useWhoToFollowStore = defineStore('whoToFollow', {
       this.loading = true
       this.error = null
       try {
-        const response = await api.get('/getAllUsers')
-        this.users = response.data
+        const usersRef = collection(db, 'users')
+        const q = query(usersRef, limit(15)) // Get up to 15 users
+        const querySnapshot = await getDocs(q)
+        this.users = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
       } catch (error) {
         this.error = 'Failed to fetch users.'
         console.error('Error fetching users:', error)

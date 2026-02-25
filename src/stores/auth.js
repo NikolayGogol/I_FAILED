@@ -3,6 +3,7 @@ import {
   auth,
   browserLocalPersistence,
   browserSessionPersistence,
+  createUserWithEmailAndPassword,
   db,
   doc,
   facebookProvider,
@@ -15,6 +16,7 @@ import {
   signInWithEmailAndPassword,
   signInWithPopup,
   updatePassword,
+  updateProfile,
 } from '@/firebase'
 
 // Helper function to extract serializable user data
@@ -70,10 +72,16 @@ const saveUserToFirestore = async (user) => {
   const userRef = doc(db, 'users', user.uid)
   const userDoc = await getDoc(userRef)
 
+  // Get the primary provider ID
+  const providerId = user.providerData && user.providerData.length > 0
+    ? user.providerData[0].providerId
+    : 'password'
+
   const userData = {
     email: user.email,
     displayName: user.displayName,
     photoURL: user.photoURL,
+    providerId, // Add provider information
     lastLoginAt: serverTimestamp(),
   }
 
