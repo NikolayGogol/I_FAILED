@@ -215,10 +215,9 @@
         </v-btn>
       </v-col>
     </v-row>
+    <v-divider v-if="post.stepFive?.allowComments" class="mb-6" />
 
-    <v-divider class="mb-6" />
-
-    <div class="single-post-page__comments">
+    <div v-if="post.stepFive?.allowComments" class="single-post-page__comments">
       <h3 class="text-h5 font-weight-bold mb-4">Comments ({{ comments.length }})</h3>
 
       <div class="mb-6">

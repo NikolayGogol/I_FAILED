@@ -5,6 +5,7 @@ import { useFirestore } from 'vuefire'
 import { getDownloadURL, ref, uploadBytes } from '@/firebase' // Correctly import storage from your firebase setup
 // eslint-disable-next-line import/no-duplicates
 import { storage } from '@/firebase' // Explicitly import storage
+import { noAvatar } from '@/models/no-data.js'
 import { useAuthStore } from '@/stores/auth.js'
 
 const collection_db = import.meta.env.VITE_POST_COLLECTION
@@ -100,8 +101,8 @@ export const useCreatePostStore = defineStore('createPost', {
         publishedAt: isScheduled ? null : serverTimestamp(),
         uid: authStore.user.uid,
         user: {
-          displayName: authStore.user.displayName,
-          photoURL: authStore.user.photoURL,
+          displayName: this.stepFive.isAnonymous ? 'Anonymous Anonymous' : authStore.user.displayName,
+          photoURL: this.stepFive.isAnonymous ? noAvatar : authStore.user.photoURL,
         },
         likes: 0,
         comments: 0,

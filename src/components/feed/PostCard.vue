@@ -100,7 +100,7 @@
       </v-btn>
     </header>
 
-    <div class="post-tags">
+    <div v-if="post.stepOne.selectedCategories.length > 0" class="post-tags">
       <span>{{ post.stepOne.selectedCategories.map(el => el.label).join(' / ') }}</span>
     </div>
 
@@ -111,7 +111,7 @@
     <p class="post-body" v-html="truncatedBody" />
     <button v-if="showReadMore" class="read-more" @click="readMore">Read more</button>
 
-    <div class="post-chips">
+    <div v-if="post.stepFour.emotionTags" class="post-chips">
       <span
         v-for="chip in post.stepFour.emotionTags"
         :key="chip"
@@ -122,12 +122,12 @@
       </span>
     </div>
 
-    <div class="post-meta">
-      <div class="meta-item">
+    <div v-if="post.stepFour?.recoveryTime || post.stepFour.cost" class="post-meta">
+      <div v-if="post.stepFour.cost" class="meta-item">
         <span class="meta-label">💰    Cost:</span>
         <span>$ {{ post.stepFour.cost }}</span>
       </div>
-      <div class="meta-item">
+      <div v-if="post.stepFour?.recoveryTime" class="meta-item">
         <span class="meta-label">⏱️   Recovery:</span>
         <span>{{ post.stepFour?.recoveryTime?.title }}</span>
       </div>
@@ -138,7 +138,7 @@
         <v-icon size="18">{{ isLiked ? 'mdi-heart' : 'mdi-heart-outline' }}</v-icon>
         <span>{{ likeCount }}</span>
       </button>
-      <button class="icon-btn">
+      <button v-if="post.stepFive.allowComments" class="icon-btn">
         <v-icon size="18">mdi-comment-outline</v-icon>
         <span>{{ commentCount }}</span>
       </button>
