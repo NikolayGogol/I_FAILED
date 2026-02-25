@@ -6,7 +6,7 @@ exports.publishScheduledPosts = onSchedule('every 10 minutes', async event => {
   const now = admin.firestore.Timestamp.now()
 
   try {
-    const snapshot = await db.collection('posts')
+    const snapshot = await db.collection(process.env.POST_COLLECTION)
       .where('status', '==', 'scheduled')
       .where('scheduledAt', '<=', now)
       .get()

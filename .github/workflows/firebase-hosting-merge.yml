@@ -69,6 +69,7 @@ jobs:
           echo "SENDGRID_API_KEY=${{ vars.SENDGRID_API_KEY }}" >> functions/.env
           echo "PENDING_USERS=${{ vars.PENDING_USERS }}" >> functions/.env
           echo "VERIFY_LINK=${{ vars.VERIFY_LINK }}" >> functions/.env
+          echo "POST_COLLECTION=${{ vars.POST_COLLECTION }}" >> functions/.env
 
       - name: Install Function Dependencies
         run: cd functions && npm ci
