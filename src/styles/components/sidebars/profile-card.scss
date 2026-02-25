@@ -39,6 +39,14 @@
 
   .profile-search {
     margin-top: $spacing-lg;
+
+    .v-input__control {
+      border: 1px solid $color-border;
+    }
+
+    .v-field__input {
+      border: none;
+    }
   }
 }
 
@@ -70,6 +78,7 @@
 
       &.v-list-item--active {
         background-color: $color-accent-bg;
+
         .v-list-item-title {
           color: $color-accent-text;
           font-weight: bold;
@@ -80,6 +89,7 @@
         .v-list-item-title {
           color: $color-error;
         }
+
         &:hover {
           background-color: rgba($color-error, 0.05);
         }
