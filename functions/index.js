@@ -7,7 +7,6 @@ const { onRequest } = require('firebase-functions/v2/https')
 admin.initializeApp()
 
 const authRoutes = require('./routes/auth')
-const userRoutes = require('./routes/users')
 const { publishScheduledPosts } = require('./scheduled/publish-posts')
 
 const app = express()
@@ -23,7 +22,6 @@ app.use(express.json())
 
 // Mount the routers
 app.use(authRoutes)
-app.use(userRoutes)
 
 // Export the API as a single Cloud Function
 exports.api = onRequest(app)
