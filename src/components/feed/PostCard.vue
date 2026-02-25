@@ -3,8 +3,8 @@
   import { useRouter } from 'vue-router'
   import { auth } from '@/firebase'
   import { usePostCardStore } from '@/stores/post-card.js'
+  import { formatNumber } from '@/utils/format-number.js'
   import '@/styles/components/feed/post-card.scss'
-  import {formatNumber} from "@/utils/format-number.js";
 
   const p = defineProps({
     post: {

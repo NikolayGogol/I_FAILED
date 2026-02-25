@@ -1,11 +1,11 @@
 export const feedNavItems = [
-  { id: 'sidebars', label: 'Feed', icon: 'mdi-home-outline' },
-  { id: 'explore', label: 'Explore', icon: 'mdi-compass-outline' },
-  { id: 'notifications', label: 'Notifications', icon: 'mdi-bell-outline' },
-  { id: 'library', label: 'Library', icon: 'mdi-book-open-outline' },
-  { id: 'premium', label: 'Premium', icon: 'mdi-star-outline' },
-  { id: 'failure-resume', label: 'Failure Resume', icon: 'mdi-file-document-outline' },
-  { id: 'failure-age', label: 'Failure Age', icon: 'mdi-timer-sand' },
+  { id: 'sidebars', label: 'Feed', icon: 'home' },
+  { id: 'explore', label: 'Explore', icon: 'search' },
+  { id: 'notifications', label: 'Notifications', icon: 'bell' },
+  { id: 'library', label: 'Library', icon: 'mark' },
+  { id: 'premium', label: 'Premium', icon: 'premium' },
+  { id: 'failure-resume', label: 'Failure Resume', icon: 'medal' },
+  { id: 'failure-age', label: 'Failure Age', icon: 'chart' },
 ]
 
 export const feedQuickStats = {

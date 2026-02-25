@@ -3,6 +3,7 @@
   import { useRouter } from 'vue-router'
   import ProfileCard from '@/components/sidebars/ProfileCard.vue'
   import { feedNavItems, feedQuickStats } from '@/models/feed'
+  import { getIcon } from '@/models/icons.js'
   import { useMainStore } from '@/stores/main.js'
   import '@/styles/components/sidebars/sidebar.scss'
 
@@ -35,9 +36,7 @@
           class="nav-item py-2"
           :to="item.id === 'sidebars' ? '/' : '/' + item.id"
         >
-          <v-icon class="nav-icon mr-2" size="25">
-            {{ item.icon }}
-          </v-icon>
+          <p class="mr-3" v-html="getIcon(item.icon)" />
           <span>{{ item.label }}</span>
         </router-link>
       </div>

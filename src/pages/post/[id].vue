@@ -13,7 +13,7 @@
   import FormInput from '@/components/FormInput.vue'
   import { useAuthStore } from '@/stores/auth'
   import { useSinglePostStore } from '@/stores/single-post'
-  import {formatNumber} from "@/utils/format-number.js";
+  import { formatNumber } from '@/utils/format-number.js'
 
   const route = useRoute()
   const { getPostById, incrementViewCount, addComment, addReply, toggleCommentLike, getComments } = useSinglePostStore()

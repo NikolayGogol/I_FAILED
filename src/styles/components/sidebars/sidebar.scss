@@ -28,8 +28,20 @@
         padding: $spacing-sm 0;
 
         &.router-link-active {
-          color: $color-primary;
+          color: #6E240F;
           font-weight: 600;
+
+          svg {
+            &.fill-current {
+              * {
+                fill: #6E240F;
+              }
+            }
+
+            * {
+              stroke: #6E240F;
+            }
+          }
         }
       }
     }
