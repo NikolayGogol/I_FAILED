@@ -123,22 +123,20 @@
     gap: $spacing-lg;
     margin-bottom: $spacing-md;
     padding: $spacing-sm $spacing-md;
-    background-color: $color-background;
     border-radius: $radius-md;
 
     .meta-item {
       display: flex;
-      flex-direction: column;
       font-size: 12px;
 
       .meta-label {
         color: $color-text-secondary;
-        margin-bottom: 2px;
       }
 
       span:not(.meta-label) {
         font-weight: 600;
         color: $color-text-primary;
+        margin-left: 10px;
       }
     }
   }
