@@ -4,6 +4,7 @@
   import { auth } from '@/firebase'
   import { usePostCardStore } from '@/stores/post-card.js'
   import '@/styles/components/feed/post-card.scss'
+  import {formatNumber} from "@/utils/format-number.js";
 
   const p = defineProps({
     post: {
@@ -125,7 +126,7 @@
     <div v-if="post.stepFour?.recoveryTime || post.stepFour.cost" class="post-meta">
       <div v-if="post.stepFour.cost" class="meta-item">
         <span class="meta-label">💰    Cost:</span>
-        <span>$ {{ post.stepFour.cost }}</span>
+        <span>{{ formatNumber(post.stepFour.cost) }}</span>
       </div>
       <div v-if="post.stepFour?.recoveryTime" class="meta-item">
         <span class="meta-label">⏱️   Recovery:</span>

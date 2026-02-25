@@ -13,6 +13,7 @@
   import FormInput from '@/components/FormInput.vue'
   import { useAuthStore } from '@/stores/auth'
   import { useSinglePostStore } from '@/stores/single-post'
+  import {formatNumber} from "@/utils/format-number.js";
 
   const route = useRoute()
   const { getPostById, incrementViewCount, addComment, addReply, toggleCommentLike, getComments } = useSinglePostStore()
@@ -185,7 +186,7 @@
     <div class="single-post-page__stats bg-grey-lighten-5 pa-4 rounded-lg mb-8">
       <div v-if="post.stepFour?.cost" class="d-flex mb-2">
         <v-icon class="mr-2" color="grey">mdi-currency-usd</v-icon>
-        <span class="font-weight-bold mr-2">Cost:</span>$ {{ post.stepFour?.cost }}
+        <span class="font-weight-bold mr-2">Cost:</span>{{ formatNumber(post.stepFour?.cost) }}
       </div>
       <div v-if="post.stepFour?.recoveryTime" class="d-flex mb-2">
         <v-icon class="mr-2" color="grey">mdi-history</v-icon>
