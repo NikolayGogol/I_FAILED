@@ -20,28 +20,24 @@
     { label: 'For You', value: 'for-you' },
   ]
 
-  // The active tab is now managed by the store, but we can keep a local ref for the UI
   const activeTab = computed(() => mainStore.activeTab)
-
-  // Posts are now directly from the store, no client-side sorting needed
   const posts = computed(() => mainStore.posts)
 
   function selectTab (tab) {
+    // Scroll to the top of the page with smooth animation
+    window.scrollTo({ top: 0, behavior: 'smooth' })
     // Fetch posts for the newly selected tab
     mainStore.fetchPosts({ tab: tab.value })
   }
 
   function handleScroll () {
     const { scrollTop, scrollHeight, clientHeight } = document.documentElement
-    // Fetch more posts when user is 100px from the bottom
     if (scrollHeight - scrollTop - clientHeight < 100) {
-      // Fetch more posts for the current active tab
       mainStore.fetchPosts()
     }
   }
 
   onMounted(() => {
-    // Initial fetch for the default tab
     mainStore.fetchPosts({ tab: 'latest' })
     window.addEventListener('scroll', handleScroll)
   })
