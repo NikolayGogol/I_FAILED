@@ -1,21 +1,22 @@
 <script setup>
-  import { ref } from 'vue'
+  import { computed, onMounted } from 'vue'
   import { useRouter } from 'vue-router'
   import ProfileCard from '@/components/sidebars/ProfileCard.vue'
-  import { feedNavItems, feedQuickStats } from '@/models/feed'
+  import { feedNavItems } from '@/models/feed'
   import { getIcon } from '@/models/icons.js'
   import { useMainStore } from '@/stores/main.js'
   import '@/styles/components/sidebars/sidebar.scss'
 
   const navItems = feedNavItems
-  const quickStats = feedQuickStats
-  const totalPosts = ref(0)
   const router = useRouter()
-  //
-  const { getFeeds } = useMainStore()
-  //
-  getFeeds().then(res => {
-    totalPosts.value = res.length
+  const mainStore = useMainStore()
+
+  // Use a computed property to reactively get the total posts count from the store
+  const totalPosts = computed(() => mainStore.totalPosts)
+
+  // Fetch the total count when the component is mounted
+  onMounted(() => {
+    mainStore.fetchTotalPostCount()
   })
 </script>
 <template>

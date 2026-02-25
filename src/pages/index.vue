@@ -1,57 +1,56 @@
 <route lang="json">
 {
-"meta": {
-"layout": "MainLayout"
-}
+  "meta": {
+    "layout": "MainLayout"
+  }
 }
 </route>
+
 <script setup>
-  import { computed, ref } from 'vue'
+  import { computed, onMounted, onUnmounted } from 'vue'
   import PostCard from '@/components/feed/PostCard.vue'
   import { useMainStore } from '@/stores/main.js'
-  import { useAuthStore } from '@/stores/auth.js'
   import '@/styles/pages/index.scss'
-  const { getFeeds } = useMainStore()
-  const authStore = useAuthStore()
-  const activeTab = ref(1)
-  const posts = ref([])
+
+  const mainStore = useMainStore()
+
   const tabs = [
-    {
-      label: 'Lastest',
-      value: 1,
-    },
-    {
-      label: 'Popular',
-      value: 2,
-    },
-    {
-      label: 'For You',
-      value: 3,
-    },
+    { label: 'Latest', value: 'latest' },
+    { label: 'Popular', value: 'popular' },
+    { label: 'For You', value: 'for-you' },
   ]
 
-  const sortedPosts = computed(() => {
-    if (activeTab.value === 2) {
-      return [...posts.value].toSorted((a, b) => b.views - a.views)
+  // The active tab is now managed by the store, but we can keep a local ref for the UI
+  const activeTab = computed(() => mainStore.activeTab)
+
+  // Posts are now directly from the store, no client-side sorting needed
+  const posts = computed(() => mainStore.posts)
+
+  function selectTab (tab) {
+    // Fetch posts for the newly selected tab
+    mainStore.fetchPosts({ tab: tab.value })
+  }
+
+  function handleScroll () {
+    const { scrollTop, scrollHeight, clientHeight } = document.documentElement
+    // Fetch more posts when user is 100px from the bottom
+    if (scrollHeight - scrollTop - clientHeight < 100) {
+      // Fetch more posts for the current active tab
+      mainStore.fetchPosts()
     }
-    if (activeTab.value === 3) {
-      const following = authStore.user?.following || []
-      const followingPosts = posts.value.filter(post => following.includes(post.user.uid))
-      const otherPosts = posts.value.filter(post => !following.includes(post.user.uid))
-      otherPosts.sort((a, b) => (b.likes || 0) - (a.likes || 0))
-      return [...followingPosts, ...otherPosts]
-    }
-    return posts.value
+  }
+
+  onMounted(() => {
+    // Initial fetch for the default tab
+    mainStore.fetchPosts({ tab: 'latest' })
+    window.addEventListener('scroll', handleScroll)
   })
 
-  getFeeds()
-    .then(res => {
-      posts.value = res
-    })
-  function selectTab (tab) {
-    activeTab.value = tab.value
-  }
+  onUnmounted(() => {
+    window.removeEventListener('scroll', handleScroll)
+  })
 </script>
+
 <template>
   <div class="feed-page">
     <section class="feed-main">
@@ -70,9 +69,7 @@
 
       <!-- Composer -->
       <div class="composer-card mb-6">
-        <div
-          class="write-post-btn font-weight-semibold"
-        >
+        <div class="write-post-btn font-weight-semibold">
           Write a post
         </div>
         <div class="composer-filter">
@@ -81,11 +78,23 @@
       </div>
 
       <!-- Posts -->
+      <div v-if="mainStore.loading && posts.length === 0" class="text-center py-10">
+        Loading...
+      </div>
+      <div v-else-if="posts.length === 0" class="text-center py-10 text-gray-500">
+        No posts found.
+      </div>
       <PostCard
-        v-for="post in sortedPosts"
+        v-for="post in posts"
         :key="post.id"
         :post="post"
       />
+      <div v-if="mainStore.loading && posts.length > 0" class="text-center py-4">
+        Loading more posts...
+      </div>
+      <div v-if="!mainStore.hasMore && posts.length > 0" class="text-center py-4 text-gray-500">
+        You've reached the end.
+      </div>
     </section>
   </div>
 </template>

@@ -1,3 +1,4 @@
+import { onSnapshot } from 'firebase/firestore'
 import { defineStore } from 'pinia'
 import {
   auth,
@@ -18,10 +19,9 @@ import {
   updatePassword,
   updateProfile,
 } from '@/firebase'
-import { onSnapshot } from 'firebase/firestore'
 
 // Helper function to extract serializable user data
-const getSerializableUser = (user) => {
+function getSerializableUser (user) {
   if (!user) {
     return null
   }
@@ -66,7 +66,7 @@ const getSerializableUser = (user) => {
 }
 
 // Function to save user to Firestore
-const saveUserToFirestore = async (user) => {
+async function saveUserToFirestore (user) {
   if (!user) {
     return
   }
@@ -105,7 +105,7 @@ export const useAuthStore = defineStore('auth', {
   actions: {
     // Initialize auth state listener
     initAuthListener () {
-      onAuthStateChanged(auth, (user) => {
+      onAuthStateChanged(auth, user => {
         if (unsubscribeFromUserDoc) {
           unsubscribeFromUserDoc()
           unsubscribeFromUserDoc = null
@@ -115,7 +115,7 @@ export const useAuthStore = defineStore('auth', {
           const authData = getSerializableUser(user)
           const userRef = doc(db, 'users', user.uid)
 
-          unsubscribeFromUserDoc = onSnapshot(userRef, (docSnapshot) => {
+          unsubscribeFromUserDoc = onSnapshot(userRef, docSnapshot => {
             if (docSnapshot.exists()) {
               this.user = { ...authData, ...docSnapshot.data() }
             } else {

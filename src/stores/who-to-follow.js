@@ -1,14 +1,14 @@
-import { defineStore } from 'pinia'
 import {
+  arrayRemove,
+  arrayUnion,
   collection,
+  doc,
   getDocs,
   limit,
   query,
-  doc,
   updateDoc,
-  arrayUnion,
-  arrayRemove,
 } from 'firebase/firestore'
+import { defineStore } from 'pinia'
 import { db } from '@/firebase'
 import { useAuthStore } from '@/stores/auth'
 
@@ -62,12 +62,16 @@ export const useWhoToFollowStore = defineStore('whoToFollow', {
         // Update the local state
         const user = this.users.find(u => u.id === userIdToFollow)
         if (user) {
-          if (!user.followers) user.followers = []
+          if (!user.followers) {
+            user.followers = []
+          }
           user.followers.push(currentUserId)
         }
         const currentUser = this.users.find(u => u.id === currentUserId)
         if (currentUser) {
-          if (!currentUser.following) currentUser.following = []
+          if (!currentUser.following) {
+            currentUser.following = []
+          }
           currentUser.following.push(userIdToFollow)
         }
       } catch (error) {
