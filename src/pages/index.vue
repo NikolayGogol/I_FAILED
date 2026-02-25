@@ -6,19 +6,42 @@
 }
 </route>
 <script setup>
-  import { ref } from 'vue'
+  import { computed, ref } from 'vue'
   import PostCard from '@/components/feed/PostCard.vue'
   import { useMainStore } from '@/stores/main.js'
   import '@/styles/pages/index.scss'
   const { getFeeds } = useMainStore()
-  const activeTab = ref('latest')
+  const activeTab = ref(1)
   const posts = ref([])
-  //
+  const tabs = [
+    {
+      label: 'Lastest',
+      value: 1,
+    },
+    {
+      label: 'Popular',
+      value: 2,
+    },
+    {
+      label: 'For You',
+      value: 3,
+    },
+  ]
+
+  const sortedPosts = computed(() => {
+    if (activeTab.value === 2) {
+      return [...posts.value].toSorted((a, b) => b.views - a.views)
+    }
+    return posts.value
+  })
+
   getFeeds()
     .then(res => {
       posts.value = res
     })
-
+  function selectTab (tab) {
+    activeTab.value = tab.value
+  }
 </script>
 <template>
   <div class="feed-page">
@@ -26,25 +49,13 @@
       <!-- Tabs -->
       <div class="feed-tabs">
         <button
+          v-for="tab in tabs"
+          :key="tab.value"
           class="feed-tab"
-          :class="{ active: activeTab === 'latest' }"
-          @click="activeTab = 'latest'"
+          :class="{ active: activeTab === tab.value }"
+          @click="selectTab(tab)"
         >
-          Latest
-        </button>
-        <button
-          class="feed-tab"
-          :class="{ active: activeTab === 'popular' }"
-          @click="activeTab = 'popular'"
-        >
-          Popular
-        </button>
-        <button
-          class="feed-tab"
-          :class="{ active: activeTab === 'forYou' }"
-          @click="activeTab = 'forYou'"
-        >
-          For You
+          {{ tab.label }}
         </button>
       </div>
 
@@ -62,7 +73,7 @@
 
       <!-- Posts -->
       <PostCard
-        v-for="post in posts"
+        v-for="post in sortedPosts"
         :key="post.id"
         :post="post"
       />
