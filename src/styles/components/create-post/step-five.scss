@@ -53,6 +53,9 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    background-color: #F9EAD5;
+    padding: 8px 15px;
+    border-radius: $radius-md;
 
     .setting-title {
       color: #1C1C1B;

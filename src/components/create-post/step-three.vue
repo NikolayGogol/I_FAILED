@@ -38,15 +38,15 @@
     </div>
     <div class="form-group">
       <label class="form-label">Key takeaways</label>
-      <QuillEditor v-model:content="store.stepThree.keyTakeaways" content-type="html" theme="snow" />
+      <QuillEditor v-model:content="store.stepThree.keyTakeaways" placeholder="Describe the situation in detail..." content-type="html" theme="snow" />
     </div>
     <div class="form-group mt-6">
       <label class="form-label">What I'd do differently</label>
-      <QuillEditor v-model:content="store.stepThree.whatIdDoDifferently" content-type="html" theme="snow" />
+      <QuillEditor v-model:content="store.stepThree.whatIdDoDifferently" placeholder="Describe the situation in detail..." content-type="html" theme="snow" />
     </div>
     <div class="form-group mt-6">
       <label class="form-label">Advice for others</label>
-      <QuillEditor v-model:content="store.stepThree.advice" content-type="html" theme="snow" />
+      <QuillEditor v-model:content="store.stepThree.advice" placeholder="Describe the situation in detail..." content-type="html" theme="snow" />
     </div>
   </div>
 </template>

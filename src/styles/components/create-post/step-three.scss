@@ -31,5 +31,12 @@
 
   .ql-container {
     border-radius: 0 0 $radius-xs $radius-xs;
+    height: 114px;
+  }
+
+  .ql-editor.ql-blank::before {
+    color: #7F8C8D;
+    font-size: 14px;
+    font-style: normal;
   }
 }

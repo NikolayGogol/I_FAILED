@@ -16,7 +16,7 @@
   <div class="step-five">
     <h2 class="step-title">Privacy & Posting</h2>
 
-    <div class="setting-row bg-secondary pa-2 rounded-lg">
+    <div class="setting-row ">
       <div>
         <div class="setting-title">Post as Anonymous</div>
         <div class="setting-desc">Hide your identity on this post</div>
@@ -43,7 +43,7 @@
       />
     </div>
 
-    <div class="setting-row bg-secondary pa-2 rounded-lg">
+    <div class="setting-row">
       <div class="setting-title">Allow comments</div>
       <v-switch
         v-model="store.stepFive.allowComments"
@@ -54,7 +54,7 @@
       />
     </div>
 
-    <div class="setting-row bg-secondary mt-4 pa-2 rounded-lg">
+    <div class="setting-row mt-4">
       <div class="setting-title">Enable trigger warning</div>
       <v-switch
         v-model="store.stepFive.enableTriggerWarning"

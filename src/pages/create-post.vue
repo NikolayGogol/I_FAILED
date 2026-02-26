@@ -98,7 +98,7 @@
       </v-window>
 
       <div class="action-buttons">
-        <v-btn
+        <v-btn color="primary"
           class="prev-btn rounded-lg"
           :disabled="step === 1"
           prepend-icon="mdi-arrow-left"
