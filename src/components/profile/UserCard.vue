@@ -96,7 +96,7 @@
           <h2>{{ displayName }}</h2>
           <button class="edit-profile-btn" @click="openEditDialog">Edit profile</button>
         </div>
-        <p class="user-email">@{{ displayName.replace(/\s/g, '') }}</p>
+        <p class="user-email">@{{ displayName.replaceAll(' ', '_') }}</p>
         <p class="user-bio">Entrepreneur learning from startup failures. Sharing my journey to help others.</p>
 
         <div class="user-meta d-flex align-center">

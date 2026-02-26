@@ -114,12 +114,12 @@
             </v-tooltip>
           </div>
           <div class="follow-handle">
-            @{{ user.displayName?.replace(/\s/g, '') || 'user' }}
+            @{{ user.displayName?.replaceAll(' ', '_') || 'user' }}
             <v-tooltip
               activator="parent"
               content-class="custom-tooltip"
               location="bottom"
-            >@{{ user.displayName?.replace(/\s/g, '') || 'user' }}
+            >@{{ user.displayName?.replaceAll(' ', '_') || 'user' }}
             </v-tooltip>
           </div>
         </div>

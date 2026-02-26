@@ -93,7 +93,7 @@
       </div>
       <div class="post-author">
         <div class="post-author-name">{{ post.user.displayName }}</div>
-        <div class="post-author-handle">@{{ post.user.displayName.replace(/\s/g, '') }}</div>
+        <div class="post-author-handle">@{{ post.user.displayName.replaceAll(' ', '_') }}</div>
       </div>
       <v-spacer />
       <v-btn icon size="small" variant="text">
