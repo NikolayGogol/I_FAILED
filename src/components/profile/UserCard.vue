@@ -163,7 +163,7 @@
             </label>
           </div>
 
-          <v-text-field
+          <form-input
             v-model="newDisplayName"
             density="comfortable"
             label="Display Name"
