@@ -31,7 +31,7 @@
     </div>
 
     <div class="form-group my-4">
-      <label class="form-label">Visibility</label>
+      <label class="form-label mt-1">Visibility</label>
       <v-select
         v-model="store.stepFive.visibility"
         class="form-input form-field select"
@@ -69,7 +69,7 @@
       <label class="form-label">Schedule post (optional)</label>
       <DatePickerInput
         v-model="store.stepFive.scheduleDate"
-        class="date-picker"
+        class="date-picker mt-1"
         enable-time
         :min-date="new Date()"
         :minutes-grid-step="10"

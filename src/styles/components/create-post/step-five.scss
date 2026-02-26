@@ -9,6 +9,18 @@
   padding: 24px;
   margin-top: 24px;
 
+  .v-switch__track {
+    height: 25px !important;
+  }
+
+  .v-selection-control__input {
+    .v-switch__thumb {
+      height: 18px;
+      width: 18px;
+      transform: scale(1);
+    }
+  }
+
   .step-title {
     font-size: 20px;
     font-weight: 600;

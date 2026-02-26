@@ -56,11 +56,13 @@ function getSerializableUser (user) {
     emailVerified,
     isAnonymous,
     providerData,
-    stsTokenManager: stsTokenManager ? {
-      refreshToken: stsTokenManager.refreshToken,
-      accessToken: stsTokenManager.accessToken,
-      expirationTime: stsTokenManager.expirationTime,
-    } : null,
+    stsTokenManager: stsTokenManager
+      ? {
+          refreshToken: stsTokenManager.refreshToken,
+          accessToken: stsTokenManager.accessToken,
+          expirationTime: stsTokenManager.expirationTime,
+        }
+      : null,
     createdAt,
     lastLoginAt,
   }
@@ -102,7 +104,7 @@ export const useAuthStore = defineStore('auth', {
   }),
   actions: {
     initAuthListener () {
-      onAuthStateChanged(auth, (user) => {
+      onAuthStateChanged(auth, user => {
         if (unsubscribeFromUserDoc) {
           unsubscribeFromUserDoc()
           unsubscribeFromUserDoc = null
@@ -112,7 +114,7 @@ export const useAuthStore = defineStore('auth', {
           const authData = getSerializableUser(user)
           const userRef = doc(db, 'users', user.uid)
 
-          unsubscribeFromUserDoc = onSnapshot(userRef, (docSnapshot) => {
+          unsubscribeFromUserDoc = onSnapshot(userRef, docSnapshot => {
             if (docSnapshot.exists()) {
               // Merge auth data with Firestore data
               this.user = { ...authData, ...docSnapshot.data() }
@@ -202,7 +204,9 @@ export const useAuthStore = defineStore('auth', {
 
     async updateUserPassword (newPassword) {
       this.error = null
-      if (!auth.currentUser) throw new Error('No user logged in')
+      if (!auth.currentUser) {
+        throw new Error('No user logged in')
+      }
       await updatePassword(auth.currentUser, newPassword)
     },
 

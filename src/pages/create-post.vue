@@ -37,9 +37,15 @@
       isLoading.value = false
     })
   }
+
   function nextStep () {
     step.value++
     isValid.value = false
+  }
+
+  function prevStep () {
+    step.value--
+    isValid.value = true
   }
 </script>
 
@@ -97,7 +103,7 @@
           :disabled="step === 1"
           prepend-icon="mdi-arrow-left"
           variant="outlined"
-          @click="step--"
+          @click="prevStep"
         >
           Back
         </v-btn>

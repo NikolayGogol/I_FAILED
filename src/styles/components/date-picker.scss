@@ -1,7 +1,37 @@
 @use '../settings.scss' as *;
 
 .date-picker-wrapper {
+  .dp__input {
+    padding-left: 40px;
+    line-height: normal;
+    padding-bottom: 8px;
+  }
 
+  .dp__calendar_row {
+    gap: 8px;
+
+    .dp__calendar_item {
+      min-width: 30px;
+      min-height: 30px;
+      border: 1px solid $color-border;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: $radius-sm;
+      font-size: 12px;
+
+      .dp__today {
+        border-radius: $radius-sm;
+        min-width: 30px;
+        min-height: 30px;
+      }
+
+      .dp__active_date {
+        border-radius: $radius-sm;
+      }
+    }
+
+  }
   .dp__main {
     .dp__input_wrap {
       height: 44px;

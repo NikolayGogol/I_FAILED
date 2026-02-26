@@ -1,5 +1,4 @@
 @use '../../settings.scss' as *;
-@use '../../global/fonts.scss' as *;
 
 .step-two {
   background-color: $color-surface;
@@ -8,6 +7,9 @@
   border-bottom: 0;
   padding: 24px;
   margin-top: 24px;
+
+
+
 
   .v-field__input {
     border: none;
@@ -35,6 +37,7 @@
     font-size: 14px;
     margin-bottom: 8px;
   }
+
 
   .ql-toolbar {
     border-radius: $radius-xs $radius-xs 0 0;
