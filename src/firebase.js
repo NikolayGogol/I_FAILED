@@ -5,16 +5,21 @@ import {
   browserSessionPersistence,
   confirmPasswordReset,
   createUserWithEmailAndPassword,
+  EmailAuthProvider,
   FacebookAuthProvider,
   getAuth,
   GoogleAuthProvider,
   onAuthStateChanged,
+  reauthenticateWithCredential,
+  reauthenticateWithPopup,
   sendPasswordResetEmail,
   setPersistence,
   signInWithEmailAndPassword,
   signInWithPopup,
+  updateEmail,
   updatePassword,
   updateProfile,
+  verifyBeforeUpdateEmail,
 } from 'firebase/auth'
 import { getFirestore } from 'firebase/firestore'
 import { getFunctions } from 'firebase/functions'
@@ -48,19 +53,24 @@ onAuthStateChanged(auth, user => {
 })
 
 export { auth, db, facebookProvider, functions, googleProvider, storage }
- 
+
 export {
   browserLocalPersistence,
   browserSessionPersistence,
   confirmPasswordReset,
   createUserWithEmailAndPassword,
+  EmailAuthProvider,
   onAuthStateChanged,
+  reauthenticateWithCredential,
+  reauthenticateWithPopup,
   sendPasswordResetEmail,
   setPersistence,
   signInWithEmailAndPassword,
   signInWithPopup,
+  updateEmail,
   updatePassword,
   updateProfile,
+  verifyBeforeUpdateEmail,
 } from 'firebase/auth'
 /* eslint-enable */
 export { doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore'

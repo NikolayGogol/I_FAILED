@@ -62,6 +62,51 @@ async function sendVerificationEmail (email, verificationLink) {
   return sendEmail({ to: email, subject, html, text })
 }
 
+async function sendEmailChangeVerification (email, verificationLink) {
+  const subject = `Verify your new email for ${APP_NAME}`
+  const html = `
+    <body style="margin:0;padding:0;background-color:${colors.background};">
+      <div style="font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width:640px; margin:24px auto; padding:0 16px;">
+        <div style="background:${colors.surface};border-radius:16px;box-shadow:0 10px 30px rgba(15,23,42,0.1);overflow:hidden;border:1px solid ${colors.border};">
+          <div style="padding:20px 24px;border-bottom:1px solid ${colors.border};">
+            <img src="${LOGO_URL}" alt="${APP_NAME} Logo" style="height:32px;">
+          </div>
+          <div style="padding:24px 24px 8px;">
+            <h2 style="margin:0 0 12px;font-size:22px;font-weight:700;color:${colors.textPrimary};">Verify your new email address</h2>
+            <p style="margin:0 0 16px;font-size:14px;line-height:1.6;color:${colors.textSecondary};">
+              You requested to change your email address for ${APP_NAME}. Please verify this new address by clicking the button below.
+            </p>
+            <div style="text-align:center;margin:24px 0 16px;">
+              <a href="${verificationLink}"
+                 style="display:inline-block;background-color:${colors.primary};color:${colors.surface};text-decoration:none;padding:12px 28px;border-radius:999px;font-size:14px;font-weight:600;">
+                Verify new email
+              </a>
+            </div>
+            <p style="margin:0 0 8px;font-size:12px;line-height:1.6;color:${colors.textSecondary};">
+              Or copy and paste this link into your browser:
+            </p>
+            <p style="margin:0 0 16px;font-size:12px;word-break:break-all;color:${colors.textPrimary};">
+              ${verificationLink}
+            </p>
+            <p style="margin:0 0 4px;font-size:12px;color:${colors.textSecondary};">
+              If you didn’t request this change, you can safely ignore this email.
+            </p>
+          </div>
+          <div style="padding:12px 24px 16px;border-top:1px solid ${colors.border};text-align:center;">
+            <p style="margin:4px 0;font-size:11px;color:${colors.textSecondary};">
+              © ${new Date().getFullYear()} ${APP_NAME}. All rights reserved.
+            </p>
+          </div>
+        </div>
+      </div>
+    </body>
+  `
+  const text = `
+    Verify your new email for ${APP_NAME}\n\nPlease copy and paste the following link in your browser to verify your new email address:\n\n${verificationLink}\n\nIf you did not request this, please ignore this email.
+  `
+  return sendEmail({ to: email, subject, html, text })
+}
+
 async function sendWelcomeEmail (email, displayName) {
   const subject = `Welcome to ${APP_NAME}!`
   const html = `
@@ -170,4 +215,4 @@ async function sendEmail ({ to, subject, html, text }) {
   }
 }
 
-module.exports = { sendWelcomeEmail, sendVerificationEmail, sendOTPEmail, sendEmail }
+module.exports = { sendWelcomeEmail, sendVerificationEmail, sendOTPEmail, sendEmail, sendEmailChangeVerification }

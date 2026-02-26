@@ -38,6 +38,7 @@ declare module 'vue-router/auto-routes' {
     '/register': RouteRecordInfo<'/register', '/register', Record<never, never>, Record<never, never>>,
     '/set-password': RouteRecordInfo<'/set-password', '/set-password', Record<never, never>, Record<never, never>>,
     '/settings': RouteRecordInfo<'/settings', '/settings', Record<never, never>, Record<never, never>>,
+    '/verify-email-change': RouteRecordInfo<'/verify-email-change', '/verify-email-change', Record<never, never>, Record<never, never>>,
     '/verify-new-user': RouteRecordInfo<'/verify-new-user', '/verify-new-user', Record<never, never>, Record<never, never>>,
   }
 
@@ -130,6 +131,10 @@ declare module 'vue-router/auto-routes' {
     }
     'src/pages/settings.vue': {
       routes: '/settings'
+      views: never
+    }
+    'src/pages/verify-email-change.vue': {
+      routes: '/verify-email-change'
       views: never
     }
     'src/pages/verify-new-user.vue': {

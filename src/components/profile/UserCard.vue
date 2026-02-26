@@ -18,6 +18,9 @@
   const newDisplayName = ref('')
   const newPhotoFile = ref(null)
   const photoPreviewUrl = ref(null)
+  const newEmail = ref('')
+  const password = ref('')
+  const emailError = ref('')
 
   const displayName = computed(() => user.value?.displayName || 'User')
   const photoURL = computed(() => user.value?.photoURL)
@@ -48,6 +51,9 @@
     newDisplayName.value = displayName.value
     photoPreviewUrl.value = photoURL.value
     newPhotoFile.value = null
+    newEmail.value = user.value?.email || ''
+    password.value = ''
+    emailError.value = ''
     editDialog.value = true
   }
 
@@ -69,9 +75,24 @@
         displayName: newDisplayName.value,
         photoFile: newPhotoFile.value,
       })
-      toast.success('Profile updated successfully!')
+
+      if (newEmail.value !== user.value?.email) {
+        const result = await profileStore.updateUserEmail(newEmail.value, password.value)
+        if (result && result.message) {
+          toast.info(result.message)
+        } else {
+          toast.success('Email updated successfully!')
+        }
+      } else {
+        toast.success('Profile updated successfully!')
+      }
+
       editDialog.value = false
-    } catch {
+    } catch (error) {
+      console.error(error)
+      if (error.message) {
+        emailError.value = error.message
+      }
       toast.error('Failed to update profile.')
     }
   }
@@ -164,10 +185,34 @@
 
           <form-input
             v-model="newDisplayName"
+            class="mb-4"
             density="comfortable"
             label="Display Name"
             variant="outlined"
           />
+
+          <form-input
+            v-model="newEmail"
+            class="mb-4"
+            density="comfortable"
+            label="Email"
+            type="email"
+            variant="outlined"
+          />
+
+          <form-input
+            v-if="user?.providerData[0]?.providerId === 'password' && newEmail !== user?.email"
+            v-model="password"
+            class="mb-4"
+            density="comfortable"
+            label="Current Password (required to change email)"
+            type="password"
+            variant="outlined"
+          />
+
+          <div v-if="emailError" class="text-error mb-4">
+            {{ emailError }}
+          </div>
         </v-card-text>
         <v-card-actions>
           <v-spacer />
