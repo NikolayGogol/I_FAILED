@@ -1,4 +1,5 @@
 <script setup>
+  import dayjs from 'dayjs'
   import { storeToRefs } from 'pinia'
   import { computed, ref } from 'vue'
   import { useToast } from 'vue-toastification'
@@ -29,11 +30,15 @@
     return (parts[0].charAt(0) + (parts[1]?.charAt(0) || '')).toUpperCase()
   })
   const joinDate = computed(() => {
-    if (user.value?.metadata?.creationTime) {
-      return new Date(user.value.metadata.creationTime).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+    if (user.value?.createdAt) {
+      return dayjs.unix(user.value.createdAt).format('MMM D, YYYY')
     }
     return 'Unknown'
   })
+
+  // CORRECT: Add computed properties for followers and following counts
+  const followersCount = computed(() => user.value?.followers?.length || 0)
+  const followingCount = computed(() => user.value?.following?.length || 0)
 
   function openEditDialog () {
     newDisplayName.value = displayName.value
@@ -47,9 +52,9 @@
     if (file) {
       newPhotoFile.value = file
       const reader = new FileReader()
-      reader.onload = e => {
+      reader.addEventListener('load', e => {
         photoPreviewUrl.value = e.target.result
-      }
+      })
       reader.readAsDataURL(file)
     }
   }
@@ -62,7 +67,7 @@
       })
       toast.success('Profile updated successfully!')
       editDialog.value = false
-    } catch (error) {
+    } catch {
       toast.error('Failed to update profile.')
     }
   }
@@ -90,12 +95,13 @@
         <p class="user-bio">Entrepreneur learning from startup failures. Sharing my journey to help others.</p>
 
         <div class="user-meta">
-          <span class="join-date">Joined {{ joinDate }}</span>
+          <span class="join-date">Joined: {{ joinDate }}</span>
         </div>
 
         <div class="user-stats">
-          <span><strong>2</strong> followers</span>
-          <span><strong>2</strong> following</span>
+          <!-- CORRECT: Use the computed properties -->
+          <span><strong>{{ followersCount }}</strong> followers</span>
+          <span><strong>{{ followingCount }}</strong> following</span>
         </div>
 
         <div class="user-badge">

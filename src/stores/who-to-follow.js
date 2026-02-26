@@ -56,19 +56,8 @@ export const useWhoToFollowStore = defineStore('whoToFollow', {
           followers: arrayUnion(currentUserId),
         })
 
-        const user = this.users.find(u => u.id === userIdToFollow)
-        if (user) {
-          if (!user.followers) {
-            user.followers = []
-          }
-          user.followers.push(currentUserId)
-        }
-        if (authStore.user) {
-          if (!authStore.user.following) {
-            authStore.user.following = []
-          }
-          authStore.user.following.push(userIdToFollow)
-        }
+        // REMOVED optimistic update. Let onSnapshot handle the state change.
+
         return true
       } catch (error) {
         console.error('Error following user:', error)
@@ -94,13 +83,8 @@ export const useWhoToFollowStore = defineStore('whoToFollow', {
           followers: arrayRemove(currentUserId),
         })
 
-        const user = this.users.find(u => u.id === userIdToUnfollow)
-        if (user && user.followers) {
-          user.followers = user.followers.filter(id => id !== currentUserId)
-        }
-        if (authStore.user && authStore.user.following) {
-          authStore.user.following = authStore.user.following.filter(id => id !== userIdToUnfollow)
-        }
+        // REMOVED optimistic update. Let onSnapshot handle the state change.
+
         return true
       } catch (error) {
         console.error('Error unfollowing user:', error)
