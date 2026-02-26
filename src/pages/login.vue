@@ -127,7 +127,7 @@
   ]
 
   // Watch for the user state to change
-  watch(() => authStore.user, (newUser) => {
+  watch(() => authStore.user, newUser => {
     if (newUser) {
       toast.success('Successfully signed in!')
       router.push('/')

@@ -8,13 +8,24 @@
 </route>
 
 <script setup>
-  import { ref } from 'vue'
+  import { storeToRefs } from 'pinia'
+  import { onMounted } from 'vue'
   import PostCard from '@/components/feed/PostCard.vue'
   import UserCard from '@/components/profile/UserCard.vue'
-  import { feedPosts } from '@/models/feed'
+  import { useAuthStore } from '@/stores/auth'
+  import { useProfileStore } from '@/stores/profile'
   import '@/styles/pages/profile.scss'
 
-  const posts = ref(feedPosts)
+  const authStore = useAuthStore()
+  const profileStore = useProfileStore()
+
+  const { posts, loading, error } = storeToRefs(profileStore)
+
+  onMounted(() => {
+    if (authStore.user?.uid) {
+      profileStore.fetchUserPosts(authStore.user.uid)
+    }
+  })
 </script>
 
 <template>
@@ -24,7 +35,7 @@
 
       <div class="content-feed">
         <nav class="user-tabs">
-          <button class="tab-item active">Posts (2)</button>
+          <button class="tab-item active">Posts ({{ posts.length }})</button>
           <button class="tab-item">Activity</button>
         </nav>
 
@@ -36,7 +47,16 @@
           </div>
         </div>
 
-        <div class="profile-posts">
+        <div v-if="loading" class="text-center py-10">
+          <v-progress-circular color="primary" indeterminate />
+        </div>
+        <div v-else-if="error" class="text-center py-10 text-error">
+          {{ error }}
+        </div>
+        <div v-else-if="posts.length === 0" class="text-center py-10 text-medium-emphasis">
+          You haven't posted anything yet.
+        </div>
+        <div v-else class="profile-posts">
           <PostCard
             v-for="post in posts"
             :key="post.id"

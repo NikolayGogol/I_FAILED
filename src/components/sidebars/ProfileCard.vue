@@ -61,6 +61,7 @@
                 <v-img
                   v-if="currentUserPhoto"
                   alt="Profile"
+                  class="h-100"
                   cover
                   :src="currentUserPhoto"
                 />
