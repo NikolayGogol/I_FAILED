@@ -6,47 +6,63 @@ const { sendOTPEmail } = require('../utils/email')
 const db = admin.firestore()
 
 exports.forgotPassword = async (req, res) => {
+  logger.info('Forgot Password function triggered.')
+
   try {
     const { email } = req.body
     if (!email) {
+      logger.warn('Forgot Password attempt without email.')
       return res.status(400).json({ message: 'Email is required' })
     }
 
+    logger.info(`Processing forgot password for email: ${email}`)
+
     // Check if user exists in Firebase Auth
     try {
+      logger.info('Checking if user exists in Firebase Auth...')
       await admin.auth().getUserByEmail(email)
+      logger.info('User found in Firebase Auth.')
     } catch (error) {
       if (error.code === 'auth/user-not-found') {
+        logger.warn(`Forgot password attempt for non-existent user: ${email}`)
         return res.status(404).json({ message: 'No account found with this email' })
       }
+      // Re-throw other auth errors to be caught by the outer catch block
+      logger.error('Error checking user in Firebase Auth:', error)
       throw error
     }
 
     // Generate 6-digit OTP
     const otp = Math.floor(100_000 + Math.random() * 900_000).toString()
+    logger.info(`Generated OTP: ${otp} for email: ${email}`)
 
     // Set expiration to 15 minutes from now
     const expiresAt = new Date()
     expiresAt.setMinutes(expiresAt.getMinutes() + 15)
 
     // Store OTP in Firestore
+    logger.info('Storing OTP in Firestore...')
     await db.collection('password_resets').doc(email).set({
       otp,
       expiresAt: Timestamp.fromDate(expiresAt),
       verified: false,
     })
+    logger.info('OTP stored successfully.')
 
     // Send OTP via email
+    logger.info('Sending OTP email...')
     await sendOTPEmail(email, otp)
+    logger.info('OTP email sent successfully.')
 
     return res.status(200).json({ message: 'Verification code sent to your email' })
   } catch (error) {
-    logger.error('Error in forgotPassword:', error)
+    logger.error('Critical error in forgotPassword function:', error)
     res.status(500).json({ message: 'Failed to process request', error: error.message })
   }
 }
 
 exports.verifyOTP = async (req, res) => {
+  // ... (rest of the file is the same)
   try {
     const { email, code } = req.body
     if (!email || !code) {

@@ -137,7 +137,11 @@
         <v-card-actions>
           <v-spacer />
           <v-btn color="grey" variant="text" @click="logoutDialog = false">Cancel</v-btn>
-          <v-btn color="error" variant="text" @click="confirmLogout">Sign out</v-btn>
+          <v-btn
+            color="primary"
+            variant="tonal"
+            @click="confirmLogout"
+          >Sign out</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>

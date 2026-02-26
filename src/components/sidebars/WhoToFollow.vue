@@ -1,5 +1,6 @@
 <script setup>
   import { computed, onMounted } from 'vue'
+  import { useRouter } from 'vue-router'
   import { useToast } from 'vue-toastification'
   import { useAuthStore } from '@/stores/auth'
   import { useWhoToFollowStore } from '@/stores/who-to-follow'
@@ -8,7 +9,7 @@
   const whoToFollowStore = useWhoToFollowStore()
   const authStore = useAuthStore()
   const toast = useToast()
-
+  const router = useRouter()
   onMounted(() => {
     whoToFollowStore.fetchAllUsers()
   })
@@ -53,6 +54,10 @@
   }
 
   async function handleFollowClick (userId, userName) {
+    if (!authStore.user) {
+      router.push('/login')
+      return
+    }
     if (isFollowing(userId)) {
       const success = await whoToFollowStore.unfollowUser(userId)
       if (success) {
@@ -92,7 +97,11 @@
           class="follow-avatar mr-3"
         >
           <img v-if="user.photoURL" alt="User avatar" class="avatar-image" :src="user.photoURL">
-          <span v-else class="avatar-initials" :style="{ backgroundColor: getRandomColor() }">{{ getInitials(user.displayName) }}</span>
+          <span
+            v-else
+            class="avatar-initials"
+            :style="{ backgroundColor: getRandomColor() }"
+          >{{ getInitials(user.displayName) }}</span>
         </div>
         <div class="follow-info">
           <div class="follow-name">
@@ -101,7 +110,8 @@
               activator="parent"
               content-class="custom-tooltip"
               location="top"
-            >{{ user.displayName }}</v-tooltip>
+            >{{ user.displayName }}
+            </v-tooltip>
           </div>
           <div class="follow-handle">
             @{{ user.displayName?.replace(/\s/g, '') || 'user' }}
@@ -109,7 +119,8 @@
               activator="parent"
               content-class="custom-tooltip"
               location="bottom"
-            >@{{ user.displayName?.replace(/\s/g, '') || 'user' }}</v-tooltip>
+            >@{{ user.displayName?.replace(/\s/g, '') || 'user' }}
+            </v-tooltip>
           </div>
         </div>
         <v-spacer />

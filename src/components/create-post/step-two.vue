@@ -49,7 +49,7 @@
 
     <div class="form-group mt-6">
       <label class="form-label">What happened? <span class="text-error">*</span></label>
-      <QuillEditor v-model:content="store.stepTwo.description" placeholder="Describe the situation in detail..." content-type="html" theme="snow" />
+      <QuillEditor v-model:content="store.stepTwo.description" content-type="html" placeholder="Describe the situation in detail..." theme="snow" />
     </div>
 
     <div class="form-group mt-6">
@@ -63,11 +63,11 @@
     </div>
     <div class="form-group mt-6">
       <label class="form-label">What went wrong?</label>
-      <QuillEditor v-model:content="store.stepTwo.whatWentWrong" placeholder="What factors contributed to the failure?" content-type="html" theme="snow" />
+      <QuillEditor v-model:content="store.stepTwo.whatWentWrong" content-type="html" placeholder="What factors contributed to the failure?" theme="snow" />
     </div>
     <div class="form-group mt-6">
       <label class="form-label">How did it feel?</label>
-      <QuillEditor v-model:content="store.stepTwo.howDidItFeel" placeholder="Describe your emotional experience..." content-type="html" theme="snow" />
+      <QuillEditor v-model:content="store.stepTwo.howDidItFeel" content-type="html" placeholder="Describe your emotional experience..." theme="snow" />
     </div>
   </div>
 </template>

@@ -5,11 +5,13 @@ import { useAuthStore } from '@/stores/auth'
 const toast = useToast()
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_FIREBASE_BASE_URL || 'https://us-central1-ifailed-69373.cloudfunctions.net/api',
+  baseURL: import.meta.env.VITE_FIREBASE_BASE_URL || 'http://127.0.0.1:5001/ifailed-69373/us-central1/api',
 })
 
 api.interceptors.request.use(
   config => {
+    // ADDING THIS LINE TO DEBUG THE URL
+    console.log('Requesting URL:', api.getUri(config))
     return config
   },
   error => {
@@ -30,7 +32,7 @@ api.interceptors.response.use(
       toast.error('Session expired. Please login again.')
       await authStore.logout()
     } else {
-      toast.error(message)
+      // The interceptor already shows a toast on error, which is good.
     }
 
     throw error

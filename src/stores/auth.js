@@ -1,11 +1,10 @@
-import { sendPasswordResetEmail } from 'firebase/auth'
 import { onSnapshot } from 'firebase/firestore'
 import { defineStore } from 'pinia'
+import api from '@/axios' // Using the configured axios instance
 import {
   auth,
   browserLocalPersistence,
   browserSessionPersistence,
-  createUserWithEmailAndPassword,
   db,
   doc,
   facebookProvider,
@@ -39,7 +38,6 @@ function getSerializableUser (user) {
     lastLoginAt,
   } = user
 
-  // Robustly get the email from provider data if it's missing at the root
   let finalEmail = email
   if (!finalEmail && providerData && providerData.length > 0) {
     const providerWithEmail = providerData.find(p => p.email)
@@ -116,10 +114,8 @@ export const useAuthStore = defineStore('auth', {
 
           unsubscribeFromUserDoc = onSnapshot(userRef, docSnapshot => {
             if (docSnapshot.exists()) {
-              // Merge auth data with Firestore data
               this.user = { ...authData, ...docSnapshot.data() }
             } else {
-              // If doc doesn't exist, it might be a new user, save it.
               this.user = authData
               saveUserToFirestore(authData)
             }
@@ -131,11 +127,15 @@ export const useAuthStore = defineStore('auth', {
     },
 
     async createAcc (payload) {
-      const { email, password, displayName } = payload
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password)
-      await updateProfile(userCredential.user, { displayName })
-      // onAuthStateChanged will handle saving the user to Firestore
-      return userCredential
+      return await api.post('createUser', payload)
+    },
+
+    async verifyUser (token) {
+      return await api.post('verifyUser', { token })
+    },
+
+    async resendVerificationEmail (token) {
+      return await api.post('resendVerificationEmail', { token })
     },
 
     async signInWithEmail (email, password, rememberMe = false) {
@@ -155,11 +155,7 @@ export const useAuthStore = defineStore('auth', {
 
         const result = await signInWithPopup(auth, googleProvider)
         const serializableUser = getSerializableUser(result.user)
-
-        // Explicitly save the user to Firestore immediately after sign-in
         await saveUserToFirestore(serializableUser)
-
-        // The onAuthStateChanged listener will then pick up the user and sync the state
         return serializableUser
       } catch (error) {
         console.error('Error signing in with Google:', error)
@@ -177,9 +173,7 @@ export const useAuthStore = defineStore('auth', {
 
         const result = await signInWithPopup(auth, facebookProvider)
         const serializableUser = getSerializableUser(result.user)
-
         await saveUserToFirestore(serializableUser)
-
         return serializableUser
       } catch (error) {
         console.error('Error signing in with Facebook:', error)
@@ -198,8 +192,15 @@ export const useAuthStore = defineStore('auth', {
     },
 
     async sendPasswordResetOTP (email) {
-      this.error = null
-      await sendPasswordResetEmail(auth, email)
+      return await api.post('forgotPassword', { email })
+    },
+
+    async verifyOTP (email, code) {
+      return await api.post('verifyOTP', { email, code })
+    },
+
+    async resetPassword (email, code, password) {
+      return await api.post('resetPassword', { email, code, password })
     },
 
     async updateUserPassword (newPassword) {

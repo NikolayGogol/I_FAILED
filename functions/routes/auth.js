@@ -1,6 +1,6 @@
 const express = require('express')
 const { createUser } = require('../controllers/createUser')
-const { forgotPassword, verifyOTP, resetPassword } = require('../controllers/forgotPassword')
+const forgotPasswordController = require('../controllers/forgotPassword')
 const { resendVerificationEmail } = require('../controllers/resendVerificationEmail')
 const { verifyUser } = require('../controllers/verifyUser')
 
@@ -11,8 +11,8 @@ router.post('/verifyUser', verifyUser)
 router.post('/resendVerificationEmail', resendVerificationEmail)
 
 // Password reset routes
-router.post('/forgotPassword', forgotPassword)
-router.post('/verifyOTP', verifyOTP)
-router.post('/resetPassword', resetPassword)
+router.post('/forgotPassword', forgotPasswordController.forgotPassword)
+router.post('/verifyOTP', forgotPasswordController.verifyOTP)
+router.post('/resetPassword', forgotPasswordController.resetPassword)
 
 module.exports = router

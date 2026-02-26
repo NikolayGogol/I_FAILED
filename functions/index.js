@@ -20,6 +20,13 @@ app.options('*', corsMiddleware)
 
 app.use(express.json())
 
+// --- DEBUGGING STEP ---
+// Add a simple status endpoint to check if the function is alive at all
+app.get('/status', (req, res) => {
+  res.status(200).send('API is running!')
+})
+// --- END DEBUGGING STEP ---
+
 // Mount the routers
 app.use(authRoutes)
 

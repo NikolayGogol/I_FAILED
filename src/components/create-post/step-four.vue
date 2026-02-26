@@ -100,7 +100,7 @@
         <v-chip
           v-for="(tag, index) in store.stepFour.tags"
           :key="index"
-          class="tag-chip"
+          class="tag-chip mr-2"
           closable
           @click:close="removeTag(index)"
         >

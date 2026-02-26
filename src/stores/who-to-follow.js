@@ -58,11 +58,15 @@ export const useWhoToFollowStore = defineStore('whoToFollow', {
 
         const user = this.users.find(u => u.id === userIdToFollow)
         if (user) {
-          if (!user.followers) user.followers = []
+          if (!user.followers) {
+            user.followers = []
+          }
           user.followers.push(currentUserId)
         }
         if (authStore.user) {
-          if (!authStore.user.following) authStore.user.following = []
+          if (!authStore.user.following) {
+            authStore.user.following = []
+          }
           authStore.user.following.push(userIdToFollow)
         }
         return true

@@ -92,7 +92,6 @@
 
   function handleInput (index, event) {
     const value = event.target.value
-    // Ensure only numbers
     if (!/^\d*$/.test(value)) {
       code.value[index] = ''
       return
@@ -144,18 +143,17 @@
     loading.value = true
     try {
       const verificationCode = code.value.join('')
-      await authStore.verifyPasswordResetOTP(email.value, verificationCode)
+      // CORRECT: Calling the right function from the store
+      await authStore.verifyOTP(email.value, verificationCode)
       toast.success('Code verified successfully!')
 
-      // Navigate to reset password page
-      // Note: In a real app, you might get a token back from verifyPasswordResetOTP
-      // to pass to the next step for security.
       router.push({
         path: '/set-password',
         query: { email: email.value, code: verificationCode },
       })
-    } catch {
-      toast.error(authStore.error || 'Invalid code. Please try again.')
+    } catch (error) {
+      // The axios interceptor will show the error toast
+      console.error('OTP verification error:', error)
       code.value = Array.from({ length: 6 }).fill('')
       inputRefs.value[0]?.focus()
     } finally {
@@ -172,8 +170,9 @@
       toast.success('Code resent successfully!')
       code.value = Array.from({ length: 6 }).fill('')
       inputRefs.value[0]?.focus()
-    } catch {
-      toast.error(authStore.error || 'Failed to resend code.')
+    } catch (error) {
+      // The axios interceptor will show the error toast
+      console.error('Resend code error:', error)
     } finally {
       resendLoading.value = false
     }

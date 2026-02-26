@@ -97,26 +97,22 @@
     const { valid } = await form.value.validate()
     if (!valid) return
 
+    if (!email.value || !code.value) {
+      toast.error('Invalid session. Please start over.')
+      router.push('/forgot-password')
+      return
+    }
+
     loading.value = true
     try {
-      if (code.value && code.value.length === 6) {
-        await authStore.resetPasswordWithOTP(email.value, code.value, password.value)
-        toast.success('Password reset successfully!')
-        setTimeout(() => {
-          router.push('/login')
-        }, 1500)
-      } else if (authStore.user) {
-        await authStore.updateUserPassword(password.value)
-        toast.success('Password updated successfully!')
-        setTimeout(() => {
-          router.push('/login')
-        }, 1500)
-      } else {
-        toast.error('Please verify your code first')
-        router.push('/otp')
-      }
+      // CORRECT: Calling the right function from the store
+      await authStore.resetPassword(email.value, code.value, password.value)
+      toast.success('Password reset successfully!')
+      setTimeout(() => {
+        router.push('/login')
+      }, 1500)
     } catch (error) {
-      toast.error(authStore.error || 'Failed to reset password. Please try again.')
+      // The axios interceptor will show the error toast
       console.error('Set password error:', error)
     } finally {
       loading.value = false
