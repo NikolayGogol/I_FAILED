@@ -42,40 +42,33 @@ export const useWhoToFollowStore = defineStore('whoToFollow', {
       const authStore = useAuthStore()
       if (!authStore.user) {
         console.error('User not authenticated')
-        return
+        return false
       }
       const currentUserId = authStore.user.uid
       const userToFollowRef = doc(db, 'users', userIdToFollow)
       const currentUserRef = doc(db, 'users', currentUserId)
 
       try {
-        // Add userIdToFollow to the 'following' array of the current user
         await updateDoc(currentUserRef, {
           following: arrayUnion(userIdToFollow),
         })
-
-        // Add currentUserId to the 'followers' array of the user being followed
         await updateDoc(userToFollowRef, {
           followers: arrayUnion(currentUserId),
         })
 
-        // Update the local state
         const user = this.users.find(u => u.id === userIdToFollow)
         if (user) {
-          if (!user.followers) {
-            user.followers = []
-          }
+          if (!user.followers) user.followers = []
           user.followers.push(currentUserId)
         }
-        const currentUser = this.users.find(u => u.id === currentUserId)
-        if (currentUser) {
-          if (!currentUser.following) {
-            currentUser.following = []
-          }
-          currentUser.following.push(userIdToFollow)
+        if (authStore.user) {
+          if (!authStore.user.following) authStore.user.following = []
+          authStore.user.following.push(userIdToFollow)
         }
+        return true
       } catch (error) {
         console.error('Error following user:', error)
+        return false
       }
     },
 
@@ -83,34 +76,31 @@ export const useWhoToFollowStore = defineStore('whoToFollow', {
       const authStore = useAuthStore()
       if (!authStore.user) {
         console.error('User not authenticated')
-        return
+        return false
       }
       const currentUserId = authStore.user.uid
       const userToUnfollowRef = doc(db, 'users', userIdToUnfollow)
       const currentUserRef = doc(db, 'users', currentUserId)
 
       try {
-        // Remove userIdToUnfollow from the 'following' array of the current user
         await updateDoc(currentUserRef, {
           following: arrayRemove(userIdToUnfollow),
         })
-
-        // Remove currentUserId from the 'followers' array of the user being unfollowed
         await updateDoc(userToUnfollowRef, {
           followers: arrayRemove(currentUserId),
         })
 
-        // Update the local state
         const user = this.users.find(u => u.id === userIdToUnfollow)
         if (user && user.followers) {
           user.followers = user.followers.filter(id => id !== currentUserId)
         }
-        const currentUser = this.users.find(u => u.id === currentUserId)
-        if (currentUser && currentUser.following) {
-          currentUser.following = currentUser.following.filter(id => id !== userIdToUnfollow)
+        if (authStore.user && authStore.user.following) {
+          authStore.user.following = authStore.user.following.filter(id => id !== userIdToUnfollow)
         }
+        return true
       } catch (error) {
         console.error('Error unfollowing user:', error)
+        return false
       }
     },
   },

@@ -1,11 +1,13 @@
 <script setup>
   import { computed, onMounted } from 'vue'
+  import { useToast } from 'vue-toastification'
   import { useAuthStore } from '@/stores/auth'
   import { useWhoToFollowStore } from '@/stores/who-to-follow'
   import '@/styles/components/sidebars/who-to-follow.scss'
 
   const whoToFollowStore = useWhoToFollowStore()
   const authStore = useAuthStore()
+  const toast = useToast()
 
   onMounted(() => {
     whoToFollowStore.fetchAllUsers()
@@ -50,11 +52,21 @@
     return authStore.user.following.includes(userId)
   }
 
-  function handleFollowClick (userId) {
+  async function handleFollowClick (userId, userName) {
     if (isFollowing(userId)) {
-      whoToFollowStore.unfollowUser(userId)
+      const success = await whoToFollowStore.unfollowUser(userId)
+      if (success) {
+        toast.info(`Unfollowed ${userName}`)
+      } else {
+        toast.error(`Failed to unfollow ${userName}`)
+      }
     } else {
-      whoToFollowStore.followUser(userId)
+      const success = await whoToFollowStore.followUser(userId)
+      if (success) {
+        toast.info(`Following ${userName}`)
+      } else {
+        toast.error(`Failed to follow ${userName}`)
+      }
     }
   }
 </script>
@@ -103,7 +115,7 @@
         <v-spacer />
         <div
           class="follow-btn"
-          @click="handleFollowClick(user.id)"
+          @click="handleFollowClick(user.id, user.displayName)"
         >
           {{ isFollowing(user.id) ? 'Unfollow' : 'Follow' }}
         </div>
