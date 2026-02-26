@@ -2,7 +2,6 @@
 
 .profile-page {
   min-height: 100vh;
-  padding-top: $spacing-md;
 
   .profile-main {
     max-width: 800px;
@@ -19,28 +18,23 @@
       margin-bottom: $spacing-lg;
 
       .tab-item {
-        padding: $spacing-md;
         background: none;
         border: none;
         border-bottom: 2px solid transparent;
-        color: $color-text-secondary;
-        font-weight: bold;
+        color: #454541;
         cursor: pointer;
         transition: color 0.2s, border-color 0.2s;
-        flex-grow: 1;
         text-align: center;
-
-        @include media-up($breakpoint-sm) {
-          flex-grow: 0;
-          padding: $spacing-md $spacing-lg;
-        }
+        width: 50%;
+        font-size: 14px;
+        padding-bottom: 5px;
 
         &:hover {
           color: $color-text-primary;
         }
 
         &.active {
-          color: $color-text-primary;
+          color: $color-primary;
           border-bottom-color: $color-primary;
         }
       }

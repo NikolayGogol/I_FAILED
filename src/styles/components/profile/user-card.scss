@@ -4,7 +4,7 @@
   background-color: $color-surface;
   border: 1px solid $color-border;
   border-radius: $radius-lg;
-  padding: $spacing-xl;
+  padding: 24px;
 
   .user-card-header {
     display: flex;
@@ -66,42 +66,53 @@
     }
 
     .user-email {
-      color: $color-text-secondary;
+      color: #808079;
+      font-size: 16px;
       margin-bottom: $spacing-md;
     }
 
     .user-bio {
       color: $color-text-primary;
+      font-size: 16px;
       margin-bottom: $spacing-md;
     }
 
+    .join-date {
+      font-size: 14px;
+      color: #808079;
+    }
+
     .user-meta {
-      color: $color-text-secondary;
       font-size: 14px;
       margin-bottom: $spacing-md;
+
+      i {
+        color: #808079;
+      }
     }
 
     .user-stats {
       display: flex;
       gap: $spacing-lg;
-      margin-bottom: $spacing-lg;
+      margin-bottom: 16px;
 
       span {
-        color: $color-text-secondary;
+        color: #808079;
+
         strong {
-          color: $color-text-primary;
+          color: $color-text-primary !important;
         }
       }
     }
 
     .user-badge {
-      background-color: $color-accent-bg;
-      color: $color-accent-text;
-      padding: $spacing-xs $spacing-sm;
-      border-radius: $radius-sm;
+      background-color: #F9EAD5;
+      color: #D65A1F;
+      padding: 8px 12px;
+      border-radius: $radius-xs;
       display: inline-block;
       font-weight: 600;
-      font-size: 14px;
+      font-size: 12px;
     }
   }
 

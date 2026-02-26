@@ -1,7 +1,7 @@
 <script setup>
   import dayjs from 'dayjs'
   import { storeToRefs } from 'pinia'
-  import { computed, ref } from 'vue'
+  import { computed, onMounted, ref } from 'vue'
   import { useToast } from 'vue-toastification'
   import { useAuthStore } from '@/stores/auth.js'
   import { useProfileStore } from '@/stores/profile.js'
@@ -12,7 +12,7 @@
   const toast = useToast()
 
   const { user } = storeToRefs(authStore)
-  const { loading } = storeToRefs(profileStore)
+  const { loading, userActivity } = storeToRefs(profileStore)
 
   const editDialog = ref(false)
   const newDisplayName = ref('')
@@ -31,14 +31,19 @@
   })
   const joinDate = computed(() => {
     if (user.value?.createdAt) {
-      return dayjs.unix(user.value.createdAt).format('MMM D, YYYY')
+      return dayjs.unix(user.value.createdAt.seconds).format('MMMM YYYY')
     }
     return 'Unknown'
   })
 
-  // CORRECT: Add computed properties for followers and following counts
   const followersCount = computed(() => user.value?.followers?.length || 0)
   const followingCount = computed(() => user.value?.following?.length || 0)
+
+  onMounted(() => {
+    if (user.value?.uid) {
+      profileStore.fetchUserActivity(user.value.uid)
+    }
+  })
 
   function openEditDialog () {
     newDisplayName.value = displayName.value
@@ -91,15 +96,15 @@
           <h2>{{ displayName }}</h2>
           <button class="edit-profile-btn" @click="openEditDialog">Edit profile</button>
         </div>
-        <p class="user-email">{{ email }}</p>
+        <p class="user-email">@{{ displayName.replace(/\s/g, '') }}</p>
         <p class="user-bio">Entrepreneur learning from startup failures. Sharing my journey to help others.</p>
 
-        <div class="user-meta">
-          <span class="join-date">Joined: {{ joinDate }}</span>
+        <div class="user-meta d-flex align-center">
+          <v-icon class="mr-1" icon="mdi-calendar-blank-outline" />
+          <span class="join-date">Joined {{ joinDate }}</span>
         </div>
 
         <div class="user-stats">
-          <!-- CORRECT: Use the computed properties -->
           <span><strong>{{ followersCount }}</strong> followers</span>
           <span><strong>{{ followingCount }}</strong> following</span>
         </div>
@@ -114,19 +119,19 @@
 
     <div class="user-activity-footer">
       <div class="activity-stat">
-        <span class="stat-value">12</span>
+        <span class="stat-value">{{ userActivity.posts }}</span>
         <span class="stat-label">Posts</span>
       </div>
       <div class="activity-stat">
-        <span class="stat-value">45</span>
+        <span class="stat-value">{{ userActivity.comments }}</span>
         <span class="stat-label">Comments</span>
       </div>
       <div class="activity-stat">
-        <span class="stat-value">156</span>
+        <span class="stat-value">{{ userActivity.reactionsReceived }}</span>
         <span class="stat-label">Reactions Received</span>
       </div>
       <div class="activity-stat">
-        <span class="stat-value">89</span>
+        <span class="stat-value">{{ userActivity.reactionsGiven }}</span>
         <span class="stat-label">Reactions Given</span>
       </div>
     </div>

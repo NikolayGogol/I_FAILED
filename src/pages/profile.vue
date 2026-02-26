@@ -1,15 +1,15 @@
 <route lang="json">
 {
-  "meta": {
-    "layout": "MainLayout",
-    "auth": true
-  }
+"meta": {
+"layout": "MainLayout",
+"auth": true
+}
 }
 </route>
 
 <script setup>
   import { storeToRefs } from 'pinia'
-  import { onMounted } from 'vue'
+  import { onMounted, ref } from 'vue'
   import PostCard from '@/components/feed/PostCard.vue'
   import UserCard from '@/components/profile/UserCard.vue'
   import { useAuthStore } from '@/stores/auth'
@@ -20,12 +20,25 @@
   const profileStore = useProfileStore()
 
   const { posts, loading, error } = storeToRefs(profileStore)
-
+  const activeTabIndex = ref(0)
   onMounted(() => {
     if (authStore.user?.uid) {
       profileStore.fetchUserPosts(authStore.user.uid)
+      profileStore.fetchUserActivity(authStore.user.uid)
     }
   })
+
+  const tabsList = [
+    {
+      label: 'Posts',
+    },
+    {
+      label: 'Activity',
+    },
+  ]
+  function selectTab (tab, index) {
+    activeTabIndex.value = index
+  }
 </script>
 
 <template>
@@ -35,10 +48,15 @@
 
       <div class="content-feed">
         <nav class="user-tabs">
-          <button class="tab-item active">Posts ({{ posts.length }})</button>
-          <button class="tab-item">Activity</button>
+          <button
+            v-for="(item, index) in tabsList"
+            :key="item.label"
+            class="tab-item"
+            :class="{ active: activeTabIndex === index }"
+            @click="selectTab(item, index)"
+          >{{ item.label }} <span v-if="!index">({{ posts?.length }})</span>
+          </button>
         </nav>
-
         <div class="create-post-card">
           <div class="create-post-content">
             <div class="user-avatar-mini">SC</div>
