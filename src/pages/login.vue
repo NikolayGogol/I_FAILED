@@ -97,7 +97,7 @@
 </template>
 
 <script setup>
-  import { ref } from 'vue'
+  import { ref, watch } from 'vue'
   import { useRouter } from 'vue-router'
   import { useToast } from 'vue-toastification'
   import FacebookLoginButton from '@/components/FacebookLoginButton.vue'
@@ -126,19 +126,25 @@
     v => v.length >= 6 || 'Password must be at least 6 characters',
   ]
 
+  // Watch for the user state to change
+  watch(() => authStore.user, (newUser) => {
+    if (newUser) {
+      toast.success('Successfully signed in!')
+      router.push('/')
+    }
+  })
+
   async function handleLogin () {
     const { valid } = await form.value.validate()
     if (!valid) return
 
     loading.value = true
     try {
+      // Just call the sign-in method. The watcher will handle the redirect.
       await authStore.signInWithEmail(email.value, password.value, rememberMe.value)
-      if (authStore.user) {
-        toast.success('Successfully signed in!')
-        router.push('/')
-      }
     } catch (error) {
-      toast.error(authStore.error || 'Login failed. Please try again.')
+      const errorMessage = authStore.getErrorMessage(error.code)
+      toast.error(errorMessage || 'Login failed. Please try again.')
       console.error('Login error:', error)
     } finally {
       loading.value = false

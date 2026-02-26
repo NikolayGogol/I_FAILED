@@ -31,9 +31,17 @@
   }
 
   .profile-info {
+    // This will allow the name to be truncated
+    min-width: 0;
+
     .profile-name {
       font-weight: 600;
       color: $color-text-primary;
+
+      // CSS for ellipsis
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
   }
 
