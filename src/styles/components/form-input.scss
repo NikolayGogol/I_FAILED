@@ -5,6 +5,16 @@
   border-radius: 8px !important;
 }
 
+.form-custom-input {
+  .v-field__input {
+    border: none !important;
+  }
+
+  .v-input__control {
+    border: 1px solid $color-border;
+  }
+}
+
 .form-field {
   .v-field__outline {
     display: none;

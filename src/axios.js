@@ -11,7 +11,6 @@ const api = axios.create({
 api.interceptors.request.use(
   config => {
     // ADDING THIS LINE TO DEBUG THE URL
-    console.log('Requesting URL:', api.getUri(config))
     return config
   },
   error => {
