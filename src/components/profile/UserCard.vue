@@ -20,7 +20,6 @@
   const photoPreviewUrl = ref(null)
 
   const displayName = computed(() => user.value?.displayName || 'User')
-  const email = computed(() => user.value?.email || '')
   const photoURL = computed(() => user.value?.photoURL)
   const initials = computed(() => {
     const name = displayName.value

@@ -61,10 +61,10 @@ export const useProfileStore = defineStore('profile', {
         const postsSnapshot = await getDocs(postsQuery)
         let reactionsReceivedCount = 0
 
-        postsSnapshot.docs.forEach(doc => {
+        for (const doc of postsSnapshot.docs) {
           const data = doc.data()
           reactionsReceivedCount += (data.likes || 0)
-        })
+        }
 
         // 2. Fetch user's comments
         // Note: Comments are stored with a nested user object: { user: { uid: ... } }

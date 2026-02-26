@@ -17,7 +17,6 @@ import {
   signInWithEmailAndPassword,
   signInWithPopup,
   updatePassword,
-  updateProfile,
 } from '@/firebase'
 
 // Helper function to extract serializable user data

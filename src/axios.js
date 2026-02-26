@@ -24,8 +24,6 @@ api.interceptors.response.use(
     return response
   },
   async error => {
-    const message = error.response?.data?.message || error.message || 'An error occurred'
-
     if (error.response && error.response.status === 401) {
       const authStore = useAuthStore()
       toast.error('Session expired. Please login again.')
