@@ -8,6 +8,7 @@ import {
   limit,
   query,
   updateDoc,
+  where,
 } from 'firebase/firestore'
 import { defineStore } from 'pinia'
 import { db } from '@/firebase'
@@ -31,7 +32,15 @@ export const useWhoToFollowStore = defineStore('whoToFollow', {
         const usersRef = collection(db, 'users')
         const q = query(usersRef, limit(15)) // Get up to 15 users
         const querySnapshot = await getDocs(q)
-        this.users = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+        const users = []
+        for (const doc of querySnapshot.docs) {
+          const user = { id: doc.id, ...doc.data() }
+          const postsQuery = query(collection(db, 'posts'), where('uid', '==', user.id))
+          const postsSnapshot = await getDocs(postsQuery)
+          user.postCount = postsSnapshot.size
+          users.push(user)
+        }
+        this.users = users
       } catch (error) {
         this.error = 'Failed to fetch users.'
         console.error('Error fetching users:', error)

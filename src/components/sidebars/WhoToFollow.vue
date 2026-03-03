@@ -22,9 +22,9 @@
   })
 
   const sortedUsers = computed(() => {
-    const usersWithAvatars = filteredUsers.value.filter(user => user.photoURL)
-    const usersWithoutAvatars = filteredUsers.value.filter(user => !user.photoURL)
-    return [...usersWithAvatars, ...usersWithoutAvatars].slice(0, 5)
+    return [...filteredUsers.value]
+      .sort((a, b) => (b.postCount || 0) - (a.postCount || 0))
+      .slice(0, 5)
   })
 
   const backgroundColors = [
