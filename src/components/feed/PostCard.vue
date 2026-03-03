@@ -4,6 +4,7 @@
   import { useToast } from 'vue-toastification'
   import { auth } from '@/firebase'
   import { useAuthStore } from '@/stores/auth.js'
+  import { useFeedStore } from '@/stores/feed.js'
   import { usePostCardStore } from '@/stores/post-card.js'
   import { useWhoToFollowStore } from '@/stores/who-to-follow.js'
   import { formatNumber } from '@/utils/format-number.js'
@@ -19,6 +20,7 @@
   const postCardStore = usePostCardStore()
   const authStore = useAuthStore()
   const whoToFollowStore = useWhoToFollowStore()
+  const feedStore = useFeedStore()
   const router = useRouter()
   const toast = useToast()
 
@@ -49,6 +51,11 @@
   const isBlocked = computed(() => {
     if (!authStore.user || !authStore.user.blockedUsers) return false
     return authStore.user.blockedUsers.includes(p.post.uid)
+  })
+
+  const isMuted = computed(() => {
+    if (!authStore.user || !authStore.user.mutedPosts) return false
+    return authStore.user.mutedPosts.includes(p.post.id)
   })
 
   onMounted(async () => {
@@ -165,10 +172,19 @@
       toast.error(`Failed to unblock ${userName}`)
     }
   }
+
+  async function handleMutePost () {
+    const success = await feedStore.mutePost(p.post.id)
+    if (success) {
+      toast.info('Post muted')
+    } else {
+      toast.error('Failed to mute post')
+    }
+  }
 </script>
 
 <template>
-  <div v-if="post" class="post-card">
+  <div v-if="post && !isMuted" class="post-card">
     <header class="post-header">
       <div class="post-avatar">
         <img v-if="post.user.photoURL" alt="User avatar" :src="post.user.photoURL">
@@ -186,9 +202,9 @@
           </v-btn>
         </template>
         <v-list class="rounded-lg">
-          <v-list-item class="cursor-pointer">
+          <v-list-item class="cursor-pointer" @click="handleMutePost">
             <v-icon class="mr-2" icon="mdi-volume-off" />
-            Mute @{{ post.user.displayName.replaceAll(' ', '_') }}
+            Mute this post
           </v-list-item>
           <template v-if="!isBlocked">
             <v-list-item class="cursor-pointer" @click="handleFollow">
