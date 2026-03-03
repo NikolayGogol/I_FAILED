@@ -84,6 +84,10 @@
   }
 
   async function handleLike () {
+    if (!authStore.user) {
+      await router.push('/login')
+      return
+    }
     if (isLiking.value) return // Prevent multiple clicks
     isLiking.value = true
 
@@ -117,7 +121,7 @@
 
   async function handleFollow () {
     if (!authStore.user) {
-      router.push('/login')
+      await router.push('/login')
       return
     }
     // Use post.uid instead of post.user.uid as post.uid is the author's ID
@@ -146,6 +150,10 @@
   }
 
   async function confirmBlock () {
+    if (!authStore.user){
+      await router.push('/login')
+      return
+    }
     const userId = p.post.uid
     const userName = p.post.user.displayName
 
@@ -160,7 +168,7 @@
 
   async function handleUnblock () {
     if (!authStore.user) {
-      router.push('/login')
+      await router.push('/login')
       return
     }
     const userId = p.post.uid
@@ -175,6 +183,10 @@
   }
 
   async function handleMutePost () {
+    if (!authStore.user) {
+      await router.push('/login')
+      return
+    }
     const success = await feedStore.mutePost(p.post.id)
     if (success) {
       toast.info('Post muted')
@@ -245,14 +257,14 @@
       <p class="post-body" @click="openPost" v-html="truncatedBody" />
       <button v-if="showReadMore" class="read-more" @click="readMore">Read more</button>
       <div v-if="post.stepFour.emotionTags" class="post-chips" @click="openPost">
-      <span
-        v-for="chip in post.stepFour.emotionTags"
-        :key="chip"
-        class="post-chip"
-      >
-        {{ chip.emoji }}
-        {{ chip.label }}
-      </span>
+        <span
+          v-for="chip in post.stepFour.emotionTags"
+          :key="chip"
+          class="post-chip"
+        >
+          {{ chip.emoji }}
+          {{ chip.label }}
+        </span>
       </div>
       <div v-if="post.stepFour?.recoveryTime || post.stepFour.cost" class="post-meta" @click="openPost">
         <div v-if="post.stepFour.cost" class="meta-item">
