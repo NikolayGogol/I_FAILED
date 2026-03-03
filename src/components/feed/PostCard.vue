@@ -187,16 +187,8 @@
         </template>
         <v-list class="rounded-lg">
           <v-list-item class="cursor-pointer">
-            <v-icon class="mr-2" icon="mdi-emoticon-sad-outline" />
-            Not interested in this post
-          </v-list-item>
-          <v-list-item class="cursor-pointer">
             <v-icon class="mr-2" icon="mdi-volume-off" />
             Mute @{{ post.user.displayName.replaceAll(' ', '_') }}
-          </v-list-item>
-          <v-list-item class="cursor-pointer">
-            <v-icon class="mr-2" icon="mdi-flag-variant-outline" />
-            Report this post
           </v-list-item>
           <template v-if="!isBlocked">
             <v-list-item class="cursor-pointer" @click="handleFollow">

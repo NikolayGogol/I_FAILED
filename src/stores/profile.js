@@ -1,4 +1,4 @@
-import { collection, doc, getDocs, query, updateDoc, where } from 'firebase/firestore'
+import { collection, doc, getDoc, getDocs, query, updateDoc, where } from 'firebase/firestore'
 import { getDownloadURL, ref as storageRef, uploadBytes } from 'firebase/storage'
 import { defineStore } from 'pinia'
 import { auth, db, storage, updateProfile } from '@/firebase'
@@ -86,6 +86,102 @@ export const useProfileStore = defineStore('profile', {
       } catch (error) {
         console.error('Error fetching user activity:', error)
         this.error = 'Failed to fetch user activity.'
+      } finally {
+        this.loading = false
+      }
+    },
+
+    async fetchUserActivityDetails (userId) {
+      this.loading = true
+      this.error = null
+      const activities = []
+
+      try {
+        // 1. Fetch user's posts
+        const postsQuery = query(collection(db, 'posts'), where('uid', '==', userId))
+        const postsSnapshot = await getDocs(postsQuery)
+
+        postsSnapshot.forEach(doc => {
+          const data = doc.data()
+          activities.push({
+            type: 'post',
+            id: doc.id,
+            title: data.stepTwo?.title || 'Untitled Post',
+            content: data.stepTwo?.description || '',
+            createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : new Date(data.createdAt),
+            image: data.stepTwo?.images?.[0] || null,
+          })
+        })
+
+        // 2. Fetch user's comments
+        const commentsQuery = query(collection(db, 'comments'), where('user.uid', '==', userId))
+        const commentsSnapshot = await getDocs(commentsQuery)
+
+        commentsSnapshot.forEach(doc => {
+          const data = doc.data()
+          activities.push({
+            type: 'comment',
+            id: doc.id,
+            postId: data.postId,
+            content: data.text || '',
+            createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : new Date(data.createdAt),
+          })
+        })
+
+        // Sort by date descending
+        activities.sort((a, b) => b.createdAt - a.createdAt)
+
+        return activities
+      } catch (error) {
+        console.error('Error fetching user activity details:', error)
+        this.error = 'Failed to fetch activity details.'
+        return []
+      } finally {
+        this.loading = false
+      }
+    },
+
+    async fetchUserInteractedPosts (userId) {
+      this.loading = true
+      this.error = null
+      const posts = []
+      const postIds = new Set()
+
+      try {
+        // 1. Fetch user's comments to get post IDs
+        const commentsQuery = query(collection(db, 'comments'), where('user.uid', '==', userId))
+        const commentsSnapshot = await getDocs(commentsQuery)
+
+        commentsSnapshot.forEach(doc => {
+          const data = doc.data()
+          if (data.postId) {
+            postIds.add(data.postId)
+          }
+        })
+
+        // 2. Fetch each post details
+        const fetchPromises = Array.from(postIds).map(async (postId) => {
+          const postDocRef = doc(db, 'posts', postId)
+          const postDoc = await getDoc(postDocRef)
+          if (postDoc.exists()) {
+            return { id: postDoc.id, ...postDoc.data() }
+          }
+          return null
+        })
+
+        const fetchedPosts = await Promise.all(fetchPromises)
+
+        fetchedPosts.forEach(post => {
+          if (post) {
+            posts.push(post)
+          }
+        })
+
+        return posts
+      } catch (error) {
+        console.error('Error fetching interacted posts:', error)
+        this.error = 'Failed to fetch interacted posts.'
+        return []
       } finally {
         this.loading = false
       }

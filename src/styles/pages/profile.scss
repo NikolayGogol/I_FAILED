@@ -56,12 +56,11 @@
           width: 40px;
           height: 40px;
           border-radius: 50%;
-          background-color: $color-accent-bg;
-          color: $color-accent-text;
+          background-color: $color-primary;
+          color: $color-surface;
           display: flex;
           align-items: center;
           justify-content: center;
-          font-weight: bold;
           font-size: 14px;
           flex-shrink: 0;
         }

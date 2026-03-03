@@ -43,12 +43,12 @@
 
 <template>
   <div class="check-inbox-message">
-  <div class="d-flex">
-    <div class="back-link" @click="router.push('/register')">
-      <v-icon size="small">mdi-arrow-left</v-icon>
-      Back
+    <div class="d-flex">
+      <div class="back-link" @click="router.push('/register')">
+        <v-icon size="small">mdi-arrow-left</v-icon>
+        Back
+      </div>
     </div>
-  </div>
     <h1 class="welcome-title">Check your inbox</h1>
     <p class="prompt-text">Click on the link we sent to <b>{{ email }} </b> <br>to finish your registration.</p>
     <p class="prompt-text">

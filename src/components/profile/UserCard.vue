@@ -13,7 +13,7 @@
   const toast = useToast()
 
   const { user } = storeToRefs(authStore)
-  const { loading, userActivity } = storeToRefs(profileStore)
+  const { userActivity } = storeToRefs(profileStore)
 
   const editDialog = ref(false)
   const newDisplayName = ref('')
