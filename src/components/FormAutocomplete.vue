@@ -79,7 +79,11 @@
           @input="onInput"
           @keydown.enter.prevent="addTag()"
         >
-        <div class="cancel-btn add-btn" @click="addTag()">Add</div>
+        <div
+          class="cancel-btn add-btn"
+          :class="{'pointer-events-none opacity-60': !text}"
+          @click="addTag()"
+        >Add</div>
       </div>
       <p class="form-hint my-2">Suggested from popular tags</p>
 

@@ -32,6 +32,7 @@
   const isLiking = ref(false) // To disable the button during the request
   const commentCount = ref(0)
   const showBlockDialog = ref(false)
+  const showSensitiveContent = ref(false)
 
   const userInitial = computed(() => {
     return p.post.user?.displayName?.charAt(0).toUpperCase() || ''
@@ -226,7 +227,12 @@
       </v-menu>
 
     </header>
-
+    <div v-if="post.stepFive.enableTriggerWarning && !showSensitiveContent" class="sensitive-content">
+      <div class="content">
+        ⚠️This post contains triggers: Legal issues, financial loss
+        <div class="submit-btn mt-2" @click="showSensitiveContent = true">Show post</div>
+      </div>
+    </div>
     <div v-if="post.stepOne.selectedCategories.length > 0" class="post-tags" @click="openPost">
       <span>{{ post.stepOne.selectedCategories.map(el => el.label).join(' / ') }}</span>
     </div>

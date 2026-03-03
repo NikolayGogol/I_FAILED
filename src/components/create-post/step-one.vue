@@ -13,7 +13,7 @@
   function toggleCategory (category) {
     const index = store.stepOne.selectedCategories.findIndex(c => c.id === category.id)
     if (index === -1) {
-      store.stepOne.selectedCategories.push(category)
+      store.stepOne.selectedCategories = [category]
     } else {
       store.stepOne.selectedCategories.splice(index, 1)
     }
