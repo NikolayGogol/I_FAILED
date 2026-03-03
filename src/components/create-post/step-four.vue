@@ -5,7 +5,6 @@
   import FormInput from '@/components/FormInput.vue'
   import { emotionTags, recoveryTimeOptions } from '@/models/categories.js'
   import { useCreatePostStore } from '@/stores/create-post'
-  import '@/styles/components/form-input.scss'
   import '@/styles/components/create-post/step-four.scss'
 
   const store = useCreatePostStore()
