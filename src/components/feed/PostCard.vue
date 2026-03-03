@@ -229,22 +229,22 @@
     </header>
     <div v-if="post.stepFive.enableTriggerWarning && !showSensitiveContent" class="sensitive-content">
       <div class="content">
-        ⚠️This post contains triggers: Legal issues, financial loss
+        <p>
+          ⚠️This post contains triggers: <span class="text-capitalize">{{ post.stepFive?.triggerTags?.join(',') }}</span>
+        </p>
         <div class="submit-btn mt-2" @click="showSensitiveContent = true">Show post</div>
       </div>
     </div>
-    <div v-if="post.stepOne.selectedCategories.length > 0" class="post-tags" @click="openPost">
-      <span>{{ post.stepOne.selectedCategories.map(el => el.label).join(' / ') }}</span>
-    </div>
-
-    <h2 class="post-title" @click="openPost">
-      {{ post.stepTwo.title }}
-    </h2>
-
-    <p class="post-body" @click="openPost" v-html="truncatedBody" />
-    <button v-if="showReadMore" class="read-more" @click="readMore">Read more</button>
-
-    <div v-if="post.stepFour.emotionTags" class="post-chips" @click="openPost">
+    <template v-else>
+      <div v-if="post.stepOne.selectedCategories.length > 0" class="post-tags" @click="openPost">
+        <span>{{ post.stepOne.selectedCategories.map(el => el.label).join(' / ') }}</span>
+      </div>
+      <h2 class="post-title" @click="openPost">
+        {{ post.stepTwo.title }}
+      </h2>
+      <p class="post-body" @click="openPost" v-html="truncatedBody" />
+      <button v-if="showReadMore" class="read-more" @click="readMore">Read more</button>
+      <div v-if="post.stepFour.emotionTags" class="post-chips" @click="openPost">
       <span
         v-for="chip in post.stepFour.emotionTags"
         :key="chip"
@@ -253,19 +253,18 @@
         {{ chip.emoji }}
         {{ chip.label }}
       </span>
-    </div>
-
-    <div v-if="post.stepFour?.recoveryTime || post.stepFour.cost" class="post-meta" @click="openPost">
-      <div v-if="post.stepFour.cost" class="meta-item">
-        <span class="meta-label">💰    Cost:</span>
-        <span>{{ formatNumber(post.stepFour.cost) }}</span>
       </div>
-      <div v-if="post.stepFour?.recoveryTime" class="meta-item">
-        <span class="meta-label">⏱️   Recovery:</span>
-        <span>{{ post.stepFour?.recoveryTime?.title }}</span>
+      <div v-if="post.stepFour?.recoveryTime || post.stepFour.cost" class="post-meta" @click="openPost">
+        <div v-if="post.stepFour.cost" class="meta-item">
+          <span class="meta-label">💰    Cost:</span>
+          <span>{{ formatNumber(post.stepFour.cost) }}</span>
+        </div>
+        <div v-if="post.stepFour?.recoveryTime" class="meta-item">
+          <span class="meta-label">⏱️   Recovery:</span>
+          <span>{{ post.stepFour?.recoveryTime?.title }}</span>
+        </div>
       </div>
-    </div>
-
+    </template>
     <footer class="post-footer" @click="openPost">
       <button class="icon-btn" :class="{ 'liked': isLiked }" :disabled="isLiking" @click.stop.prevent="handleLike">
         <v-icon size="18">{{ isLiked ? 'mdi-heart' : 'mdi-heart-outline' }}</v-icon>
@@ -287,7 +286,6 @@
         <v-icon size="18">mdi-share-variant</v-icon>
       </button>
     </footer>
-
     <!-- Block User Dialog -->
     <v-dialog v-model="showBlockDialog" max-width="480">
       <div class="bg-white rounded-lg py-6 px-6">

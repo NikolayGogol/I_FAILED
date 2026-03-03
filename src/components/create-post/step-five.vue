@@ -1,4 +1,5 @@
 <script setup>
+  import { ref, watch } from 'vue'
   import DatePickerInput from '@/components/DatePickerInput.vue'
   import { useCreatePostStore } from '@/stores/create-post'
   import '@/styles/components/form-input.scss'
@@ -6,10 +7,21 @@
 
   const store = useCreatePostStore()
   const emit = defineEmits(['isValid'])
+  const triggerText = ref('')
   //
-  // eslint-disable-next-line vue/custom-event-name-casing
-  emit('isValid', true)
-
+  function addTag () {
+    store.stepFive.triggerTags.push(triggerText.value)
+    triggerText.value = ''
+  }
+  watch(() => store.stepFive.enableTriggerWarning, val => {
+    if (val && store.stepFive.triggerTags.length === 0) {
+      // eslint-disable-next-line vue/custom-event-name-casing
+      emit('isValid', false)
+    } else {
+      // eslint-disable-next-line vue/custom-event-name-casing
+      emit('isValid', true)
+    }
+  }, { immediate: true })
 </script>
 
 <template>
@@ -64,7 +76,24 @@
         inset
       />
     </div>
-
+    <div v-if="store.stepFive.enableTriggerWarning" class="mt-2">
+      <label for="">Trigger Warning</label>
+      <div class="d-flex">
+        <form-input
+          v-model="triggerText"
+          hide-details
+          placeholder="e.g., Financial loss, Mental health"
+          @keydown.enter.prevent="addTag()"
+        />
+        <div class="cancel-btn" @click="addTag">Add</div>
+      </div>
+      <ul class="selected-tags-list mt-2 ga-2">
+        <li v-for="tag in store.stepFive.triggerTags" :key="tag" class="tag-chip py-1 px-2">
+          {{ tag }}
+          <span class="remove-tag cursor-pointer" @click="removeTag(index)">×</span>
+        </li>
+      </ul>
+    </div>
     <div class="form-group mt-6">
       <label class="form-label">Schedule post (optional)</label>
       <DatePickerInput
