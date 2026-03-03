@@ -8,59 +8,59 @@
 </route>
 
 <script setup>
-import { computed, reactive, ref, watch } from 'vue'
-import { useRouter } from 'vue-router'
-import StepFive from '@/components/create-post/step-five.vue'
-import StepFour from '@/components/create-post/step-four.vue'
-import StepOne from '@/components/create-post/step-one.vue'
-import StepThree from '@/components/create-post/step-three.vue'
-import StepTwo from '@/components/create-post/step-two.vue'
-import { useCreatePostStore } from '@/stores/create-post.js'
-import '@/styles/pages/create-post.scss'
+  import { computed, reactive, ref, watch } from 'vue'
+  import { useRouter } from 'vue-router'
+  import StepFive from '@/components/create-post/step-five.vue'
+  import StepFour from '@/components/create-post/step-four.vue'
+  import StepOne from '@/components/create-post/step-one.vue'
+  import StepThree from '@/components/create-post/step-three.vue'
+  import StepTwo from '@/components/create-post/step-two.vue'
+  import { useCreatePostStore } from '@/stores/create-post.js'
+  import '@/styles/pages/create-post.scss'
 
-const router = useRouter()
-const step = ref(1)
-const { createPost } = useCreatePostStore()
-const isLoading = ref(false)
+  const router = useRouter()
+  const step = ref(1)
+  const { createPost } = useCreatePostStore()
+  const isLoading = ref(false)
 
-const stepsValidity = reactive({
-  1: false,
-  2: false,
-  3: false,
-  4: false,
-  5: false,
-})
+  const stepsValidity = reactive({
+    1: false,
+    2: false,
+    3: false,
+    4: false,
+    5: false,
+  })
 
-const progress = computed(() => (step.value / 5) * 100)
-const isValid = computed(() => stepsValidity[step.value])
+  const progress = computed(() => (step.value / 5) * 100)
+  const isValid = computed(() => stepsValidity[step.value])
 
-function updateStepValidity(stepNumber, isValid) {
-  stepsValidity[stepNumber] = isValid
-}
-
-function submit() {
-  isLoading.value = true
-  createPost()
-    .then(() => {
-      router.push('/post-success-created')
-      sessionStorage.setItem('post-success-created', 'true')
-    })
-    .finally(() => {
-      isLoading.value = false
-    })
-}
-
-function nextStep() {
-  if (step.value < 5) {
-    step.value++
+  function updateStepValidity (stepNumber, isValid) {
+    stepsValidity[stepNumber] = isValid
   }
-}
 
-function prevStep() {
-  if (step.value > 1) {
-    step.value--
+  function submit () {
+    isLoading.value = true
+    createPost()
+      .then(() => {
+        router.push('/post-success-created')
+        sessionStorage.setItem('post-success-created', 'true')
+      })
+      .finally(() => {
+        isLoading.value = false
+      })
   }
-}
+
+  function nextStep () {
+    if (step.value < 5) {
+      step.value++
+    }
+  }
+
+  function prevStep () {
+    if (step.value > 1) {
+      step.value--
+    }
+  }
 </script>
 
 <template>

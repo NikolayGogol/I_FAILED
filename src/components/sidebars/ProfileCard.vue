@@ -130,20 +130,22 @@
 
     <!-- Logout Confirmation Dialog -->
     <v-dialog v-model="logoutDialog" max-width="400">
-      <v-card class="logout-dialog-card">
-        <v-card-title>Sign out?</v-card-title>
-        <v-card-text>
+      <v-card class="logout-dialog-card py-6">
+        <v-card-title class="text-center">Sign out?</v-card-title>
+        <v-card-text class="text-center pt-0">
           Are you sure you want to sign out?
         </v-card-text>
-        <v-card-actions>
-          <v-spacer />
-          <v-btn color="grey" variant="text" @click="logoutDialog = false">Cancel</v-btn>
-          <v-btn
-            color="primary"
-            variant="tonal"
-            @click="confirmLogout"
-          >Sign out</v-btn>
-        </v-card-actions>
+        <v-row class="px-6">
+          <v-col>
+            <div class="cancel-btn" @click="logoutDialog = false">Cancel</div>
+          </v-col>
+          <v-col>
+            <div
+              class="submit-btn"
+              @click="confirmLogout"
+            >Sign out</div>
+          </v-col>
+        </v-row>
       </v-card>
     </v-dialog>
   </section>

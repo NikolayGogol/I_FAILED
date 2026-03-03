@@ -150,7 +150,7 @@
   }
 
   async function confirmBlock () {
-    if (!authStore.user){
+    if (!authStore.user) {
       await router.push('/login')
       return
     }
