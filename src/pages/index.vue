@@ -65,7 +65,7 @@
 
       <!-- Composer -->
       <div class="composer-card mb-6">
-        <div class="write-post-btn font-weight-semibold">
+        <div class="write-post-btn font-weight-semibold" @click="$router.push('/create-post')">
           Write a post
         </div>
         <div class="composer-filter">
