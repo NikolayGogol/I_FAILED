@@ -1,10 +1,11 @@
 @use '../settings.scss' as *;
+@use '../global/fonts' as *;
 
 .profile-page {
   min-height: 100vh;
 
   .profile-main {
-    max-width: 800px;
+    max-width: $container-width-lg;
     margin: 0 auto;
     padding: 0 $spacing-md;
   }
@@ -20,14 +21,14 @@
       .tab-item {
         background: none;
         border: none;
-        border-bottom: 2px solid transparent;
-        color: #454541;
+        border-bottom: $border-width-md solid transparent;
+        color: $color-text-secondary;
         cursor: pointer;
         transition: color 0.2s, border-color 0.2s;
         text-align: center;
         width: 50%;
-        font-size: 14px;
-        padding-bottom: 5px;
+        font-size: $font-size-sm;
+        padding-bottom: $spacing-xxs;
 
         &:hover {
           color: $color-text-primary;
@@ -53,22 +54,22 @@
         gap: $spacing-md;
 
         .user-avatar-mini {
-          width: 40px;
-          height: 40px;
+          width: $avatar-size-md;
+          height: $avatar-size-md;
           border-radius: 50%;
           background-color: $color-primary;
           color: $color-surface;
           display: flex;
           align-items: center;
           justify-content: center;
-          font-size: 14px;
+          font-size: $font-size-sm;
           flex-shrink: 0;
         }
 
         .post-input-placeholder {
           flex-grow: 1;
           color: $color-text-tertiary;
-          font-size: 14px;
+          font-size: $font-size-sm;
         }
 
         .write-post-btn {

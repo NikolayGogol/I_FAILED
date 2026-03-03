@@ -1,4 +1,6 @@
 @use '../settings.scss' as *;
+@use '../global/fonts' as *;
+@use '../global/mixins' as *;
 
 .feed-page {
   min-height: 100vh;
@@ -21,8 +23,8 @@
       border: none;
       cursor: pointer;
       transition: color 0.2s, border-color 0.2s;
-      border-bottom: 2px solid transparent;
-      font-size: 14px;
+      border-bottom: $border-width-md solid transparent;
+      font-size: $font-size-sm;
       font-weight: 500;
 
       @include media-up($breakpoint-sm) {
@@ -64,7 +66,7 @@
       cursor: pointer;
       padding: $spacing-sm $spacing-lg;
       line-height: normal;
-      font-size: 14px;
+      font-size: $font-size-sm;
       font-weight: 500;
     }
 

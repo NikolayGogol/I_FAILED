@@ -6,17 +6,24 @@ $color-surface: #ffffff;
 $color-text-primary: #1C1C1B;
 $color-text-secondary: #454541;
 $color-text-tertiary: #94a3b8;
+$color-text-quaternary: #808079;
 $color-border: #DCDCD8;
 $color-accent-bg: #e0f2fe;
 $color-accent-text: #0369a1;
 $color-error: #ef4444;
+$color-tag-bg: #F9EAD5;
 
 // Spacing
+$spacing-xxs: 5px;
 $spacing-xs: 4px;
 $spacing-sm: 8px;
+$spacing-sm-md: 10px;
+$spacing-md-sm: 12px;
 $spacing-md: 16px;
+$spacing-md-lg: 20px;
 $spacing-lg: 24px;
 $spacing-xl: 32px;
+$spacing-2xl: 40px;
 
 // Border Radius
 $radius-xs: 8px;
@@ -29,3 +36,37 @@ $radius-full: 999px;
 // Shadows
 $shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.08);
 $shadow-lg: 0 20px 40px rgba(15, 23, 42, 0.35);
+
+// Typography
+$line-height-sm: 20px;
+$line-height-base: 1.4;
+$line-height-relaxed: 1.6;
+$line-height-tight: 1.3;
+$font-size-display: 120px;
+
+// Components
+$input-height: 44px;
+$input-height-lg: 48px;
+$calendar-cell-size: 30px;
+$input-icon-left: 15px;
+$upload-area-height: 270px;
+$border-width-md: 2px;
+$border-width-lg: 3px;
+$autocomplete-max-height: 250px;
+$avatar-size-md: 40px;
+$tag-padding: 5px 10px;
+$chip-padding: 4px 10px;
+$container-width-xs: 440px;
+$container-width-sm: 480px;
+$container-width-md: 600px;
+$container-width-lg: 800px;
+$container-width-xl: 900px;
+$otp-width-sm: 40px;
+$otp-height-sm: 50px;
+$otp-width-md: 50px;
+$otp-height-md: 60px;
+$card-min-width: 200px;
+$card-min-width-lg: 300px;
+$card-image-height: 120px;
+$image-max-width-sm: 300px;
+$sidebar-width: 250px;

@@ -1,7 +1,9 @@
 @use '../settings.scss' as *;
+@use '../global/fonts' as *;
+@use '../global/mixins' as *;
 
 .register-form {
-  max-width: 600px;
+  max-width: $container-width-md;
   width: 100%;
   margin: 0 auto;
   padding: $spacing-md;
@@ -9,22 +11,22 @@
   .welcome-title {
     text-align: center;
     color: $color-text-primary;
-    font-size: 32px;
+    font-size: $font-size-xl;
     margin-bottom: $spacing-sm;
 
     @include media-up($breakpoint-sm) {
-      font-size: 48px;
+      font-size: $font-size-3xl;
     }
   }
 
   .auth-prompt {
     text-align: center;
     color: $color-text-secondary;
-    font-size: 14px;
+    font-size: $font-size-sm;
     margin-bottom: $spacing-lg;
 
     @include media-up($breakpoint-sm) {
-      font-size: 16px;
+      font-size: $font-size-base;
     }
 
     .auth-link {
@@ -60,7 +62,7 @@
     }
 
     .separator-text {
-      font-size: 14px;
+      font-size: $font-size-sm;
       color: $color-text-tertiary;
     }
   }
@@ -81,7 +83,7 @@
 }
 
 .register-success-message {
-  max-width: 600px;
+  max-width: $container-width-md;
   width: 100%;
   margin: 0 auto;
   text-align: center;
@@ -98,7 +100,7 @@
 
   .placeholder-image {
     width: 100%;
-    max-width: 300px;
+    max-width: $image-max-width-sm;
     height: auto;
     aspect-ratio: 440 / 238;
     background-color: $color-background;
@@ -108,13 +110,13 @@
   }
 
   .welcome-title {
-    font-size: 1.8rem;
+    font-size: $font-size-2xl-sm;
     font-weight: 600;
     color: $color-text-primary;
     margin-bottom: $spacing-md;
 
     @include media-up($breakpoint-sm) {
-      font-size: 2rem;
+      font-size: $font-size-xl;
     }
   }
 

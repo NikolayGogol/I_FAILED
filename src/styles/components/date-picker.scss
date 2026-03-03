@@ -1,29 +1,30 @@
 @use '../settings.scss' as *;
+@use '../global/fonts' as *;
 
 .date-picker-wrapper {
   .dp__input {
-    padding-left: 40px;
+    padding-left: $spacing-2xl;
     line-height: normal;
-    padding-bottom: 8px;
+    padding-bottom: $spacing-sm;
   }
 
   .dp__calendar_row {
-    gap: 8px;
+    gap: $spacing-sm;
 
     .dp__calendar_item {
-      min-width: 30px;
-      min-height: 30px;
+      min-width: $calendar-cell-size;
+      min-height: $calendar-cell-size;
       border: 1px solid $color-border;
       display: flex;
       align-items: center;
       justify-content: center;
       border-radius: $radius-sm;
-      font-size: 12px;
+      font-size: $font-size-xs;
 
       .dp__today {
         border-radius: $radius-sm;
-        min-width: 30px;
-        min-height: 30px;
+        min-width: $calendar-cell-size;
+        min-height: $calendar-cell-size;
       }
 
       .dp__active_date {
@@ -34,7 +35,7 @@
   }
   .dp__main {
     .dp__input_wrap {
-      height: 44px;
+      height: $input-height;
       border: 1px solid $color-border;
       border-radius: $radius-sm;
 
@@ -52,7 +53,7 @@
       background-color: $color-primary;
     }
     .dp__input_icon {
-      left: 15px;
+      left: $input-icon-left;
     }
   }
 }

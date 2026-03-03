@@ -1,4 +1,5 @@
 @use '../settings.scss' as *;
+@use '../global/fonts' as *;
 
 .not-found-page {
   min-height: 100vh;
@@ -11,7 +12,7 @@
 }
 
 .not-found-content {
-  max-width: 480px;
+  max-width: $container-width-sm;
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -19,7 +20,7 @@
 }
 
 .error-code {
-  font-size: 120px;
+  font-size: $font-size-display;
   font-weight: 900;
   color: $color-primary;
   line-height: 1;
@@ -28,17 +29,17 @@
 }
 
 .error-title {
-  font-size: 32px;
+  font-size: $font-size-xl;
   font-weight: 800;
   color: $color-text-primary;
   margin-bottom: $spacing-sm;
 }
 
 .error-message {
-  font-size: 16px;
+  font-size: $font-size-base;
   color: $color-text-secondary;
   margin-bottom: $spacing-xl;
-  line-height: 1.6;
+  line-height: $line-height-relaxed;
 }
 
 .home-btn {

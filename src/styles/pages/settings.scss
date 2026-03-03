@@ -1,11 +1,13 @@
 @use '../settings.scss' as *;
+@use '../global/fonts' as *;
+@use '../global/mixins' as *;
 
 .settings-page {
   min-height: 100vh;
   padding-top: $spacing-md;
 
   .settings-title {
-    font-size: 24px;
+    font-size: $font-size-2xl;
     font-weight: bold;
     color: $color-text-primary;
     margin-bottom: $spacing-lg;
@@ -15,11 +17,11 @@
   .settings-wrapper {
     display: flex;
     gap: $spacing-lg;
-    max-width: 900px;
+    max-width: $container-width-xl;
     margin: 0 auto;
 
     .settings-sidebar {
-      width: 250px;
+      width: $sidebar-width;
       flex-shrink: 0;
 
       .settings-menu {
@@ -52,12 +54,12 @@
             background-color: $color-accent-bg;
             color: $color-accent-text;
             font-weight: bold;
-            border-left: 3px solid $color-accent-text;
+            border-left: $border-width-lg solid $color-accent-text;
           }
 
           .icon {
             margin-right: $spacing-md;
-            font-size: 18px;
+            font-size: $font-size-lg;
           }
         }
       }
@@ -95,7 +97,7 @@
 
             .option-icon {
               margin-right: $spacing-md;
-              font-size: 20px;
+              font-size: $font-size-lg-xl;
             }
 
             .option-text {
@@ -106,7 +108,7 @@
 
           .arrow {
             color: $color-text-tertiary;
-            font-size: 20px;
+            font-size: $font-size-lg-xl;
             font-weight: bold;
           }
         }

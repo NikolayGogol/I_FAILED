@@ -1,31 +1,33 @@
 @use '../settings.scss' as *;
+@use '../global/fonts' as *;
+@use '../global/mixins' as *;
 
 .login-form {
-  max-width: 600px;
+  max-width: $container-width-md;
   width: 100%;
   margin: 0 auto;
   padding: $spacing-md;
 
   .welcome-title {
     color: $color-text-primary;
-    font-size: 32px;
+    font-size: $font-size-xl;
     text-align: center;
     margin-bottom: $spacing-sm;
 
     @include media-up($breakpoint-sm) {
-      font-size: 48px;
+      font-size: $font-size-3xl;
       text-align: left;
     }
   }
 
   .auth-prompt { // Changed from signup-prompt for consistency
     text-align: center;
-    font-size: 14px;
+    font-size: $font-size-sm;
     margin-bottom: $spacing-lg;
 
     @include media-up($breakpoint-sm) {
       text-align: left;
-      font-size: 18px;
+      font-size: $font-size-lg;
     }
 
     span {
@@ -59,7 +61,7 @@
   .separator-text {
     padding: 0 $spacing-md;
     color: $color-text-tertiary;
-    font-size: 14px;
+    font-size: $font-size-sm;
   }
 
   .form-options {

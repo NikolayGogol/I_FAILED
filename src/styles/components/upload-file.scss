@@ -3,12 +3,12 @@
 @use 'sass:color';
 
 .upload-file-wrapper {
-  height: 270px;
+  height: $upload-area-height;
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 3px dashed $color-border;
+  border: $border-width-lg dashed $color-border;
   border-radius: $radius-md;
   transition: all 0.3s ease;
   cursor: pointer;
@@ -20,22 +20,22 @@
 
 
   .upload-title {
-    font-size: 14px;
+    font-size: $font-size-sm;
     color: $color-text-primary;
   }
 
   .upload-sub-title {
-    color: #808079;
-    font-size: 12px;
+    color: $color-text-quaternary;
+    font-size: $font-size-xs;
     margin-top: 0;
   }
 
   .upload-btn {
     background-color: $color-primary;
     color: white;
-    padding: 12px 24px;
-    font-size: 16px;
-    margin-top: 24px;
+    padding: $spacing-md-sm $spacing-lg;
+    font-size: $font-size-base;
+    margin-top: $spacing-lg;
     cursor: pointer;
   }
 }

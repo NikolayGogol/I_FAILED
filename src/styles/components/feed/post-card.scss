@@ -1,4 +1,5 @@
 @use '../../settings.scss' as *;
+@use '../../global/fonts' as *;
 @use 'sass:color';
 
 .post-card {
@@ -23,7 +24,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    margin-bottom: 20px;
+    margin-bottom: $spacing-md-lg;
 
     .content {
       position: relative;
@@ -42,8 +43,8 @@
     cursor: pointer;
 
     .post-avatar {
-      width: 40px;
-      height: 40px;
+      width: $avatar-size-md;
+      height: $avatar-size-md;
       border-radius: 50%;
       background-color: $color-accent-bg;
       color: $color-accent-text;
@@ -65,12 +66,12 @@
       .post-author-name {
         font-weight: 600;
         color: $color-text-primary;
-        font-size: 14px;
+        font-size: $font-size-sm;
       }
 
       .post-author-handle {
         color: $color-text-secondary;
-        font-size: 12px;
+        font-size: $font-size-xs;
       }
     }
   }
@@ -85,27 +86,27 @@
 
     span {
       color: $color-primary;
-      font-size: 12px;
+      font-size: $font-size-xs;
       font-weight: 600;
       margin-right: $spacing-sm;
-      background-color: #F9EAD5;
-      padding: 5px 10px;
+      background-color: $color-tag-bg;
+      padding: $tag-padding;
       border-radius: $radius-sm;
     }
   }
 
   .post-title {
-    font-size: 18px;
+    font-size: $font-size-lg;
     font-weight: 700;
     color: $color-text-primary;
     margin-bottom: $spacing-sm;
-    line-height: 1.4;
+    line-height: $line-height-base;
   }
 
   .post-body {
     color: $color-text-secondary;
-    font-size: 14px;
-    line-height: 1.6;
+    font-size: $font-size-sm;
+    line-height: $line-height-relaxed;
     margin-bottom: $spacing-md;
   }
 
@@ -132,9 +133,9 @@
     .post-chip {
       background-color: $color-background;
       color: $color-text-secondary;
-      padding: 4px 10px;
+      padding: $chip-padding;
       border-radius: $radius-full;
-      font-size: 12px;
+      font-size: $font-size-xs;
       font-weight: 500;
     }
   }
@@ -148,7 +149,7 @@
 
     .meta-item {
       display: flex;
-      font-size: 12px;
+      font-size: $font-size-xs;
 
       .meta-label {
         color: $color-text-secondary;
@@ -157,7 +158,7 @@
       span:not(.meta-label) {
         font-weight: 600;
         color: $color-text-primary;
-        margin-left: 10px;
+        margin-left: $spacing-sm-md;
       }
     }
   }
@@ -177,11 +178,11 @@
       cursor: pointer;
       margin-right: $spacing-lg;
       transition: color 0.2s;
-      font-size: 14px;
+      font-size: $font-size-sm;
 
       span {
         margin-left: $spacing-sm;
-        font-size: 12px;
+        font-size: $font-size-xs;
         font-weight: 500;
       }
 

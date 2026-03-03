@@ -1,4 +1,5 @@
 @use '../settings.scss' as *;
+@use '../global/fonts' as *;
 
 .library-page {
   min-height: 100vh;
@@ -9,7 +10,7 @@
     text-align: center;
 
     h1 {
-      font-size: 24px;
+      font-size: $font-size-2xl;
       font-weight: bold;
       color: $color-text-primary;
       margin-bottom: $spacing-sm;
@@ -17,13 +18,13 @@
 
     p {
       color: $color-text-secondary;
-      font-size: 16px;
+      font-size: $font-size-base;
     }
   }
 
   .library-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax($card-min-width-lg, 1fr));
     gap: $spacing-lg;
 
     .library-card {
@@ -46,8 +47,8 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 40px;
-        height: 40px;
+        width: $avatar-size-md;
+        height: $avatar-size-md;
         background-color: $color-accent-bg;
         border-radius: 50%;
         color: $color-accent-text;
@@ -58,7 +59,7 @@
         flex-grow: 1;
 
         h3 {
-          font-size: 16px;
+          font-size: $font-size-base;
           font-weight: bold;
           color: $color-text-primary;
           margin-bottom: $spacing-xs;
@@ -66,14 +67,14 @@
 
         p {
           color: $color-text-secondary;
-          font-size: 14px;
+          font-size: $font-size-sm;
           margin-bottom: $spacing-sm;
-          line-height: 1.4;
+          line-height: $line-height-base;
         }
 
         .library-date {
           color: $color-text-tertiary;
-          font-size: 12px;
+          font-size: $font-size-xs;
         }
       }
     }
