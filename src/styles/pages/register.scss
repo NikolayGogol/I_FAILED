@@ -43,6 +43,7 @@
 
   .social-buttons {
     margin-top: $spacing-lg;
+
     .v-row {
       flex-direction: column;
       @include media-up($breakpoint-sm) {
@@ -78,6 +79,26 @@
     width: 100%;
     @include media-up($breakpoint-sm) {
       width: auto;
+    }
+  }
+
+  .select {
+    border: 1px solid $color-border;
+    border-radius: $radius-md;
+
+    .v-field__outline {
+      display: none;
+    }
+
+    .v-field {
+      padding-right: 0;
+
+    }
+
+    .v-field__append-inner {
+      background-color: $color-surface;
+      border-radius: 0  $radius-md $radius-md 0;
+
     }
   }
 }

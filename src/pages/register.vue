@@ -154,7 +154,7 @@
         <label class="label d-block mb-2 text-body-2 text-high-emphasis">Why joining?</label>
         <v-select
           v-model="whyJoining"
-          clearable
+          class="select"
           color="primary"
           density="comfortable"
           hide-details="auto"
