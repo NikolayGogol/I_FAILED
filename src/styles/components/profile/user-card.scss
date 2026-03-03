@@ -50,19 +50,6 @@
         color: $color-text-primary;
       }
 
-      .edit-profile-btn {
-        border: 1px solid $color-border;
-        background-color: $color-surface;
-        padding: $spacing-sm $spacing-md;
-        border-radius: $radius-md;
-        font-weight: 600;
-        cursor: pointer;
-        transition: background-color 0.2s;
-
-        &:hover {
-          background-color: $color-background;
-        }
-      }
     }
 
     .user-email {
@@ -146,9 +133,24 @@
 
 // Dialog styles
 .edit-profile-dialog {
+  padding: 15px;
+  border-radius: 20px !important;
+
+  .v-card-text {
+    padding: 0 15px !important;
+  }
+
   .v-card-title {
     font-size: 20px;
     font-weight: 600;
+    padding: 0 !important;
+  }
+
+  i {
+    color: $color-text-secondary;
+  }
+
+  .v-card {
   }
 
   .edit-avatar-section {
@@ -159,8 +161,8 @@
     margin-bottom: $spacing-xl;
 
     .edit-avatar {
-      width: 120px;
-      height: 120px;
+      width: 96px;
+      height: 96px;
 
       .v-img {
         border-radius: $radius-full;
@@ -183,16 +185,22 @@
     }
 
     .upload-btn {
-      background-color: rgba($color-primary, 0.1);
-      color: $color-primary;
-      padding: $spacing-sm $spacing-md;
-      border-radius: $radius-md;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       cursor: pointer;
-      font-weight: 600;
-      transition: background-color 0.2s;
+      border-radius: 50%;
+      background-color: rgba(0, 0, 0, 0.5);
 
-      &:hover {
-        background-color: rgba($color-primary, 0.15);
+      i {
+        color: white;
       }
     }
   }

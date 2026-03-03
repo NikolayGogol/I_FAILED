@@ -56,8 +56,6 @@ export const useWhoToFollowStore = defineStore('whoToFollow', {
           followers: arrayUnion(currentUserId),
         })
 
-        // REMOVED optimistic update. Let onSnapshot handle the state change.
-
         return true
       } catch (error) {
         console.error('Error following user:', error)
@@ -83,11 +81,66 @@ export const useWhoToFollowStore = defineStore('whoToFollow', {
           followers: arrayRemove(currentUserId),
         })
 
-        // REMOVED optimistic update. Let onSnapshot handle the state change.
-
         return true
       } catch (error) {
         console.error('Error unfollowing user:', error)
+        return false
+      }
+    },
+
+    async blockUser (userIdToBlock) {
+      const authStore = useAuthStore()
+      if (!authStore.user) {
+        console.error('User not authenticated')
+        return false
+      }
+      const currentUserId = authStore.user.uid
+
+      // Unfollow each other first
+      await this.unfollowUser(userIdToBlock)
+      // And make the other user unfollow the current user
+      const userToBlockRef = doc(db, 'users', userIdToBlock)
+      const currentUserRef = doc(db, 'users', currentUserId)
+      try {
+        await updateDoc(userToBlockRef, {
+          following: arrayRemove(currentUserId),
+        })
+        await updateDoc(currentUserRef, {
+          followers: arrayRemove(userIdToBlock),
+        })
+      } catch (error) {
+        console.error('Error during mutual unfollow on block:', error)
+        // We can continue even if this fails
+      }
+
+      // Now, block the user
+      try {
+        await updateDoc(currentUserRef, {
+          blockedUsers: arrayUnion(userIdToBlock),
+        })
+        return true
+      } catch (error) {
+        console.error('Error blocking user:', error)
+        return false
+      }
+    },
+
+    async unblockUser (userIdToUnblock) {
+      const authStore = useAuthStore()
+      if (!authStore.user) {
+        console.error('User not authenticated')
+        return false
+      }
+      const currentUserId = authStore.user.uid
+      const currentUserRef = doc(db, 'users', currentUserId)
+
+      try {
+        await updateDoc(currentUserRef, {
+          blockedUsers: arrayRemove(userIdToUnblock),
+        })
+        return true
+      } catch (error) {
+        console.error('Error unblocking user:', error)
         return false
       }
     },

@@ -16,6 +16,7 @@ declare module 'vue' {
     DatePickerInput: typeof import('./src/components/DatePickerInput.vue')['default']
     FacebookLoginButton: typeof import('./src/components/FacebookLoginButton.vue')['default']
     FormInput: typeof import('./src/components/FormInput.vue')['default']
+    FormTextarea: typeof import('./src/components/FormTextarea.vue')['default']
     GoogleLoginButton: typeof import('./src/components/GoogleLoginButton.vue')['default']
     HelpSettings: typeof import('./src/components/settings/HelpSettings.vue')['default']
     NotificationSettings: typeof import('./src/components/settings/NotificationSettings.vue')['default']

@@ -10,3 +10,33 @@
 .v-application {
   background-color: $color-background;
 }
+
+.cancel-btn {
+  box-shadow: none;
+  text-transform: none;
+  border: 1px solid $color-border;
+  border-radius: $radius-md;
+  padding: $spacing-sm $spacing-md;
+  color: $color-primary;
+  cursor: pointer;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.submit-btn {
+  background-color: $color-primary;
+  border-radius: $radius-md;
+  color: white;
+  cursor: pointer;
+  text-align: center;
+  padding: $spacing-sm $spacing-md;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.text-description {
+  font-size: 16px;
+  font-weight: 400;
+  color: #808079;
+}

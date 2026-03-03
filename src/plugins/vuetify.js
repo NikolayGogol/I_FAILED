@@ -15,6 +15,7 @@ const myCustomTheme = {
   colors: {
     primary: '#D65A1F',
     secondary: '#F9EAD5',
+    danger: '#C8372B',
   },
 }
 // https://vuetifyjs.com/en/introduction/why-vuetify/#feature-guides

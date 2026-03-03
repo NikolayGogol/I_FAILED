@@ -1,8 +1,11 @@
 <script setup>
   import { computed, onMounted, ref } from 'vue'
   import { useRouter } from 'vue-router'
+  import { useToast } from 'vue-toastification'
   import { auth } from '@/firebase'
+  import { useAuthStore } from '@/stores/auth.js'
   import { usePostCardStore } from '@/stores/post-card.js'
+  import { useWhoToFollowStore } from '@/stores/who-to-follow.js'
   import { formatNumber } from '@/utils/format-number.js'
   import '@/styles/components/feed/post-card.scss'
 
@@ -14,7 +17,11 @@
   })
 
   const postCardStore = usePostCardStore()
+  const authStore = useAuthStore()
+  const whoToFollowStore = useWhoToFollowStore()
   const router = useRouter()
+  const toast = useToast()
+
   const isExpanded = ref(false)
   const maxLength = 200
 
@@ -22,9 +29,26 @@
   const likeCount = ref(p.post.likes || 0)
   const isLiking = ref(false) // To disable the button during the request
   const commentCount = ref(0)
+  const showBlockDialog = ref(false)
 
   const userInitial = computed(() => {
     return p.post.user?.displayName?.charAt(0).toUpperCase() || ''
+  })
+
+  const isOwnPost = computed(() => {
+    if (!authStore.user) return false
+    return authStore.user.uid === p.post.uid
+  })
+
+  const isFollowing = computed(() => {
+    if (!authStore.user || !authStore.user.following) return false
+    // Ensure we are comparing strings
+    return authStore.user.following.includes(p.post.uid)
+  })
+
+  const isBlocked = computed(() => {
+    if (!authStore.user || !authStore.user.blockedUsers) return false
+    return authStore.user.blockedUsers.includes(p.post.uid)
   })
 
   onMounted(async () => {
@@ -82,11 +106,70 @@
   function openPost () {
     router.push(`/post/${p.post.id}`)
   }
+
+  async function handleFollow () {
+    if (!authStore.user) {
+      router.push('/login')
+      return
+    }
+    // Use post.uid instead of post.user.uid as post.uid is the author's ID
+    const userId = p.post.uid
+    const userName = p.post.user.displayName
+
+    if (isFollowing.value) {
+      const success = await whoToFollowStore.unfollowUser(userId)
+      if (success) {
+        toast.info(`Unfollowed ${userName}`)
+      } else {
+        toast.error(`Failed to unfollow ${userName}`)
+      }
+    } else {
+      const success = await whoToFollowStore.followUser(userId)
+      if (success) {
+        toast.info(`Following ${userName}`)
+      } else {
+        toast.error(`Failed to follow ${userName}`)
+      }
+    }
+  }
+
+  function handleBlock () {
+    showBlockDialog.value = true
+  }
+
+  async function confirmBlock () {
+    const userId = p.post.uid
+    const userName = p.post.user.displayName
+
+    const success = await whoToFollowStore.blockUser(userId)
+    if (success) {
+      toast.info(`Blocked ${userName}`)
+    } else {
+      toast.error(`Failed to block ${userName}`)
+    }
+    showBlockDialog.value = false
+  }
+
+  async function handleUnblock () {
+    if (!authStore.user) {
+      router.push('/login')
+      return
+    }
+    const userId = p.post.uid
+    const userName = p.post.user.displayName
+
+    const success = await whoToFollowStore.unblockUser(userId)
+    if (success) {
+      toast.info(`Unblocked ${userName}`)
+    } else {
+      toast.error(`Failed to unblock ${userName}`)
+    }
+  }
 </script>
 
 <template>
   <div v-if="post" class="post-card">
-    <header class="post-header" @click="openPost">
+    <header class="post-header">
       <div class="post-avatar">
         <img v-if="post.user.photoURL" alt="User avatar" :src="post.user.photoURL">
         <span v-else>{{ userInitial }}</span>
@@ -96,23 +179,58 @@
         <div class="post-author-handle">@{{ post.user.displayName.replaceAll(' ', '_') }}</div>
       </div>
       <v-spacer />
-      <v-btn icon size="small" variant="text">
-        <v-icon>mdi-dots-horizontal</v-icon>
-      </v-btn>
+      <v-menu v-if="!isOwnPost" open-on-hover>
+        <template #activator="{ props }">
+          <v-btn icon size="small" v-bind="props" variant="text">
+            <v-icon>mdi-dots-horizontal</v-icon>
+          </v-btn>
+        </template>
+        <v-list class="rounded-lg">
+          <v-list-item class="cursor-pointer">
+            <v-icon class="mr-2" icon="mdi-emoticon-sad-outline" />
+            Not interested in this post
+          </v-list-item>
+          <v-list-item class="cursor-pointer">
+            <v-icon class="mr-2" icon="mdi-volume-off" />
+            Mute @{{ post.user.displayName.replaceAll(' ', '_') }}
+          </v-list-item>
+          <v-list-item class="cursor-pointer">
+            <v-icon class="mr-2" icon="mdi-flag-variant-outline" />
+            Report this post
+          </v-list-item>
+          <template v-if="!isBlocked">
+            <v-list-item class="cursor-pointer" @click="handleFollow">
+              <v-icon class="mr-2" :icon="isFollowing ? 'mdi-account-minus-outline' : 'mdi-account-plus-outline'" />
+              {{ isFollowing ? 'Unfollow' : 'Follow' }} @{{ post.user.displayName.replaceAll(' ', '_') }}
+            </v-list-item>
+            <v-list-item class="cursor-pointer text-danger" @click="handleBlock">
+              <v-icon class="mr-2" icon="mdi-block-helper" />
+              Block this user
+            </v-list-item>
+          </template>
+          <template v-else>
+            <v-list-item class="cursor-pointer text-danger" @click="handleUnblock">
+              <v-icon class="mr-2" icon="mdi-account-off-outline" />
+              Unblock this user
+            </v-list-item>
+          </template>
+        </v-list>
+      </v-menu>
+
     </header>
 
-    <div v-if="post.stepOne.selectedCategories.length > 0" class="post-tags">
+    <div v-if="post.stepOne.selectedCategories.length > 0" class="post-tags" @click="openPost">
       <span>{{ post.stepOne.selectedCategories.map(el => el.label).join(' / ') }}</span>
     </div>
 
-    <h2 class="post-title">
+    <h2 class="post-title" @click="openPost">
       {{ post.stepTwo.title }}
     </h2>
 
-    <p class="post-body" v-html="truncatedBody" />
+    <p class="post-body" @click="openPost" v-html="truncatedBody" />
     <button v-if="showReadMore" class="read-more" @click="readMore">Read more</button>
 
-    <div v-if="post.stepFour.emotionTags" class="post-chips">
+    <div v-if="post.stepFour.emotionTags" class="post-chips" @click="openPost">
       <span
         v-for="chip in post.stepFour.emotionTags"
         :key="chip"
@@ -123,7 +241,7 @@
       </span>
     </div>
 
-    <div v-if="post.stepFour?.recoveryTime || post.stepFour.cost" class="post-meta">
+    <div v-if="post.stepFour?.recoveryTime || post.stepFour.cost" class="post-meta" @click="openPost">
       <div v-if="post.stepFour.cost" class="meta-item">
         <span class="meta-label">💰    Cost:</span>
         <span>{{ formatNumber(post.stepFour.cost) }}</span>
@@ -134,7 +252,7 @@
       </div>
     </div>
 
-    <footer class="post-footer">
+    <footer class="post-footer" @click="openPost">
       <button class="icon-btn" :class="{ 'liked': isLiked }" :disabled="isLiking" @click.stop.prevent="handleLike">
         <v-icon size="18">{{ isLiked ? 'mdi-heart' : 'mdi-heart-outline' }}</v-icon>
         <span>{{ likeCount }}</span>
@@ -155,5 +273,23 @@
         <v-icon size="18">mdi-share-variant</v-icon>
       </button>
     </footer>
+
+    <!-- Block User Dialog -->
+    <v-dialog v-model="showBlockDialog" max-width="480">
+      <div class="bg-white rounded-lg py-6 px-6">
+        <h6 class="text-h6 text-center">Block @{{ post.user.displayName }}?</h6>
+        <p class="text-description mt-3">
+          They will be able to see your public posts, but will no longer be able to engage with them. @{{ post.user.displayName }} will also not be able to follow or message you, and you will not see notifications from them.
+        </p>
+        <v-row class="mt-3">
+          <v-col>
+            <div class="cancel-btn" @click="showBlockDialog = false">Cancel</div>
+          </v-col>
+          <v-col>
+            <div class="submit-btn" @click="confirmBlock">Block</div>
+          </v-col>
+        </v-row>
+      </div>
+    </v-dialog>
   </div>
 </template>

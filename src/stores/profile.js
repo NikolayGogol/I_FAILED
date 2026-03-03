@@ -91,7 +91,7 @@ export const useProfileStore = defineStore('profile', {
       }
     },
 
-    async updateUserProfile ({ displayName, photoFile }) {
+    async updateUserProfile ({ displayName, photoFile, bio }) {
       this.loading = true
       this.error = null
       const authStore = useAuthStore()
@@ -104,6 +104,7 @@ export const useProfileStore = defineStore('profile', {
 
         let newPhotoURL = user.photoURL
         const newDisplayName = displayName || user.displayName
+        const newBio = bio === undefined ? authStore.user?.bio : bio
 
         if (photoFile) {
           const fileRef = storageRef(storage, `profile_photos/${user.uid}/${photoFile.name}`)
@@ -120,6 +121,7 @@ export const useProfileStore = defineStore('profile', {
         await updateDoc(userDocRef, {
           displayName: newDisplayName,
           photoURL: newPhotoURL,
+          bio: newBio,
         })
 
         authStore.$patch({
@@ -127,6 +129,7 @@ export const useProfileStore = defineStore('profile', {
             ...authStore.user,
             displayName: newDisplayName,
             photoURL: newPhotoURL,
+            bio: newBio,
           },
         })
 

@@ -3,6 +3,7 @@
   import { storeToRefs } from 'pinia'
   import { computed, onMounted, ref } from 'vue'
   import { useToast } from 'vue-toastification'
+  import FormTextarea from '@/components/FormTextarea.vue'
   import { useAuthStore } from '@/stores/auth.js'
   import { useProfileStore } from '@/stores/profile.js'
   import '@/styles/components/profile/user-card.scss'
@@ -16,6 +17,7 @@
 
   const editDialog = ref(false)
   const newDisplayName = ref('')
+  const newBio = ref('')
   const newPhotoFile = ref(null)
   const photoPreviewUrl = ref(null)
 
@@ -46,6 +48,7 @@
 
   function openEditDialog () {
     newDisplayName.value = displayName.value
+    newBio.value = user.value?.bio || ''
     photoPreviewUrl.value = photoURL.value
     newPhotoFile.value = null
     editDialog.value = true
@@ -68,6 +71,7 @@
       await profileStore.updateUserProfile({
         displayName: newDisplayName.value,
         photoFile: newPhotoFile.value,
+        bio: newBio.value,
       })
       toast.success('Profile updated successfully!')
       editDialog.value = false
@@ -90,14 +94,13 @@
         <span v-else>{{ initials }}</span>
       </div>
 
-      <div class="user-main-info">
-        <div class="user-name-row">
+      <div class="user-main-info w-100">
+        <div class="user-name-row align-center justify-between">
           <h2>{{ displayName }}</h2>
-          <button class="edit-profile-btn" @click="openEditDialog">Edit profile</button>
+          <button class="cancel-btn" @click="openEditDialog">Edit profile</button>
         </div>
         <p class="user-email">@{{ displayName.replaceAll(' ', '_') }}</p>
-        <p class="user-bio">Entrepreneur learning from startup failures. Sharing my journey to help others.</p>
-
+        <p class="user-bio">{{ user?.bio || 'Entrepreneur learning from startup failures. Sharing my journey to help others.' }}</p>
         <div class="user-meta d-flex align-center">
           <v-icon class="mr-1" icon="mdi-calendar-blank-outline" />
           <span class="join-date">Joined {{ joinDate }}</span>
@@ -138,9 +141,12 @@
     <!-- Edit Profile Dialog -->
     <v-dialog v-model="editDialog" max-width="500px">
       <v-card class="edit-profile-dialog">
-        <v-card-title>Edit Profile</v-card-title>
+        <div class="d-flex justify-end">
+          <v-icon class="cursor-pointer" icon="mdi-close" @click="editDialog = false" />
+        </div>
+        <v-card-title class="text-center">Edit Profile</v-card-title>
         <v-card-text>
-          <div class="edit-avatar-section">
+          <div class="edit-avatar-section position-relative">
             <div class="edit-avatar">
               <v-img
                 v-if="photoPreviewUrl"
@@ -158,29 +164,42 @@
               @change="onFileChange"
             >
             <label class="upload-btn" for="photo-upload">
-              Change Photo
+              <v-icon icon="mdi-camera-outline" />
             </label>
           </div>
 
           <form-input
             v-model="newDisplayName"
             density="comfortable"
+            hide-details
             label="Display Name"
             variant="outlined"
           />
+          <div class="mt-2">
+            <form-textarea
+              v-model="newBio"
+              auto-grow
+              density="comfortable"
+              hide-details
+              label="Bio"
+              rows="3"
+              variant="outlined"
+            />
+          </div>
         </v-card-text>
-        <v-card-actions>
-          <v-spacer />
-          <v-btn text @click="editDialog = false">Cancel</v-btn>
-          <v-btn
-            color="primary"
-            :loading="loading"
-            variant="tonal"
-            @click="handleUpdateProfile"
-          >
-            Save
-          </v-btn>
-        </v-card-actions>
+        <v-row class="mt-1 px-4">
+          <v-col>
+            <div class="cancel-btn" @click="editDialog = false">Cancel</div>
+          </v-col>
+          <v-col>
+            <div
+              class="submit-btn"
+              @click="handleUpdateProfile"
+            >
+              Save
+            </div>
+          </v-col>
+        </v-row>
       </v-card>
     </v-dialog>
   </div>
