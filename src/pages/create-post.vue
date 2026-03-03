@@ -1,52 +1,66 @@
 <route lang="json">
 {
-"meta": {
-"layout": "MainLayout",
-"auth": true
-}
+  "meta": {
+    "layout": "MainLayout",
+    "auth": true
+  }
 }
 </route>
 
 <script setup>
-  import { computed, ref } from 'vue'
-  import { useRouter } from 'vue-router'
-  import StepFive from '@/components/create-post/step-five.vue'
-  import StepFour from '@/components/create-post/step-four.vue'
-  import StepOne from '@/components/create-post/step-one.vue'
-  import StepThree from '@/components/create-post/step-three.vue'
-  import StepTwo from '@/components/create-post/step-two.vue'
-  import { useCreatePostStore } from '@/stores/create-post.js'
-  import '@/styles/pages/create-post.scss'
+import { computed, reactive, ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
+import StepFive from '@/components/create-post/step-five.vue'
+import StepFour from '@/components/create-post/step-four.vue'
+import StepOne from '@/components/create-post/step-one.vue'
+import StepThree from '@/components/create-post/step-three.vue'
+import StepTwo from '@/components/create-post/step-two.vue'
+import { useCreatePostStore } from '@/stores/create-post.js'
+import '@/styles/pages/create-post.scss'
 
-  const router = useRouter()
-  const step = ref(1)
-  const { createPost } = useCreatePostStore()
-  const isLoading = ref(false)
-  //
-  const progress = computed(() => {
-    return (step.value / 5) * 100
-  })
-  const isValid = ref(false)
+const router = useRouter()
+const step = ref(1)
+const { createPost } = useCreatePostStore()
+const isLoading = ref(false)
 
-  function submit () {
-    isLoading.value = true
-    createPost().then(() => {
+const stepsValidity = reactive({
+  1: false,
+  2: false,
+  3: false,
+  4: false,
+  5: false,
+})
+
+const progress = computed(() => (step.value / 5) * 100)
+const isValid = computed(() => stepsValidity[step.value])
+
+function updateStepValidity(stepNumber, isValid) {
+  stepsValidity[stepNumber] = isValid
+}
+
+function submit() {
+  isLoading.value = true
+  createPost()
+    .then(() => {
       router.push('/post-success-created')
       sessionStorage.setItem('post-success-created', 'true')
-    }).finally(() => {
+    })
+    .finally(() => {
       isLoading.value = false
     })
-  }
+}
 
-  function nextStep () {
+function nextStep() {
+  if (step.value < 5) {
     step.value++
-    isValid.value = false
   }
+}
 
-  function prevStep () {
+function prevStep() {
+  if (step.value > 1) {
     step.value--
-    isValid.value = true
   }
+}
 </script>
 
 <template>
@@ -81,19 +95,19 @@
     <div class="post-card-content">
       <v-window v-model="step" class="step-content">
         <v-window-item :value="1">
-          <step-one @is-valid="isValid = $event" />
+          <step-one @is-valid="updateStepValidity(1, $event)" />
         </v-window-item>
         <v-window-item :value="2">
-          <step-two @is-valid="isValid = $event" />
+          <step-two @is-valid="updateStepValidity(2, $event)" />
         </v-window-item>
         <v-window-item :value="3">
-          <step-three @is-valid="isValid = $event" />
+          <step-three @is-valid="updateStepValidity(3, $event)" />
         </v-window-item>
         <v-window-item :value="4">
-          <step-four @is-valid="isValid = $event" />
+          <step-four @is-valid="updateStepValidity(4, $event)" />
         </v-window-item>
         <v-window-item :value="5">
-          <step-five @is-valid="isValid = $event" />
+          <step-five @is-valid="updateStepValidity(5, $event)" />
         </v-window-item>
       </v-window>
 
