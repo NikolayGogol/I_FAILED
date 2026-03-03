@@ -1,6 +1,6 @@
+import { arrayUnion, doc, updateDoc } from 'firebase/firestore'
 import { defineStore } from 'pinia'
-import { doc, updateDoc, arrayUnion } from 'firebase/firestore'
-import { db, auth } from '@/firebase'
+import { db } from '@/firebase'
 import { useAuthStore } from '@/stores/auth'
 
 export const useFeedStore = defineStore('feed', {

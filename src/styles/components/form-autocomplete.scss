@@ -1,0 +1,58 @@
+@use '../settings' as *;
+
+.form-autocomplete {
+  position: relative;
+
+  input {
+    border: 1px solid $color-border;
+    background-color: $color-surface;
+    border-radius: $radius-md;
+    height: 48px;
+    padding: $spacing-md;
+
+    &:focus {
+      outline: none;
+    }
+  }
+
+  .suggestion-list {
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    width: 100%;
+    background-color: $color-surface;
+    border: 1px solid $color-border;
+    border-radius: $radius-md;
+    z-index: 99;
+    max-height: 250px;
+    overflow-y: auto;
+
+    li {
+      list-style: none;
+      padding: $spacing-md;
+
+      &:hover {
+        background-color: $color-background;
+        cursor: pointer;
+      }
+    }
+  }
+
+  .add-btn {
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 15px;
+  }
+
+  .selected-tags-list {
+    display: flex;
+    flex-wrap: wrap;
+
+    .tag-chip {
+      font-size: 12px;
+      border-radius: $radius-md;
+    }
+  }
+}

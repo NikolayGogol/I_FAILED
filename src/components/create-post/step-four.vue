@@ -1,6 +1,7 @@
 <script setup>
-  import { ref } from 'vue'
+  import { onMounted } from 'vue'
   import { useToast } from 'vue-toastification'
+  import FormAutocomplete from '@/components/FormAutocomplete.vue'
   import FormInput from '@/components/FormInput.vue'
   import { emotionTags, recoveryTimeOptions } from '@/models/categories.js'
   import { useCreatePostStore } from '@/stores/create-post'
@@ -10,24 +11,12 @@
   const store = useCreatePostStore()
   const toast = useToast()
   const emit = defineEmits(['isValid'])
-  const newTag = ref('')
   // eslint-disable-next-line vue/custom-event-name-casing
   emit('isValid', true)
 
-  function addTag () {
-    if (!newTag.value.trim()) {
-      toast.error('You can not add empty tag')
-      return
-    }
-    if (newTag.value.trim()) {
-      store.stepFour.tags.push(newTag.value.trim())
-      newTag.value = ''
-    }
-  }
-
-  function removeTag (index) {
-    store.stepFour.tags.splice(index, 1)
-  }
+  onMounted(() => {
+    store.fetchSuggestedTags()
+  })
 
   function handleEmotionChange (val) {
     if (val.length > 3) {
@@ -95,35 +84,11 @@
 
     <div class="form-group mt-6">
       <label class="form-label">Tags</label>
-      <p class="form-hint mb-3">Suggested from popular tags</p>
-      <div v-if="store.stepFour.tags.length > 0" class="tags-container my-3">
-        <v-chip
-          v-for="(tag, index) in store.stepFour.tags"
-          :key="index"
-          class="tag-chip mr-2"
-          closable
-          @click:close="removeTag(index)"
-        >
-          {{ tag }}
-        </v-chip>
-      </div>
-
-      <div class="add-tag-wrapper w-100 d-flex align-center">
-        <FormInput
-          v-model="newTag"
-          class="add-tag-input"
-          hide-details
-          placeholder="Add tag"
-          @keyup.enter="addTag"
-        />
-        <div
-          class="add-tag-btn"
-          :class="{disabled: !newTag}"
-          @click="addTag"
-        >
-          Add
-        </div>
-      </div>
+      <FormAutocomplete
+        v-model="store.stepFour.tags"
+        :options="store.suggestedTags"
+        placeholder="Add tag"
+      />
     </div>
   </div>
 </template>

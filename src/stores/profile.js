@@ -101,7 +101,7 @@ export const useProfileStore = defineStore('profile', {
         const postsQuery = query(collection(db, 'posts'), where('uid', '==', userId))
         const postsSnapshot = await getDocs(postsQuery)
 
-        postsSnapshot.forEach(doc => {
+        for (const doc of postsSnapshot) {
           const data = doc.data()
           activities.push({
             type: 'post',
@@ -111,13 +111,13 @@ export const useProfileStore = defineStore('profile', {
             createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : new Date(data.createdAt),
             image: data.stepTwo?.images?.[0] || null,
           })
-        })
+        }
 
         // 2. Fetch user's comments
         const commentsQuery = query(collection(db, 'comments'), where('user.uid', '==', userId))
         const commentsSnapshot = await getDocs(commentsQuery)
 
-        commentsSnapshot.forEach(doc => {
+        for (const doc of commentsSnapshot) {
           const data = doc.data()
           activities.push({
             type: 'comment',
@@ -126,7 +126,7 @@ export const useProfileStore = defineStore('profile', {
             content: data.text || '',
             createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : new Date(data.createdAt),
           })
-        })
+        }
 
         // Sort by date descending
         activities.sort((a, b) => b.createdAt - a.createdAt)
@@ -152,15 +152,15 @@ export const useProfileStore = defineStore('profile', {
         const commentsQuery = query(collection(db, 'comments'), where('user.uid', '==', userId))
         const commentsSnapshot = await getDocs(commentsQuery)
 
-        commentsSnapshot.forEach(doc => {
+        for (const doc of commentsSnapshot) {
           const data = doc.data()
           if (data.postId) {
             postIds.add(data.postId)
           }
-        })
+        }
 
         // 2. Fetch each post details
-        const fetchPromises = Array.from(postIds).map(async (postId) => {
+        const fetchPromises = Array.from(postIds).map(async postId => {
           const postDocRef = doc(db, 'posts', postId)
           const postDoc = await getDoc(postDocRef)
           if (postDoc.exists()) {
@@ -171,11 +171,11 @@ export const useProfileStore = defineStore('profile', {
 
         const fetchedPosts = await Promise.all(fetchPromises)
 
-        fetchedPosts.forEach(post => {
+        for (const post of fetchedPosts) {
           if (post) {
             posts.push(post)
           }
-        })
+        }
 
         return posts
       } catch (error) {

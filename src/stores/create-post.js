@@ -1,10 +1,10 @@
-import { addDoc, collection, serverTimestamp, updateDoc } from 'firebase/firestore'
+import { addDoc, collection, getDocs, limit, orderBy, query, serverTimestamp, updateDoc } from 'firebase/firestore'
 import { defineStore } from 'pinia'
 import { useFirestore } from 'vuefire'
 // eslint-disable-next-line import/no-duplicates
 import { getDownloadURL, ref, uploadBytes } from '@/firebase' // Correctly import storage from your firebase setup
 // eslint-disable-next-line import/no-duplicates
-import { storage } from '@/firebase' // Explicitly import storage
+import { db, storage } from '@/firebase' // Explicitly import storage
 import { noAvatar } from '@/models/no-data.js'
 import { useAuthStore } from '@/stores/auth.js'
 
@@ -43,8 +43,35 @@ export const useCreatePostStore = defineStore('createPost', {
       enableTriggerWarning: false,
       scheduleDate: null,
     },
+    suggestedTags: [],
   }),
   actions: {
+    async fetchSuggestedTags () {
+      if (this.suggestedTags.length > 0) {
+        return
+      }
+
+      try {
+        const postsRef = collection(db, collection_db)
+        const q = query(postsRef, orderBy('createdAt', 'desc'), limit(50))
+        const querySnapshot = await getDocs(q)
+
+        const tagsSet = new Set()
+        // Correctly iterate over the documents in the snapshot
+        for (const doc of querySnapshot.docs) {
+          const data = doc.data()
+          if (data.stepFour && data.stepFour.tags && Array.isArray(data.stepFour.tags)) {
+            for (const tag of data.stepFour.tags) {
+              tagsSet.add(tag)
+            }
+          }
+        }
+
+        this.suggestedTags = Array.from(tagsSet)
+      } catch (error) {
+        console.error('Error fetching suggested tags:', error)
+      }
+    },
     resetState () {
       this.stepOne = {
         selectedCategories: [],
