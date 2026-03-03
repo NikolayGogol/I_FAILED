@@ -81,7 +81,7 @@
           </div>
 
         </template>
-        <v-list>
+        <v-list color="primary">
           <template v-if="currentUserName">
             <v-list-item
               v-for="(item, index) in items"
