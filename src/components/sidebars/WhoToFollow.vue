@@ -23,7 +23,7 @@
 
   const sortedUsers = computed(() => {
     return [...filteredUsers.value]
-      .sort((a, b) => (b.postCount || 0) - (a.postCount || 0))
+      .toSorted((a, b) => (b.postCount || 0) - (a.postCount || 0))
       .slice(0, 5)
   })
 

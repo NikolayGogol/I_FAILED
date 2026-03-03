@@ -8,7 +8,7 @@
 </route>
 
 <script setup>
-  import { computed, reactive, ref, watch } from 'vue'
+  import { computed, reactive, ref } from 'vue'
   import { useRouter } from 'vue-router'
   import StepFive from '@/components/create-post/step-five.vue'
   import StepFour from '@/components/create-post/step-four.vue'
