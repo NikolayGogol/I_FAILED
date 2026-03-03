@@ -78,8 +78,16 @@ export const useMainStore = defineStore('main', {
           }
 
           const newPosts = []
+          const blockedUsers = authStore.user?.blockedUsers || []
+
           for (const postDoc of querySnapshot.docs) {
             const postData = postDoc.data()
+
+            // Skip posts from blocked users
+            if (blockedUsers.includes(postData.uid)) {
+              continue
+            }
+
             const finalPost = { id: postDoc.id, ...postData }
 
             if (postData.uid) {

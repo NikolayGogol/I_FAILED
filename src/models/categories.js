@@ -18,16 +18,7 @@ export const recoveryTimeOptions = [
   { title: '> 1 year', value: 'over-1-year' },
 ]
 export const emotionTags = [
-  { label: 'Painful', emoji: '😔', value: 'painful' },
-  { label: 'Learning', emoji: '💡', value: 'learning' },
-  { label: 'Embarrassing', emoji: '😳', value: 'embarrassing' },
-  { label: 'Funny', emoji: '😂', value: 'funny' },
-  { label: 'Sad', emoji: '😢', value: 'sad' },
-  { label: 'Angry', emoji: '😠', value: 'angry' },
-  { label: 'Frustrating', emoji: '😤', value: 'frustrating' },
-  { label: 'Relieved', emoji: '😌', value: 'relieved' },
-  { label: 'Hopeful', emoji: '🤞', value: 'hopeful' },
-  { label: 'Scary', emoji: '😱', value: 'scary' },
-  { label: 'Regret', emoji: '😞', value: 'regret' },
-  { label: 'Growth', emoji: '🌱', value: 'growth' },
+  { label: 'Painful', emoji: '🥺', value: 'painful' },
+  { label: 'Embarrassing', emoji: '😅', value: 'embarrassing' },
+  { label: 'Learning', emoji: '🧠', value: 'learning' },
 ]

@@ -150,7 +150,7 @@
 
     const success = await whoToFollowStore.blockUser(userId)
     if (success) {
-      toast.info(`Blocked ${userName}`)
+      toast.info('User blocked, and you will no longer see their posts')
     } else {
       toast.error(`Failed to block ${userName}`)
     }
@@ -184,7 +184,7 @@
 </script>
 
 <template>
-  <div v-if="post && !isMuted" class="post-card">
+  <div v-if="post && !isMuted && !isBlocked" class="post-card">
     <header class="post-header">
       <div class="post-avatar">
         <img v-if="post.user.photoURL" alt="User avatar" :src="post.user.photoURL">

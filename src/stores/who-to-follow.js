@@ -3,6 +3,7 @@ import {
   arrayUnion,
   collection,
   doc,
+  getDoc,
   getDocs,
   limit,
   query,
@@ -46,6 +47,22 @@ export const useWhoToFollowStore = defineStore('whoToFollow', {
       }
       const currentUserId = authStore.user.uid
       const userToFollowRef = doc(db, 'users', userIdToFollow)
+
+      // Check if the target user has blocked the current user
+      try {
+        const userToFollowSnap = await getDoc(userToFollowRef)
+        if (userToFollowSnap.exists()) {
+          const userData = userToFollowSnap.data()
+          if (userData.blockedUsers && userData.blockedUsers.includes(currentUserId)) {
+            console.warn('Cannot follow this user as they have blocked you.')
+            return false
+          }
+        }
+      } catch (error) {
+        console.error('Error checking user block status:', error)
+        return false
+      }
+
       const currentUserRef = doc(db, 'users', currentUserId)
 
       try {
