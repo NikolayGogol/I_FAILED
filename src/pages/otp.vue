@@ -20,14 +20,14 @@
     </div>
 
     <v-form class="verify-form-fields" @submit.prevent="handleVerify">
-      <div class="otp-inputs d-flex justify-center ga-5 mb-6">
-        <v-text-field
+      <div class="otp-inputs d-flex justify-center ga-3 w-100">
+        <form-input
           v-for="(digit, index) in 6"
           :key="index"
           :ref="el => { if (el) inputRefs[index] = el }"
           v-model="code[index]"
           autocomplete="one-time-code"
-          class="otp-field text-center bg-white"
+          class="otp-field text-center h-100"
           density="comfortable"
           hide-details
           maxlength="1"
@@ -39,7 +39,7 @@
         />
       </div>
 
-      <div class="resend-code text-center mb-6">
+      <div class="resend-code text-center mb-2">
         <span class="text-body-2 text-medium-emphasis">Don't receive the code? </span>
         <button
           class="resend-link text-primary font-weight-bold"

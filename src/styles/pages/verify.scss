@@ -35,6 +35,19 @@
     }
   }
 
+  .verify-form-fields {
+    .otp-inputs {
+      .form-custom-input {
+        width: 96px;
+        height: 76px;
+
+        input {
+          height: 100%;
+        }
+      }
+    }
+  }
+
   .verify-prompt {
     text-align: center;
     color: $color-text-secondary;
@@ -43,27 +56,11 @@
 
     @include media-up($breakpoint-sm) {
       font-size: $font-size-lg;
-      margin-bottom: $spacing-xl * 1.5;
-    }
-  }
-
-  .otp-inputs {
-    gap: $spacing-sm;
-    justify-content: center;
-
-    .otp-field {
-      width: $otp-width-sm;
-      height: $otp-height-sm;
-
-      @include media-up($breakpoint-sm) {
-        width: $otp-width-md;
-        height: $otp-height-md;
-      }
     }
   }
 
   .resend-code {
-    margin-top: $spacing-lg;
+    margin-top: $spacing-sm-md;
     margin-bottom: $spacing-lg;
     text-align: center;
 

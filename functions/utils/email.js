@@ -33,6 +33,7 @@ async function sendVerificationEmail (email, verificationLink) {
             </p>
             <div style="text-align:center;margin:24px 0 16px;">
               <a href="${verificationLink}"
+              target="_blank"
                  style="display:inline-block;background-color:${colors.primary};color:${colors.surface};text-decoration:none;padding:12px 28px;border-radius:999px;font-size:14px;font-weight:600;">
                 Verify email
               </a>
@@ -80,7 +81,8 @@ async function sendWelcomeEmail (email, displayName) {
               You can start by creating your first post or exploring what others have shared in the feed.
             </p>
             <div style="text-align:center;margin:24px 0 8px;">
-              <a href="${process.env.APP_URL || '#'}"
+              <a href="${process.env.VERIFY_LINK || '#'}"
+              target="_blank"
                  style="display:inline-block;background-color:${colors.primary};color:${colors.surface};text-decoration:none;padding:12px 28px;border-radius:999px;font-size:14px;font-weight:600;">
                 Go to feed
               </a>

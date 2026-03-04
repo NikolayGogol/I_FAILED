@@ -28,10 +28,10 @@
   const loading = ref(false)
 
   const whyJoiningOptions = [
-    'Personal use',
-    'Work / Business',
-    'Learning',
-    'Other',
+    'Personal Growth',
+    'Business',
+    'Support',
+    'Curiosity',
   ]
 
   const emailRules = [
