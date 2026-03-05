@@ -7,7 +7,7 @@
 // Composables
 import { createApp } from 'vue'
 
-import Toast from 'vue-toastification'
+import Toast, { POSITION } from 'vue-toastification'
 
 // Plugins
 import { registerPlugins } from '@/plugins'
@@ -20,7 +20,11 @@ import 'vue-toastification/dist/index.css'
 
 const app = createApp(App)
 
+const toastOptions = {
+  position: POSITION.BOTTOM_CENTER,
+}
+
 registerPlugins(app)
-app.use(Toast)
+app.use(Toast, toastOptions)
 
 app.mount('#app')

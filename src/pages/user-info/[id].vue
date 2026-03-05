@@ -9,7 +9,7 @@
 
 <script setup>
   import { storeToRefs } from 'pinia'
-  import { computed, onMounted, ref } from 'vue'
+  import { computed, onMounted, ref, watch } from 'vue'
   import { useRoute } from 'vue-router'
   import { useToast } from 'vue-toastification'
   import PostCard from '@/components/feed/PostCard.vue'
@@ -41,6 +41,7 @@
   async function toggleFollow () {
     await (isFollowing.value ? profileStore.unfollowUser(userId) : profileStore.followUser(userId))
     await userInfoStore.fetchUser(userId)
+    toast.info(isFollowing.value ? `Followed ${user.value.displayName}` : `Unfollowed ${user.value.displayName}`)
   }
 
   function copyProfileLink () {
@@ -78,6 +79,12 @@
   function selectTab (tab, index) {
     activeTabIndex.value = index
   }
+
+  watch(() => route.params.id, id => {
+    userInfoStore.fetchUser(id)
+    userInfoStore.fetchUserPosts(id)
+    userInfoStore.fetchUserActivity(id)
+  })
 </script>
 
 <template>
@@ -108,17 +115,20 @@
                 <v-list-item @click="aboutAccount">
                   <v-list-item-title>
                     <v-icon class="mr-2" icon="mdi-information-outline" />
-                    About this account</v-list-item-title>
+                    About this account
+                  </v-list-item-title>
                 </v-list-item>
                 <v-list-item @click="copyProfileLink">
                   <v-list-item-title>
                     <v-icon class="mr-2" icon="mdi-paperclip" />
-                    Copy link to profile</v-list-item-title>
+                    Copy link to profile
+                  </v-list-item-title>
                 </v-list-item>
                 <v-list-item v-if="!isCurrentUser" class="text-error" @click="blockUser">
                   <v-list-item-title>
                     <v-icon class="mr-2" icon="mdi-block-helper" />
-                    Block this user</v-list-item-title>
+                    Block this user
+                  </v-list-item-title>
                 </v-list-item>
               </v-list>
             </v-menu>

@@ -18,7 +18,10 @@
     if (!authStore.user) {
       return whoToFollowStore.users
     }
-    return whoToFollowStore.users.filter(user => user.id !== authStore.user.uid)
+    const blockedUserIds = authStore.user.blockedUsers || []
+    return whoToFollowStore.users.filter(user => {
+      return user.id !== authStore.user.uid && !blockedUserIds.includes(user.id)
+    })
   })
 
   const sortedUsers = computed(() => {
@@ -74,6 +77,10 @@
       }
     }
   }
+
+  function openUserProfile (user) {
+    router.push(`/user-info/${user.id}`)
+  }
 </script>
 <template>
   <section class="right-card follow-card">
@@ -94,7 +101,8 @@
         class="follow-row py-2"
       >
         <div
-          class="follow-avatar mr-3"
+          class="follow-avatar cursor-pointer mr-3"
+          @click="openUserProfile(user)"
         >
           <img v-if="user.photoURL" alt="User avatar" class="avatar-image" :src="user.photoURL">
           <span
@@ -103,7 +111,7 @@
             :style="{ backgroundColor: getRandomColor() }"
           >{{ getInitials(user.displayName) }}</span>
         </div>
-        <div class="follow-info">
+        <div class="follow-info cursor-pointer" @click="openUserProfile(user)">
           <div class="follow-name">
             {{ user.displayName }}
             <v-tooltip

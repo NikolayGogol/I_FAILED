@@ -40,3 +40,17 @@
   font-weight: 400;
   color: #808079;
 }
+
+.Vue-Toastification__toast--info {
+  background-color: #1E5BBF;
+}
+
+.Vue-Toastification__toast {
+  min-height: auto;
+  padding: 15px;
+  border-radius: 12px;
+
+  svg {
+    display: none;
+  }
+}

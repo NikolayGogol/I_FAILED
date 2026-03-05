@@ -1,6 +1,6 @@
 <script setup>
   import { computed, onMounted, ref } from 'vue'
-  import { useRouter } from 'vue-router'
+  import { useRoute, useRouter } from 'vue-router'
   import { useToast } from 'vue-toastification'
   import { auth } from '@/firebase'
   import { useAuthStore } from '@/stores/auth.js'
@@ -22,6 +22,7 @@
   const whoToFollowStore = useWhoToFollowStore()
   const feedStore = useFeedStore()
   const router = useRouter()
+  const route = useRoute()
   const toast = useToast()
 
   const isExpanded = ref(false)
@@ -55,6 +56,7 @@
   })
 
   const isMuted = computed(() => {
+    if (route.name.includes('user-info')) return false
     if (!authStore.user || !authStore.user.mutedPosts) return false
     return authStore.user.mutedPosts.includes(p.post.id)
   })
@@ -109,7 +111,7 @@
       isLiked.value = originalIsLiked
       likeCount.value = originalLikeCount
       console.error('Failed to update like status:', result.error)
-      // Optionally, show a notification to the user
+    // Optionally, show a notification to the user
     }
 
     isLiking.value = false
@@ -121,7 +123,7 @@
 
   function openUserProfile () {
     if (p.post.stepFive?.isAnonymous) return
-    router.push(`/user-info/${p.post.uid}`)
+    authStore.user.uid === p.post.uid ? router.push('/profile') : router.push(`/user-info/${p.post.uid}`)
   }
 
   async function handleFollow () {
@@ -213,43 +215,43 @@
         <div class="post-author-handle">@{{ post.user.displayName.replaceAll(' ', '_') }}</div>
       </div>
       <v-spacer />
-      <slot name="actions">
-        <v-menu v-if="!isOwnPost" open-on-hover>
-          <template #activator="{ props }">
-            <v-btn icon size="small" v-bind="props" variant="text">
-              <v-icon>mdi-dots-horizontal</v-icon>
-            </v-btn>
-          </template>
-          <v-list class="rounded-lg">
-            <v-list-item class="cursor-pointer" @click="handleMutePost">
-              <v-icon class="mr-2" icon="mdi-volume-off" />
-              Hide this post
+      <v-menu v-if="!isOwnPost" open-on-hover>
+        <template #activator="{ props }">
+          <v-btn icon size="small" v-bind="props" variant="text">
+            <v-icon>mdi-dots-horizontal</v-icon>
+          </v-btn>
+        </template>
+        <v-list class="rounded-lg">
+          <v-list-item class="cursor-pointer" @click="handleMutePost">
+            <v-icon class="mr-2" icon="mdi-volume-off" />
+            Hide this post
+          </v-list-item>
+          <template v-if="!isBlocked">
+            <v-list-item class="cursor-pointer" @click="handleFollow">
+              <v-icon class="mr-2" :icon="isFollowing ? 'mdi-account-minus-outline' : 'mdi-account-plus-outline'" />
+              {{ isFollowing ? 'Unfollow' : 'Follow' }} @{{ post.user.displayName.replaceAll(' ', '_') }}
             </v-list-item>
-            <template v-if="!isBlocked">
-              <v-list-item class="cursor-pointer" @click="handleFollow">
-                <v-icon class="mr-2" :icon="isFollowing ? 'mdi-account-minus-outline' : 'mdi-account-plus-outline'" />
-                {{ isFollowing ? 'Unfollow' : 'Follow' }} @{{ post.user.displayName.replaceAll(' ', '_') }}
-              </v-list-item>
-              <v-list-item class="cursor-pointer text-danger" @click="handleBlock">
-                <v-icon class="mr-2" icon="mdi-block-helper" />
-                Block this user
-              </v-list-item>
-            </template>
-            <template v-else>
-              <v-list-item class="cursor-pointer text-danger" @click="handleUnblock">
-                <v-icon class="mr-2" icon="mdi-account-off-outline" />
-                Unblock this user
-              </v-list-item>
-            </template>
-          </v-list>
-        </v-menu>
-      </slot>
+            <v-list-item class="cursor-pointer text-danger" @click="handleBlock">
+              <v-icon class="mr-2" icon="mdi-block-helper" />
+              Block this user
+            </v-list-item>
+          </template>
+          <template v-else>
+            <v-list-item class="cursor-pointer text-danger" @click="handleUnblock">
+              <v-icon class="mr-2" icon="mdi-account-off-outline" />
+              Unblock this user
+            </v-list-item>
+          </template>
+        </v-list>
+      </v-menu>
 
     </header>
     <div v-if="post.stepFive.enableTriggerWarning && !showSensitiveContent" class="sensitive-content">
       <div class="content">
         <p>
-          ⚠️This post contains triggers: <span class="text-capitalize">{{ post.stepFive?.triggerTags?.join(',') }}</span>
+          ⚠️This post contains triggers: <span class="text-capitalize">{{
+            post.stepFive?.triggerTags?.join(',')
+          }}</span>
         </p>
         <div class="submit-btn mt-2" @click="showSensitiveContent = true">Show post</div>
       </div>
@@ -310,7 +312,9 @@
       <div class="bg-white rounded-lg py-6 px-6">
         <h6 class="text-h6 text-center">Block @{{ post.user.displayName }}?</h6>
         <p class="text-description mt-3">
-          They will be able to see your public posts, but will no longer be able to engage with them. @{{ post.user.displayName }} will also not be able to follow or message you, and you will not see notifications from them.
+          They will be able to see your public posts, but will no longer be able to engage with them.
+          @{{ post.user.displayName }} will also not be able to follow or message you, and you will not see
+          notifications from them.
         </p>
         <v-row class="mt-3">
           <v-col>
