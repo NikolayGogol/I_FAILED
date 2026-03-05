@@ -72,6 +72,7 @@ jobs:
           echo "VERIFY_LINK=${{ vars.VERIFY_LINK }}" >> functions/.env
           echo "POST_COLLECTION=${{ vars.POST_COLLECTION }}" >> functions/.env
           echo "POST_COLLECTION_SCEDULED=${{ vars.POST_COLLECTION_SCEDULED }}" >> functions/.env
+          echo "POST_PASSWORD_RESET=${{ vars.POST_PASSWORD_RESET }}" >> functions/.env
 
       - name: Install Function Dependencies
         run: cd functions && npm ci

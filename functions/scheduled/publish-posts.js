@@ -1,58 +1,76 @@
-const admin = require('firebase-admin')
-const { onSchedule } = require('firebase-functions/v2/scheduler')
+// Import required modules
+const admin = require('firebase-admin');
+const { onSchedule } = require('firebase-functions/v2/scheduler');
 
+/**
+ * A scheduled Cloud Function that runs periodically to publish scheduled posts.
+ * It checks for posts in a 'scheduled' collection that are due to be published,
+ * moves them to the main 'published' collection, and updates their status.
+ */
 exports.publishScheduledPosts = onSchedule({
+  // Define the schedule for this function to run
   schedule: 'every 10 minutes',
-  timeZone: 'Europe/Kiev', // Set your timezone
-}, async event => {
-  console.log(event)
-  const db = admin.firestore()
-  const now = admin.firestore.Timestamp.now()
-  const scheduledCollection = process.env.POST_COLLECTION_SCEDULED || 'scheduledPosts'
-  const publishedCollection = process.env.POST_COLLECTION || 'posts'
+  // Set the timezone for the schedule
+  timeZone: 'Europe/Kiev',
+}, async (event) => {
+  console.log(event);
+  // Initialize Firestore
+  const db = admin.firestore();
+  // Get the current timestamp
+  const now = admin.firestore.Timestamp.now();
 
-  console.log(`Checking for scheduled posts at ${new Date().toISOString()}...`)
+  // Define collection names from environment variables, with fallbacks
+  const scheduledCollection = process.env.POST_COLLECTION_SCEDULED || 'scheduledPosts';
+  const publishedCollection = process.env.POST_COLLECTION || 'posts';
+
+  console.log(`Checking for scheduled posts at ${new Date().toISOString()}...`);
 
   try {
-    // Query for scheduled posts that are due
+    // Query the scheduled posts collection for documents where 'scheduledAt' is in the past
     const snapshot = await db.collection(scheduledCollection)
       .where('scheduledAt', '<=', now)
-      .get()
+      .get();
 
+    // If no posts are due, log and exit
     if (snapshot.empty) {
-      console.log('No scheduled posts to publish.')
-      return
+      console.log('No scheduled posts to publish.');
+      return;
     }
 
-    console.log(`Found ${snapshot.size} posts to publish.`)
+    console.log(`Found ${snapshot.size} posts to publish.`);
 
-    const batch = db.batch()
+    // Create a Firestore batch to perform multiple writes as a single atomic operation
+    const batch = db.batch();
 
+    // Iterate over the documents found
     for (const doc of snapshot.docs) {
-      const postData = doc.data()
+      const postData = doc.data();
 
-      // Prepare data for the published collection
+      // Prepare the data for the new document in the published collection
       const publishedData = {
         ...postData,
-        status: 'published',
-        publishedAt: now,
-        createdAt: now,
-      }
+        status: 'published', // Update status
+        publishedAt: now,    // Set the publication timestamp
+        createdAt: now,      // Set the creation timestamp
+      };
 
-      // Remove scheduledAt field
-      delete publishedData.scheduledAt
+      // Remove the 'scheduledAt' field as it's no longer needed
+      delete publishedData.scheduledAt;
 
-      // Create a new document in the published collection with the same ID
-      const newDocRef = db.collection(publishedCollection).doc(doc.id)
-      batch.set(newDocRef, publishedData)
+      // Create a reference to the new document in the published collection, using the same ID
+      const newDocRef = db.collection(publishedCollection).doc(doc.id);
+      // Add the 'set' operation to the batch
+      batch.set(newDocRef, publishedData);
 
-      // Delete the document from the scheduled collection
-      batch.delete(doc.ref)
+      // Add the 'delete' operation for the original scheduled document to the batch
+      batch.delete(doc.ref);
     }
 
-    await batch.commit()
-    console.log(`Successfully published ${snapshot.size} posts.`)
+    // Commit the batch to execute all operations
+    await batch.commit();
+    console.log(`Successfully published ${snapshot.size} posts.`);
   } catch (error) {
-    console.error('Error publishing scheduled posts:', error)
+    // Log any errors that occur during the process
+    console.error('Error publishing scheduled posts:', error);
   }
-})
+});
