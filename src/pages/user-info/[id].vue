@@ -1,7 +1,7 @@
 <route lang="json">
 {
 "meta": {
-"layout": "MainLayout",
+"layout": "MainLayout"
 }
 }
 </route>
@@ -9,7 +9,7 @@
 <script setup>
   import { storeToRefs } from 'pinia'
   import { computed, onMounted, ref, watch } from 'vue'
-  import { useRoute } from 'vue-router'
+  import {useRoute, useRouter} from 'vue-router'
   import { useToast } from 'vue-toastification'
   import PostCard from '@/components/feed/PostCard.vue'
   import AboutAccountModal from '@/components/profile/AboutAccountModal.vue'
@@ -24,6 +24,7 @@
   const authStore = useAuthStore()
   const profileStore = useProfileStore()
   const route = useRoute()
+  const router = useRouter()
   const toast = useToast()
 
   const { posts, loading, error, user, userActivity } = storeToRefs(userInfoStore)
@@ -38,6 +39,10 @@
   })
 
   async function toggleFollow () {
+    if (!authStore.user) {
+      await router.push('/login')
+      return
+    }
     await (isFollowing.value ? profileStore.unfollowUser(userId.value) : profileStore.followUser(userId.value))
     await userInfoStore.fetchUser(userId.value)
     toast.info(isFollowing.value ? `Followed ${user.value.displayName}` : `Unfollowed ${user.value.displayName}`)
