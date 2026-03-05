@@ -217,7 +217,7 @@
         <v-list class="rounded-lg">
           <v-list-item class="cursor-pointer" @click="handleMutePost">
             <v-icon class="mr-2" icon="mdi-volume-off" />
-            Mute this post
+            Hide this post
           </v-list-item>
           <template v-if="!isBlocked">
             <v-list-item class="cursor-pointer" @click="handleFollow">

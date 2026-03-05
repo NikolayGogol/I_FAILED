@@ -90,7 +90,7 @@ export const useMainStore = defineStore('main', {
 
             const finalPost = { id: postDoc.id, ...postData }
 
-            if (postData.uid) {
+            if (postData.uid && !postData.stepFive?.isAnonymous) {
               const userRef = doc(db, 'users', postData.uid)
               const userSnap = await getDoc(userRef)
               finalPost.user = userSnap.exists() ? { ...finalPost.user, ...userSnap.data(), uid: userSnap.id } : { ...finalPost.user, uid: postData.uid }

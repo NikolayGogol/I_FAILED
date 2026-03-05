@@ -103,6 +103,7 @@ export const useCreatePostStore = defineStore('createPost', {
         allowComments: true,
         enableTriggerWarning: false,
         scheduleDate: null,
+        triggerTags: [],
       }
     },
     async createPost () {
@@ -129,7 +130,7 @@ export const useCreatePostStore = defineStore('createPost', {
         publishedAt: isScheduled ? null : serverTimestamp(),
         uid: authStore.user.uid,
         user: {
-          displayName: this.stepFive.isAnonymous ? 'Anonymous Anonymous' : authStore.user.displayName,
+          displayName: this.stepFive.isAnonymous ? 'Anonymous' : authStore.user.displayName,
           photoURL: this.stepFive.isAnonymous ? noAvatar : authStore.user.photoURL,
         },
         likes: 0,
@@ -137,7 +138,7 @@ export const useCreatePostStore = defineStore('createPost', {
         views: 0,
         likedBy: [],
       }
-
+      console.log(this.stepFive.isAnonymous);
       try {
         // 2. Create the document in Firestore to get a unique ID
         // If scheduled, save to 'scheduledPosts' collection, otherwise to main collection

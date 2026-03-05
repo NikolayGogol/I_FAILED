@@ -25,7 +25,6 @@
   const inputRef = ref(null)
 
   const filteredOptions = computed(() => {
-    if (!text.value) return []
     const lowerText = text.value.toLowerCase()
     return props.options.filter(opt =>
       opt.toLowerCase().includes(lowerText)
@@ -88,7 +87,7 @@
       <p class="form-hint my-2">Suggested from popular tags</p>
 
     </div>
-    <ul v-if="showSuggestions && filteredOptions.length > 0" class="suggestion-list">
+    <ul v-if="showSuggestions" class="suggestion-list">
       <li
         v-for="tag in filteredOptions"
         :key="tag"
@@ -96,6 +95,9 @@
         @mousedown.prevent="selectTag(tag)"
       >
         {{ tag }}
+      </li>
+      <li v-if="filteredOptions.length === 0" class="suggestion-item">
+        No tags found
       </li>
     </ul>
     <div v-if="modelValue.length > 0" class="selected-tags-list ga-2 mt-3">

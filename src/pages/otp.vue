@@ -5,68 +5,6 @@
   }
 }
 </route>
-
-<template>
-  <div class="verify-form">
-    <router-link class="back-link" to="/forgot-password">
-      <v-icon size="small">mdi-arrow-left</v-icon>
-      Back
-    </router-link>
-
-    <h1 class="welcome-title font-weight-semibold">Enter verification code</h1>
-
-    <div class="verify-prompt">
-      <span>We sent a code to {{ email }}</span>
-    </div>
-
-    <v-form class="verify-form-fields" @submit.prevent="handleVerify">
-      <div class="otp-inputs d-flex justify-center ga-3 w-100">
-        <form-input
-          v-for="(digit, index) in 6"
-          :key="index"
-          :ref="el => { if (el) inputRefs[index] = el }"
-          v-model="code[index]"
-          autocomplete="one-time-code"
-          class="otp-field text-center h-100"
-          density="comfortable"
-          hide-details
-          maxlength="1"
-          type="text"
-          variant="outlined"
-          @input="handleInput(index, $event)"
-          @keydown="handleKeydown(index, $event)"
-          @paste="handlePaste"
-        />
-      </div>
-
-      <div class="resend-code text-center mb-2">
-        <span class="text-body-2 text-medium-emphasis">Don't receive the code? </span>
-        <button
-          class="resend-link text-primary font-weight-bold"
-          :disabled="resendLoading"
-          type="button"
-          @click="handleResendCode"
-        >
-          {{ resendLoading ? 'Sending...' : 'Send again' }}
-        </button>
-      </div>
-
-      <div class="d-flex justify-center">
-        <v-btn
-          class="rounded-lg"
-          color="primary"
-          :disabled="loading || !isCodeComplete"
-          :loading="loading"
-          size="large"
-          type="submit"
-        >
-          Confirm
-        </v-btn>
-      </div>
-    </v-form>
-  </div>
-</template>
-
 <script setup>
   import { computed, nextTick, onMounted, ref } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
@@ -189,6 +127,67 @@
     })
   })
 </script>
+
+<template>
+  <div class="verify-form">
+    <router-link class="back-link" to="/forgot-password">
+      <v-icon size="small">mdi-arrow-left</v-icon>
+      Back
+    </router-link>
+
+    <h1 class="welcome-title font-weight-semibold">Enter verification code</h1>
+
+    <div class="verify-prompt">
+      <span>We sent a code to {{ email }}</span>
+    </div>
+
+    <v-form class="verify-form-fields" @submit.prevent="handleVerify">
+      <div class="otp-inputs d-flex justify-center ga-3 w-100">
+        <form-input
+          v-for="(digit, index) in 6"
+          :key="index"
+          :ref="el => { if (el) inputRefs[index] = el }"
+          v-model="code[index]"
+          autocomplete="one-time-code"
+          class="otp-field text-center h-100"
+          density="comfortable"
+          hide-details
+          maxlength="1"
+          type="text"
+          variant="outlined"
+          @input="handleInput(index, $event)"
+          @keydown="handleKeydown(index, $event)"
+          @paste="handlePaste"
+        />
+      </div>
+
+      <div class="resend-code text-center mb-2">
+        <span class="text-body-2 text-medium-emphasis">Don't receive the code? </span>
+        <button
+          class="resend-link text-primary font-weight-bold"
+          :disabled="resendLoading"
+          type="button"
+          @click="handleResendCode"
+        >
+          {{ resendLoading ? 'Sending...' : 'Send again' }}
+        </button>
+      </div>
+
+      <div class="d-flex justify-center">
+        <v-btn
+          class="rounded-lg"
+          color="primary"
+          :disabled="loading || !isCodeComplete"
+          :loading="loading"
+          size="large"
+          type="submit"
+        >
+          Confirm
+        </v-btn>
+      </div>
+    </v-form>
+  </div>
+</template>
 
 <style scoped>
 /* Styles are imported from verify.scss */

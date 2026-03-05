@@ -9,16 +9,23 @@
 <script setup>
 
   import { useRouter } from 'vue-router'
+  import { useMainStore } from '@/stores/main'
+
   const flag = sessionStorage.getItem('post-success-created')
   const router = useRouter()
+  const mainStore = useMainStore()
+
   if (flag) {
     sessionStorage.removeItem('post-success-created')
   } else {
     router.push('/')
   }
-  setTimeout(() => {
-    router.push('/')
-  }, 5000)
+  mainStore.fetchPosts({ tab: 'latest' }).then(() => {
+    setTimeout(() => {
+      router.push('/')
+    }, 2000)
+  })
+
 </script>
 
 <template>
