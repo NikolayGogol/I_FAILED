@@ -26,13 +26,14 @@ export const useMainStore = defineStore('main', {
       }
     },
 
-    async fetchPosts ({ tab, pageSize = 4 } = {}) {
+    async fetchPosts ({ tab, pageSize = 4, refresh = false } = {}) {
       // If a new tab is selected, reset everything
-      if (tab && tab !== this.activeTab) {
-        this.activeTab = tab
+      if ((tab && tab !== this.activeTab) || refresh) {
+        if (tab) this.activeTab = tab
         this.posts = []
         this.lastVisible = null
         this.hasMore = true
+        this.loading = false // Reset loading state on refresh
       }
 
       if (this.loading || !this.hasMore) {

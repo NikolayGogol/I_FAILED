@@ -20,7 +20,7 @@
   } else {
     router.push('/')
   }
-  mainStore.fetchPosts({ tab: 'latest' }).then(() => {
+  mainStore.fetchPosts({ tab: 'latest', refresh: true }).then(() => {
     setTimeout(() => {
       router.push('/')
     }, 2000)
