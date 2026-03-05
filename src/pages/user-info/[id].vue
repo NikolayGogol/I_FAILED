@@ -13,6 +13,7 @@
   import { useRoute } from 'vue-router'
   import { useToast } from 'vue-toastification'
   import PostCard from '@/components/feed/PostCard.vue'
+  import AboutAccountModal from '@/components/profile/AboutAccountModal.vue'
   import Activity from '@/components/profile/Activity.vue'
   import UserCard from '@/components/profile/UserCard.vue'
   import { useAuthStore } from '@/stores/auth.js'
@@ -30,6 +31,7 @@
   const { user: authUser } = storeToRefs(authStore)
   const activeTabIndex = ref(0)
   const userId = route.params.id
+  const aboutDialog = ref(false)
 
   const isCurrentUser = computed(() => authUser.value?.uid === userId)
   const isFollowing = computed(() => {
@@ -53,7 +55,7 @@
   }
 
   function aboutAccount () {
-    toast.info('About account functionality coming soon')
+    aboutDialog.value = true
   }
 
   onMounted(() => {
@@ -95,12 +97,14 @@
             <v-menu location="bottom end" open-on-hover>
               <template #activator="{ props }">
                 <v-btn
+                  class="border rounded-lg"
                   icon="mdi-dots-horizontal"
+                  size="small"
                   variant="text"
                   v-bind="props"
                 />
               </template>
-              <v-list color="primary">
+              <v-list>
                 <v-list-item @click="aboutAccount">
                   <v-list-item-title>
                     <v-icon class="mr-2" icon="mdi-information-outline" />
@@ -154,5 +158,6 @@
         <activity v-if="activeTabIndex === 1" :user-id="userId" />
       </div>
     </section>
+    <AboutAccountModal v-model="aboutDialog" :user="user" />
   </div>
 </template>

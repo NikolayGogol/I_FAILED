@@ -1,0 +1,79 @@
+@use '@/styles/settings.scss' as *;
+
+.about-account-dialog {
+  .v-card {
+    text-align: center;
+    padding: 24px !important;
+    border-radius: $radius-xl !important;
+
+    .v-card-title {
+      font-size: 20px;
+      font-weight: 700;
+      justify-content: center;
+      margin-bottom: 16px;
+      padding: 0;
+    }
+
+    .v-card-text {
+      padding: 0 !important;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      .user-avatar {
+        width: 88px;
+        height: 88px;
+        border-radius: 50%;
+        margin-bottom: 12px;
+
+        .v-img {
+          border-radius: 50%;
+        }
+
+        .initials-span {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 100%;
+          height: 100%;
+          border-radius: 50%;
+          background-color: $color-primary;
+          color: $color-surface;
+          font-size: 32px;
+          font-weight: 600;
+        }
+      }
+
+      h2 {
+        font-size: 22px;
+        font-weight: 700;
+      }
+    }
+
+    .user-list {
+      .icon {
+        width: 32px;
+
+        svg {
+          width: 100%;
+        }
+      }
+
+      h6 {
+        font-size: 14px;
+        font-weight: 600;
+        color: $color-text-primary;
+      }
+
+      p {
+        font-size: 14px;
+        font-weight: 400;
+        color: $color-text-quaternary;
+      }
+    }
+
+    .cancel-btn {
+      margin-top: 24px;
+    }
+  }
+}

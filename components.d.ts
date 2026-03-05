@@ -11,6 +11,7 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    AboutAccountModal: typeof import('./src/components/profile/AboutAccountModal.vue')['default']
     AccountSettings: typeof import('./src/components/settings/AccountSettings.vue')['default']
     Activity: typeof import('./src/components/profile/Activity.vue')['default']
     ContentSettings: typeof import('./src/components/settings/ContentSettings.vue')['default']
