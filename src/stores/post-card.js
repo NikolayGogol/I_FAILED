@@ -2,6 +2,7 @@ import { arrayRemove, arrayUnion, collection, doc, getCountFromServer, increment
 import { defineStore } from 'pinia'
 import { auth, db } from '@/firebase'
 const VITE_POST_COLLECTION = import.meta.env.VITE_POST_COLLECTION
+const VITE_COMMENTS = import.meta.env.VITE_COMMENTS
 
 export const usePostCardStore = defineStore('postCard', {
   actions: {
@@ -42,7 +43,7 @@ export const usePostCardStore = defineStore('postCard', {
     },
     async getCommentCount (postId) {
       try {
-        const q = query(collection(db, 'comments'), where('postId', '==', postId))
+        const q = query(collection(db, VITE_COMMENTS), where('postId', '==', postId))
         const snapshot = await getCountFromServer(q)
         return snapshot.data().count
       } catch (error) {

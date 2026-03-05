@@ -2,6 +2,8 @@ import { collection, doc, getDoc, getDocs, query, where } from 'firebase/firesto
 import { defineStore } from 'pinia'
 import { db } from '@/firebase'
 const VITE_USERS_COLLECTION = import.meta.env.VITE_USERS_COLLECTION
+const VITE_POST_COLLECTION = import.meta.env.VITE_POST_COLLECTION
+const VITE_COMMENTS = import.meta.env.VITE_COMMENTS
 
 export const useUserInfoStore = defineStore('userInfo', {
   state: () => ({
@@ -41,7 +43,7 @@ export const useUserInfoStore = defineStore('userInfo', {
       this.posts = []
 
       try {
-        const postsRef = collection(db, 'posts')
+        const postsRef = collection(db, VITE_POST_COLLECTION)
         const q = query(postsRef, where('uid', '==', userId))
         const querySnapshot = await getDocs(q)
 
@@ -92,7 +94,7 @@ export const useUserInfoStore = defineStore('userInfo', {
       this.error = null
       try {
         // 1. Fetch user's posts and calculate reactions received
-        const postsQuery = query(collection(db, 'posts'), where('uid', '==', userId))
+        const postsQuery = query(collection(db, VITE_POST_COLLECTION), where('uid', '==', userId))
         const postsSnapshot = await getDocs(postsQuery)
         let reactionsReceivedCount = 0
         let publicPostsCount = 0
@@ -108,11 +110,11 @@ export const useUserInfoStore = defineStore('userInfo', {
         }
 
         // 2. Fetch user's comments
-        const commentsQuery = query(collection(db, 'comments'), where('user.uid', '==', userId))
+        const commentsQuery = query(collection(db, VITE_COMMENTS), where('user.uid', '==', userId))
         const commentsSnapshot = await getDocs(commentsQuery)
 
         // 3. Fetch user's given reactions (posts liked by user)
-        const reactionsGivenQuery = query(collection(db, 'posts'), where('likedBy', 'array-contains', userId))
+        const reactionsGivenQuery = query(collection(db, VITE_POST_COLLECTION), where('likedBy', 'array-contains', userId))
         const reactionsGivenSnapshot = await getDocs(reactionsGivenQuery)
 
         // 4. Update state
