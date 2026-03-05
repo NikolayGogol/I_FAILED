@@ -147,18 +147,22 @@
 
     <div class="user-activity-footer">
       <div class="activity-stat">
+        <v-icon icon="mdi-file-outline" />
         <span class="stat-value">{{ displayActivity.posts }}</span>
         <span class="stat-label">Posts</span>
       </div>
       <div class="activity-stat">
+        <v-icon icon="mdi-comment-outline" />
         <span class="stat-value">{{ displayActivity.comments }}</span>
         <span class="stat-label">Comments</span>
       </div>
       <div class="activity-stat">
+        <v-icon icon="mdi-heart-outline" />
         <span class="stat-value">{{ displayActivity.reactionsReceived }}</span>
         <span class="stat-label">Reactions Received</span>
       </div>
       <div class="activity-stat">
+        <v-icon icon="mdi-heart-outline" />
         <span class="stat-value">{{ displayActivity.reactionsGiven }}</span>
         <span class="stat-label">Reactions Given</span>
       </div>
