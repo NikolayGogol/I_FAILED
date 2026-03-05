@@ -33,6 +33,15 @@
   const userId = computed(() => route.params.id)
   const aboutDialog = ref(false)
 
+  const filteredActivity = computed(() => {
+    if (!userActivity.value) return null
+    const filteredPosts = posts.value.filter(post => !post.stepFive?.isAnonymous)
+    return {
+      ...userActivity.value,
+      posts: filteredPosts.length,
+    }
+  })
+
   const isCurrentUser = computed(() => authUser.value?.uid === userId.value)
   const isFollowing = computed(() => {
     return authUser.value?.following?.includes(userId.value)
@@ -94,7 +103,7 @@
 <template>
   <div class="profile-page">
     <section class="profile-main">
-      <UserCard :activity="userActivity" :user="user">
+      <UserCard :activity="filteredActivity" :user="user">
         <template #profile-actions>
           <div class="d-flex align-center">
             <button
