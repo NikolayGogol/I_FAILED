@@ -123,6 +123,7 @@
         <div class="user-name-row align-center justify-between">
           <h2>{{ displayName }}</h2>
           <button v-if="isCurrentUser" class="cancel-btn" @click="openEditDialog">Edit profile</button>
+          <slot name="profile-actions" />
         </div>
         <p class="user-email">@{{ displayName.replaceAll(' ', '_') }}</p>
         <p class="user-bio">{{ displayUser?.bio || 'Entrepreneur learning from startup failures. Sharing my journey to help others.' }}</p>

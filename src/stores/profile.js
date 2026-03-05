@@ -1,4 +1,4 @@
-import { collection, doc, getDoc, getDocs, query, updateDoc, where } from 'firebase/firestore'
+import { arrayRemove, arrayUnion, collection, doc, getDoc, getDocs, query, updateDoc, where } from 'firebase/firestore'
 import { getDownloadURL, ref as storageRef, uploadBytes } from 'firebase/storage'
 import { defineStore } from 'pinia'
 import { auth, db, storage, updateProfile } from '@/firebase'
@@ -233,6 +233,86 @@ export const useProfileStore = defineStore('profile', {
       } catch (error) {
         console.error('Error updating profile:', error)
         this.error = error.message
+        throw error
+      } finally {
+        this.loading = false
+      }
+    },
+
+    async followUser (targetUserId) {
+      this.loading = true
+      this.error = null
+      const authStore = useAuthStore()
+      const currentUserId = authStore.user?.uid
+
+      if (!currentUserId) {
+        return
+      }
+
+      try {
+        // Add targetUserId to current user's following
+        const currentUserRef = doc(db, 'users', currentUserId)
+        await updateDoc(currentUserRef, {
+          following: arrayUnion(targetUserId),
+        })
+
+        // Add currentUserId to target user's followers
+        const targetUserRef = doc(db, 'users', targetUserId)
+        await updateDoc(targetUserRef, {
+          followers: arrayUnion(currentUserId),
+        })
+
+        // Update local state
+        const updatedFollowing = [...(authStore.user.following || []), targetUserId]
+        authStore.$patch({
+          user: {
+            ...authStore.user,
+            following: updatedFollowing,
+          },
+        })
+      } catch (error) {
+        console.error('Error following user:', error)
+        this.error = 'Failed to follow user.'
+        throw error
+      } finally {
+        this.loading = false
+      }
+    },
+
+    async unfollowUser (targetUserId) {
+      this.loading = true
+      this.error = null
+      const authStore = useAuthStore()
+      const currentUserId = authStore.user?.uid
+
+      if (!currentUserId) {
+        return
+      }
+
+      try {
+        // Remove targetUserId from current user's following
+        const currentUserRef = doc(db, 'users', currentUserId)
+        await updateDoc(currentUserRef, {
+          following: arrayRemove(targetUserId),
+        })
+
+        // Remove currentUserId from target user's followers
+        const targetUserRef = doc(db, 'users', targetUserId)
+        await updateDoc(targetUserRef, {
+          followers: arrayRemove(currentUserId),
+        })
+
+        // Update local state
+        const updatedFollowing = (authStore.user.following || []).filter(id => id !== targetUserId)
+        authStore.$patch({
+          user: {
+            ...authStore.user,
+            following: updatedFollowing,
+          },
+        })
+      } catch (error) {
+        console.error('Error unfollowing user:', error)
+        this.error = 'Failed to unfollow user.'
         throw error
       } finally {
         this.loading = false

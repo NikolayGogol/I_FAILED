@@ -37,6 +37,8 @@
   }
 
   .user-main-info {
+    min-width: 0; // Allow flex child to shrink below content size
+
     .user-name-row {
       display: flex;
       align-items: center;
@@ -48,14 +50,23 @@
         font-size: 24px;
         font-weight: 700;
         color: $color-text-primary;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
 
+      button {
+        flex-shrink: 0;
+      }
     }
 
     .user-email {
       color: #808079;
       font-size: 16px;
       margin-bottom: $spacing-md;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .user-bio {

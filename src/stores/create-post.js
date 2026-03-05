@@ -138,7 +138,7 @@ export const useCreatePostStore = defineStore('createPost', {
         views: 0,
         likedBy: [],
       }
-      console.log(this.stepFive.isAnonymous);
+      console.log(this.stepFive.isAnonymous)
       try {
         // 2. Create the document in Firestore to get a unique ID
         // If scheduled, save to 'scheduledPosts' collection, otherwise to main collection

@@ -48,10 +48,10 @@ export const useUserInfoStore = defineStore('userInfo', {
         // Fetch user data once to reuse
         let userData = this.user
         if (!userData || userData.id !== userId) {
-           const userDoc = await getDoc(doc(db, 'users', userId))
-           if (userDoc.exists()) {
-             userData = { id: userDoc.id, ...userDoc.data() }
-           }
+          const userDoc = await getDoc(doc(db, 'users', userId))
+          if (userDoc.exists()) {
+            userData = { id: userDoc.id, ...userDoc.data() }
+          }
         }
 
         for (const doc of querySnapshot.docs) {
@@ -61,7 +61,7 @@ export const useUserInfoStore = defineStore('userInfo', {
           // but the requirement is for a public user info page, so we should probably hide anonymous posts
           // unless we are the owner. But for now, let's just filter based on the isAnonymous flag.
           if (postData.stepFive?.isAnonymous) {
-             continue;
+            continue
           }
 
           const post = { id: doc.id, ...postData }

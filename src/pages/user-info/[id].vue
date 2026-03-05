@@ -9,20 +9,52 @@
 
 <script setup>
   import { storeToRefs } from 'pinia'
-  import { onMounted, ref } from 'vue'
+  import { computed, onMounted, ref } from 'vue'
   import { useRoute } from 'vue-router'
+  import { useToast } from 'vue-toastification'
   import PostCard from '@/components/feed/PostCard.vue'
   import Activity from '@/components/profile/Activity.vue'
   import UserCard from '@/components/profile/UserCard.vue'
+  import { useAuthStore } from '@/stores/auth.js'
+  import { useProfileStore } from '@/stores/profile.js'
   import { useUserInfoStore } from '@/stores/user-info.js'
   import '@/styles/pages/profile.scss'
 
   const userInfoStore = useUserInfoStore()
+  const authStore = useAuthStore()
+  const profileStore = useProfileStore()
   const route = useRoute()
+  const toast = useToast()
 
   const { posts, loading, error, user, userActivity } = storeToRefs(userInfoStore)
+  const { user: authUser } = storeToRefs(authStore)
   const activeTabIndex = ref(0)
   const userId = route.params.id
+
+  const isCurrentUser = computed(() => authUser.value?.uid === userId)
+  const isFollowing = computed(() => {
+    return authUser.value?.following?.includes(userId)
+  })
+
+  async function toggleFollow () {
+    await (isFollowing.value ? profileStore.unfollowUser(userId) : profileStore.followUser(userId))
+    await userInfoStore.fetchUser(userId)
+  }
+
+  function copyProfileLink () {
+    const url = window.location.href
+    navigator.clipboard.writeText(url).then(() => {
+      toast.success('Link copied to clipboard')
+    })
+  }
+
+  function blockUser () {
+    toast.info('Block user functionality coming soon')
+  }
+
+  function aboutAccount () {
+    toast.info('About account functionality coming soon')
+  }
 
   onMounted(() => {
     if (userId) {
@@ -49,7 +81,46 @@
 <template>
   <div class="profile-page">
     <section class="profile-main">
-      <UserCard :activity="userActivity" :user="user" />
+      <UserCard :activity="userActivity" :user="user">
+        <template #profile-actions>
+          <div class="d-flex align-center">
+            <button
+              v-if="!isCurrentUser"
+              class="cancel-btn mr-2"
+              @click="toggleFollow"
+            >
+              {{ isFollowing ? 'Unfollow' : 'Follow' }}
+            </button>
+
+            <v-menu location="bottom end" open-on-hover>
+              <template #activator="{ props }">
+                <v-btn
+                  icon="mdi-dots-horizontal"
+                  variant="text"
+                  v-bind="props"
+                />
+              </template>
+              <v-list color="primary">
+                <v-list-item @click="aboutAccount">
+                  <v-list-item-title>
+                    <v-icon class="mr-2" icon="mdi-information-outline" />
+                    About this account</v-list-item-title>
+                </v-list-item>
+                <v-list-item @click="copyProfileLink">
+                  <v-list-item-title>
+                    <v-icon class="mr-2" icon="mdi-paperclip" />
+                    Copy link to profile</v-list-item-title>
+                </v-list-item>
+                <v-list-item v-if="!isCurrentUser" class="text-error" @click="blockUser">
+                  <v-list-item-title>
+                    <v-icon class="mr-2" icon="mdi-block-helper" />
+                    Block this user</v-list-item-title>
+                </v-list-item>
+              </v-list>
+            </v-menu>
+          </div>
+        </template>
+      </UserCard>
 
       <div class="content-feed">
         <nav class="user-tabs">
