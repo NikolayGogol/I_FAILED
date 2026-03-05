@@ -1,10 +1,20 @@
+// =================================================================================================
+// Imports
+// =================================================================================================
 import { collection, doc, getCountFromServer, getDoc, getDocs, limit, orderBy, query, startAfter, where } from 'firebase/firestore'
 import { defineStore } from 'pinia'
 import { db } from '@/firebase'
 import { useAuthStore } from '@/stores/auth'
 
+// =================================================================================================
+// Constants
+// =================================================================================================
 const collection_db = import.meta.env.VITE_POST_COLLECTION
+const USER_COLLECTION = import.meta.env.VITE_USERS_COLLECTION
 
+// =================================================================================================
+// Main Store
+// =================================================================================================
 export const useMainStore = defineStore('main', {
   state: () => ({
     posts: [],
@@ -15,7 +25,9 @@ export const useMainStore = defineStore('main', {
     totalPosts: 0, // State to hold the total count
   }),
   actions: {
-    // Action to get the total number of posts
+    /**
+     * Fetches the total number of posts from the server.
+     */
     async fetchTotalPostCount () {
       try {
         const postsRef = collection(db, collection_db)
@@ -26,8 +38,15 @@ export const useMainStore = defineStore('main', {
       }
     },
 
+    /**
+     * Fetches posts from Firestore with pagination.
+     * @param {object} options - The options for fetching posts.
+     * @param {string} options.tab - The tab to fetch posts for ('latest', 'popular', 'for-you').
+     * @param {number} options.pageSize - The number of posts to fetch per page.
+     * @param {boolean} options.refresh - Whether to refresh the posts list.
+     */
     async fetchPosts ({ tab, pageSize = 4, refresh = false } = {}) {
-      // If a new tab is selected, reset everything
+      // If a new tab is selected or a refresh is requested, reset the state
       if ((tab && tab !== this.activeTab) || refresh) {
         if (tab) {
           this.activeTab = tab
@@ -38,6 +57,7 @@ export const useMainStore = defineStore('main', {
         this.loading = false // Reset loading state on refresh
       }
 
+      // Prevent fetching if already loading or no more posts are available
       if (this.loading || !this.hasMore) {
         return
       }
@@ -49,11 +69,13 @@ export const useMainStore = defineStore('main', {
         const postsRef = collection(db, collection_db)
         let q
 
+        // Set up query constraints for pagination
         const queryConstraints = [limit(pageSize)]
         if (this.lastVisible) {
           queryConstraints.push(startAfter(this.lastVisible))
         }
 
+        // Build the query based on the active tab
         if (this.activeTab === 'popular') {
           q = query(postsRef, orderBy('views', 'desc'), ...queryConstraints)
         } else if (this.activeTab === 'for-you') {
@@ -83,6 +105,7 @@ export const useMainStore = defineStore('main', {
           const newPosts = []
           const blockedUsers = authStore.user?.blockedUsers || []
 
+          // Process each post document
           for (const postDoc of querySnapshot.docs) {
             const postData = postDoc.data()
 
@@ -93,8 +116,9 @@ export const useMainStore = defineStore('main', {
 
             const finalPost = { id: postDoc.id, ...postData }
 
+            // Fetch user data for the post if it's not anonymous
             if (postData.uid && !postData.stepFive?.isAnonymous) {
-              const userRef = doc(db, 'users', postData.uid)
+              const userRef = doc(db, USER_COLLECTION, postData.uid)
               const userSnap = await getDoc(userRef)
               finalPost.user = userSnap.exists() ? { ...finalPost.user, ...userSnap.data(), uid: userSnap.id } : { ...finalPost.user, uid: postData.uid }
             }

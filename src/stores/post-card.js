@@ -1,6 +1,7 @@
 import { arrayRemove, arrayUnion, collection, doc, getCountFromServer, increment, query, updateDoc, where } from 'firebase/firestore'
 import { defineStore } from 'pinia'
 import { auth, db } from '@/firebase'
+const VITE_POST_COLLECTION = import.meta.env.VITE_POST_COLLECTION
 
 export const usePostCardStore = defineStore('postCard', {
   actions: {
@@ -15,7 +16,7 @@ export const usePostCardStore = defineStore('postCard', {
         return { success: false, error: 'Invalid post ID' }
       }
 
-      const postRef = doc(db, 'posts', postId)
+      const postRef = doc(db, VITE_POST_COLLECTION, postId)
       const uid = auth.currentUser.uid
 
       try {

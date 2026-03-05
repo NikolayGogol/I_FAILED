@@ -1,10 +1,18 @@
 <script setup>
+  // =================================================================================================
+  // Imports
+  // =================================================================================================
   import { ref } from 'vue'
   import { useDisplay } from 'vuetify'
   import Rightbar from '@/components/sidebars/Rightbar.vue'
   import Sidebar from '@/components/sidebars/Sidebar.vue'
 
+  // =================================================================================================
+  // State
+  // =================================================================================================
+  // Controls the visibility of the mobile navigation drawer
   const drawer = ref(false)
+  // Vuetify's display utility to handle responsive layout
   const { mdAndUp } = useDisplay()
 </script>
 
@@ -35,7 +43,7 @@
     <v-main>
       <v-container>
         <v-row>
-          <!-- Desktop Sidebar -->
+          <!-- Desktop Sidebar (visible on medium screens and up) -->
           <v-col
             v-if="mdAndUp"
             lg="3"
@@ -50,10 +58,11 @@
             lg="6"
             md="8"
           >
+            <!-- The main content of the page is injected here -->
             <slot />
           </v-col>
 
-          <!-- Right Sidebar (hidden on smaller screens) -->
+          <!-- Right Sidebar (visible on medium screens and up) -->
           <v-col
             v-if="mdAndUp"
             lg="3"

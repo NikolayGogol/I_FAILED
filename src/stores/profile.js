@@ -1,9 +1,18 @@
+// =================================================================================================
+// Imports
+// =================================================================================================
 import { arrayRemove, arrayUnion, collection, doc, getDoc, getDocs, query, updateDoc, where } from 'firebase/firestore'
 import { getDownloadURL, ref as storageRef, uploadBytes } from 'firebase/storage'
 import { defineStore } from 'pinia'
 import { auth, db, storage, updateProfile } from '@/firebase'
 import { useAuthStore } from '@/stores/auth'
+const VITE_POST_COLLECTION = import.meta.env.VITE_POST_COLLECTION
+const VITE_USERS_COLLECTION = import.meta.env.VITE_USERS_COLLECTION
+const VITE_COMMENTS = import.meta.env.VITE_COMMENTS
 
+// =================================================================================================
+// Profile Store
+// =================================================================================================
 export const useProfileStore = defineStore('profile', {
   state: () => ({
     posts: [],
@@ -17,13 +26,17 @@ export const useProfileStore = defineStore('profile', {
     },
   }),
   actions: {
+    /**
+     * Fetches all posts for a specific user.
+     * @param {string} userId - The ID of the user whose posts to fetch.
+     */
     async fetchUserPosts (userId) {
       this.loading = true
       this.error = null
       this.posts = []
 
       try {
-        const postsRef = collection(db, 'posts')
+        const postsRef = collection(db, VITE_POST_COLLECTION)
         const q = query(postsRef, where('uid', '==', userId))
         const querySnapshot = await getDocs(q)
 
@@ -34,12 +47,14 @@ export const useProfileStore = defineStore('profile', {
         for (const doc of querySnapshot.docs) {
           const post = { id: doc.id, ...doc.data() }
 
+          // Handle anonymous posts
           if (post.stepFive?.isAnonymous) {
             post.user = {
               displayName: 'Anonymous',
               photoURL: null,
             }
           } else if (post.uid && user) {
+            // Assign user data to the post
             post.user = {
               displayName: user.displayName,
               photoURL: user.photoURL,
@@ -56,6 +71,10 @@ export const useProfileStore = defineStore('profile', {
       }
     },
 
+    /**
+     * Fetches a summary of a user's activity (post count, comment count, etc.).
+     * @param {string} userId - The ID of the user whose activity to fetch.
+     */
     async fetchUserActivity (userId) {
       if (!userId) {
         return
@@ -65,7 +84,7 @@ export const useProfileStore = defineStore('profile', {
       this.error = null
       try {
         // 1. Fetch user's posts and calculate reactions received
-        const postsQuery = query(collection(db, 'posts'), where('uid', '==', userId))
+        const postsQuery = query(collection(db, VITE_POST_COLLECTION), where('uid', '==', userId))
         const postsSnapshot = await getDocs(postsQuery)
         let reactionsReceivedCount = 0
 
@@ -75,16 +94,14 @@ export const useProfileStore = defineStore('profile', {
         }
 
         // 2. Fetch user's comments
-        // Note: Comments are stored with a nested user object: { user: { uid: ... } }
-        // We need to query based on 'user.uid'
-        const commentsQuery = query(collection(db, 'comments'), where('user.uid', '==', userId))
+        const commentsQuery = query(collection(db, VITE_COMMENTS), where('user.uid', '==', userId))
         const commentsSnapshot = await getDocs(commentsQuery)
 
         // 3. Fetch user's given reactions (posts liked by user)
-        const reactionsGivenQuery = query(collection(db, 'posts'), where('likedBy', 'array-contains', userId))
+        const reactionsGivenQuery = query(collection(db, VITE_POST_COLLECTION), where('likedBy', 'array-contains', userId))
         const reactionsGivenSnapshot = await getDocs(reactionsGivenQuery)
 
-        // 4. Update state
+        // 4. Update state with the fetched activity data
         this.userActivity = {
           posts: postsSnapshot.size,
           comments: commentsSnapshot.size,
@@ -99,6 +116,11 @@ export const useProfileStore = defineStore('profile', {
       }
     },
 
+    /**
+     * Fetches a detailed list of a user's activities (posts and comments).
+     * @param {string} userId - The ID of the user whose activity details to fetch.
+     * @returns {Promise<Array>} A promise that resolves with an array of activity objects.
+     */
     async fetchUserActivityDetails (userId) {
       this.loading = true
       this.error = null
@@ -106,7 +128,7 @@ export const useProfileStore = defineStore('profile', {
 
       try {
         // 1. Fetch user's posts
-        const postsQuery = query(collection(db, 'posts'), where('uid', '==', userId))
+        const postsQuery = query(collection(db, VITE_POST_COLLECTION), where('uid', '==', userId))
         const postsSnapshot = await getDocs(postsQuery)
 
         for (const doc of postsSnapshot.docs) {
@@ -122,7 +144,7 @@ export const useProfileStore = defineStore('profile', {
         }
 
         // 2. Fetch user's comments
-        const commentsQuery = query(collection(db, 'comments'), where('user.uid', '==', userId))
+        const commentsQuery = query(collection(db, VITE_COMMENTS), where('user.uid', '==', userId))
         const commentsSnapshot = await getDocs(commentsQuery)
 
         for (const doc of commentsSnapshot.docs) {
@@ -136,7 +158,7 @@ export const useProfileStore = defineStore('profile', {
           })
         }
 
-        // Sort by date descending
+        // Sort activities by date in descending order
         activities.sort((a, b) => b.createdAt - a.createdAt)
 
         return activities
@@ -149,6 +171,11 @@ export const useProfileStore = defineStore('profile', {
       }
     },
 
+    /**
+     * Fetches all posts that a user has interacted with (commented on).
+     * @param {string} userId - The ID of the user.
+     * @returns {Promise<Array>} A promise that resolves with an array of post objects.
+     */
     async fetchUserInteractedPosts (userId) {
       this.loading = true
       this.error = null
@@ -156,8 +183,8 @@ export const useProfileStore = defineStore('profile', {
       const postIds = new Set()
 
       try {
-        // 1. Fetch user's comments to get post IDs
-        const commentsQuery = query(collection(db, 'comments'), where('user.uid', '==', userId))
+        // 1. Fetch user's comments to get the IDs of the posts they commented on
+        const commentsQuery = query(collection(db, VITE_COMMENTS), where('user.uid', '==', userId))
         const commentsSnapshot = await getDocs(commentsQuery)
 
         for (const doc of commentsSnapshot.docs) {
@@ -167,21 +194,23 @@ export const useProfileStore = defineStore('profile', {
           }
         }
 
-        // 2. Fetch each post details
+        // 2. Fetch the details for each unique post ID
         const fetchPromises = Array.from(postIds).map(async postId => {
-          const postDocRef = doc(db, 'posts', postId)
+          const postDocRef = doc(db, VITE_POST_COLLECTION, postId)
           const postDoc = await getDoc(postDocRef)
           if (postDoc.exists()) {
             const postData = postDoc.data()
             const post = { id: postDoc.id, ...postData }
 
+            // Handle anonymous posts
             if (post.stepFive?.isAnonymous) {
               post.user = {
                 displayName: 'Anonymous',
                 photoURL: null,
               }
             } else if (post.uid) {
-              const userDocRef = doc(db, 'users', post.uid)
+              // Fetch the author's user data
+              const userDocRef = doc(db, VITE_USERS_COLLECTION, post.uid)
               const userDoc = await getDoc(userDocRef)
               if (userDoc.exists()) {
                 post.user = userDoc.data()
@@ -210,6 +239,14 @@ export const useProfileStore = defineStore('profile', {
       }
     },
 
+    /**
+     * Updates the user's profile information.
+     * @param {object} profileData - The new profile data.
+     * @param {string} profileData.displayName - The new display name.
+     * @param {File} profileData.photoFile - The new profile photo file.
+     * @param {string} profileData.bio - The new bio.
+     * @returns {Promise<boolean>} A promise that resolves with true if the update was successful.
+     */
     async updateUserProfile ({ displayName, photoFile, bio }) {
       this.loading = true
       this.error = null
@@ -225,24 +262,28 @@ export const useProfileStore = defineStore('profile', {
         const newDisplayName = displayName || user.displayName
         const newBio = bio === undefined ? authStore.user?.bio : bio
 
+        // If a new photo file is provided, upload it to Firebase Storage
         if (photoFile) {
           const fileRef = storageRef(storage, `profile_photos/${user.uid}/${photoFile.name}`)
           const snapshot = await uploadBytes(fileRef, photoFile)
           newPhotoURL = await getDownloadURL(snapshot.ref)
         }
 
+        // Update the user's profile in Firebase Authentication
         await updateProfile(user, {
           displayName: newDisplayName,
           photoURL: newPhotoURL,
         })
 
-        const userDocRef = doc(db, 'users', user.uid)
+        // Update the user's document in Firestore
+        const userDocRef = doc(db, VITE_USERS_COLLECTION, user.uid)
         await updateDoc(userDocRef, {
           displayName: newDisplayName,
           photoURL: newPhotoURL,
           bio: newBio,
         })
 
+        // Update the local user state in the auth store
         authStore.$patch({
           user: {
             ...authStore.user,
@@ -262,6 +303,10 @@ export const useProfileStore = defineStore('profile', {
       }
     },
 
+    /**
+     * Follows a user.
+     * @param {string} targetUserId - The ID of the user to follow.
+     */
     async followUser (targetUserId) {
       this.loading = true
       this.error = null
@@ -273,19 +318,19 @@ export const useProfileStore = defineStore('profile', {
       }
 
       try {
-        // Add targetUserId to current user's following
-        const currentUserRef = doc(db, 'users', currentUserId)
+        // Add targetUserId to the current user's 'following' array
+        const currentUserRef = doc(db, VITE_USERS_COLLECTION, currentUserId)
         await updateDoc(currentUserRef, {
           following: arrayUnion(targetUserId),
         })
 
-        // Add currentUserId to target user's followers
-        const targetUserRef = doc(db, 'users', targetUserId)
+        // Add currentUserId to the target user's 'followers' array
+        const targetUserRef = doc(db, VITE_USERS_COLLECTION, targetUserId)
         await updateDoc(targetUserRef, {
           followers: arrayUnion(currentUserId),
         })
 
-        // Update local state
+        // Update the local state to reflect the new following status
         const updatedFollowing = [...(authStore.user.following || []), targetUserId]
         authStore.$patch({
           user: {
@@ -302,6 +347,10 @@ export const useProfileStore = defineStore('profile', {
       }
     },
 
+    /**
+     * Unfollows a user.
+     * @param {string} targetUserId - The ID of the user to unfollow.
+     */
     async unfollowUser (targetUserId) {
       this.loading = true
       this.error = null
@@ -313,19 +362,19 @@ export const useProfileStore = defineStore('profile', {
       }
 
       try {
-        // Remove targetUserId from current user's following
-        const currentUserRef = doc(db, 'users', currentUserId)
+        // Remove targetUserId from the current user's 'following' array
+        const currentUserRef = doc(db, VITE_USERS_COLLECTION, currentUserId)
         await updateDoc(currentUserRef, {
           following: arrayRemove(targetUserId),
         })
 
-        // Remove currentUserId from target user's followers
-        const targetUserRef = doc(db, 'users', targetUserId)
+        // Remove currentUserId from the target user's 'followers' array
+        const targetUserRef = doc(db, VITE_USERS_COLLECTION, targetUserId)
         await updateDoc(targetUserRef, {
           followers: arrayRemove(currentUserId),
         })
 
-        // Update local state
+        // Update the local state to reflect the new following status
         const updatedFollowing = (authStore.user.following || []).filter(id => id !== targetUserId)
         authStore.$patch({
           user: {

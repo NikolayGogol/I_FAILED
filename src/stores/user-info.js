@@ -1,6 +1,7 @@
 import { collection, doc, getDoc, getDocs, query, where } from 'firebase/firestore'
 import { defineStore } from 'pinia'
 import { db } from '@/firebase'
+const VITE_USERS_COLLECTION = import.meta.env.VITE_USERS_COLLECTION
 
 export const useUserInfoStore = defineStore('userInfo', {
   state: () => ({
@@ -20,7 +21,7 @@ export const useUserInfoStore = defineStore('userInfo', {
       this.loading = true
       this.error = null
       try {
-        const userDoc = await getDoc(doc(db, 'users', userId))
+        const userDoc = await getDoc(doc(db, VITE_USERS_COLLECTION, userId))
         if (userDoc.exists()) {
           this.user = { id: userDoc.id, ...userDoc.data() }
         } else {
@@ -48,7 +49,7 @@ export const useUserInfoStore = defineStore('userInfo', {
         // Fetch user data once to reuse
         let userData = this.user
         if (!userData || userData.id !== userId) {
-          const userDoc = await getDoc(doc(db, 'users', userId))
+          const userDoc = await getDoc(doc(db, VITE_USERS_COLLECTION, userId))
           if (userDoc.exists()) {
             userData = { id: userDoc.id, ...userDoc.data() }
           }

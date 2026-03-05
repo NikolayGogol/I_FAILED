@@ -1,15 +1,18 @@
 <route lang="json">
 {
-"meta": {
-"layout": "MainLayout"
-}
+  "meta": {
+    "layout": "MainLayout"
+  }
 }
 </route>
 
 <script setup>
+  // =================================================================================================
+  // Imports
+  // =================================================================================================
   import { storeToRefs } from 'pinia'
   import { computed, onMounted, ref, watch } from 'vue'
-  import {useRoute, useRouter} from 'vue-router'
+  import { useRoute, useRouter } from 'vue-router'
   import { useToast } from 'vue-toastification'
   import PostCard from '@/components/feed/PostCard.vue'
   import AboutAccountModal from '@/components/profile/AboutAccountModal.vue'
@@ -20,6 +23,9 @@
   import { useUserInfoStore } from '@/stores/user-info.js'
   import '@/styles/pages/profile.scss'
 
+  // =================================================================================================
+  // Stores & Hooks
+  // =================================================================================================
   const userInfoStore = useUserInfoStore()
   const authStore = useAuthStore()
   const profileStore = useProfileStore()
@@ -27,12 +33,19 @@
   const router = useRouter()
   const toast = useToast()
 
+  // =================================================================================================
+  // State
+  // =================================================================================================
   const { posts, loading, error, user, userActivity } = storeToRefs(userInfoStore)
   const { user: authUser } = storeToRefs(authStore)
   const activeTabIndex = ref(0)
   const userId = computed(() => route.params.id)
   const aboutDialog = ref(false)
 
+  // =================================================================================================
+  // Computed Properties
+  // =================================================================================================
+  // Filter out anonymous posts from the user's activity
   const filteredActivity = computed(() => {
     if (!userActivity.value) return null
     const filteredPosts = posts.value.filter(post => !post.stepFive?.isAnonymous)
@@ -42,11 +55,18 @@
     }
   })
 
+  // Check if the currently viewed profile belongs to the authenticated user
   const isCurrentUser = computed(() => authUser.value?.uid === userId.value)
+
+  // Check if the authenticated user is following the currently viewed user
   const isFollowing = computed(() => {
     return authUser.value?.following?.includes(userId.value)
   })
 
+  // =================================================================================================
+  // Functions
+  // =================================================================================================
+  // Toggle the follow state for the currently viewed user
   async function toggleFollow () {
     if (!authStore.user) {
       await router.push('/login')
@@ -57,6 +77,7 @@
     toast.info(isFollowing.value ? `Followed ${user.value.displayName}` : `Unfollowed ${user.value.displayName}`)
   }
 
+  // Copy the user's profile link to the clipboard
   function copyProfileLink () {
     const url = window.location.href
     navigator.clipboard.writeText(url).then(() => {
@@ -64,14 +85,20 @@
     })
   }
 
+  // Placeholder for blocking a user
   function blockUser () {
     toast.info('Block user functionality coming soon')
   }
 
+  // Open the "About this account" dialog
   function aboutAccount () {
     aboutDialog.value = true
   }
 
+  // =================================================================================================
+  // Lifecycle Hooks
+  // =================================================================================================
+  // Fetch user data when the component is mounted
   onMounted(() => {
     if (userId.value) {
       userInfoStore.fetchUser(userId.value)
@@ -80,6 +107,16 @@
     }
   })
 
+  // Watch for changes in the route params and refetch user data
+  watch(() => route.params.id, id => {
+    userInfoStore.fetchUser(id)
+    userInfoStore.fetchUserPosts(id)
+    userInfoStore.fetchUserActivity(id)
+  })
+
+  // =================================================================================================
+  // Tab Navigation
+  // =================================================================================================
   const tabsList = [
     {
       label: 'Posts',
@@ -92,20 +129,16 @@
   function selectTab (tab, index) {
     activeTabIndex.value = index
   }
-
-  watch(() => route.params.id, id => {
-    userInfoStore.fetchUser(id)
-    userInfoStore.fetchUserPosts(id)
-    userInfoStore.fetchUserActivity(id)
-  })
 </script>
 
 <template>
   <div class="profile-page">
     <section class="profile-main">
+      <!-- User information card -->
       <UserCard :activity="filteredActivity" :user="user">
         <template #profile-actions>
           <div class="d-flex align-center">
+            <!-- Follow/Unfollow button -->
             <button
               v-if="!isCurrentUser"
               class="cancel-btn mr-2"
@@ -114,6 +147,7 @@
               {{ isFollowing ? 'Unfollow' : 'Follow' }}
             </button>
 
+            <!-- More options menu -->
             <v-menu location="bottom end" open-on-hover>
               <template #activator="{ props }">
                 <v-btn
@@ -149,7 +183,9 @@
         </template>
       </UserCard>
 
+      <!-- User's content feed -->
       <div class="content-feed">
+        <!-- Tabs for posts and activity -->
         <nav class="user-tabs">
           <button
             v-for="(item, index) in tabsList"
@@ -160,6 +196,7 @@
           >{{ item.label }} <span v-if="!index">({{ posts?.length }})</span>
           </button>
         </nav>
+        <!-- Posts tab content -->
         <template v-if="activeTabIndex === 0">
           <div v-if="loading" class="text-center py-10">
             <v-progress-circular color="primary" indeterminate />
@@ -178,9 +215,11 @@
             />
           </div>
         </template>
+        <!-- Activity tab content -->
         <activity v-if="activeTabIndex === 1" :user-id="userId" />
       </div>
     </section>
+    <!-- "About this account" modal -->
     <AboutAccountModal v-model="aboutDialog" :user="user" />
   </div>
 </template>

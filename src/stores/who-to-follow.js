@@ -13,6 +13,8 @@ import {
 import { defineStore } from 'pinia'
 import { db } from '@/firebase'
 import { useAuthStore } from '@/stores/auth'
+const VITE_USERS_COLLECTION = import.meta.env.VITE_USERS_COLLECTION
+const VITE_POST_COLLECTION = import.meta.env.VITE_POST_COLLECTION
 
 export const useWhoToFollowStore = defineStore('whoToFollow', {
   state: () => ({
@@ -29,13 +31,13 @@ export const useWhoToFollowStore = defineStore('whoToFollow', {
       this.loading = true
       this.error = null
       try {
-        const usersRef = collection(db, 'users')
+        const usersRef = collection(db, VITE_USERS_COLLECTION)
         const q = query(usersRef, limit(15)) // Get up to 15 users
         const querySnapshot = await getDocs(q)
         const users = []
         for (const doc of querySnapshot.docs) {
           const user = { id: doc.id, ...doc.data() }
-          const postsQuery = query(collection(db, 'posts'), where('uid', '==', user.id))
+          const postsQuery = query(collection(db, VITE_POST_COLLECTION), where('uid', '==', user.id))
           const postsSnapshot = await getDocs(postsQuery)
           user.postCount = postsSnapshot.size
           users.push(user)
@@ -55,7 +57,7 @@ export const useWhoToFollowStore = defineStore('whoToFollow', {
         return false
       }
       const currentUserId = authStore.user.uid
-      const userToFollowRef = doc(db, 'users', userIdToFollow)
+      const userToFollowRef = doc(db, VITE_USERS_COLLECTION, userIdToFollow)
 
       // Check if the target user has blocked the current user
       try {
@@ -72,7 +74,7 @@ export const useWhoToFollowStore = defineStore('whoToFollow', {
         return false
       }
 
-      const currentUserRef = doc(db, 'users', currentUserId)
+      const currentUserRef = doc(db, VITE_USERS_COLLECTION, currentUserId)
 
       try {
         await updateDoc(currentUserRef, {
@@ -96,8 +98,8 @@ export const useWhoToFollowStore = defineStore('whoToFollow', {
         return false
       }
       const currentUserId = authStore.user.uid
-      const userToUnfollowRef = doc(db, 'users', userIdToUnfollow)
-      const currentUserRef = doc(db, 'users', currentUserId)
+      const userToUnfollowRef = doc(db, VITE_USERS_COLLECTION, userIdToUnfollow)
+      const currentUserRef = doc(db, VITE_USERS_COLLECTION, currentUserId)
 
       try {
         await updateDoc(currentUserRef, {
@@ -125,8 +127,8 @@ export const useWhoToFollowStore = defineStore('whoToFollow', {
       // Unfollow each other first
       await this.unfollowUser(userIdToBlock)
       // And make the other user unfollow the current user
-      const userToBlockRef = doc(db, 'users', userIdToBlock)
-      const currentUserRef = doc(db, 'users', currentUserId)
+      const userToBlockRef = doc(db, VITE_USERS_COLLECTION, userIdToBlock)
+      const currentUserRef = doc(db, VITE_USERS_COLLECTION, currentUserId)
       try {
         await updateDoc(userToBlockRef, {
           following: arrayRemove(currentUserId),
@@ -158,7 +160,7 @@ export const useWhoToFollowStore = defineStore('whoToFollow', {
         return false
       }
       const currentUserId = authStore.user.uid
-      const currentUserRef = doc(db, 'users', currentUserId)
+      const currentUserRef = doc(db, VITE_USERS_COLLECTION, currentUserId)
 
       try {
         await updateDoc(currentUserRef, {

@@ -1,4 +1,7 @@
 <script setup>
+  // =================================================================================================
+  // Imports
+  // =================================================================================================
   import { computed, onMounted } from 'vue'
   import { useRouter } from 'vue-router'
   import { useToast } from 'vue-toastification'
@@ -6,14 +9,26 @@
   import { useWhoToFollowStore } from '@/stores/who-to-follow'
   import '@/styles/components/sidebars/who-to-follow.scss'
 
+  // =================================================================================================
+  // Stores & Hooks
+  // =================================================================================================
   const whoToFollowStore = useWhoToFollowStore()
   const authStore = useAuthStore()
   const toast = useToast()
   const router = useRouter()
+
+  // =================================================================================================
+  // Lifecycle Hooks
+  // =================================================================================================
+  // Fetch all users when the component is mounted
   onMounted(() => {
     whoToFollowStore.fetchAllUsers()
   })
 
+  // =================================================================================================
+  // Computed Properties
+  // =================================================================================================
+  // Filter users to exclude the current user and any blocked users
   const filteredUsers = computed(() => {
     if (!authStore.user) {
       return whoToFollowStore.users
@@ -24,12 +39,17 @@
     })
   })
 
+  // Sort users by post count in descending order and take the top 5
   const sortedUsers = computed(() => {
     return [...filteredUsers.value]
       .toSorted((a, b) => (b.postCount || 0) - (a.postCount || 0))
       .slice(0, 5)
   })
 
+  // =================================================================================================
+  // Mock Data
+  // =================================================================================================
+  // Background colors for user avatars
   const backgroundColors = [
     '#ffcdd2', '#f8bbd0', '#e1bee7', '#d1c4e9', '#c5cae9',
     '#bbdefb', '#b3e5fc', '#b2ebf2', '#b2dfdb', '#c8e6c9',
@@ -37,11 +57,16 @@
     '#ffccbc', '#d7ccc8', '#cfd8dc',
   ]
 
+  // =================================================================================================
+  // Functions
+  // =================================================================================================
+  // Get a random background color for the avatar
   function getRandomColor () {
     const randomIndex = Math.floor(Math.random() * backgroundColors.length)
     return backgroundColors[randomIndex]
   }
 
+  // Get the initials from a user's name
   function getInitials (name) {
     if (!name) return ''
     const parts = name.split(' ')
@@ -51,11 +76,13 @@
     return (parts[0].charAt(0) + (parts[1]?.charAt(0) || '')).toUpperCase()
   }
 
+  // Check if the current user is following a specific user
   function isFollowing (userId) {
     if (!authStore.user || !authStore.user.following) return false
     return authStore.user.following.includes(userId)
   }
 
+  // Handle the follow/unfollow button click
   async function handleFollowClick (userId, userName) {
     if (!authStore.user) {
       router.push('/login')
@@ -78,6 +105,7 @@
     }
   }
 
+  // Navigate to a user's profile page
   function openUserProfile (user) {
     router.push(`/user-info/${user.id}`)
   }
@@ -87,13 +115,16 @@
     <header class="right-card-header">
       <h3 class="font-weight-semibold">Who to follow</h3>
     </header>
+    <!-- Loading state -->
     <div v-if="whoToFollowStore.loading">
       <!-- You can add a loading skeleton here -->
       <p>Loading...</p>
     </div>
+    <!-- Error state -->
     <div v-else-if="whoToFollowStore.error">
       <p class="text-error">{{ whoToFollowStore.error }}</p>
     </div>
+    <!-- User list -->
     <template v-else>
       <div
         v-for="user in sortedUsers"
@@ -104,7 +135,9 @@
           class="follow-avatar cursor-pointer mr-3"
           @click="openUserProfile(user)"
         >
+          <!-- User avatar image -->
           <img v-if="user.photoURL" alt="User avatar" class="avatar-image" :src="user.photoURL">
+          <!-- User initials fallback -->
           <span
             v-else
             class="avatar-initials"
@@ -112,6 +145,7 @@
           >{{ getInitials(user.displayName) }}</span>
         </div>
         <div class="follow-info cursor-pointer" @click="openUserProfile(user)">
+          <!-- User display name -->
           <div class="follow-name">
             {{ user.displayName }}
             <v-tooltip
@@ -121,6 +155,7 @@
             >{{ user.displayName }}
             </v-tooltip>
           </div>
+          <!-- User handle -->
           <div class="follow-handle">
             @{{ user.displayName?.replaceAll(' ', '_') || 'user' }}
             <v-tooltip
@@ -132,6 +167,7 @@
           </div>
         </div>
         <v-spacer />
+        <!-- Follow/Unfollow button -->
         <div
           class="follow-btn"
           @click="handleFollowClick(user.id, user.displayName)"

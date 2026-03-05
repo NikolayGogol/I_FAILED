@@ -1,4 +1,7 @@
 <script setup>
+  // =================================================================================================
+  // Imports
+  // =================================================================================================
   import dayjs from 'dayjs'
   import { storeToRefs } from 'pinia'
   import { computed, onMounted, ref } from 'vue'
@@ -8,6 +11,9 @@
   import { useProfileStore } from '@/stores/profile.js'
   import '@/styles/components/profile/user-card.scss'
 
+  // =================================================================================================
+  // Props
+  // =================================================================================================
   const props = defineProps({
     user: {
       type: Object,
@@ -19,22 +25,33 @@
     },
   })
 
+  // =================================================================================================
+  // Stores & Hooks
+  // =================================================================================================
   const authStore = useAuthStore()
   const profileStore = useProfileStore()
   const toast = useToast()
 
+  // =================================================================================================
+  // State
+  // =================================================================================================
   const { user: authUser } = storeToRefs(authStore)
   const { userActivity: profileActivity } = storeToRefs(profileStore)
-
   const editDialog = ref(false)
   const newDisplayName = ref('')
   const newBio = ref('')
   const newPhotoFile = ref(null)
   const photoPreviewUrl = ref(null)
 
+  // =================================================================================================
+  // Computed Properties
+  // =================================================================================================
+  // Determine which user to display (either from props or the authenticated user)
   const displayUser = computed(() => props.user || authUser.value)
+  // Determine which activity to display (either from props or the authenticated user's activity)
   const displayActivity = computed(() => props.activity || profileActivity.value)
 
+  // Check if the displayed user is the currently authenticated user
   const isCurrentUser = computed(() => {
     if (!authUser.value || !displayUser.value) return false
     const authId = authUser.value.uid
@@ -42,8 +59,11 @@
     return authId === displayId
   })
 
+  // Get the display name of the user
   const displayName = computed(() => displayUser.value?.displayName || 'User')
+  // Get the photo URL of the user
   const photoURL = computed(() => displayUser.value?.photoURL)
+  // Get the initials of the user for the avatar fallback
   const initials = computed(() => {
     const name = displayName.value
     if (!name) return 'U'
@@ -51,6 +71,7 @@
     if (parts.length === 1) return parts[0].charAt(0).toUpperCase()
     return (parts[0].charAt(0) + (parts[1]?.charAt(0) || '')).toUpperCase()
   })
+  // Format the join date of the user
   const joinDate = computed(() => {
     if (displayUser.value?.createdAt) {
       const seconds = displayUser.value.createdAt.seconds
@@ -62,15 +83,25 @@
     return 'Unknown'
   })
 
+  // Get the number of followers
   const followersCount = computed(() => displayUser.value?.followers?.length || 0)
+  // Get the number of users the user is following
   const followingCount = computed(() => displayUser.value?.following?.length || 0)
 
+  // =================================================================================================
+  // Lifecycle Hooks
+  // =================================================================================================
+  // Fetch user activity if no user is passed as a prop
   onMounted(() => {
     if (!props.user && authUser.value?.uid) {
       profileStore.fetchUserActivity(authUser.value.uid)
     }
   })
 
+  // =================================================================================================
+  // Functions
+  // =================================================================================================
+  // Open the edit profile dialog
   function openEditDialog () {
     newDisplayName.value = displayName.value
     newBio.value = displayUser.value?.bio || ''
@@ -79,6 +110,7 @@
     editDialog.value = true
   }
 
+  // Handle the file change event for the photo upload
   function onFileChange (event) {
     const file = event.target.files[0]
     if (file) {
@@ -91,6 +123,7 @@
     }
   }
 
+  // Handle the profile update
   async function handleUpdateProfile () {
     try {
       await profileStore.updateUserProfile({
@@ -109,6 +142,7 @@
 <template>
   <div class="user-card">
     <div class="user-card-header">
+      <!-- User avatar -->
       <div class="user-avatar">
         <v-img
           v-if="photoURL"
@@ -121,23 +155,29 @@
       </div>
 
       <div class="user-main-info w-100">
+        <!-- User name and edit button -->
         <div class="user-name-row align-center justify-between">
           <h2>{{ displayName }}</h2>
           <button v-if="isCurrentUser" class="cancel-btn" @click="openEditDialog">Edit profile</button>
           <slot name="profile-actions" />
         </div>
+        <!-- User handle -->
         <p class="user-email">@{{ displayName.replaceAll(' ', '_') }}</p>
+        <!-- User bio -->
         <p class="user-bio">{{ displayUser?.bio || 'Entrepreneur learning from startup failures. Sharing my journey to help others.' }}</p>
+        <!-- User meta data -->
         <div class="user-meta d-flex align-center">
           <v-icon class="mr-1" icon="mdi-calendar-blank-outline" />
           <span class="join-date">Joined {{ joinDate }}</span>
         </div>
 
+        <!-- User stats -->
         <div class="user-stats">
           <span><strong>{{ followersCount }}</strong> followers</span>
           <span><strong>{{ followingCount }}</strong> following</span>
         </div>
 
+        <!-- User badge -->
         <div class="user-badge">
           Failure Age: 24.5 years
         </div>
@@ -146,6 +186,7 @@
 
     <hr class="user-card-divider">
 
+    <!-- User activity stats -->
     <div class="user-activity-footer">
       <div class="activity-stat">
         <v-icon icon="mdi-file-outline" />
@@ -177,6 +218,7 @@
         </div>
         <v-card-title class="text-center">Edit Profile</v-card-title>
         <v-card-text>
+          <!-- Avatar editing section -->
           <div class="edit-avatar-section position-relative">
             <div class="edit-avatar">
               <v-img
@@ -199,6 +241,7 @@
             </label>
           </div>
 
+          <!-- Form inputs for display name and bio -->
           <form-input
             v-model="newDisplayName"
             density="comfortable"
@@ -218,6 +261,7 @@
             />
           </div>
         </v-card-text>
+        <!-- Dialog actions -->
         <v-row class="mt-1 px-4">
           <v-col>
             <div class="cancel-btn" @click="editDialog = false">Cancel</div>
