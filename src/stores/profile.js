@@ -28,13 +28,21 @@ export const useProfileStore = defineStore('profile', {
         const querySnapshot = await getDocs(q)
 
         const posts = []
+        const authStore = useAuthStore()
+        const user = authStore.user
+
         for (const doc of querySnapshot.docs) {
           const post = { id: doc.id, ...doc.data() }
-          if (post.uid) {
-            const authStore = useAuthStore()
+
+          if (post.stepFive?.isAnonymous) {
             post.user = {
-              displayName: authStore.user?.displayName,
-              photoURL: authStore.user?.photoURL,
+              displayName: 'Anonymous',
+              photoURL: null,
+            }
+          } else if (post.uid && user) {
+            post.user = {
+              displayName: user.displayName,
+              photoURL: user.photoURL,
             }
           }
           posts.push(post)
@@ -101,7 +109,7 @@ export const useProfileStore = defineStore('profile', {
         const postsQuery = query(collection(db, 'posts'), where('uid', '==', userId))
         const postsSnapshot = await getDocs(postsQuery)
 
-        for (const doc of postsSnapshot) {
+        for (const doc of postsSnapshot.docs) {
           const data = doc.data()
           activities.push({
             type: 'post',
@@ -117,7 +125,7 @@ export const useProfileStore = defineStore('profile', {
         const commentsQuery = query(collection(db, 'comments'), where('user.uid', '==', userId))
         const commentsSnapshot = await getDocs(commentsQuery)
 
-        for (const doc of commentsSnapshot) {
+        for (const doc of commentsSnapshot.docs) {
           const data = doc.data()
           activities.push({
             type: 'comment',
@@ -152,7 +160,7 @@ export const useProfileStore = defineStore('profile', {
         const commentsQuery = query(collection(db, 'comments'), where('user.uid', '==', userId))
         const commentsSnapshot = await getDocs(commentsQuery)
 
-        for (const doc of commentsSnapshot) {
+        for (const doc of commentsSnapshot.docs) {
           const data = doc.data()
           if (data.postId) {
             postIds.add(data.postId)
@@ -164,7 +172,22 @@ export const useProfileStore = defineStore('profile', {
           const postDocRef = doc(db, 'posts', postId)
           const postDoc = await getDoc(postDocRef)
           if (postDoc.exists()) {
-            return { id: postDoc.id, ...postDoc.data() }
+            const postData = postDoc.data()
+            const post = { id: postDoc.id, ...postData }
+
+            if (post.stepFive?.isAnonymous) {
+              post.user = {
+                displayName: 'Anonymous',
+                photoURL: null,
+              }
+            } else if (post.uid) {
+              const userDocRef = doc(db, 'users', post.uid)
+              const userDoc = await getDoc(userDocRef)
+              if (userDoc.exists()) {
+                post.user = userDoc.data()
+              }
+            }
+            return post
           }
           return null
         })

@@ -113,6 +113,7 @@
         <v-img
           v-if="photoURL"
           alt="Profile"
+          class="h-100"
           cover
           :src="photoURL"
         />
