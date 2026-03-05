@@ -30,17 +30,17 @@
   const { posts, loading, error, user, userActivity } = storeToRefs(userInfoStore)
   const { user: authUser } = storeToRefs(authStore)
   const activeTabIndex = ref(0)
-  const userId = route.params.id
+  const userId = computed(() => route.params.id)
   const aboutDialog = ref(false)
 
-  const isCurrentUser = computed(() => authUser.value?.uid === userId)
+  const isCurrentUser = computed(() => authUser.value?.uid === userId.value)
   const isFollowing = computed(() => {
-    return authUser.value?.following?.includes(userId)
+    return authUser.value?.following?.includes(userId.value)
   })
 
   async function toggleFollow () {
-    await (isFollowing.value ? profileStore.unfollowUser(userId) : profileStore.followUser(userId))
-    await userInfoStore.fetchUser(userId)
+    await (isFollowing.value ? profileStore.unfollowUser(userId.value) : profileStore.followUser(userId.value))
+    await userInfoStore.fetchUser(userId.value)
     toast.info(isFollowing.value ? `Followed ${user.value.displayName}` : `Unfollowed ${user.value.displayName}`)
   }
 
@@ -60,10 +60,10 @@
   }
 
   onMounted(() => {
-    if (userId) {
-      userInfoStore.fetchUser(userId)
-      userInfoStore.fetchUserPosts(userId)
-      userInfoStore.fetchUserActivity(userId)
+    if (userId.value) {
+      userInfoStore.fetchUser(userId.value)
+      userInfoStore.fetchUserPosts(userId.value)
+      userInfoStore.fetchUserActivity(userId.value)
     }
   })
 
