@@ -8,12 +8,23 @@
   import { useProfileStore } from '@/stores/profile.js'
   import '@/styles/components/profile/user-card.scss'
 
+  const props = defineProps({
+    user: {
+      type: Object,
+      default: null,
+    },
+    activity: {
+      type: Object,
+      default: null,
+    },
+  })
+
   const authStore = useAuthStore()
   const profileStore = useProfileStore()
   const toast = useToast()
 
-  const { user } = storeToRefs(authStore)
-  const { userActivity } = storeToRefs(profileStore)
+  const { user: authUser } = storeToRefs(authStore)
+  const { userActivity: profileActivity } = storeToRefs(profileStore)
 
   const editDialog = ref(false)
   const newDisplayName = ref('')
@@ -21,8 +32,18 @@
   const newPhotoFile = ref(null)
   const photoPreviewUrl = ref(null)
 
-  const displayName = computed(() => user.value?.displayName || 'User')
-  const photoURL = computed(() => user.value?.photoURL)
+  const displayUser = computed(() => props.user || authUser.value)
+  const displayActivity = computed(() => props.activity || profileActivity.value)
+
+  const isCurrentUser = computed(() => {
+    if (!authUser.value || !displayUser.value) return false
+    const authId = authUser.value.uid
+    const displayId = displayUser.value.id || displayUser.value.uid
+    return authId === displayId
+  })
+
+  const displayName = computed(() => displayUser.value?.displayName || 'User')
+  const photoURL = computed(() => displayUser.value?.photoURL)
   const initials = computed(() => {
     const name = displayName.value
     if (!name) return 'U'
@@ -31,24 +52,28 @@
     return (parts[0].charAt(0) + (parts[1]?.charAt(0) || '')).toUpperCase()
   })
   const joinDate = computed(() => {
-    if (user.value?.createdAt) {
-      return dayjs.unix(user.value.createdAt.seconds).format('MMMM YYYY')
+    if (displayUser.value?.createdAt) {
+      const seconds = displayUser.value.createdAt.seconds
+      if (seconds) {
+        return dayjs.unix(seconds).format('MMMM YYYY')
+      }
+      return dayjs(displayUser.value.createdAt).format('MMMM YYYY')
     }
     return 'Unknown'
   })
 
-  const followersCount = computed(() => user.value?.followers?.length || 0)
-  const followingCount = computed(() => user.value?.following?.length || 0)
+  const followersCount = computed(() => displayUser.value?.followers?.length || 0)
+  const followingCount = computed(() => displayUser.value?.following?.length || 0)
 
   onMounted(() => {
-    if (user.value?.uid) {
-      profileStore.fetchUserActivity(user.value.uid)
+    if (!props.user && authUser.value?.uid) {
+      profileStore.fetchUserActivity(authUser.value.uid)
     }
   })
 
   function openEditDialog () {
     newDisplayName.value = displayName.value
-    newBio.value = user.value?.bio || ''
+    newBio.value = displayUser.value?.bio || ''
     photoPreviewUrl.value = photoURL.value
     newPhotoFile.value = null
     editDialog.value = true
@@ -97,10 +122,10 @@
       <div class="user-main-info w-100">
         <div class="user-name-row align-center justify-between">
           <h2>{{ displayName }}</h2>
-          <button class="cancel-btn" @click="openEditDialog">Edit profile</button>
+          <button v-if="isCurrentUser" class="cancel-btn" @click="openEditDialog">Edit profile</button>
         </div>
         <p class="user-email">@{{ displayName.replaceAll(' ', '_') }}</p>
-        <p class="user-bio">{{ user?.bio || 'Entrepreneur learning from startup failures. Sharing my journey to help others.' }}</p>
+        <p class="user-bio">{{ displayUser?.bio || 'Entrepreneur learning from startup failures. Sharing my journey to help others.' }}</p>
         <div class="user-meta d-flex align-center">
           <v-icon class="mr-1" icon="mdi-calendar-blank-outline" />
           <span class="join-date">Joined {{ joinDate }}</span>
@@ -121,19 +146,19 @@
 
     <div class="user-activity-footer">
       <div class="activity-stat">
-        <span class="stat-value">{{ userActivity.posts }}</span>
+        <span class="stat-value">{{ displayActivity.posts }}</span>
         <span class="stat-label">Posts</span>
       </div>
       <div class="activity-stat">
-        <span class="stat-value">{{ userActivity.comments }}</span>
+        <span class="stat-value">{{ displayActivity.comments }}</span>
         <span class="stat-label">Comments</span>
       </div>
       <div class="activity-stat">
-        <span class="stat-value">{{ userActivity.reactionsReceived }}</span>
+        <span class="stat-value">{{ displayActivity.reactionsReceived }}</span>
         <span class="stat-label">Reactions Received</span>
       </div>
       <div class="activity-stat">
-        <span class="stat-value">{{ userActivity.reactionsGiven }}</span>
+        <span class="stat-value">{{ displayActivity.reactionsGiven }}</span>
         <span class="stat-label">Reactions Given</span>
       </div>
     </div>

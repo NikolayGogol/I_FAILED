@@ -119,6 +119,11 @@
     router.push(`/post/${p.post.id}`)
   }
 
+  function openUserProfile () {
+    if (p.post.stepFive?.isAnonymous) return
+    router.push(`/user-info/${p.post.uid}`)
+  }
+
   async function handleFollow () {
     if (!authStore.user) {
       await router.push('/login')
@@ -199,44 +204,46 @@
 <template>
   <div v-if="post && !isMuted && !isBlocked" class="post-card">
     <header class="post-header">
-      <div class="post-avatar">
+      <div class="post-avatar cursor-pointer" @click="openUserProfile">
         <img v-if="post.user.photoURL" alt="User avatar" :src="post.user.photoURL">
         <span v-else>{{ userInitial }}</span>
       </div>
-      <div class="post-author">
+      <div class="post-author cursor-pointer" @click="openUserProfile">
         <div class="post-author-name">{{ post.user.displayName }}</div>
         <div class="post-author-handle">@{{ post.user.displayName.replaceAll(' ', '_') }}</div>
       </div>
       <v-spacer />
-      <v-menu v-if="!isOwnPost" open-on-hover>
-        <template #activator="{ props }">
-          <v-btn icon size="small" v-bind="props" variant="text">
-            <v-icon>mdi-dots-horizontal</v-icon>
-          </v-btn>
-        </template>
-        <v-list class="rounded-lg">
-          <v-list-item class="cursor-pointer" @click="handleMutePost">
-            <v-icon class="mr-2" icon="mdi-volume-off" />
-            Hide this post
-          </v-list-item>
-          <template v-if="!isBlocked">
-            <v-list-item class="cursor-pointer" @click="handleFollow">
-              <v-icon class="mr-2" :icon="isFollowing ? 'mdi-account-minus-outline' : 'mdi-account-plus-outline'" />
-              {{ isFollowing ? 'Unfollow' : 'Follow' }} @{{ post.user.displayName.replaceAll(' ', '_') }}
-            </v-list-item>
-            <v-list-item class="cursor-pointer text-danger" @click="handleBlock">
-              <v-icon class="mr-2" icon="mdi-block-helper" />
-              Block this user
-            </v-list-item>
+      <slot name="actions">
+        <v-menu v-if="!isOwnPost" open-on-hover>
+          <template #activator="{ props }">
+            <v-btn icon size="small" v-bind="props" variant="text">
+              <v-icon>mdi-dots-horizontal</v-icon>
+            </v-btn>
           </template>
-          <template v-else>
-            <v-list-item class="cursor-pointer text-danger" @click="handleUnblock">
-              <v-icon class="mr-2" icon="mdi-account-off-outline" />
-              Unblock this user
+          <v-list class="rounded-lg">
+            <v-list-item class="cursor-pointer" @click="handleMutePost">
+              <v-icon class="mr-2" icon="mdi-volume-off" />
+              Hide this post
             </v-list-item>
-          </template>
-        </v-list>
-      </v-menu>
+            <template v-if="!isBlocked">
+              <v-list-item class="cursor-pointer" @click="handleFollow">
+                <v-icon class="mr-2" :icon="isFollowing ? 'mdi-account-minus-outline' : 'mdi-account-plus-outline'" />
+                {{ isFollowing ? 'Unfollow' : 'Follow' }} @{{ post.user.displayName.replaceAll(' ', '_') }}
+              </v-list-item>
+              <v-list-item class="cursor-pointer text-danger" @click="handleBlock">
+                <v-icon class="mr-2" icon="mdi-block-helper" />
+                Block this user
+              </v-list-item>
+            </template>
+            <template v-else>
+              <v-list-item class="cursor-pointer text-danger" @click="handleUnblock">
+                <v-icon class="mr-2" icon="mdi-account-off-outline" />
+                Unblock this user
+              </v-list-item>
+            </template>
+          </v-list>
+        </v-menu>
+      </slot>
 
     </header>
     <div v-if="post.stepFive.enableTriggerWarning && !showSensitiveContent" class="sensitive-content">

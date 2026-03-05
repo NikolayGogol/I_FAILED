@@ -4,6 +4,13 @@
   import { useAuthStore } from '@/stores/auth'
   import { useProfileStore } from '@/stores/profile'
 
+  const props = defineProps({
+    userId: {
+      type: String,
+      default: null,
+    },
+  })
+
   const profileStore = useProfileStore()
   const authStore = useAuthStore()
 
@@ -11,8 +18,9 @@
   const loading = ref(true)
 
   onMounted(async () => {
-    if (authStore.user?.uid) {
-      posts.value = await profileStore.fetchUserInteractedPosts(authStore.user.uid)
+    const targetUserId = props.userId || authStore.user?.uid
+    if (targetUserId) {
+      posts.value = await profileStore.fetchUserInteractedPosts(targetUserId)
       loading.value = false
     }
   })
@@ -25,7 +33,7 @@
     </div>
 
     <div v-else-if="posts.length === 0" class="text-center pa-4 text-grey">
-      No activity found. You haven't commented on any posts yet.
+      No activity found. This user hasn't commented on any posts yet.
     </div>
 
     <div v-else class="posts-list">

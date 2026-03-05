@@ -10,23 +10,25 @@
 <script setup>
   import { storeToRefs } from 'pinia'
   import { onMounted, ref } from 'vue'
+  import { useRoute } from 'vue-router'
   import PostCard from '@/components/feed/PostCard.vue'
   import Activity from '@/components/profile/Activity.vue'
   import UserCard from '@/components/profile/UserCard.vue'
-  import { useAuthStore } from '@/stores/auth'
-  import { useProfileStore } from '@/stores/profile'
+  import { useUserInfoStore } from '@/stores/user-info.js'
   import '@/styles/pages/profile.scss'
 
-  const authStore = useAuthStore()
-  const profileStore = useProfileStore()
+  const userInfoStore = useUserInfoStore()
+  const route = useRoute()
 
-  const { user } = storeToRefs(authStore)
-  const { posts, loading, error, userActivity } = storeToRefs(profileStore)
+  const { posts, loading, error, user, userActivity } = storeToRefs(userInfoStore)
   const activeTabIndex = ref(0)
+  const userId = route.params.id
+
   onMounted(() => {
-    if (authStore.user?.uid) {
-      profileStore.fetchUserPosts(authStore.user.uid)
-      profileStore.fetchUserActivity(authStore.user.uid)
+    if (userId) {
+      userInfoStore.fetchUser(userId)
+      userInfoStore.fetchUserPosts(userId)
+      userInfoStore.fetchUserActivity(userId)
     }
   })
 
@@ -60,13 +62,6 @@
           >{{ item.label }} <span v-if="!index">({{ posts?.length }})</span>
           </button>
         </nav>
-        <div class="create-post-card">
-          <div class="create-post-content">
-            <div class="user-avatar-mini">SC</div>
-            <div class="post-input-placeholder">What's new?</div>
-            <button class="cancel-btn" @click="$router.push('/create-post')">Write a post</button>
-          </div>
-        </div>
         <template v-if="activeTabIndex === 0">
           <div v-if="loading" class="text-center py-10">
             <v-progress-circular color="primary" indeterminate />
@@ -75,7 +70,7 @@
             {{ error }}
           </div>
           <div v-else-if="posts.length === 0" class="text-center py-10 text-medium-emphasis">
-            You haven't posted anything yet.
+            This user hasn't posted anything yet.
           </div>
           <div v-else class="profile-posts">
             <PostCard
@@ -85,7 +80,7 @@
             />
           </div>
         </template>
-        <activity v-if="activeTabIndex === 1" />
+        <activity v-if="activeTabIndex === 1" :user-id="userId" />
       </div>
     </section>
   </div>
