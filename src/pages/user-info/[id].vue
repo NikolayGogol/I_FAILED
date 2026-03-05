@@ -2,7 +2,6 @@
 {
 "meta": {
 "layout": "MainLayout",
-"auth": true
 }
 }
 </route>

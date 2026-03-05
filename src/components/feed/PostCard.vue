@@ -123,7 +123,7 @@
 
   function openUserProfile () {
     if (p.post.stepFive?.isAnonymous) return
-    authStore.user.uid === p.post.uid ? router.push('/profile') : router.push(`/user-info/${p.post.uid}`)
+    authStore.user?.uid === p.post.uid ? router.push('/profile') : router.push(`/user-info/${p.post.uid}`)
   }
 
   async function handleFollow () {
