@@ -6,7 +6,6 @@ import { defineStore } from 'pinia'
 import { db } from '@/firebase'
 import { useAuthStore } from '@/stores/auth'
 const USER_COLLECTION = import.meta.env.VITE_USERS_COLLECTION
-const VITE_USERS_COLLECTION = import.meta.env.VITE_USERS_COLLECTION
 
 // =================================================================================================
 // Feed Store

@@ -39,8 +39,7 @@ const googleProvider = new GoogleAuthProvider()
 const facebookProvider = new FacebookAuthProvider()
 
 // Global error handler for Firebase Auth
-onAuthStateChanged(auth, user => {
-  console.log(user)
+onAuthStateChanged(auth, () => {
   // You can handle auth state changes here
 }, error => {
   console.error('Firebase Auth Error:', error)
@@ -48,7 +47,7 @@ onAuthStateChanged(auth, user => {
 })
 
 export { auth, db, facebookProvider, functions, googleProvider, storage }
- 
+
 export {
   browserLocalPersistence,
   browserSessionPersistence,

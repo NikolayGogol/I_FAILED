@@ -6,8 +6,16 @@
 }
 
 .form-custom-input {
+  position: relative;
+
   .v-field__input {
     border: none !important;
+  }
+
+  .v-counter {
+    position: absolute;
+    bottom: 25px;
+    right: 10px;
   }
 
   .v-input__control {
