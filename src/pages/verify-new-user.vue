@@ -1,8 +1,8 @@
 <route lang="json">
 {
-  "meta": {
-    "layout": "AuthMinLayout"
-  }
+"meta": {
+"layout": "AuthMinLayout"
+}
 }
 </route>
 
@@ -37,7 +37,11 @@
         errorMessage.value = response.data.message || 'Verification failed.'
       }
     } catch (error) {
-      errorMessage.value = error.response?.data?.message || 'An unexpected error occurred during verification.'
+      const data = error.response?.data
+      errorMessage.value = data?.error === 'Invalid or expired token' ? 'This verification link has already been used.' : data?.message || data?.error || 'An unexpected error occurred during verification.'
+      setTimeout(() => {
+        router.push('/login')
+      }, 2000)
     } finally {
       loading.value = false
     }
@@ -68,7 +72,7 @@
         class="mb-4"
         icon="mdi-alert-circle"
         prominent
-        type="error"
+        type="success"
       >
         {{ errorMessage || 'Failed to verify your email. The link might be invalid or expired.' }}
       </v-alert>

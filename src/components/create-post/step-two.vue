@@ -1,6 +1,6 @@
 <script setup>
   import { QuillEditor } from '@vueup/vue-quill'
-  import { ref, watch } from 'vue'
+  import { watch } from 'vue'
   import DatePickerInput from '@/components/DatePickerInput.vue'
   import FormInput from '@/components/FormInput.vue'
   import UploadFile from '@/components/UploadFile.vue'

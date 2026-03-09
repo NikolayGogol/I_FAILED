@@ -1,7 +1,6 @@
 <script setup>
   import { QuillEditor } from '@vueup/vue-quill'
   import { watch } from 'vue'
-  import FormInput from '@/components/FormInput.vue'
   import { useCreatePostStore } from '@/stores/create-post'
   import { stripHtml } from '@/utils/html.js'
   import '@vueup/vue-quill/dist/vue-quill.snow.css'
@@ -10,7 +9,6 @@
 
   const store = useCreatePostStore()
   const emit = defineEmits(['isValid'])
-  const inputLength = 100
   const quillLength = 5000
 
   // Handler to limit text length
