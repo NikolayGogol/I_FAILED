@@ -36,6 +36,7 @@
       <FormInput
         v-model="store.stepFour.cost"
         class="form-input"
+        persistent-counter
         placeholder="Monetary or time, e.g., $5,000 or 6 months of time"
       />
     </div>
