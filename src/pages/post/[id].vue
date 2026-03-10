@@ -1,7 +1,8 @@
 <route lang="json">
 {
   "meta": {
-    "layout": "MainLayout"
+    "layout": "MainLayout",
+    "auth": false
   }
 }
 </route>
