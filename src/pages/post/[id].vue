@@ -9,15 +9,21 @@
 
 <script setup>
   import { computed, onMounted, ref } from 'vue'
-  import { useRoute } from 'vue-router'
+  import { useRoute, useRouter } from 'vue-router'
+  import { useToast } from 'vue-toastification'
   import FormInput from '@/components/FormInput.vue'
+  import { auth } from '@/firebase'
   import { useAuthStore } from '@/stores/auth'
+  import { usePostCardStore } from '@/stores/post-card.js'
   import { useSinglePostStore } from '@/stores/single-post'
   import { formatNumber } from '@/utils/format-number.js'
   import '@/styles/pages/single-post.scss'
 
   const route = useRoute()
+  const router = useRouter()
+  const toast = useToast()
   const { getPostById, incrementViewCount, addComment, addReply, toggleCommentLike, getComments } = useSinglePostStore()
+  const postCardStore = usePostCardStore()
   const authStore = useAuthStore()
   const post = ref(null)
   const comments = ref([])
@@ -25,6 +31,11 @@
   const isSubmitting = ref(false)
   const replyText = ref({})
   const showReplyInput = ref({})
+
+  // Like logic state
+  const isLiked = ref(false)
+  const likeCount = ref(0)
+  const isLiking = ref(false)
 
   const reactions = ref([
     {
@@ -70,10 +81,54 @@
       getPostById(postId).then(res => {
         post.value = res
         incrementViewCount(postId)
+
+        // Initialize like state
+        if (auth.currentUser && res.likedBy?.includes(auth.currentUser.uid)) {
+          isLiked.value = true
+        }
+        likeCount.value = res.likes || 0
       })
       loadComments(postId)
     }
   })
+
+  async function handlePostLike () {
+    if (!authStore.user) {
+      await router.push('/login')
+      return
+    }
+    if (isLiking.value) return
+    isLiking.value = true
+
+    const originalIsLiked = isLiked.value
+    const originalLikeCount = likeCount.value
+    const newIsLiked = !isLiked.value
+
+    isLiked.value = newIsLiked
+    likeCount.value += newIsLiked ? 1 : -1
+
+    const result = await postCardStore.toggleLike({
+      postId: post.value.id,
+      liked: newIsLiked,
+    })
+
+    if (!result.success) {
+      isLiked.value = originalIsLiked
+      likeCount.value = originalLikeCount
+      console.error('Failed to update like status:', result.error)
+    }
+
+    isLiking.value = false
+  }
+
+  function handleShare () {
+    const url = window.location.href
+    navigator.clipboard.writeText(url).then(() => {
+      toast.success('Link copied to clipboard!')
+    }).catch(() => {
+      toast.error('Failed to copy link')
+    })
+  }
 
   async function loadComments (postId) {
     const allComments = await getComments(postId)
@@ -184,13 +239,7 @@
           size="small"
         >{{ post.stepOne.selectedCategories[0].label }}
         </v-chip>
-        <div class="text-caption text-grey d-flex align-center">
-          <v-icon class="mr-1" size="small">mdi-eye-outline</v-icon>
-          {{ post.views || 0 }}
-          <span class="mx-2">•</span>
-          <v-icon class="mr-1" size="small">mdi-clock-outline</v-icon>
-          1 min read
-        </div>
+
       </div>
 
       <h1 class="single-post-page__title text-h3 font-weight-bold mb-8 text-blue-grey-darken-4">
@@ -266,8 +315,8 @@
         class="w-100"
         :src="img"
       >
-      <v-divider class="mb-6" />
-      <div class="text-center mb-4 font-weight-bold">React to This Story</div>
+      <v-divider class="my-6"></v-divider>
+      <h3>React to This Story</h3>
       <ul class="reaction-list ga-2">
         <li v-for="(item, index) in reactions" :key="index">
           <p class="emoji">{{ item.emoji }}</p>
@@ -275,9 +324,25 @@
         </li>
       </ul>
       <div class="footer">
-        <div class="item">
-          <v-icon icon="mdi-heart-outline"></v-icon>
+        <div class="d-flex">
+          <div
+            class="item cursor-pointer"
+            :class="{ 'text-primary': isLiked }"
+            @click="handlePostLike"
+          >
+            <v-icon :icon="isLiked ? 'mdi-heart' : 'mdi-heart-outline'" />
+            <span class="ml-2">{{ likeCount }}</span>
+          </div>
+          <div class="item ml-4">
+            <v-icon icon="mdi-comment-outline" />
+            <span class="ml-2">{{ comments.length }}</span>
+          </div>
+          <div class="item ml-4">
+            <v-icon icon="mdi-eye-outline" />
+            <span class="ml-2">{{ post.views || 0 }}</span>
+          </div>
         </div>
+        <v-icon icon="mdi-share-variant-outline" class="cursor-pointer" @click="handleShare"></v-icon>
       </div>
     </div>
 

@@ -18,7 +18,7 @@
   h3 {
     color: $color-text-primary;
     font-weight: 600;
-    font-size: 24xp;
+    font-size: 24px;
     margin-bottom: 12px;
   }
 
@@ -68,6 +68,23 @@
         font-size: 12px;
         line-height: normal;
         white-space: nowrap;
+      }
+    }
+  }
+
+  .footer {
+    margin-top: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .item {
+      color: $color-text-quaternary;
+      font-size: 16px;
+      font-weight: 400;
+
+      i {
+        font-size: 20px;
       }
     }
   }
