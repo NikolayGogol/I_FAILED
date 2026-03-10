@@ -4,12 +4,10 @@
   // =================================================================================================
   import { computed, onMounted, ref } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
-  import { useToast } from 'vue-toastification'
+  import PostMenu from '@/components/feed/PostMenu.vue'
   import { auth } from '@/firebase'
   import { useAuthStore } from '@/stores/auth.js'
-  import { useFeedStore } from '@/stores/feed.js'
   import { usePostCardStore } from '@/stores/post-card.js'
-  import { useWhoToFollowStore } from '@/stores/who-to-follow.js'
   import { formatNumber } from '@/utils/format-number.js'
   import '@/styles/components/feed/post-card.scss'
 
@@ -28,11 +26,8 @@
   // =================================================================================================
   const postCardStore = usePostCardStore()
   const authStore = useAuthStore()
-  const whoToFollowStore = useWhoToFollowStore()
-  const feedStore = useFeedStore()
   const router = useRouter()
   const route = useRoute()
-  const toast = useToast()
 
   // =================================================================================================
   // State
@@ -43,7 +38,6 @@
   const likeCount = ref(p.post.likes || 0)
   const isLiking = ref(false) // To disable the button during the request
   const commentCount = ref(0)
-  const showBlockDialog = ref(false)
   const showSensitiveContent = ref(false)
 
   // =================================================================================================
@@ -58,12 +52,6 @@
   const isOwnPost = computed(() => {
     if (!authStore.user) return false
     return authStore.user.uid === p.post.uid
-  })
-
-  // Check if the current user is following the post's author
-  const isFollowing = computed(() => {
-    if (!authStore.user || !authStore.user.following) return false
-    return authStore.user.following.includes(p.post.uid)
   })
 
   // Check if the post's author is blocked by the current user
@@ -154,86 +142,6 @@
     if (p.post.stepFive?.isAnonymous) return
     authStore.user?.uid === p.post.uid ? router.push('/profile') : router.push(`/user-info/${p.post.uid}`)
   }
-
-  // Handle the follow button click
-  async function handleFollow () {
-    if (!authStore.user) {
-      await router.push('/login')
-      return
-    }
-    const userId = p.post.uid
-    const userName = p.post.user.displayName
-
-    if (isFollowing.value) {
-      const success = await whoToFollowStore.unfollowUser(userId)
-      if (success) {
-        toast.info(`Unfollowed ${userName}`)
-      } else {
-        toast.error(`Failed to unfollow ${userName}`)
-      }
-    } else {
-      const success = await whoToFollowStore.followUser(userId)
-      if (success) {
-        toast.info(`Following ${userName}`)
-      } else {
-        toast.error(`Failed to follow ${userName}`)
-      }
-    }
-  }
-
-  // Show the block user confirmation dialog
-  function handleBlock () {
-    showBlockDialog.value = true
-  }
-
-  // Confirm blocking the user
-  async function confirmBlock () {
-    if (!authStore.user) {
-      await router.push('/login')
-      return
-    }
-    const userId = p.post.uid
-    const userName = p.post.user.displayName
-
-    const success = await whoToFollowStore.blockUser(userId)
-    if (success) {
-      toast.info('User blocked, and you will no longer see their posts')
-    } else {
-      toast.error(`Failed to block ${userName}`)
-    }
-    showBlockDialog.value = false
-  }
-
-  // Handle the unblock button click
-  async function handleUnblock () {
-    if (!authStore.user) {
-      await router.push('/login')
-      return
-    }
-    const userId = p.post.uid
-    const userName = p.post.user.displayName
-
-    const success = await whoToFollowStore.unblockUser(userId)
-    if (success) {
-      toast.info(`Unblocked ${userName}`)
-    } else {
-      toast.error(`Failed to unblock ${userName}`)
-    }
-  }
-
-  // Mute the post
-  async function handleMutePost () {
-    if (!authStore.user) {
-      await router.push('/login')
-      return
-    }
-    const success = await feedStore.mutePost(p.post.id)
-    if (success) {
-      toast.info('Post muted')
-    } else {
-      toast.error('Failed to mute post')
-    }
-  }
 </script>
 
 <template>
@@ -251,35 +159,7 @@
       </div>
       <v-spacer />
       <!-- Post options menu -->
-      <v-menu v-if="!isOwnPost" open-on-hover>
-        <template #activator="{ props }">
-          <v-btn icon size="small" v-bind="props" variant="text">
-            <v-icon>mdi-dots-horizontal</v-icon>
-          </v-btn>
-        </template>
-        <v-list class="rounded-lg">
-          <v-list-item class="cursor-pointer" @click="handleMutePost">
-            <v-icon class="mr-2" icon="mdi-volume-off" />
-            Hide this post
-          </v-list-item>
-          <template v-if="!isBlocked">
-            <v-list-item class="cursor-pointer" @click="handleFollow">
-              <v-icon class="mr-2" :icon="isFollowing ? 'mdi-account-minus-outline' : 'mdi-account-plus-outline'" />
-              {{ isFollowing ? 'Unfollow' : 'Follow' }} @{{ post.user.displayName.replaceAll(' ', '_') }}
-            </v-list-item>
-            <v-list-item class="cursor-pointer text-danger" @click="handleBlock">
-              <v-icon class="mr-2" icon="mdi-block-helper" />
-              Block this user
-            </v-list-item>
-          </template>
-          <template v-else>
-            <v-list-item class="cursor-pointer text-danger" @click="handleUnblock">
-              <v-icon class="mr-2" icon="mdi-account-off-outline" />
-              Unblock this user
-            </v-list-item>
-          </template>
-        </v-list>
-      </v-menu>
+      <PostMenu v-if="!isOwnPost" :post="post" />
 
     </header>
     <!-- Sensitive content warning -->
@@ -346,24 +226,5 @@
         <v-icon size="18">mdi-share-variant</v-icon>
       </button>
     </footer>
-    <!-- Block User Dialog -->
-    <v-dialog v-model="showBlockDialog" max-width="480">
-      <div class="bg-white rounded-lg py-6 px-6">
-        <h6 class="text-h6 text-center">Block @{{ post.user.displayName }}?</h6>
-        <p class="text-description mt-3">
-          They will be able to see your public posts, but will no longer be able to engage with them.
-          @{{ post.user.displayName }} will also not be able to follow or message you, and you will not see
-          notifications from them.
-        </p>
-        <v-row class="mt-3">
-          <v-col>
-            <div class="cancel-btn" @click="showBlockDialog = false">Cancel</div>
-          </v-col>
-          <v-col>
-            <div class="submit-btn" @click="confirmBlock">Block</div>
-          </v-col>
-        </v-row>
-      </div>
-    </v-dialog>
   </div>
 </template>

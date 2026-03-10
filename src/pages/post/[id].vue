@@ -292,23 +292,26 @@
       <h1 class="font-weight-bold text-grey-darken-3">Post</h1>
     </div>
     <div class="bg mt-4">
-      <div class="single-post-page__header d-flex align-center">
-        <v-avatar class="mr-4" color="grey-lighten-2" size="48">
-          <v-img
-            v-if="post.user?.photoURL"
-            alt="User avatar"
-            class="w-100 img-cover"
-            :src="post.user.photoURL"
-          />
-          <span v-else class="text-h6">{{ userInitial }}</span>
-        </v-avatar>
-        <div>
-          <div class="d-flex">
-            <div class="font-weight-bold">{{ post.user?.displayName }}</div>
-            <div class="create-at">{{ timeAgo }}</div>
+      <div class="single-post-page__header w-100 d-flex align-center justify-space-between">
+        <div class="d-flex align-start">
+          <v-avatar class="mr-4" color="grey-lighten-2" size="48">
+            <v-img
+              v-if="post.user?.photoURL"
+              alt="User avatar"
+              class="w-100 img-cover"
+              :src="post.user.photoURL"
+            />
+            <span v-else class="text-h6">{{ userInitial }}</span>
+          </v-avatar>
+          <div>
+            <div class="d-flex">
+              <div class="font-weight-bold">{{ post.user?.displayName }}</div>
+              <div class="create-at">{{ timeAgo }}</div>
+            </div>
+            <div class="text-caption text-grey">@{{ post.user?.displayName.replaceAll(' ', '_') }}</div>
           </div>
-          <div class="text-caption text-grey">@{{ post.user?.displayName.replaceAll(' ', '_') }}</div>
         </div>
+        <div class="post-actions" />
       </div>
       <div class="d-flex justify-start mt-2">
         <div

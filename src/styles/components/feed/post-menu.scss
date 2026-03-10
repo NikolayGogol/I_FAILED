@@ -1,0 +1,46 @@
+@use '../../settings.scss' as *;
+@use '../../global/fonts' as *;
+@use 'sass:color';
+
+.v-list-item {
+  &.text-danger {
+    color: $color-error !important;
+
+    .v-icon {
+      color: $color-error !important;
+    }
+  }
+}
+
+.cancel-btn {
+  cursor: pointer;
+  text-align: center;
+  padding: $spacing-sm $spacing-md;
+  border-radius: $radius-md;
+  border: 1px solid $color-border;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: $color-background;
+  }
+}
+
+.submit-btn {
+  cursor: pointer;
+  text-align: center;
+  padding: $spacing-sm $spacing-md;
+  border-radius: $radius-md;
+  background-color: $color-error;
+  color: white;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: color.adjust($color-error, $lightness: -10%);
+  }
+}
+
+.text-description {
+  color: $color-text-secondary;
+  font-size: $font-size-sm;
+  line-height: $line-height-relaxed;
+}

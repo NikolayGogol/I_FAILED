@@ -25,6 +25,7 @@ declare module 'vue' {
     NotificationSettings: typeof import('./src/components/settings/NotificationSettings.vue')['default']
     PopularTags: typeof import('./src/components/sidebars/PopularTags.vue')['default']
     PostCard: typeof import('./src/components/feed/PostCard.vue')['default']
+    PostMenu: typeof import('./src/components/feed/PostMenu.vue')['default']
     PremiumSettings: typeof import('./src/components/settings/PremiumSettings.vue')['default']
     PrivacySettings: typeof import('./src/components/settings/PrivacySettings.vue')['default']
     ProfileCard: typeof import('./src/components/sidebars/ProfileCard.vue')['default']
