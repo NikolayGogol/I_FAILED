@@ -504,7 +504,7 @@
 
                 <span class="date text-caption text-grey">{{ formatCommentDate(comment.createdAt) }}</span>
               </div>
-              <div class="comment-item__content text-body-2 mb-2">{{ comment.text }}</div>
+              <div class="comment-item__content mb-2">{{ comment.text }}</div>
 
               <div class="comment-item__actions d-flex align-center mb-2">
                 <div
