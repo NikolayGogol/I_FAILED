@@ -12,7 +12,7 @@
 
 <script setup>
   import { computed, useAttrs } from 'vue'
-  import '@/styles/components/form-custom-textarea.scss'
+  import '@/styles/components/form-textarea.scss'
   defineOptions({
     inheritAttrs: false,
   })

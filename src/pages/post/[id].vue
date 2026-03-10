@@ -576,6 +576,7 @@
                     <div class="d-flex mt-2">
                       <div
                         class="submit-btn"
+                        :class="{ 'disabled': !replyText[comment.id]?.trim() }"
                         @click="submitReply(comment.id)"
                       >
                         Reply
@@ -605,13 +606,33 @@
                         reply.user?.displayName?.charAt(0).toUpperCase() || 'U'
                       }}</span>
                     </v-avatar>
-                    <div class="d-block">
-                      <span class="font-weight-bold text-body-2 mr-2">{{ reply.user?.displayName }}</span>
-                      <div class="text-caption text-grey">@{{ reply.user?.displayName.replaceAll(' ', '_') }}</div>
+                    <div class="d-flex flex-column">
+                      <div class="d-flex">
+                        <div class="d-block">
+                          <span class="font-weight-bold text-body-2 mr-2">{{ reply.user?.displayName }}</span>
+                          <div class="text-caption text-grey">@{{ reply.user?.displayName.replaceAll(' ', '_') }}</div>
+                        </div>
+                        <span class="text-caption text-grey">{{ formatCommentDate(reply.createdAt) }}</span>
+                      </div>
+                      <div class="mt-2">
+                        <div class="text-body-2">{{ reply.text }}</div>
+                        <div class="d-flex align-center mt-1">
+                          <div
+                            class="px-0 text-grey-darken-1 cursor-pointer"
+                            @click="toggleLike(reply)"
+                          >
+                            <v-icon
+                              :color="reply.likes?.includes(authStore.user?.uid) ? 'primary' : ''"
+                              icon="mdi-heart-outline"
+                              size="14px"
+                              start
+                            />
+                            <span class="text-caption">{{ reply.likes?.length || 0 }}</span>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                    <span class="text-caption text-grey">{{ formatCommentDate(reply.createdAt) }}</span>
                   </div>
-                  <div class="text-body-2 ml-8">{{ reply.text }}</div>
                 </div>
               </div>
             </div>
