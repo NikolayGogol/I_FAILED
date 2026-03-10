@@ -11,7 +11,7 @@
   import dayjs from 'dayjs'
   import relativeTime from 'dayjs/plugin/relativeTime'
   import { computed, onMounted, ref } from 'vue'
-  import { VEmojiPickerVEmojiPicker } from 'vue-emoji-picker'
+  import EmojiPicker from 'vue3-emoji-picker'
   import { useRoute, useRouter } from 'vue-router'
   import { useToast } from 'vue-toastification'
   import FormInput from '@/components/FormInput.vue'
@@ -20,6 +20,7 @@
   import { usePostCardStore } from '@/stores/post-card.js'
   import { useSinglePostStore } from '@/stores/single-post'
   import { formatNumber } from '@/utils/format-number.js'
+  import 'vue3-emoji-picker/css'
   import '@/styles/pages/single-post.scss'
 
   dayjs.extend(relativeTime)
@@ -219,6 +220,11 @@
   })
 
   async function submitComment () {
+    if (!authStore.user) {
+      await router.push('/login')
+      return
+    }
+
     if (!newComment.value.trim()) return
 
     isSubmitting.value = true
@@ -265,7 +271,7 @@
   }
 
   function onSelectEmoji (emoji) {
-    newComment.value += emoji.data
+    newComment.value += emoji.i
     showEmojiPicker.value = false
   }
 </script>
@@ -443,7 +449,7 @@
                 placeholder="Write a comment..."
               />
               <div class="emoji-picker-container">
-                <VEmojiPicker
+                <EmojiPicker
                   v-if="showEmojiPicker"
                   class="emoji-picker"
                   @select="onSelectEmoji"
