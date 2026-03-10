@@ -1,9 +1,9 @@
 <route lang="json">
 {
-  "meta": {
-    "layout": "MainLayout",
-    "auth": false
-  }
+"meta": {
+"layout": "MainLayout",
+"auth": false
+}
 }
 </route>
 
@@ -14,7 +14,6 @@
   import EmojiPicker from 'vue3-emoji-picker'
   import { useRoute, useRouter } from 'vue-router'
   import { useToast } from 'vue-toastification'
-  import FormInput from '@/components/FormInput.vue'
   import { auth } from '@/firebase'
   import { useAuthStore } from '@/stores/auth'
   import { usePostCardStore } from '@/stores/post-card.js'
@@ -38,6 +37,7 @@
   const replyText = ref({})
   const showReplyInput = ref({})
   const showEmojiPicker = ref(false)
+  const showReplyEmojiPicker = ref({})
 
   // Like logic state
   const isLiked = ref(false)
@@ -274,6 +274,14 @@
     newComment.value += emoji.i
     showEmojiPicker.value = false
   }
+
+  function onSelectReplyEmoji (emoji, commentId) {
+    if (!replyText.value[commentId]) {
+      replyText.value[commentId] = ''
+    }
+    replyText.value[commentId] += emoji.i
+    showReplyEmojiPicker.value[commentId] = false
+  }
 </script>
 
 <template>
@@ -375,7 +383,7 @@
         </ul>
       </div>
 
-      <v-divider class="my-6" />
+      <v-divider v-if="post.stepTwo.images?.length > 0" class="my-6" />
       <img
         v-for="img in post.stepTwo.images"
         :key="img"
@@ -473,102 +481,142 @@
           </div>
         </div>
       </div>
-
-      <div v-for="comment in comments" :key="comment.id" class="comment-item mb-4">
-        <div class="d-flex">
-          <v-avatar class="mr-3" color="grey-lighten-2" size="40">
-            <img v-if="comment.user?.photoURL" alt="User avatar" :src="comment.user.photoURL">
-            <span v-else class="text-subtitle-1">{{ comment.user?.displayName?.charAt(0).toUpperCase() || 'U' }}</span>
-          </v-avatar>
-          <div class="flex-grow-1">
-            <div class="comment-item__header d-flex align-center mb-1">
-              <span class="username font-weight-bold mr-2">{{ comment.user?.displayName }}</span>
-              <span class="date text-caption text-grey">{{ formatCommentDate(comment.createdAt) }}</span>
-            </div>
-            <div class="comment-item__content text-body-2 mb-2">{{ comment.text }}</div>
-
-            <div class="comment-item__actions d-flex align-center mb-2">
-              <v-btn
-                class="px-0 mr-4"
-                color="grey-darken-1"
-                density="compact"
-                variant="text"
-                @click="toggleLike(comment)"
-              >
-                <v-icon
-                  :color="comment.likes?.includes(authStore.user?.uid) ? 'primary' : ''"
-                  icon="mdi-thumb-up-outline"
-                  start
-                />
-                {{ comment.likes?.length || 0 }}
-              </v-btn>
-
-              <v-btn
-                class="px-0"
-                color="grey-darken-1"
-                density="compact"
-                variant="text"
-                @click="showReplyInput[comment.id] = !showReplyInput[comment.id]"
-              >
-                Reply
-              </v-btn>
-            </div>
-
-            <!-- Reply Input -->
-            <div v-if="showReplyInput[comment.id]" class="mt-2 mb-4 ml-4">
-              <FormInput
-                label="Write a reply..."
-                :model-value="replyText[comment.id] || ''"
-                placeholder="Reply to comment..."
-                @update:model-value="val => replyText[comment.id] = val"
+      <template v-if="comments.length > 0">
+        <div v-for="comment in comments" :key="comment.id" class="comment-item mb-4 mt-7">
+          <div class="d-flex">
+            <v-avatar class="mr-3" color="grey-lighten-2" size="40">
+              <v-img
+                v-if="comment.user?.photoURL"
+                alt="User avatar"
+                cover
+                :src="comment.user.photoURL"
               />
-              <div class="d-flex justify-end mt-2">
-                <v-btn
-                  color="primary"
-                  size="small"
-                  variant="text"
-                  @click="submitReply(comment.id)"
+              <span v-else class="text-subtitle-1">{{
+                comment.user?.displayName?.charAt(0).toUpperCase() || 'U'
+              }}</span>
+            </v-avatar>
+            <div class="flex-grow-1">
+              <div class="comment-item__header d-flex align-center mb-1">
+                <span class="username font-weight-bold mr-2">{{ comment.user?.displayName }}</span>
+                <span class="date text-caption text-grey">{{ formatCommentDate(comment.createdAt) }}</span>
+              </div>
+              <div class="comment-item__content text-body-2 mb-2">{{ comment.text }}</div>
+
+              <div class="comment-item__actions d-flex align-center mb-2">
+                <div
+                  class="px-0 text-grey-darken-1 cursor-pointer"
+                  @click="toggleLike(comment)"
+                >
+                  <v-icon
+                    :color="comment.likes?.includes(authStore.user?.uid) ? 'primary' : ''"
+                    icon="mdi-heart-outline"
+                    size="18px"
+                    start
+                  />
+                  {{ comment.likes?.length || 0 }}
+                </div>
+                <div
+                  class="px-0 text-grey-darken-1 cursor-pointer ml-3"
+                >
+                  <v-icon
+                    icon="mdi-comment-outline"
+                    size="18px"
+                    start
+                  />
+                  {{ comment.replies?.length || 0 }}
+                </div>
+
+                <div
+                  class="px-0 text-primary ml-5 cursor-pointer"
+                  style="font-size: 14px;"
+                  @click="showReplyInput[comment.id] = !showReplyInput[comment.id]"
                 >
                   Reply
-                </v-btn>
+                </div>
               </div>
-            </div>
 
-            <!-- Replies -->
-            <div v-if="comment.replies?.length" class="comment-item__replies ml-8 mt-2 pl-4 border-s-sm">
-              <div v-for="reply in comment.replies" :key="reply.id" class="reply-item mb-3">
-                <div class="d-flex align-center mb-1">
-                  <v-avatar class="mr-2" color="grey-lighten-2" size="24">
-                    <img v-if="reply.user?.photoURL" alt="User avatar" :src="reply.user.photoURL">
-                    <span v-else class="text-caption">{{
-                      reply.user?.displayName?.charAt(0).toUpperCase() || 'U'
+              <!-- Reply Input -->
+              <div v-if="showReplyInput[comment.id]" class="mt-2 mb-4 ml-4">
+                <div class="d-flex">
+                  <v-avatar class="mr-3" color="grey-lighten-2" size="40">
+                    <v-img
+                      v-if="comment.user?.photoURL"
+                      alt="User avatar"
+                      cover
+                      :src="comment.user.photoURL"
+                    />
+                    <span v-else class="text-subtitle-1">{{
+                      comment.user?.displayName?.charAt(0).toUpperCase() || 'U'
                     }}</span>
                   </v-avatar>
-                  <span class="font-weight-bold text-body-2 mr-2">{{ reply.user?.displayName }}</span>
-                  <span class="text-caption text-grey">{{ formatCommentDate(reply.createdAt) }}</span>
+                  <div class="d-block w-100">
+                    <div class="position-relative">
+                      <FormTextarea
+                        :model-value="replyText[comment.id] || ''"
+                        placeholder="Share your thoughts..."
+                        @update:model-value="val => replyText[comment.id] = val"
+                      />
+                      <div class="emoji-picker-container">
+                        <EmojiPicker
+                          v-if="showReplyEmojiPicker[comment.id]"
+                          class="emoji-picker"
+                          @select="emoji => onSelectReplyEmoji(emoji, comment.id)"
+                        />
+                        <v-icon
+                          class="emoji-icon cursor-pointer"
+                          icon="mdi-emoticon-outline"
+                          @click="showReplyEmojiPicker[comment.id] = !showReplyEmojiPicker[comment.id]"
+                        />
+                      </div>
+                    </div>
+                    <div class="d-flex mt-2">
+                      <div
+                        class="submit-btn"
+                        @click="submitReply(comment.id)"
+                      >
+                        Reply
+                      </div>
+                      <div class="cancel-btn ml-4" @click="showReplyInput[comment.id] = false">
+                        Cancel
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div class="text-body-2 ml-8">{{ reply.text }}</div>
+
+              </div>
+
+              <!-- Replies -->
+              <div v-if="comment.replies?.length" class="comment-item__replies ml-8 mt-2">
+                <div v-for="reply in comment.replies" :key="reply.id" class="reply-item mb-3">
+                  <div class="d-flex align-center mb-1">
+                    <v-avatar class="mr-2" color="grey-lighten-2" size="24">
+                      <v-img
+                        v-if="reply.user?.photoURL"
+                        alt="User avatar"
+                        cover
+                        :src="reply.user.photoURL"
+                      />
+                      <span v-else class="text-caption">{{
+                        reply.user?.displayName?.charAt(0).toUpperCase() || 'U'
+                      }}</span>
+                    </v-avatar>
+                    <span class="font-weight-bold text-body-2 mr-2">{{ reply.user?.displayName }}</span>
+                    <span class="text-caption text-grey">{{ formatCommentDate(reply.createdAt) }}</span>
+                  </div>
+                  <div class="text-body-2 ml-8">{{ reply.text }}</div>
+                </div>
               </div>
             </div>
           </div>
         </div>
+      </template>
+      <div v-else class="d-flex flex-column align-center mt-12 no-comments pb-6">
+        <div class="icon">
+          <v-icon icon="mdi-comment-outline" />
+        </div>
+        <div class="title">There are no comments yet</div>
+        <div class="sub-title">Write a comment and it appears here</div>
       </div>
     </div>
   </div>
 </template>
-
-<style scoped lang="scss">
-.emoji-picker-container {
-  position: absolute;
-  bottom: 10px;
-  right: 10px;
-  z-index: 10;
-
-  .emoji-picker {
-    position: absolute;
-    bottom: 40px;
-    right: 0;
-    z-index: 100;
-  }
-}
-</style>

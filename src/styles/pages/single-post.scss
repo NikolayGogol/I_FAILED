@@ -125,5 +125,62 @@
         color: $color-text-secondary;
       }
     }
+
+    .emoji-picker-container {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      z-index: 10;
+
+      i {
+        color: $color-text-quaternary;
+      }
+
+      .emoji-picker {
+        position: absolute;
+        bottom: 40px;
+        right: 0;
+        z-index: 100;
+      }
+    }
+
+    .no-comments {
+      .icon {
+        border: 1px solid $color-text-quaternary;
+        border-radius: $radius-full;
+        width: 64px;
+        height: 64px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        i {
+          color: $color-text-quaternary;
+          font-size: 30px;
+        }
+      }
+
+      .title {
+        color: $color-text-primary;
+        font-weight: 600;
+        font-size: 16px;
+        line-height: normal;
+      }
+
+      .sub-title {
+        color: $color-text-quaternary;
+        font-size: 14px;
+        line-height: normal;
+      }
+
+    }
+
+    .date {
+      &:before {
+        content: '•';
+        margin-right: 5px;
+      }
+    }
+
   }
 }
