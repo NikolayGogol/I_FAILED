@@ -1,7 +1,7 @@
 <route lang="json">
 {
   "meta": {
-    "layout": "MainLayout",
+    "layout": "MainLayout"
   }
 }
 </route>
@@ -10,6 +10,7 @@
   import dayjs from 'dayjs'
   import relativeTime from 'dayjs/plugin/relativeTime'
   import { computed, onMounted, ref } from 'vue'
+  import { VEmojiPickerVEmojiPicker } from 'vue-emoji-picker'
   import { useRoute, useRouter } from 'vue-router'
   import { useToast } from 'vue-toastification'
   import FormInput from '@/components/FormInput.vue'
@@ -34,6 +35,7 @@
   const isSubmitting = ref(false)
   const replyText = ref({})
   const showReplyInput = ref({})
+  const showEmojiPicker = ref(false)
 
   // Like logic state
   const isLiked = ref(false)
@@ -260,6 +262,11 @@
     const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp)
     return dayjs(date).fromNow()
   }
+
+  function onSelectEmoji (emoji) {
+    newComment.value += emoji.data
+    showEmojiPicker.value = false
+  }
 </script>
 
 <template>
@@ -434,7 +441,18 @@
                 hide-details
                 placeholder="Write a comment..."
               />
-              <v-icon icon="mdi-emoticon-outline"></v-icon>
+              <div class="emoji-picker-container">
+                <VEmojiPicker
+                  v-if="showEmojiPicker"
+                  class="emoji-picker"
+                  @select="onSelectEmoji"
+                />
+                <v-icon
+                  class="emoji-icon cursor-pointer"
+                  icon="mdi-emoticon-outline"
+                  @click="showEmojiPicker = !showEmojiPicker"
+                />
+              </div>
             </div>
             <div class="d-flex justify-start mt-2">
               <div
@@ -531,3 +549,19 @@
     </div>
   </div>
 </template>
+
+<style scoped lang="scss">
+.emoji-picker-container {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  z-index: 10;
+
+  .emoji-picker {
+    position: absolute;
+    bottom: 40px;
+    right: 0;
+    z-index: 100;
+  }
+}
+</style>
