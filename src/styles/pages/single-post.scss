@@ -1,286 +1,73 @@
 @use '../settings.scss' as *;
 
 .single-post-page {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: $spacing-md;
-  background-color: $color-surface;
-  border-radius: 0;
-  border: none;
-
-  @include media-up($breakpoint-sm) {
-    padding: $spacing-xl;
+  .bg {
+    background-color: $color-surface;
     border-radius: $radius-lg;
     border: 1px solid $color-border;
+    padding: 15px 25px;
   }
 
-  &__header {
-    display: flex;
-    align-items: center;
-    margin-bottom: $spacing-lg;
-
-    .v-avatar {
-      margin-right: $spacing-md;
-    }
-
-    .text-caption {
-      color: $color-text-secondary;
-    }
-  }
-
-  &__title {
-    font-size: 1.8rem;
-    font-weight: bold;
+  .section-title {
     color: $color-text-primary;
-    line-height: 1.2;
-    margin-bottom: $spacing-lg;
+    font-weight: 600;
+    font-size: 20px;
+    margin-bottom: 12px;
+  }
 
-    @include media-up($breakpoint-sm) {
-      font-size: 2.5rem;
-      margin-bottom: $spacing-xl;
+  h3 {
+    color: $color-text-primary;
+    font-weight: 600;
+    font-size: 24xp;
+    margin-bottom: 12px;
+  }
+
+  .v-chip {
+    border: 1px solid $color-border;
+
+    .v-chip__underlay {
+      display: none;
     }
   }
 
-  &__section {
-    margin-bottom: $spacing-lg;
+  .tag-list {
+    display: flex;
 
-    h2 {
-      font-size: 1.1rem;
-      font-weight: bold;
-      margin-bottom: $spacing-sm;
-      color: $color-text-primary;
-
-      @include media-up($breakpoint-sm) {
-        font-size: 1.25rem;
-      }
-    }
-
-    .text-body-1 {
-      font-size: 1rem;
-      line-height: 1.6;
-      color: $color-text-secondary;
-    }
-
-    .italic {
-      font-style: italic;
+    li {
+      list-style: none;
+      color: $color-surface;
+      background-color: $color-primary;
+      font-weight: 400;
+      font-size: 12px;
+      line-height: normal;
+      padding: 3px 5px;
+      border-radius: $radius-xs;
+      margin-right: 10px;
     }
   }
 
-  &__learning {
-    padding: $spacing-md;
-    border-radius: $radius-lg;
-    margin-bottom: $spacing-lg;
-    border: 1px dashed $color-primary !important;
-    background-color: rgba($color-primary, 0.03);
+  .reaction-list {
+    display: flex;
+    flex-wrap: wrap;
 
-    @include media-up($breakpoint-sm) {
-      padding: $spacing-lg;
-    }
-
-    h2 {
-      font-size: 1.1rem;
-      font-weight: bold;
-      margin-bottom: $spacing-sm;
-      color: $color-text-primary;
-
-      @include media-up($breakpoint-sm) {
-        font-size: 1.25rem;
-      }
-    }
-
-    div, ul {
-      color: $color-text-secondary;
-      font-size: 1rem;
-      line-height: 1.5;
-    }
-
-    ul {
-      margin-left: $spacing-lg;
-    }
-  }
-
-  &__stats {
-    background-color: $color-background;
-    padding: $spacing-md;
-    border-radius: $radius-lg;
-    margin-bottom: $spacing-xl;
-
-    .stat-row {
+    li {
+      list-style: none;
+      border: 1px solid $color-border;
+      border-radius: $radius-xs;
       display: flex;
+      flex-direction: column;
       align-items: center;
-      margin-bottom: $spacing-sm;
+      justify-content: center;
+      max-width: 144px;
+      width: 100%;
+      padding: 15px;
+      cursor: pointer;
 
-      &:last-child {
-        margin-bottom: 0;
-      }
-    }
-
-    .v-icon {
-      margin-right: $spacing-sm;
-      color: $color-text-secondary;
-    }
-
-    .font-weight-bold {
-      font-weight: bold;
-      margin-right: $spacing-sm;
-      color: $color-text-primary;
-    }
-
-    .tags-container {
-      margin-top: $spacing-md;
-      display: flex;
-      flex-wrap: wrap;
-      gap: $spacing-sm;
-    }
-  }
-
-  &__reactions {
-    margin-bottom: $spacing-xl;
-
-    .v-btn {
-      text-transform: none;
-      border-radius: $radius-lg;
-      padding: 0 $spacing-md;
-      height: 60px;
-      border-color: $color-border;
-      color: $color-text-primary;
-
-      &:hover {
-        border-color: $color-primary;
-        background-color: $color-background;
-      }
-    }
-  }
-
-  &__comments {
-    margin-top: $spacing-xl;
-
-    h3 {
-      font-size: 1.25rem;
-      font-weight: bold;
-      margin-bottom: $spacing-lg;
-      color: $color-text-primary;
-
-      @include media-up($breakpoint-sm) {
-        font-size: 1.5rem;
-      }
-    }
-
-    .comment-input-section {
-      margin-bottom: $spacing-lg;
-      display: flex;
-      gap: $spacing-md;
-
-      .v-avatar {
-        flex-shrink: 0;
-      }
-
-      .input-wrapper {
-        flex-grow: 1;
-      }
-    }
-
-    .comment-item {
-      margin-bottom: $spacing-lg;
-      padding-bottom: $spacing-lg;
-      border-bottom: 1px solid $color-border;
-
-      &:last-child {
-        border-bottom: none;
-        margin-bottom: 0;
-        padding-bottom: 0;
-      }
-
-      .comment-main {
-        display: flex;
-        gap: $spacing-md;
-      }
-
-      &__header {
-        display: flex;
-        align-items: center;
-        margin-bottom: $spacing-xs;
-
-        .username {
-          font-weight: bold;
-          margin-right: $spacing-sm;
-          color: $color-text-primary;
-          font-size: 0.95rem;
-        }
-
-        .date {
-          font-size: 0.75rem;
-          color: $color-text-tertiary;
-        }
-      }
-
-      &__content {
-        font-size: 0.95rem;
-        line-height: 1.5;
+      .label {
         color: $color-text-secondary;
-        margin-bottom: $spacing-sm;
-      }
-
-      &__actions {
-        display: flex;
-        align-items: center;
-        gap: $spacing-md;
-
-        .v-btn {
-          text-transform: none;
-          color: $color-text-tertiary;
-          font-size: 0.85rem;
-          padding: 0;
-          min-width: auto;
-          height: auto;
-
-          &:hover {
-            color: $color-primary;
-            background: transparent;
-          }
-
-          .v-icon {
-            margin-right: $spacing-xs;
-            font-size: 1.1rem;
-          }
-        }
-      }
-
-      &__replies {
-        margin-left: 40px;
-        margin-top: $spacing-md;
-
-        @include media-up($breakpoint-sm) {
-          margin-left: 56px;
-        }
-
-        .reply-item {
-          margin-bottom: $spacing-md;
-          display: flex;
-          gap: $spacing-sm;
-
-          &:last-child {
-            margin-bottom: 0;
-          }
-
-          .username {
-            font-size: 0.9rem;
-            font-weight: bold;
-            color: $color-text-primary;
-            margin-right: $spacing-sm;
-          }
-
-          .date {
-            font-size: 0.75rem;
-            color: $color-text-tertiary;
-          }
-
-          .text-body-2 {
-            font-size: 0.9rem;
-            color: $color-text-secondary;
-            line-height: 1.4;
-          }
-        }
+        font-size: 12px;
+        line-height: normal;
+        white-space: nowrap;
       }
     }
   }

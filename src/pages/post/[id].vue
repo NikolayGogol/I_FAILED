@@ -1,9 +1,9 @@
 <route lang="json">
 {
-  "meta": {
-    "layout": "MainLayout",
-    "auth": true
-  }
+"meta": {
+"layout": "MainLayout",
+"auth": true
+}
 }
 </route>
 
@@ -14,6 +14,7 @@
   import { useAuthStore } from '@/stores/auth'
   import { useSinglePostStore } from '@/stores/single-post'
   import { formatNumber } from '@/utils/format-number.js'
+  import '@/styles/pages/single-post.scss'
 
   const route = useRoute()
   const { getPostById, incrementViewCount, addComment, addReply, toggleCommentLike, getComments } = useSinglePostStore()
@@ -25,12 +26,43 @@
   const replyText = ref({})
   const showReplyInput = ref({})
 
-  const reactions = {
-    'I\'ve been there': '👏',
-    'Thank you': '🙏',
-    'Growth happens': '🌱',
-    'Not alone': '🤗',
-  }
+  const reactions = ref([
+    {
+      id: 'been_there',
+      emoji: '👋',
+      label: 'I\'ve been there',
+      count: 2,
+      active: false, // для логіки кліку
+    },
+    {
+      id: 'thanks',
+      emoji: '🙏',
+      label: 'Thank \'s for teaching',
+      count: 2,
+      active: false,
+    },
+    {
+      id: 'growth',
+      emoji: '🌱',
+      label: 'Growth happens',
+      count: 1,
+      active: false,
+    },
+    {
+      id: 'not_alone',
+      emoji: '🤗',
+      label: 'You\'re not alone',
+      count: 1,
+      active: false,
+    },
+    {
+      id: 'courage',
+      emoji: '💪',
+      label: 'This takes courage',
+      count: 1,
+      active: false,
+    },
+  ])
 
   onMounted(() => {
     const postId = route.params.id
@@ -133,96 +165,121 @@
 
 <template>
   <div v-if="post" class="single-post-page">
-    <div class="single-post-page__header d-flex align-center mb-6">
-      <v-avatar class="mr-4" color="grey-lighten-2" size="48">
-        <img v-if="post.user?.photoURL" alt="User avatar" :src="post.user.photoURL">
-        <span v-else class="text-h6">{{ userInitial }}</span>
-      </v-avatar>
-      <div>
-        <div class="font-weight-bold">{{ post.user?.displayName }}</div>
-        <div class="text-caption text-grey">18 days ago</div>
+    <div class="bg">
+      <div class="single-post-page__header d-flex align-center mb-6">
+        <v-avatar class="mr-4" color="grey-lighten-2" size="48">
+          <img v-if="post.user?.photoURL" alt="User avatar" :src="post.user.photoURL">
+          <span v-else class="text-h6">{{ userInitial }}</span>
+        </v-avatar>
+        <div>
+          <div class="font-weight-bold">{{ post.user?.displayName }}</div>
+          <div class="text-caption text-grey">18 days ago</div>
+        </div>
+        <v-spacer />
+        <v-chip
+          v-if="post.stepOne?.selectedCategories?.[0]?.label"
+          class="mr-2"
+          color="blue-grey-darken-4"
+          label
+          size="small"
+        >{{ post.stepOne.selectedCategories[0].label }}
+        </v-chip>
+        <div class="text-caption text-grey d-flex align-center">
+          <v-icon class="mr-1" size="small">mdi-eye-outline</v-icon>
+          {{ post.views || 0 }}
+          <span class="mx-2">•</span>
+          <v-icon class="mr-1" size="small">mdi-clock-outline</v-icon>
+          1 min read
+        </div>
       </div>
-      <v-spacer />
-      <v-chip
-        v-if="post.stepOne?.selectedCategories?.[0]?.label"
-        class="mr-2"
-        color="blue-grey-darken-4"
-        label
-        size="small"
-      >{{ post.stepOne.selectedCategories[0].label }}</v-chip>
-      <div class="text-caption text-grey d-flex align-center">
-        <v-icon class="mr-1" size="small">mdi-eye-outline</v-icon>
-        {{ post.views || 0 }}
-        <span class="mx-2">•</span>
-        <v-icon class="mr-1" size="small">mdi-clock-outline</v-icon> 1 min read
+
+      <h1 class="single-post-page__title text-h3 font-weight-bold mb-8 text-blue-grey-darken-4">
+        {{ post.stepTwo?.title }}
+      </h1>
+
+      <section v-if="post.stepTwo?.description" class="single-post-page__section mb-6">
+        <h2 class="section-title">What Happened</h2>
+        <div v-html="post.stepTwo?.description" />
+      </section>
+
+      <section v-if="post.stepTwo?.whatWentWrong" class="single-post-page__section mb-6">
+        <h2 class="section-title">What Went Wrong</h2>
+        <div v-html="post.stepTwo?.whatWentWrong" />
+      </section>
+
+      <div
+        v-if="post.stepThree?.whatILearned || post.stepThree?.keyTakeaways"
+        class="bg-orange-accent-1 pa-6 rounded-lg mb-6"
+      >
+        <section v-if="post.stepThree?.whatILearned">
+          <h2 class="section-title">What I Learned</h2>
+          <div v-html="post.stepThree.whatILearned" />
+        </section>
+        <section v-if="post.stepThree?.keyTakeaways">
+          <h2 class="section-title">Key Takeaways</h2>
+          <div v-html="post.stepThree.keyTakeaways " />
+        </section>
       </div>
-    </div>
 
-    <h1 class="single-post-page__title text-h3 font-weight-bold mb-8 text-blue-grey-darken-4">
-      {{ post.stepTwo?.title }}
-    </h1>
+      <section v-if="post.stepThree?.whatIdDoDifferently" class="bg-orange-accent-1 pa-6 rounded-lg mb-6">
+        <h2 class="section-title">What I'd Do Differently</h2>
+        <div v-html="post.stepThree.whatIdDoDifferently" />
+      </section>
 
-    <section v-if="post.stepTwo?.description" class="single-post-page__section mb-6">
-      <h2 class="text-h6 font-weight-bold mb-2">What Happened</h2>
-      <div class="text-body-1 text-grey-darken-2" v-html="post.stepTwo?.description" />
-    </section>
+      <section v-if="post.stepThree?.advice" class="bg-orange-accent-1 pa-6 rounded-lg mb-6">
+        <h2 class="section-title">Advice for Others</h2>
+        <div v-html="post.stepThree.advice" />
+      </section>
 
-    <section v-if="post.stepTwo?.whatWentWrong" class="single-post-page__section mb-6">
-      <h2 class="text-h6 font-weight-bold mb-2">What Went Wrong</h2>
-      <div class="text-body-1 text-grey-darken-2 italic" v-html="post.stepTwo?.whatWentWrong" />
-    </section>
+      <h3>Additional Details</h3>
 
-    <v-card class="single-post-page__learning pa-6 rounded-lg mb-6 border-dashed" color="blue" style="border-style: dashed !important;" variant="outlined">
-      <template v-if="post.stepThree?.whatILearned">
-        <h2 class="text-h6 font-weight-bold mb-2">What I Learned</h2>
-        <div class="mb-4 text-blue-darken-4">{{ post.stepThree.whatILearned }}</div>
-      </template>
-      <template v-if="post.stepThree?.keyTakeaways">
-        <h2 class="text-h6 font-weight-bold mb-2">Key Takeaways</h2>
-        <div class="text-blue-darken-4 ml-4" v-html="post.stepThree.keyTakeaways " />
-      </template>
-    </v-card>
-
-    <div class="single-post-page__stats bg-grey-lighten-5 pa-4 rounded-lg mb-8">
       <div v-if="post.stepFour?.cost" class="d-flex mb-2">
-        <v-icon class="mr-2" color="grey">mdi-currency-usd</v-icon>
-        <span class="font-weight-bold mr-2">Cost:</span>{{ formatNumber(post.stepFour?.cost) }}
+        <span class="font-weight-semibold mr-2">Cost:</span>
+        <span class="text-grey-darken-4">{{ formatNumber(post.stepFour?.cost) }}</span>
       </div>
       <div v-if="post.stepFour?.recoveryTime" class="d-flex mb-2">
-        <v-icon class="mr-2" color="grey">mdi-history</v-icon>
-        <span class="font-weight-bold mr-2">Recovery Time:</span> {{ post.stepFour?.recoveryTime?.title }}
+        <span class="font-weight-semibold mr-2">Recovery Time:</span>
+        <span class="text-grey-darken-4">{{ post.stepFour?.recoveryTime?.title }}</span>
       </div>
-      <div v-if="post.stepFour?.emotionTags.length" class="mt-4">
+      <div v-if="post.stepFour?.emotionTags.length" class="d-flex">
+        <span class="font-weight-semibold mr-2">Emotions:</span>
         <v-chip
           v-for="(chip, index) in post.stepFour?.emotionTags"
           :key="index"
           class="mr-2"
-          color="orange"
           size="small"
-          variant="tonal"
-        > {{ chip.emoji }} {{ chip.label }}</v-chip>
+        > {{ chip.emoji }} {{ chip.label }}
+        </v-chip>
+      </div>
+      <div v-if="post.stepFour.tags.length > 0" class="d-flex mt-2">
+        <span class="font-weight-semibold mr-2">Tags:</span>
+        <ul class="tag-list">
+          <li v-for="tag in post.stepFour.tags" :key="tag" class="tag">{{ tag }}</li>
+        </ul>
+      </div>
+
+      <v-divider class="my-6" />
+      <img
+        v-for="img in post.stepTwo.images"
+        :key="img"
+        :alt="img"
+        class="w-100"
+        :src="img"
+      >
+      <v-divider class="mb-6" />
+      <div class="text-center mb-4 font-weight-bold">React to This Story</div>
+      <ul class="reaction-list ga-2">
+        <li v-for="(item, index) in reactions" :key="index">
+          <p class="emoji">{{ item.emoji }}</p>
+          <p class="label text-center">{{ item.label }}</p>
+        </li>
+      </ul>
+      <div class="footer">
+        <div class="item">
+          <v-icon icon="mdi-heart-outline"></v-icon>
+        </div>
       </div>
     </div>
-    <img
-      v-for="img in post.stepTwo.images"
-      :key="img"
-      :alt="img"
-      class="w-100"
-      :src="img"
-    >
-    <v-divider class="mb-6" />
-    <div class="text-center mb-4 font-weight-bold">React to This Story</div>
-    <v-row class="single-post-page__reactions mb-8" dense justify="center">
-      <v-col v-for="(emoji, label) in reactions" :key="label" cols="auto">
-        <v-btn class="text-none rounded-lg px-4" height="60" variant="outlined">
-          <div class="d-flex flex-column align-center">
-            <span class="text-h6">{{ emoji }}</span>
-            <span class="text-caption">{{ label }}</span>
-          </div>
-        </v-btn>
-      </v-col>
-    </v-row>
-    <v-divider v-if="post.stepFive?.allowComments" class="mb-6" />
 
     <div v-if="post.stepFive?.allowComments" class="single-post-page__comments">
       <h3 class="text-h5 font-weight-bold mb-4">Comments ({{ comments.length }})</h3>
@@ -231,10 +288,12 @@
         <div class="d-flex">
           <v-avatar class="mr-3" color="grey-lighten-2" size="40">
             <img v-if="authStore.user?.photoURL" alt="User avatar" :src="authStore.user.photoURL">
-            <span v-else class="text-subtitle-1">{{ authStore.user?.displayName?.charAt(0).toUpperCase() || 'U' }}</span>
+            <span v-else class="text-subtitle-1">{{
+              authStore.user?.displayName?.charAt(0).toUpperCase() || 'U'
+            }}</span>
           </v-avatar>
           <div class="flex-grow-1">
-            <FormInput
+            <FormTextarea
               v-model="newComment"
               label="Share your thoughts..."
               placeholder="Write a comment..."
@@ -275,7 +334,11 @@
                 variant="text"
                 @click="toggleLike(comment)"
               >
-                <v-icon :color="comment.likes?.includes(authStore.user?.uid) ? 'primary' : ''" icon="mdi-thumb-up-outline" start />
+                <v-icon
+                  :color="comment.likes?.includes(authStore.user?.uid) ? 'primary' : ''"
+                  icon="mdi-thumb-up-outline"
+                  start
+                />
                 {{ comment.likes?.length || 0 }}
               </v-btn>
 
@@ -316,7 +379,9 @@
                 <div class="d-flex align-center mb-1">
                   <v-avatar class="mr-2" color="grey-lighten-2" size="24">
                     <img v-if="reply.user?.photoURL" alt="User avatar" :src="reply.user.photoURL">
-                    <span v-else class="text-caption">{{ reply.user?.displayName?.charAt(0).toUpperCase() || 'U' }}</span>
+                    <span v-else class="text-caption">{{
+                      reply.user?.displayName?.charAt(0).toUpperCase() || 'U'
+                    }}</span>
                   </v-avatar>
                   <span class="font-weight-bold text-body-2 mr-2">{{ reply.user?.displayName }}</span>
                   <span class="text-caption text-grey">{{ formatDate(reply.createdAt) }}</span>

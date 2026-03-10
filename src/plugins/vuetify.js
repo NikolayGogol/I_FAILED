@@ -13,9 +13,11 @@ import 'vuetify/styles'
 const myCustomTheme = {
   dark: false,
   colors: {
-    primary: '#D65A1F',
-    secondary: '#F9EAD5',
-    danger: '#C8372B',
+    'primary': '#D65A1F',
+    'secondary': '#F9EAD5',
+    'danger': '#C8372B',
+    'orange-accent-1': '#F9EAD5',
+    'grey-darken-4': '#454541',
   },
 }
 // https://vuetifyjs.com/en/introduction/why-vuetify/#feature-guides

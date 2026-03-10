@@ -295,13 +295,13 @@
     </div>
     <!-- Post content -->
     <template v-else>
-      <div v-if="post.stepOne.selectedCategories.length > 0" class="post-tags" @click="openPost">
+      <div v-if="post.stepOne.selectedCategories.length > 0" class="post-tags cursor-pointer" @click="openPost">
         <span>{{ post.stepOne.selectedCategories.map(el => el.label).join(' / ') }}</span>
       </div>
-      <h2 class="post-title" @click="openPost">
+      <h2 class="post-title cursor-pointer" @click="openPost">
         {{ post.stepTwo.title }}
       </h2>
-      <p class="post-body" @click="openPost" v-html="truncatedBody" />
+      <p class="post-body cursor-pointer" @click="openPost" v-html="truncatedBody" />
       <button v-if="showReadMore" class="read-more" @click="readMore">Read more</button>
       <div v-if="post.stepFour.emotionTags" class="post-chips" @click="openPost">
         <span
