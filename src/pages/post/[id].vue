@@ -1,9 +1,8 @@
 <route lang="json">
 {
-"meta": {
-"layout": "MainLayout",
-"auth": true
-}
+  "meta": {
+    "layout": "MainLayout",
+  }
 }
 </route>
 
@@ -435,6 +434,7 @@
                 hide-details
                 placeholder="Write a comment..."
               />
+              <v-icon icon="mdi-emoticon-outline"></v-icon>
             </div>
             <div class="d-flex justify-start mt-2">
               <div
