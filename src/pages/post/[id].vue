@@ -21,6 +21,7 @@
   import { formatNumber } from '@/utils/format-number.js'
   import 'vue3-emoji-picker/css'
   import '@/styles/pages/single-post.scss'
+  import PostMenu from "@/components/feed/PostMenu.vue";
 
   dayjs.extend(relativeTime)
 
@@ -311,7 +312,9 @@
             <div class="text-caption text-grey">@{{ post.user?.displayName.replaceAll(' ', '_') }}</div>
           </div>
         </div>
-        <div class="post-actions" />
+        <div class="post-actions">
+          <PostMenu :post="post" />
+        </div>
       </div>
       <div class="d-flex justify-start mt-2">
         <div

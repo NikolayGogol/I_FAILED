@@ -4,10 +4,10 @@
 
 .v-list-item {
   &.text-danger {
-    color: $color-error !important;
+    color: $color-primary !important;
 
     .v-icon {
-      color: $color-error !important;
+      color: $color-primary !important;
     }
   }
 }
@@ -30,12 +30,12 @@
   text-align: center;
   padding: $spacing-sm $spacing-md;
   border-radius: $radius-md;
-  background-color: $color-error;
+  background-color: $color-primary;
   color: white;
   transition: background-color 0.2s;
 
   &:hover {
-    background-color: color.adjust($color-error, $lightness: -10%);
+    background-color: color.adjust($color-primary, $lightness: -10%);
   }
 }
 
