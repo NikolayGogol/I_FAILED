@@ -33,7 +33,7 @@
   // State
   // =================================================================================================
   const isExpanded = ref(false)
-  const maxLength = 200
+  const maxLength = 100
   const isLiked = ref(false)
   const likeCount = ref(p.post.likes || 0)
   const isLiking = ref(false) // To disable the button during the request
