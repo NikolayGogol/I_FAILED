@@ -484,7 +484,7 @@
       <template v-if="comments.length > 0">
         <div v-for="comment in comments" :key="comment.id" class="comment-item mb-4 mt-7">
           <div class="d-flex">
-            <v-avatar class="mr-3" color="grey-lighten-2" size="40">
+            <v-avatar class="mr-3" color="grey-lighten-2" size="44">
               <v-img
                 v-if="comment.user?.photoURL"
                 alt="User avatar"
@@ -497,7 +497,11 @@
             </v-avatar>
             <div class="flex-grow-1">
               <div class="comment-item__header d-flex align-center mb-1">
-                <span class="username font-weight-bold mr-2">{{ comment.user?.displayName }}</span>
+                <div class="d-block">
+                  <span class="username font-weight-bold mr-2">{{ comment.user?.displayName }}</span>
+                  <div class="text-caption text-grey">@{{ post.user?.displayName.replaceAll(' ', '_') }}</div>
+                </div>
+
                 <span class="date text-caption text-grey">{{ formatCommentDate(comment.createdAt) }}</span>
               </div>
               <div class="comment-item__content text-body-2 mb-2">{{ comment.text }}</div>
@@ -588,19 +592,23 @@
               <!-- Replies -->
               <div v-if="comment.replies?.length" class="comment-item__replies ml-8 mt-2">
                 <div v-for="reply in comment.replies" :key="reply.id" class="reply-item mb-3">
-                  <div class="d-flex align-center mb-1">
-                    <v-avatar class="mr-2" color="grey-lighten-2" size="24">
+                  <div class="d-flex align-start mb-1">
+                    <v-avatar class="mr-2" color="grey-lighten-2" size="44">
                       <v-img
                         v-if="reply.user?.photoURL"
                         alt="User avatar"
                         cover
                         :src="reply.user.photoURL"
                       />
+
                       <span v-else class="text-caption">{{
                         reply.user?.displayName?.charAt(0).toUpperCase() || 'U'
                       }}</span>
                     </v-avatar>
-                    <span class="font-weight-bold text-body-2 mr-2">{{ reply.user?.displayName }}</span>
+                    <div class="d-block">
+                      <span class="font-weight-bold text-body-2 mr-2">{{ reply.user?.displayName }}</span>
+                      <div class="text-caption text-grey">@{{ reply.user?.displayName.replaceAll(' ', '_') }}</div>
+                    </div>
                     <span class="text-caption text-grey">{{ formatCommentDate(reply.createdAt) }}</span>
                   </div>
                   <div class="text-body-2 ml-8">{{ reply.text }}</div>
