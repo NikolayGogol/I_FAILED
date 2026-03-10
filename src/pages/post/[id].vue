@@ -14,6 +14,7 @@
   import EmojiPicker from 'vue3-emoji-picker'
   import { useRoute, useRouter } from 'vue-router'
   import { useToast } from 'vue-toastification'
+  import PostMenu from '@/components/feed/PostMenu.vue'
   import { auth } from '@/firebase'
   import { useAuthStore } from '@/stores/auth'
   import { usePostCardStore } from '@/stores/post-card.js'
@@ -21,7 +22,6 @@
   import { formatNumber } from '@/utils/format-number.js'
   import 'vue3-emoji-picker/css'
   import '@/styles/pages/single-post.scss'
-  import PostMenu from "@/components/feed/PostMenu.vue";
 
   dayjs.extend(relativeTime)
 
@@ -113,6 +113,25 @@
   const timeAgo = computed(() => {
     if (!post.value?.createdAt) return ''
     return dayjs.unix(post.value.createdAt.seconds).fromNow()
+  })
+
+  const readingTime = computed(() => {
+    if (!post.value) return '1 min read'
+
+    const content = [
+      post.value.stepTwo?.description,
+      post.value.stepTwo?.whatWentWrong,
+      post.value.stepThree?.whatILearned,
+      post.value.stepThree?.keyTakeaways,
+      post.value.stepThree?.whatIdDoDifferently,
+      post.value.stepThree?.advice,
+    ].filter(Boolean).join(' ')
+
+    const text = content.replace(/<[^>]*>/g, '')
+    const wordCount = text.trim().split(/\s+/).length
+    const time = Math.ceil(wordCount / 300)
+
+    return `${time} min read`
   })
 
   async function handlePostLike () {
@@ -316,11 +335,15 @@
           <PostMenu :post="post" />
         </div>
       </div>
-      <div class="d-flex justify-start mt-2">
+      <div class="d-flex justify-space-between mt-2">
         <div
           v-if="post.stepOne?.selectedCategories?.[0]?.label"
           class="chip-custom"
         >{{ post.stepOne.selectedCategories[0].label }}
+        </div>
+        <div class="read-widget">
+          <v-icon icon="mdi-clock-outline" />
+          {{ readingTime }}
         </div>
       </div>
 
