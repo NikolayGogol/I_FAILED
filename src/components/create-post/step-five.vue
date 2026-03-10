@@ -8,14 +8,31 @@
   const store = useCreatePostStore()
   const emit = defineEmits(['isValid'])
   const triggerText = ref('')
+  const visibilityList = [
+    {
+      label: 'Public',
+      value: 1,
+    },
+    {
+      label: 'Followers Only',
+      value: 2,
+    },
+    {
+      label: 'Private',
+      value: 3,
+    },
+  ]
+
   //
   function addTag () {
     store.stepFive.triggerTags.push(triggerText.value)
     triggerText.value = ''
   }
+
   function removeTag (index) {
     store.stepFive.triggerTags.splice(index, 1)
   }
+
   watch(() => store.stepFive, val => {
     if (val.enableTriggerWarning && store.stepFive.triggerTags.length === 0) {
       // eslint-disable-next-line vue/custom-event-name-casing
@@ -52,8 +69,10 @@
         class="form-input form-field select"
         color="primary"
         hide-details
-        :items="['Public', 'Followers Only', 'Private']"
+        item-title="label"
+        :items="visibilityList"
         placeholder="Choose an option"
+        return-object
         variant="outlined"
       />
     </div>
