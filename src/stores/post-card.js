@@ -41,6 +41,44 @@ export const usePostCardStore = defineStore('postCard', {
         return { success: false, error: error.message }
       }
     },
+
+    async toggleReaction ({ postId, reactionId, active }) {
+      if (!auth.currentUser) {
+        console.log('You must be logged in to react to a post.')
+        return { success: false, error: 'User not logged in' }
+      }
+
+      if (!postId || !reactionId) {
+        console.error('Invalid post ID or reaction ID.')
+        return { success: false, error: 'Invalid post ID or reaction ID' }
+      }
+
+      const postRef = doc(db, VITE_POST_COLLECTION, postId)
+      const uid = auth.currentUser.uid
+
+      try {
+        const updateData = {}
+        const reactionCountPath = `reactions.${reactionId}.count`
+        const reactionUsersPath = `reactions.${reactionId}.users`
+
+        if (active) {
+          // User wants to add this reaction
+          updateData[reactionCountPath] = increment(1)
+          updateData[reactionUsersPath] = arrayUnion(uid)
+        } else {
+          // User wants to remove this reaction
+          updateData[reactionCountPath] = increment(-1)
+          updateData[reactionUsersPath] = arrayRemove(uid)
+        }
+
+        await updateDoc(postRef, updateData)
+        return { success: true }
+      } catch (error) {
+        console.error('Error updating reaction:', error)
+        return { success: false, error: error.message }
+      }
+    },
+
     async getCommentCount (postId) {
       try {
         const q = query(collection(db, VITE_COMMENTS), where('postId', '==', postId))

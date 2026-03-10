@@ -1,5 +1,5 @@
 <template>
-  <div class="w-100 form-custom-input">
+  <div class="w-100 form-custom-textarea">
     <label v-if="$attrs.label" class="label">{{ $attrs.label }}</label>
     <v-textarea
       class="form-field"
@@ -12,8 +12,7 @@
 
 <script setup>
   import { computed, useAttrs } from 'vue'
-  import '@/styles/components/form-input.scss'
-
+  import '@/styles/components/form-custom-textarea.scss'
   defineOptions({
     inheritAttrs: false,
   })

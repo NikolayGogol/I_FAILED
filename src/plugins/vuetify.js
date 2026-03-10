@@ -18,6 +18,7 @@ const myCustomTheme = {
     'danger': '#C8372B',
     'orange-accent-1': '#F9EAD5',
     'grey-darken-4': '#454541',
+    'grey-darken-3': '#1C1C1B',
   },
 }
 // https://vuetifyjs.com/en/introduction/why-vuetify/#feature-guides

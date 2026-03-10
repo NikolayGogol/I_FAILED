@@ -8,6 +8,26 @@
     padding: 15px 25px;
   }
 
+  .create-at {
+    color: $color-text-quaternary;
+    font-size: 14px;
+    margin-left: 5px;
+
+    &:before {
+      content: '•';
+      margin-right: 5px;
+    }
+  }
+
+  .chip-custom {
+    background-color: $color-tag-bg;
+    color: #6E240F;
+    font-weight: 600;
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: $radius-xs;
+  }
+
   .section-title {
     color: $color-text-primary;
     font-weight: 600;
@@ -69,6 +89,10 @@
         line-height: normal;
         white-space: nowrap;
       }
+
+      .count {
+        font-size: 16px;
+      }
     }
   }
 
@@ -85,6 +109,20 @@
 
       i {
         font-size: 20px;
+      }
+    }
+  }
+
+  &__comments {
+    .notice {
+      color: $color-text-primary;
+      font-size: 14px;
+      padding: 15px;
+      background-color: #F4FBF7;
+      border-radius: $radius-sm;
+
+      span {
+        color: $color-text-secondary;
       }
     }
   }
