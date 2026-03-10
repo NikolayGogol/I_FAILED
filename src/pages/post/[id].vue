@@ -489,6 +489,8 @@
                 <EmojiPicker
                   v-if="showEmojiPicker"
                   class="emoji-picker"
+                  disable-skin-tones
+                  native
                   @select="onSelectEmoji"
                 />
                 <v-icon
@@ -593,6 +595,8 @@
                         <EmojiPicker
                           v-if="showReplyEmojiPicker[comment.id]"
                           class="emoji-picker"
+                          disable-skin-tones
+                          native
                           @select="emoji => onSelectReplyEmoji(emoji, comment.id)"
                         />
                         <v-icon
