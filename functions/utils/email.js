@@ -5,7 +5,7 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY)
 
 const FROM_EMAIL = process.env.EMAIL_USER
 const APP_NAME = 'I_FAILED'
-const LOGO_URL = 'https://firebasestorage.googleapis.com/v0/b/ifailed-69373.firebasestorage.app/o/Logo.png?alt=media&token=07b496e2-6089-4748-b8a5-95da728b2368'
+const LOGO_URL = 'https://firebasestorage.googleapis.com/v0/b/ifailed-25dab.firebasestorage.app/o/Logo.png?alt=media&token=07b496e2-6089-4748-b8a5-95da728b2368'
 
 // Define your brand colors here
 const colors = {

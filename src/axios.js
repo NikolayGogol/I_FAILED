@@ -5,7 +5,7 @@ import { useAuthStore } from '@/stores/auth'
 const toast = useToast()
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_FIREBASE_BASE_URL || 'http://127.0.0.1:5001/ifailed-69373/us-central1/api',
+  baseURL: import.meta.env.VITE_FIREBASE_BASE_URL,
 })
 
 api.interceptors.request.use(

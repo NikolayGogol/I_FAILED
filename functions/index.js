@@ -5,7 +5,7 @@ const { onRequest } = require('firebase-functions/v2/https')
 const { setGlobalOptions } = require('firebase-functions/v2')
 
 // Set the runtime service account for all functions in this project
-setGlobalOptions({ serviceAccount: 'ifailed-25dab@appspot.gserviceaccount.com' })
+// setGlobalOptions({ serviceAccount: 'ifailed-25dab@appspot.gserviceaccount.com' })
 
 // Initialize Firebase Admin FIRST
 admin.initializeApp()
