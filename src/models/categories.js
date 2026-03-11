@@ -34,3 +34,17 @@ export const emotionTags = [
   { label: 'Grateful', emoji: '🙏', value: 'grateful' },
   { label: 'Confused', emoji: '😕', value: 'confused' },
 ]
+export  const visibilityList = [
+  {
+    label: 'Public',
+    value: 1,
+  },
+  {
+    label: 'Followers Only',
+    value: 2,
+  },
+  {
+    label: 'Private',
+    value: 3,
+  },
+]

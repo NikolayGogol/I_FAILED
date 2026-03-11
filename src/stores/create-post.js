@@ -7,6 +7,7 @@ import { getDownloadURL, ref, uploadBytes } from '@/firebase' // Correctly impor
 import { db, storage } from '@/firebase' // Explicitly import storage
 import { noAvatar } from '@/models/no-data.js'
 import { useAuthStore } from '@/stores/auth.js'
+import {visibilityList} from "@/models/categories.js";
 
 const collection_db = import.meta.env.VITE_POST_COLLECTION
 const collection_db_scheduled = import.meta.env.VITE_POST_COLLECTION_SCEDULED || 'scheduledPosts'
@@ -38,7 +39,7 @@ export const useCreatePostStore = defineStore('createPost', {
     },
     stepFive: {
       isAnonymous: false,
-      visibility: 'Public',
+      visibility: visibilityList[0],
       allowComments: true,
       enableTriggerWarning: false,
       scheduleDate: null,
