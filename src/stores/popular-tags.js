@@ -20,14 +20,15 @@ export const usePopularTagsStore = defineStore('popularTags', {
         const querySnapshot = await getDocs(q)
         const allTags = []
 
-        // Iterate through each document in the collection
-        for (const doc of querySnapshot) {
+        // Iterate through each document in the collection using .docs
+        querySnapshot.docs.forEach(doc => {
           const post = doc.data()
-          // Check if the post has tags in stepFour
-          if (post.stepFour && post.stepFour.tags) {
-            allTags.push(...post.stepFour.tags)
+          // Check if tags exist and is an array
+          const tags = post.stepFour?.tags
+          if (Array.isArray(tags) && tags.length > 0) {
+            allTags.push(...tags)
           }
-        }
+        })
 
         // Count the occurrences of each tag
         const tagCounts = allTags.reduce((acc, tag) => {
@@ -35,8 +36,8 @@ export const usePopularTagsStore = defineStore('popularTags', {
           return acc
         }, {})
 
-        // Sort tags by count in descending order
-        const sortedTags = Object.keys(tagCounts).toSorted((a, b) => tagCounts[b] - tagCounts[a])
+        // Sort tags by count in descending order using sort()
+        const sortedTags = Object.keys(tagCounts).sort((a, b) => tagCounts[b] - tagCounts[a])
 
         // Store the top 5 tags
         this.tags = sortedTags.slice(0, 5)
