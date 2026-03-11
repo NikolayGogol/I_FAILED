@@ -1,13 +1,8 @@
-const { Resend } = require('resend')
+const sgMail = require('@sendgrid/mail')
 const logger = require('firebase-functions/logger')
 
-// Use a fallback or ensure process.env.RESEND_API_KEY is available
-const resendApiKey = process.env.RESEND_API_KEY
-const resend = resendApiKey ? new Resend(resendApiKey) : null
-
-const FROM_EMAIL = process.env.EMAIL_USER // This should be a verified sender email in Resend, e.g., 'onboarding@resend.dev' or your custom domain
 const APP_NAME = 'I_FAILED'
-const LOGO_URL = 'https://firebasestorage.googleapis.com/v0/b/ifailed-25dab.firebasestorage.app/o/Logo.png?alt=media&token=07b496e2-6089-4748-b8a5-95da728b2368'
+const LOGO_URL = 'https://firebasestorage.googleapis.com/v0/b/ifailed-25dab.firebasestorage.app/o/Logo.png?alt=media&token=5597847f-b4fa-4d32-b193-5f8a6bcdf771'
 
 // Define your brand colors here
 const colors = {
@@ -19,7 +14,30 @@ const colors = {
   border: '#DCDCD8',
 }
 
+// Function to validate environment variables
+function validateEnv () {
+  if (!process.env.SENDGRID_API_KEY) {
+    logger.error('SENDGRID_API_KEY is not set in environment variables.')
+    throw new Error('Email service configuration error: Missing API Key.')
+  }
+  if (!process.env.EMAIL_USER) {
+    logger.error('EMAIL_USER is not set in environment variables.')
+    throw new Error('Email service configuration error: Missing Sender Email.')
+  }
+}
+
+// Initialize SendGrid with API Key
+try {
+  if (process.env.SENDGRID_API_KEY) {
+    sgMail.setApiKey(process.env.SENDGRID_API_KEY)
+  }
+} catch (error) {
+  logger.error('Error initializing SendGrid:', error)
+}
+
 async function sendVerificationEmail (email, verificationLink) {
+  validateEnv()
+
   const subject = `Verify your email for ${APP_NAME}`
   const html = `
     <body style="margin:0;padding:0;background-color:${colors.background};">
@@ -66,6 +84,8 @@ async function sendVerificationEmail (email, verificationLink) {
 }
 
 async function sendWelcomeEmail (email, displayName) {
+  validateEnv()
+
   const subject = `Welcome to ${APP_NAME}!`
   const html = `
     <body style="margin:0;padding:0;background-color:${colors.background};">
@@ -110,6 +130,8 @@ You are receiving this email because you signed up on ${APP_NAME}.
 }
 
 async function sendOTPEmail (email, otp) {
+  validateEnv()
+
   const subject = `Your verification code for ${APP_NAME}`
   const html = `
     <body style="margin:0;padding:0;background-color:${colors.background};">
@@ -148,30 +170,29 @@ async function sendOTPEmail (email, otp) {
 }
 
 async function sendEmail ({ to, subject, html, text }) {
-  if (!resend) {
-    logger.error('RESEND_API_KEY is not set.')
-    throw new Error('Email service is not configured (Missing API Key).')
+  const msg = {
+    to,
+    from: {
+      email: process.env.EMAIL_USER,
+      name: APP_NAME
+    },
+    subject,
+    text,
+    html,
   }
 
   try {
-    const { data, error } = await resend.emails.send({
-      from: `I_FAILED <${FROM_EMAIL}>`,
-      to: [to],
-      subject,
-      html,
-      text,
-    })
+    await sgMail.send(msg)
+    logger.info(`Email sent to ${to}. Subject: ${subject}`)
+    return { success: true }
+  } catch (error) {
+    logger.error('SendGrid Error:', error)
 
-    if (error) {
-      logger.error('Resend Error:', error)
-      throw new Error('Failed to send email via Resend: ' + error.message)
+    if (error.response) {
+      logger.error('SendGrid Response Body:', error.response.body)
     }
 
-    logger.info(`Email sent to ${to}. Subject: ${subject}. ID: ${data.id}`)
-    return { success: true, id: data.id }
-  } catch (error) {
-    logger.error('Resend Exception:', error)
-    throw new Error('Failed to send email via Resend')
+    throw new Error('Failed to send email via SendGrid')
   }
 }
 

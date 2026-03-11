@@ -30,7 +30,9 @@ exports.createUser = async (req, res) => {
     expiresAtDate.setHours(expiresAtDate.getHours() + 24)
 
     // Create a reference to the pending user document in Firestore
-    const pendingUserRef = db.collection(process.env.PENDING_USERS).doc(verificationToken)
+    // Using a default collection name if the environment variable is not set
+    const pendingUsersCollection = process.env.PENDING_USERS || 'pending_users'
+    const pendingUserRef = db.collection(pendingUsersCollection).doc(verificationToken)
 
     // Store the user's data in the pending users collection
     await pendingUserRef.set({
@@ -43,7 +45,8 @@ exports.createUser = async (req, res) => {
     })
 
     // Construct the verification link
-    const verificationLink = `${process.env.VERIFY_LINK}/verify-new-user?token=${verificationToken}`
+    const verifyLinkBase = process.env.VERIFY_LINK || 'https://ifailed-25dab.web.app'
+    const verificationLink = `${verifyLinkBase}/verify-new-user?token=${verificationToken}`
 
     // Send the verification email to the user
     await sendVerificationEmail(email, verificationLink)
