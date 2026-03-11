@@ -1,7 +1,9 @@
 const { Resend } = require('resend')
 const logger = require('firebase-functions/logger')
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+// Use a fallback or ensure process.env.RESEND_API_KEY is available
+const resendApiKey = process.env.RESEND_API_KEY
+const resend = resendApiKey ? new Resend(resendApiKey) : null
 
 const FROM_EMAIL = process.env.EMAIL_USER // This should be a verified sender email in Resend, e.g., 'onboarding@resend.dev' or your custom domain
 const APP_NAME = 'I_FAILED'
@@ -146,9 +148,9 @@ async function sendOTPEmail (email, otp) {
 }
 
 async function sendEmail ({ to, subject, html, text }) {
-  if (!process.env.RESEND_API_KEY) {
+  if (!resend) {
     logger.error('RESEND_API_KEY is not set.')
-    throw new Error('Email service is not configured.')
+    throw new Error('Email service is not configured (Missing API Key).')
   }
 
   try {
@@ -162,7 +164,7 @@ async function sendEmail ({ to, subject, html, text }) {
 
     if (error) {
       logger.error('Resend Error:', error)
-      throw new Error('Failed to send email via Resend')
+      throw new Error('Failed to send email via Resend: ' + error.message)
     }
 
     logger.info(`Email sent to ${to}. Subject: ${subject}. ID: ${data.id}`)

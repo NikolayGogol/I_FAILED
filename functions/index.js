@@ -3,6 +3,7 @@ const express = require('express')
 const admin = require('firebase-admin')
 const { onRequest } = require('firebase-functions/v2/https')
 const { setGlobalOptions } = require('firebase-functions/v2')
+require('dotenv').config() // Load environment variables from .env
 
 // Set the runtime service account for all functions in this project
 // setGlobalOptions({ serviceAccount: 'ifailed-25dab@appspot.gserviceaccount.com' })
