@@ -223,9 +223,18 @@
       }
     }
 
+    const sortReplies = replies => {
+      replies.sort((a, b) => a.createdAt - b.createdAt)
+      for (const reply of replies) {
+        if (reply.replies?.length) {
+          sortReplies(reply.replies)
+        }
+      }
+    }
+
     // Sort replies by date
     for (const comment of rootComments) {
-      comment.replies.sort((a, b) => a.createdAt - b.createdAt)
+      sortReplies(comment.replies)
     }
 
     comments.value = rootComments
@@ -662,10 +671,128 @@
                             />
                             <span class="text-caption">{{ reply.likes?.length || 0 }}</span>
                           </div>
+                          <div
+                            class="px-0 text-grey-darken-1 cursor-pointer"
+                            @click="toggleLike(reply)"
+                          >
+                            <v-icon
+                              class="ml-3"
+                              icon="mdi-comment-outline"
+                              size="14px"
+                              start
+                            />
+                            <span class="text-caption">{{ reply.replies?.length || 0 }}</span>
+                          </div>
+                          <div
+                            class="px-0 text-primary ml-3 cursor-pointer"
+                            style="font-size: 12px;"
+                            @click="showReplyInput[reply.id] = !showReplyInput[reply.id]"
+                          >
+                            Reply
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
+
+                  <!-- Reply Input (Nested) -->
+                  <div v-if="showReplyInput[reply.id]" class="mt-2 mb-4 ml-4">
+                    <div class="d-flex">
+                      <v-avatar class="mr-3" color="grey-lighten-2" size="40">
+                        <v-img
+                          v-if="reply.user?.photoURL"
+                          alt="User avatar"
+                          cover
+                          :src="reply.user.photoURL"
+                        />
+                        <span v-else class="text-subtitle-1">{{
+                          reply.user?.displayName?.charAt(0).toUpperCase() || 'U'
+                        }}</span>
+                      </v-avatar>
+                      <div class="d-block w-100">
+                        <div class="position-relative">
+                          <FormTextarea
+                            :model-value="replyText[reply.id] || ''"
+                            placeholder="Share your thoughts..."
+                            @update:model-value="val => replyText[reply.id] = val"
+                          />
+                          <div class="emoji-picker-container">
+                            <EmojiPicker
+                              v-if="showReplyEmojiPicker[reply.id]"
+                              class="emoji-picker"
+                              disable-skin-tones
+                              native
+                              @select="emoji => onSelectReplyEmoji(emoji, reply.id)"
+                            />
+                            <v-icon
+                              class="emoji-icon cursor-pointer"
+                              icon="mdi-emoticon-outline"
+                              @click="showReplyEmojiPicker[reply.id] = !showReplyEmojiPicker[reply.id]"
+                            />
+                          </div>
+                        </div>
+                        <div class="d-flex mt-2">
+                          <div
+                            class="submit-btn"
+                            :class="{ 'disabled': !replyText[reply.id]?.trim() }"
+                            @click="submitReply(reply.id)"
+                          >
+                            Reply
+                          </div>
+                          <div class="cancel-btn ml-4" @click="showReplyInput[reply.id] = false">
+                            Cancel
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Level 2 Replies -->
+                  <div v-if="reply.replies?.length" class="comment-item__replies ml-8 mt-2">
+                    <div v-for="subReply in reply.replies" :key="subReply.id" class="reply-item mb-3">
+                      <div class="d-flex align-start mb-1">
+                        <v-avatar class="mr-2" color="grey-lighten-2" size="44">
+                          <v-img
+                            v-if="subReply.user?.photoURL"
+                            alt="User avatar"
+                            cover
+                            :src="subReply.user.photoURL"
+                          />
+
+                          <span v-else class="text-caption">{{
+                            subReply.user?.displayName?.charAt(0).toUpperCase() || 'U'
+                          }}</span>
+                        </v-avatar>
+                        <div class="d-flex flex-column">
+                          <div class="d-flex">
+                            <div class="d-block">
+                              <span class="font-weight-bold text-body-2 mr-2">{{ subReply.user?.displayName }}</span>
+                              <div class="text-caption text-grey">@{{ subReply.user?.displayName.replaceAll(' ', '_') }}</div>
+                            </div>
+                            <span class="text-caption text-grey">{{ formatCommentDate(subReply.createdAt) }}</span>
+                          </div>
+                          <div class="mt-2">
+                            <div class="text-body-2">{{ subReply.text }}</div>
+                            <div class="d-flex align-center mt-1">
+                              <div
+                                class="px-0 text-grey-darken-1 cursor-pointer"
+                                @click="toggleLike(subReply)"
+                              >
+                                <v-icon
+                                  :color="subReply.likes?.includes(authStore.user?.uid) ? 'primary' : ''"
+                                  icon="mdi-heart-outline"
+                                  size="14px"
+                                  start
+                                />
+                                <span class="text-caption">{{ subReply.likes?.length || 0 }}</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
                 </div>
               </div>
             </div>
