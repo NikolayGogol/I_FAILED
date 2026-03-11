@@ -584,10 +584,10 @@
                 <div class="d-flex">
                   <v-avatar class="mr-3" color="grey-lighten-2" size="40">
                     <v-img
-                      v-if="comment.user?.photoURL"
+                      v-if="authStore.user?.photoURL"
                       alt="User avatar"
                       cover
-                      :src="comment.user.photoURL"
+                      :src="authStore.user?.photoURL"
                     />
                     <span v-else class="text-subtitle-1">{{
                       comment.user?.displayName?.charAt(0).toUpperCase() || 'U'
@@ -700,10 +700,10 @@
                     <div class="d-flex">
                       <v-avatar class="mr-3" color="grey-lighten-2" size="40">
                         <v-img
-                          v-if="reply.user?.photoURL"
+                          v-if="authStore.user?.photoURL"
                           alt="User avatar"
                           cover
-                          :src="reply.user.photoURL"
+                          :src="authStore.user?.photoURL"
                         />
                         <span v-else class="text-subtitle-1">{{
                           reply.user?.displayName?.charAt(0).toUpperCase() || 'U'
