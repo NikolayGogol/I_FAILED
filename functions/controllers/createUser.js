@@ -22,6 +22,26 @@ exports.createUser = async (req, res) => {
       return res.status(400).json({ error: 'Email and password are required' })
     }
 
+    // 1. CHECK IF USER ALREADY EXISTS IN FIREBASE AUTH
+    try {
+      const userRecord = await admin.auth().getUserByEmail(email)
+      if (userRecord) {
+        logger.warn(`Registration attempt for existing email: ${email}`)
+        return res.status(409).json({ error: 'User already exists', message: 'The email address is already in use by another account.' })
+      }
+    } catch (error) {
+      // If error.code is 'auth/user-not-found', it means the user does NOT exist, which is good.
+      // If it's any other error, we should probably stop.
+      if (error.code !== 'auth/user-not-found') {
+        logger.error('Error checking user existence:', error)
+        return res.status(500).json({ error: 'Internal Server Error', message: 'Failed to validate user existence.' })
+      }
+    }
+
+    // 2. CHECK IF USER ALREADY HAS A PENDING REGISTRATION (Optional but recommended)
+    // You might want to prevent spamming verification emails.
+    // For now, we proceed to create a new pending request which overwrites or adds to the collection.
+
     // Generate a secure, random token for email verification
     const verificationToken = crypto.randomBytes(32).toString('hex')
 

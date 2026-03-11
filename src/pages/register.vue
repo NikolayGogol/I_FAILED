@@ -54,7 +54,6 @@
 
     loading.value = true
     try {
-      // CORRECT: Calls the backend and expects a verificationToken
       const response = await authStore.createAcc({
         email: email.value,
         password: password.value,
@@ -62,7 +61,6 @@
         whyJoining: whyJoining.value,
       })
       if (response.data.status === 'success' && response.data.verificationToken) {
-        // CORRECT: Redirects to check-inbox with the token
         router.push({
           path: '/check-inbox',
           query: { email: email.value, token: response.data.verificationToken },
@@ -71,8 +69,13 @@
         toast.error(response.data.message || 'Registration failed. Please try again.')
       }
     } catch (error) {
-      // The axios interceptor will show the error toast
       console.error('Registration error:', error)
+      // Display the specific error message from the backend if available
+      if (error.response && error.response.data && error.response.data.message) {
+        toast.error(error.response.data.message)
+      } else {
+        toast.error('Registration failed. Please try again.')
+      }
     } finally {
       loading.value = false
     }
