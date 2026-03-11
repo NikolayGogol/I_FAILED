@@ -1,16 +1,14 @@
 {
   "projects": {
-    "default": "ifailed-69373",
-    "staging": "ifailed-69373"
+    "default": "ifailed-25dab"
   },
   "targets": {
-    "ifailed-69373": {
+    "ifailed-25dab": {
       "hosting": {
         "ifailed": [
-          "ifailed-69373"
+          "ifailed-25dab"
         ]
       }
     }
-  },
-  "etags": {}
+  }
 }
