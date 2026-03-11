@@ -5,9 +5,9 @@ import { useFirestore } from 'vuefire'
 import { getDownloadURL, ref, uploadBytes } from '@/firebase' // Correctly import storage from your firebase setup
 // eslint-disable-next-line import/no-duplicates
 import { db, storage } from '@/firebase' // Explicitly import storage
+import { visibilityList } from '@/models/categories.js'
 import { noAvatar } from '@/models/no-data.js'
 import { useAuthStore } from '@/stores/auth.js'
-import {visibilityList} from "@/models/categories.js";
 
 const collection_db = import.meta.env.VITE_POST_COLLECTION
 const collection_db_scheduled = import.meta.env.VITE_POST_COLLECTION_SCEDULED || 'scheduledPosts'

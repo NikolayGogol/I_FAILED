@@ -39,7 +39,7 @@
   const showReplyInput = ref({})
   const showEmojiPicker = ref(false)
   const showReplyEmojiPicker = ref({})
-
+  const isAuth = computed(() => !!authStore.user)
   // Like logic state
   const isLiked = ref(false)
   const likeCount = ref(0)
@@ -283,7 +283,10 @@
   }
 
   async function toggleLike (comment) {
-    if (!authStore.user) return
+    if (!isAuth.value) {
+      await router.push('/login')
+      return
+    }
     const isLiked = comment.likes?.includes(authStore.user.uid)
     try {
       await toggleCommentLike(comment.id, authStore.user.uid, isLiked)
@@ -511,6 +514,7 @@
             </div>
             <div class="d-flex justify-start mt-2">
               <div
+                v-if="isAuth"
                 class="submit-btn"
                 :class="{ 'disabled': !newComment.trim() }"
                 @click="submitComment"
@@ -571,6 +575,7 @@
                 </div>
 
                 <div
+                  v-if="isAuth"
                   class="px-0 text-primary ml-5 cursor-pointer"
                   style="font-size: 14px;"
                   @click="showReplyInput[comment.id] = !showReplyInput[comment.id]"
@@ -617,6 +622,7 @@
                     </div>
                     <div class="d-flex mt-2">
                       <div
+                        v-if="isAuth"
                         class="submit-btn"
                         :class="{ 'disabled': !replyText[comment.id]?.trim() }"
                         @click="submitReply(comment.id)"
@@ -767,7 +773,10 @@
                           <div class="d-flex">
                             <div class="d-block">
                               <span class="font-weight-bold text-body-2 mr-2">{{ subReply.user?.displayName }}</span>
-                              <div class="text-caption text-grey">@{{ subReply.user?.displayName.replaceAll(' ', '_') }}</div>
+                              <div class="text-caption text-grey">@{{
+                                subReply.user?.displayName.replaceAll(' ', '_')
+                              }}
+                              </div>
                             </div>
                             <span class="text-caption text-grey">{{ formatCommentDate(subReply.createdAt) }}</span>
                           </div>

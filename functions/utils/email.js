@@ -174,7 +174,7 @@ async function sendEmail ({ to, subject, html, text }) {
     to,
     from: {
       email: process.env.EMAIL_USER,
-      name: APP_NAME
+      name: APP_NAME,
     },
     subject,
     text,

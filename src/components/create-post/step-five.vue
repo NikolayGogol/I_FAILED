@@ -1,10 +1,10 @@
 <script setup>
   import { ref, watch } from 'vue'
   import DatePickerInput from '@/components/DatePickerInput.vue'
+  import { visibilityList } from '@/models/categories.js'
   import { useCreatePostStore } from '@/stores/create-post'
   import '@/styles/components/form-input.scss'
   import '@/styles/components/create-post/step-five.scss'
-  import {visibilityList} from "@/models/categories.js";
 
   const store = useCreatePostStore()
   const emit = defineEmits(['isValid'])

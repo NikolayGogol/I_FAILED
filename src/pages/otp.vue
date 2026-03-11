@@ -17,7 +17,7 @@
   const toast = useToast()
   const authStore = useAuthStore()
 
-  const code = ref(Array(6).fill(''))
+  const code = ref(Array.from({ length: 6 }).fill(''))
   const inputRefs = ref([])
   const loading = ref(false)
   const resendLoading = ref(false)
@@ -29,7 +29,7 @@
   })
 
   // Helper to safely focus an input
-  const focusInput = (index) => {
+  function focusInput (index) {
     const el = inputRefs.value[index]
     if (el) {
       // Check if el is a Vue component instance with a focus method, or a raw DOM element
@@ -87,9 +87,9 @@
 
     if (!pastedData) return
 
-    pastedData.split('').forEach((char, i) => {
+    for (const [i, char] of pastedData.split('').entries()) {
       code.value[i] = char
-    })
+    }
 
     const nextIndex = Math.min(pastedData.length, 5)
     nextTick(() => {
@@ -113,7 +113,7 @@
     } catch (error) {
       console.error('OTP verification error:', error)
       // Clear code on error
-      code.value = Array(6).fill('')
+      code.value = Array.from({ length: 6 }).fill('')
       nextTick(() => {
         focusInput(0)
       })
@@ -129,7 +129,7 @@
     try {
       await authStore.sendPasswordResetOTP(email.value)
       toast.success('Code resent successfully!')
-      code.value = Array(6).fill('')
+      code.value = Array.from({ length: 6 }).fill('')
       nextTick(() => {
         focusInput(0)
       })
