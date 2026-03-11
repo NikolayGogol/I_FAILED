@@ -2,6 +2,10 @@ const cors = require('cors')
 const express = require('express')
 const admin = require('firebase-admin')
 const { onRequest } = require('firebase-functions/v2/https')
+const { setGlobalOptions } = require('firebase-functions/v2')
+
+// Set the runtime service account for all functions in this project
+setGlobalOptions({ serviceAccount: 'ifailed-25dab@appspot.gserviceaccount.com' })
 
 // Initialize Firebase Admin FIRST
 admin.initializeApp()
