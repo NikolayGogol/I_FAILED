@@ -81,7 +81,7 @@ jobs:
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_IFAILED_69373 }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_IFAILED_25DAB }}
           channelId: live
-          projectId: ifailed-69373
+          projectId: ifailed-25dab
           target: ifailed
