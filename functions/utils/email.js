@@ -1,7 +1,7 @@
 const sgMail = require('@sendgrid/mail')
 const logger = require('firebase-functions/logger')
 
-const APP_NAME = 'I_FAILED'
+const APP_NAME = 'IFELL'
 const LOGO_URL = 'https://firebasestorage.googleapis.com/v0/b/ifailed-25dab.firebasestorage.app/o/Logo.png?alt=media&token=5597847f-b4fa-4d32-b193-5f8a6bcdf771'
 
 // Define your brand colors here
