@@ -1,9 +1,9 @@
-const sgMail = require('@sendgrid/mail')
+const { Resend } = require('resend')
 const logger = require('firebase-functions/logger')
 
-sgMail.setApiKey(process.env.SENDGRID_API_KEY)
+const resend = new Resend(process.env.RESEND_API_KEY)
 
-const FROM_EMAIL = process.env.EMAIL_USER
+const FROM_EMAIL = process.env.EMAIL_USER // This should be a verified sender email in Resend, e.g., 'onboarding@resend.dev' or your custom domain
 const APP_NAME = 'I_FAILED'
 const LOGO_URL = 'https://firebasestorage.googleapis.com/v0/b/ifailed-25dab.firebasestorage.app/o/Logo.png?alt=media&token=07b496e2-6089-4748-b8a5-95da728b2368'
 
@@ -146,29 +146,30 @@ async function sendOTPEmail (email, otp) {
 }
 
 async function sendEmail ({ to, subject, html, text }) {
-  if (!process.env.SENDGRID_API_KEY || !FROM_EMAIL) {
-    logger.error('SENDGRID_API_KEY or FROM_EMAIL is not set.')
+  if (!process.env.RESEND_API_KEY) {
+    logger.error('RESEND_API_KEY is not set.')
     throw new Error('Email service is not configured.')
   }
 
-  const msg = {
-    to,
-    from: {
-      name: APP_NAME,
-      email: FROM_EMAIL,
-    },
-    subject,
-    html,
-    text,
-  }
-
   try {
-    await sgMail.send(msg)
-    logger.info(`Email sent to ${to}. Subject: ${subject}`)
-    return { success: true }
+    const { data, error } = await resend.emails.send({
+      from: `I_FAILED <${FROM_EMAIL}>`,
+      to: [to],
+      subject,
+      html,
+      text,
+    })
+
+    if (error) {
+      logger.error('Resend Error:', error)
+      throw new Error('Failed to send email via Resend')
+    }
+
+    logger.info(`Email sent to ${to}. Subject: ${subject}. ID: ${data.id}`)
+    return { success: true, id: data.id }
   } catch (error) {
-    logger.error('SendGrid Error:', error.response ? error.response.body : error)
-    throw new Error('Failed to send email via SendGrid')
+    logger.error('Resend Exception:', error)
+    throw new Error('Failed to send email via Resend')
   }
 }
 

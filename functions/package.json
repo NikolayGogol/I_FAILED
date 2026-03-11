@@ -21,7 +21,8 @@
     "firebase-admin": "^11.8.0",
     "firebase-functions": "^4.3.1",
     "jsonwebtoken": "^9.0.2",
-    "nodemailer": "^6.9.7"
+    "nodemailer": "^6.9.7",
+    "resend": "^3.2.0"
   },
   "devDependencies": {
     "firebase-functions-test": "^3.1.0",
