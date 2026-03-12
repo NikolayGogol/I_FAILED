@@ -48,7 +48,7 @@ export const useProfileStore = defineStore('profile', {
           const post = { id: doc.id, ...doc.data() }
 
           // Handle anonymous posts
-          if (post.stepFive?.isAnonymous) {
+          if (post.isAnonymous) {
             post.user = {
               displayName: 'Anonymous',
               photoURL: null,

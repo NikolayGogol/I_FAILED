@@ -1,7 +1,7 @@
 import { addDoc, collection, serverTimestamp, updateDoc } from 'firebase/firestore'
 import { defineStore } from 'pinia'
-import { getDownloadURL, ref, uploadBytes } from '@/firebase'
-import { db, storage } from '@/firebase'
+import { db, getDownloadURL, ref, storage, uploadBytes } from '@/firebase'
+
 import { visibilityList } from '@/models/categories.js'
 import { noAvatar } from '@/models/no-data.js'
 import { useAuthStore } from '@/stores/auth.js'
@@ -73,7 +73,9 @@ export const useCreatePostStore = defineStore('createPost', {
         if (this.images && this.images.length > 0) {
           const uploadPromises = this.images.map(imageObject => {
             const imageFile = imageObject.file
-            if (!imageFile) return Promise.resolve(null)
+            if (!imageFile) {
+              return Promise.resolve(null)
+            }
             const storageRef = ref(storage, `posts/${postId}/${Date.now()}_${imageObject.name}`)
             return uploadBytes(storageRef, imageFile).then(snapshot => getDownloadURL(snapshot.ref))
           })

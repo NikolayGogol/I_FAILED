@@ -107,7 +107,7 @@
 </script>
 
 <template>
-  <v-menu v-if="!post?.stepFive?.isAnonymous" open-on-hover>
+  <v-menu v-if="!post?.isAnonymous" open-on-hover>
     <template #activator="{ props: menuProps }">
       <v-btn icon size="small" v-bind="menuProps" variant="text">
         <v-icon>mdi-dots-horizontal</v-icon>

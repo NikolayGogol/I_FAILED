@@ -9,12 +9,12 @@
 <script setup>
   import { storeToRefs } from 'pinia'
   import { onMounted, onUnmounted, reactive, ref } from 'vue'
+  import { useToast } from 'vue-toastification'
   import PostCard from '@/components/feed/PostCard.vue'
   import { categories, costRange, emotionTags, recoveryTimeOptions } from '@/models/categories.js'
   import { useMainStore } from '@/stores/main.js'
-  import '@/styles/pages/index.scss'
   import { generateRandomPost } from '@/utils/post-generator.js'
-  import { useToast } from 'vue-toastification'
+  import '@/styles/pages/index.scss'
 
   const mainStore = useMainStore()
   const { filteredPosts: posts, loading, hasMore, activeTab } = storeToRefs(mainStore)
@@ -75,13 +75,13 @@
     mainStore.applyPostFilters(selectedFilter)
   }
 
-  async function handleGeneratePost() {
+  async function handleGeneratePost () {
     try {
-      await generateRandomPost();
-      toast.success('Random post generated successfully!');
-      mainStore.fetchPosts({ tab: activeTab.value, refresh: true });
+      await generateRandomPost()
+      toast.success('Random post generated successfully!')
+      mainStore.fetchPosts({ tab: activeTab.value, refresh: true })
     } catch {
-      toast.error('Failed to generate random post.');
+      toast.error('Failed to generate random post.')
     }
   }
 </script>

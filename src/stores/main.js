@@ -35,25 +35,25 @@ export const useMainStore = defineStore('main', {
         const { categories, emojiTags, recoveryTime, costRange } = state.currentFilters
 
         // 1. Category Match
-        const postCategories = post.stepOne?.selectedCategories || []
+        const postCategories = post.selectedCategories || []
         const categoryMatch = !categories || categories.length === 0 || categories.some(filterCat =>
           postCategories.some(postCat => postCat.id === filterCat.id),
         )
 
         // 2. Emoji Match
-        const postEmojis = post.stepFour?.emotionTags || []
+        const postEmojis = post.emotionTags || []
         const emojiMatch = !emojiTags || emojiTags.length === 0 || emojiTags.some(filterEmoji =>
           postEmojis.includes(filterEmoji.value),
         )
 
         // 3. Recovery Time Match
-        const postRecoveryTime = post.stepFour?.recoveryTime
+        const postRecoveryTime = post.recoveryTime
         const recoveryMatch = !recoveryTime || recoveryTime.length === 0 || recoveryTime.some(filterRecovery =>
           filterRecovery.value === postRecoveryTime,
         )
 
         // 4. Cost Range Match
-        const postCostRaw = post.stepFour?.cost
+        const postCostRaw = post.cost
         const postCost = Number(postCostRaw)
         const costMatch = !costRange || costRange.length === 0 || costRange.some(range => {
           if (range.label === 'Free') {
@@ -183,7 +183,7 @@ export const useMainStore = defineStore('main', {
             }
 
             const finalPost = { id: postDoc.id, ...postData }
-            if (postData.uid && !postData.stepFive?.isAnonymous) {
+            if (postData.uid && !postData.isAnonymous) {
               const userRef = doc(db, USER_COLLECTION, postData.uid)
               const userSnap = await getDoc(userRef)
               finalPost.user = userSnap.exists() ? { ...finalPost.user, ...userSnap.data(), uid: userSnap.id } : { ...finalPost.user, uid: postData.uid }

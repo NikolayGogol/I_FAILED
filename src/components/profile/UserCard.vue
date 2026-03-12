@@ -9,8 +9,8 @@
   import FormTextarea from '@/components/FormTextarea.vue'
   import { useAuthStore } from '@/stores/auth.js'
   import { useProfileStore } from '@/stores/profile.js'
-  import '@/styles/components/profile/user-card.scss'
   import { generateRandomPost } from '@/utils/post-generator.js'
+  import '@/styles/components/profile/user-card.scss'
 
   // =================================================================================================
   // Props
@@ -139,12 +139,12 @@
     }
   }
 
-  async function handleGeneratePost() {
+  async function handleGeneratePost () {
     try {
-      await generateRandomPost();
-      toast.success('Random post generated successfully!');
+      await generateRandomPost()
+      toast.success('Random post generated successfully!')
     } catch {
-      toast.error('Failed to generate random post.');
+      toast.error('Failed to generate random post.')
     }
   }
 </script>

@@ -1,22 +1,15 @@
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore'
 import { db } from '@/firebase'
-import { categories, recoveryTimeOptions, emotionTags, costRange } from '@/models/categories'
-import { useAuthStore } from '@/stores/auth'
+import { categories } from '@/models/categories'
 import { noAvatar } from '@/models/no-data'
+import { useAuthStore } from '@/stores/auth'
 
 const collection_db = import.meta.env.VITE_POST_COLLECTION
 
 // Helper to get a random element from an array
-const getRandomElement = (arr) => arr[Math.floor(Math.random() * arr.length)]
+const getRandomElement = arr => arr[Math.floor(Math.random() * arr.length)]
 
-// Helper to get a random subset of an array
-const getRandomSubset = (arr, max = 3) => {
-  const shuffled = [...arr].sort(() => 0.5 - Math.random())
-  const size = Math.floor(Math.random() * (max + 1))
-  return shuffled.slice(0, size)
-}
-
-export const generateRandomPost = async () => {
+export async function generateRandomPost () {
   const authStore = useAuthStore()
   if (!authStore.user) {
     console.error('User is not authenticated.')

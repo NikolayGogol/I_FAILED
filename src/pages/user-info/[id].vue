@@ -48,7 +48,7 @@
   // Filter out anonymous posts from the user's activity
   const filteredActivity = computed(() => {
     if (!userActivity.value) return null
-    const filteredPosts = posts.value.filter(post => !post.stepFive?.isAnonymous)
+    const filteredPosts = posts.value.filter(post => !post.isAnonymous)
     return {
       ...userActivity.value,
       posts: filteredPosts.length,

@@ -63,7 +63,7 @@ export const useUserInfoStore = defineStore('userInfo', {
           // Assuming we want to show all posts if it's the current user viewing their own profile,
           // but the requirement is for a public user info page, so we should probably hide anonymous posts
           // unless we are the owner. But for now, let's just filter based on the isAnonymous flag.
-          if (postData.stepFive?.isAnonymous) {
+          if (postData.isAnonymous) {
             continue
           }
 

@@ -122,17 +122,9 @@
   })
 
   const readingTime = computed(() => {
-    if (!post.value) return '1 min read'
+    if (!post.value?.description) return '1 min read'
 
-    const content = [
-      post.value.stepTwo?.description,
-      post.value.stepTwo?.whatWentWrong,
-      post.value.stepThree?.whatILearned,
-      post.value.stepThree?.keyTakeaways,
-      post.value.stepThree?.whatIdDoDifferently,
-      post.value.stepThree?.advice,
-    ].filter(Boolean).join(' ')
-
+    const content = post.value.description
     const text = content.replace(/<[^>]*>/g, '')
     const wordCount = text.trim().split(/\s+/).length
     const time = Math.ceil(wordCount / 300)
@@ -355,9 +347,9 @@
       </div>
       <div class="d-flex justify-space-between mt-2">
         <div
-          v-if="post.stepOne?.selectedCategories?.[0]?.label"
+          v-if="post.selectedCategories?.[0]?.label"
           class="chip-custom"
-        >{{ post.stepOne.selectedCategories[0].label }}
+        >{{ post.selectedCategories[0].label }}
         </div>
         <div class="read-widget">
           <v-icon icon="mdi-clock-outline" />
@@ -366,73 +358,73 @@
       </div>
 
       <h1 class="single-post-page__title text-h3 mt-6 font-weight-bold mb-8 text-blue-grey-darken-4">
-        {{ post.stepTwo?.title }}
+        {{ post.title }}
       </h1>
 
-      <section v-if="post.stepTwo?.description" class="single-post-page__section mb-6">
+      <section v-if="post.description" class="single-post-page__section mb-6">
         <h2 class="section-title">What Happened</h2>
-        <div v-html="post.stepTwo?.description" />
+        <div v-html="post.description" />
       </section>
 
-      <section v-if="post.stepTwo?.whatWentWrong" class="single-post-page__section mb-6">
+      <section v-if="post.whatWentWrong" class="single-post-page__section mb-6">
         <h2 class="section-title">What Went Wrong</h2>
-        <div v-html="post.stepTwo?.whatWentWrong" />
+        <div v-html="post.whatWentWrong" />
       </section>
 
       <div
-        v-if="post.stepThree?.whatILearned || post.stepThree?.keyTakeaways"
+        v-if="post.whatILearned || post.keyTakeaways"
         class="bg-orange-accent-1 pa-6 rounded-lg mb-6"
       >
-        <section v-if="post.stepThree?.whatILearned">
+        <section v-if="post.whatILearned">
           <h2 class="section-title">What I Learned</h2>
-          <div v-html="post.stepThree.whatILearned" />
+          <div v-html="post.whatILearned" />
         </section>
-        <section v-if="post.stepThree?.keyTakeaways">
+        <section v-if="post.keyTakeaways">
           <h2 class="section-title">Key Takeaways</h2>
-          <div v-html="post.stepThree.keyTakeaways " />
+          <div v-html="post.keyTakeaways " />
         </section>
       </div>
 
-      <section v-if="post.stepThree?.whatIdDoDifferently" class="bg-orange-accent-1 pa-6 rounded-lg mb-6">
+      <section v-if="post.whatIdDoDifferently" class="bg-orange-accent-1 pa-6 rounded-lg mb-6">
         <h2 class="section-title">What I'd Do Differently</h2>
-        <div v-html="post.stepThree.whatIdDoDifferently" />
+        <div v-html="post.whatIdDoDifferently" />
       </section>
 
-      <section v-if="post.stepThree?.advice" class="bg-orange-accent-1 pa-6 rounded-lg mb-6">
+      <section v-if="post.advice" class="bg-orange-accent-1 pa-6 rounded-lg mb-6">
         <h2 class="section-title">Advice for Others</h2>
-        <div v-html="post.stepThree.advice" />
+        <div v-html="post.advice" />
       </section>
 
       <h3>Additional Details</h3>
 
-      <div v-if="post.stepFour?.cost" class="d-flex mb-2">
+      <div v-if="post.cost" class="d-flex mb-2">
         <span class="font-weight-semibold mr-2">Cost:</span>
-        <span class="text-grey-darken-4">{{ formatNumber(post.stepFour?.cost) }}</span>
+        <span class="text-grey-darken-4">{{ formatNumber(post.cost) }}</span>
       </div>
-      <div v-if="post.stepFour?.recoveryTime" class="d-flex mb-2">
+      <div v-if="post.recoveryTime" class="d-flex mb-2">
         <span class="font-weight-semibold mr-2">Recovery Time:</span>
-        <span class="text-grey-darken-4">{{ post.stepFour?.recoveryTime?.title }}</span>
+        <span class="text-grey-darken-4">{{ post.recoveryTime?.title }}</span>
       </div>
-      <div v-if="post.stepFour?.emotionTags.length" class="d-flex">
+      <div v-if="post.emotionTags?.length" class="d-flex">
         <span class="font-weight-semibold mr-2">Emotions:</span>
         <v-chip
-          v-for="(chip, index) in post.stepFour?.emotionTags"
+          v-for="(chip, index) in post.emotionTags"
           :key="index"
           class="mr-2"
           size="small"
         > {{ chip.emoji }} {{ chip.label }}
         </v-chip>
       </div>
-      <div v-if="post.stepFour.tags.length > 0" class="d-flex mt-2">
+      <div v-if="post.tags?.length > 0" class="d-flex mt-2">
         <span class="font-weight-semibold mr-2">Tags:</span>
         <ul class="tag-list">
-          <li v-for="tag in post.stepFour.tags" :key="tag" class="tag">{{ tag }}</li>
+          <li v-for="tag in post.tags" :key="tag" class="tag">{{ tag }}</li>
         </ul>
       </div>
 
-      <v-divider v-if="post.stepTwo.images?.length > 0" class="my-6" />
+      <v-divider v-if="post.images?.length > 0" class="my-6" />
       <img
-        v-for="img in post.stepTwo.images"
+        v-for="img in post.images"
         :key="img"
         :alt="img"
         class="w-100"
@@ -476,7 +468,7 @@
       </div>
     </div>
 
-    <div v-if="post.stepFive?.allowComments" class="bg mt-6 single-post-page__comments">
+    <div v-if="post.allowComments" class="bg mt-6 single-post-page__comments">
       <h3 class="text-h5 font-weight-bold mb-4">Comments</h3>
       <div class="notice">
         <b class="font-weight-bold mr-1">Remember:</b>

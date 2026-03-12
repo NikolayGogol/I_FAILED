@@ -198,7 +198,7 @@
         </ul>
       </div>
       <div class="d-flex mt-6">
-        <v-btn :loading="isLoading" color="primary" @click="submitPost">Post</v-btn>
+        <v-btn color="primary" :loading="isLoading" @click="submitPost">Post</v-btn>
       </div>
     </div>
   </div>
