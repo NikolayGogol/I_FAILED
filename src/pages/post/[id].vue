@@ -366,62 +366,6 @@
         <div v-html="post.description" />
       </section>
 
-      <section v-if="post.whatWentWrong" class="single-post-page__section mb-6">
-        <h2 class="section-title">What Went Wrong</h2>
-        <div v-html="post.whatWentWrong" />
-      </section>
-
-      <div
-        v-if="post.whatILearned || post.keyTakeaways"
-        class="bg-orange-accent-1 pa-6 rounded-lg mb-6"
-      >
-        <section v-if="post.whatILearned">
-          <h2 class="section-title">What I Learned</h2>
-          <div v-html="post.whatILearned" />
-        </section>
-        <section v-if="post.keyTakeaways">
-          <h2 class="section-title">Key Takeaways</h2>
-          <div v-html="post.keyTakeaways " />
-        </section>
-      </div>
-
-      <section v-if="post.whatIdDoDifferently" class="bg-orange-accent-1 pa-6 rounded-lg mb-6">
-        <h2 class="section-title">What I'd Do Differently</h2>
-        <div v-html="post.whatIdDoDifferently" />
-      </section>
-
-      <section v-if="post.advice" class="bg-orange-accent-1 pa-6 rounded-lg mb-6">
-        <h2 class="section-title">Advice for Others</h2>
-        <div v-html="post.advice" />
-      </section>
-
-      <h3>Additional Details</h3>
-
-      <div v-if="post.cost" class="d-flex mb-2">
-        <span class="font-weight-semibold mr-2">Cost:</span>
-        <span class="text-grey-darken-4">{{ formatNumber(post.cost) }}</span>
-      </div>
-      <div v-if="post.recoveryTime" class="d-flex mb-2">
-        <span class="font-weight-semibold mr-2">Recovery Time:</span>
-        <span class="text-grey-darken-4">{{ post.recoveryTime?.title }}</span>
-      </div>
-      <div v-if="post.emotionTags?.length" class="d-flex">
-        <span class="font-weight-semibold mr-2">Emotions:</span>
-        <v-chip
-          v-for="(chip, index) in post.emotionTags"
-          :key="index"
-          class="mr-2"
-          size="small"
-        > {{ chip.emoji }} {{ chip.label }}
-        </v-chip>
-      </div>
-      <div v-if="post.tags?.length > 0" class="d-flex mt-2">
-        <span class="font-weight-semibold mr-2">Tags:</span>
-        <ul class="tag-list">
-          <li v-for="tag in post.tags" :key="tag" class="tag">{{ tag }}</li>
-        </ul>
-      </div>
-
       <v-divider v-if="post.images?.length > 0" class="my-6" />
       <img
         v-for="img in post.images"

@@ -92,40 +92,11 @@
     margin-bottom: 12px;
   }
 
-  h3 {
-    color: $color-text-primary;
-    font-weight: 600;
-    font-size: 24px;
-    margin-bottom: 12px;
-
-    @include media-down($breakpoint-sm) {
-      font-size: 20px;
-    }
-  }
-
   .v-chip {
     border: 1px solid $color-border;
 
     .v-chip__underlay {
       display: none;
-    }
-  }
-
-  .tag-list {
-    display: flex;
-    flex-wrap: wrap; // Allow wrapping
-    gap: 5px; // Gap between tags
-
-    li {
-      list-style: none;
-      color: $color-surface;
-      background-color: $color-primary;
-      font-weight: 400;
-      font-size: 12px;
-      line-height: normal;
-      padding: 3px 8px; // Slightly more padding
-      border-radius: $radius-xs;
-      // margin-right: 10px; // Removed in favor of gap
     }
   }
 
