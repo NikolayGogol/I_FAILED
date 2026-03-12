@@ -20,7 +20,14 @@
 <template>
   <v-app>
     <!-- Mobile Header -->
-    <v-app-bar v-if="!mdAndUp" app color="surface" density="compact" flat border>
+    <v-app-bar
+      v-if="!mdAndUp"
+      app
+      border
+      color="surface"
+      density="compact"
+      flat
+    >
       <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
       <v-toolbar-title>
         <router-link to="/">
@@ -44,17 +51,17 @@
 
     <v-main>
       <!-- Use fluid container on mobile to maximize width, contained on larger screens -->
-      <v-container :fluid="!mdAndUp" class="pa-0 pa-md-4 main-container">
+      <v-container class="pa-0 pa-md-4 main-container" :fluid="!mdAndUp">
         <v-row justify="center" no-gutters>
           <!-- Desktop Sidebar (visible on medium screens and up) -->
           <!-- Takes 3 cols on tablet, 3 on desktop -->
           <v-col
             v-if="mdAndUp"
+            class="pr-md-4"
             cols="12"
             lg="3"
             md="3"
             xl="2"
-            class="pr-md-4"
           >
             <div class="sticky-sidebar">
               <Sidebar />
@@ -64,11 +71,11 @@
           <!-- Main Content -->
           <!-- Takes full width on mobile, 9 cols on tablet, 6 cols on desktop -->
           <v-col
+            class="px-md-2"
             cols="12"
             lg="6"
             md="9"
             xl="6"
-            class="px-md-2"
           >
             <!-- The main content of the page is injected here -->
             <slot />
@@ -78,10 +85,10 @@
           <!-- Hidden on tablet to give more space to content -->
           <v-col
             v-if="lgAndUp"
+            class="pl-lg-4"
             cols="12"
             lg="3"
             xl="3"
-            class="pl-lg-4"
           >
             <div class="sticky-sidebar">
               <Rightbar />

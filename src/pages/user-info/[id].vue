@@ -74,15 +74,15 @@
     }
 
     if (isFollowing.value) {
-       await profileStore.unfollowUser(userId.value)
-       toast.info(`Unfollowed ${user.value.displayName}`)
+      await profileStore.unfollowUser(userId.value)
+      toast.info(`Unfollowed ${user.value.displayName}`)
     } else {
-       const success = await profileStore.followUser(userId.value)
-       if (success !== false) {
-         toast.info(`Followed ${user.value.displayName}`)
-       } else {
-         toast.error(`Failed to follow ${user.value.displayName}`)
-       }
+      const success = await profileStore.followUser(userId.value)
+      if (success === false) {
+        toast.error(`Failed to follow ${user.value.displayName}`)
+      } else {
+        toast.info(`Followed ${user.value.displayName}`)
+      }
     }
     await userInfoStore.fetchUser(userId.value)
   }

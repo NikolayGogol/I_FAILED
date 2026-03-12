@@ -131,7 +131,7 @@
       </template>
 
       <template v-else>
-         <v-list-item class="cursor-pointer text-danger" @click="handleUnblock">
+        <v-list-item class="cursor-pointer text-danger" @click="handleUnblock">
           <v-icon class="mr-2" icon="mdi-account-off-outline" />
           Unblock this user
         </v-list-item>
