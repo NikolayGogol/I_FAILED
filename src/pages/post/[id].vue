@@ -246,7 +246,8 @@
     }
   })
 
-  async function submitComment () {
+  async function submitComment (event) {
+    if (event && event.shiftKey) return
     if (!authStore.user) {
       await router.push('/login')
       return
@@ -266,7 +267,8 @@
     }
   }
 
-  async function submitReply (commentId) {
+  async function submitReply (commentId, event) {
+    if (event && event.shiftKey) return
     const text = replyText.value[commentId]
     if (!text?.trim()) return
 
@@ -438,6 +440,7 @@
                 height="89"
                 hide-details
                 placeholder="Write a comment..."
+                @keydown.enter.prevent="submitComment"
               />
               <div class="emoji-picker-container">
                 <EmojiPicker
@@ -459,7 +462,7 @@
                 v-if="isAuth"
                 class="submit-btn"
                 :class="{ 'disabled': !newComment.trim() }"
-                @click="submitComment"
+                @click="submitComment(null)"
               >
                 Post Comment
               </div>
@@ -545,6 +548,7 @@
                       <FormTextarea
                         :model-value="replyText[comment.id] || ''"
                         placeholder="Share your thoughts..."
+                        @keydown.enter.prevent="submitReply(comment.id, $event)"
                         @update:model-value="val => replyText[comment.id] = val"
                       />
                       <div class="emoji-picker-container">
@@ -567,7 +571,7 @@
                         v-if="isAuth"
                         class="submit-btn"
                         :class="{ 'disabled': !replyText[comment.id]?.trim() }"
-                        @click="submitReply(comment.id)"
+                        @click="submitReply(comment.id, null)"
                       >
                         Reply
                       </div>
@@ -662,6 +666,7 @@
                           <FormTextarea
                             :model-value="replyText[reply.id] || ''"
                             placeholder="Share your thoughts..."
+                            @keydown.enter.prevent="submitReply(reply.id, $event)"
                             @update:model-value="val => replyText[reply.id] = val"
                           />
                           <div class="emoji-picker-container">
@@ -683,7 +688,7 @@
                           <div
                             class="submit-btn"
                             :class="{ 'disabled': !replyText[reply.id]?.trim() }"
-                            @click="submitReply(reply.id)"
+                            @click="submitReply(reply.id, null)"
                           >
                             Reply
                           </div>
