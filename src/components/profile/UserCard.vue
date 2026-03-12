@@ -9,7 +9,6 @@
   import FormTextarea from '@/components/FormTextarea.vue'
   import { useAuthStore } from '@/stores/auth.js'
   import { useProfileStore } from '@/stores/profile.js'
-  import { generateRandomPost } from '@/utils/post-generator.js'
   import '@/styles/components/profile/user-card.scss'
 
   // =================================================================================================
@@ -139,14 +138,6 @@
     }
   }
 
-  async function handleGeneratePost () {
-    try {
-      await generateRandomPost()
-      toast.success('Random post generated successfully!')
-    } catch {
-      toast.error('Failed to generate random post.')
-    }
-  }
 </script>
 
 <template>
@@ -170,7 +161,6 @@
           <h2>{{ displayName }}</h2>
           <div class="d-flex">
             <button v-if="isCurrentUser" class="cancel-btn" @click="openEditDialog">Edit profile</button>
-            <button v-if="isCurrentUser" class="cancel-btn ml-2" @click="handleGeneratePost">Generate Post</button>
           </div>
           <slot name="profile-actions" />
         </div>

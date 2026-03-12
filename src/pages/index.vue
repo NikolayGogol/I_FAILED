@@ -111,10 +111,10 @@
         ]"
       >
         <div class="d-flex">
-          <div class="write-post-btn font-weight-semibold" @click="$router.push('/create-post')">
+          <div class="font-weight-semibold cancel-btn" @click="$router.push('/create-post')">
             New failure
           </div>
-          <div class="write-post-btn font-weight-semibold ml-2" @click="handleGeneratePost">
+          <div class="cancel-btn font-weight-semibold ml-2" @click="handleGeneratePost">
             Generate Post
           </div>
         </div>
@@ -128,36 +128,6 @@
           <v-chip
             v-for="item in categories"
             :key="item.id"
-            color="primary"
-            :text="item.label"
-            :value="item"
-          />
-        </v-chip-group>
-        <h5 class="mt-6">Emotion Tags</h5>
-        <v-chip-group v-model="selectedFilter.emojiTags" multiple>
-          <v-chip
-            v-for="item in emotionTags"
-            :key="item.value"
-            color="primary"
-            :text="item.label"
-            :value="item"
-          />
-        </v-chip-group>
-        <h5 class="mt-6">Recovery time</h5>
-        <v-chip-group v-model="selectedFilter.recoveryTime" multiple>
-          <v-chip
-            v-for="item in recoveryTimeOptions"
-            :key="item.value"
-            color="primary"
-            :text="item.title"
-            :value="item"
-          />
-        </v-chip-group>
-        <h5 class="mt-6">Cost Range</h5>
-        <v-chip-group v-model="selectedFilter.costRange" multiple>
-          <v-chip
-            v-for="item in costRange"
-            :key="item.value"
             color="primary"
             :text="item.label"
             :value="item"

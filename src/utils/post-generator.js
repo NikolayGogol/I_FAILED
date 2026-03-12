@@ -1,6 +1,6 @@
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore'
 import { db } from '@/firebase'
-import { categories } from '@/models/categories'
+import {categories, visibilityList} from '@/models/categories'
 import { noAvatar } from '@/models/no-data'
 import { useAuthStore } from '@/stores/auth'
 
@@ -27,7 +27,7 @@ export async function generateRandomPost () {
       date: new Date(),
       images: [],
       isAnonymous,
-      visibility: 'Public',
+      visibility: visibilityList[0],
       allowComments: true,
       enableTriggerWarning: false,
       triggerTags: [],
