@@ -1,8 +1,8 @@
 <route lang="json">
 {
-  "meta": {
-    "layout": "MainLayout"
-  }
+"meta": {
+"layout": "MainLayout"
+}
 }
 </route>
 
@@ -12,19 +12,23 @@
   import { useToast } from 'vue-toastification'
   import PostCard from '@/components/feed/PostCard.vue'
   import { categories } from '@/models/categories.js'
+  import { useAuthStore } from '@/stores/auth.js'
   import { useMainStore } from '@/stores/main.js'
   import { generateRandomPost } from '@/utils/post-generator.js'
   import '@/styles/pages/index.scss'
-
+  //
   const mainStore = useMainStore()
+  const authStore = useAuthStore()
   const { filteredPosts: posts, loading, hasMore, activeTab } = storeToRefs(mainStore)
   const toast = useToast()
   const isFilterPanel = ref(false)
-  const tabs = [
+  const tabs = reactive([
     { label: 'Latest', value: 'latest' },
     { label: 'Popular', value: 'popular' },
-    { label: 'For You', value: 'for-you' },
-  ]
+  ])
+  if (authStore.user) {
+    tabs.push({ label: 'For You', value: 'for-you' })
+  }
   const selectedFilter = reactive({
     categories: [],
     emojiTags: [],
@@ -83,6 +87,7 @@
       toast.error('Failed to generate random post.')
     }
   }
+
   const isDevMode = computed(() => {
     return location.hostname === 'localhost'
   })
