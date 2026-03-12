@@ -69,7 +69,7 @@
 
   // Get the truncated body of the post
   const truncatedBody = computed(() => {
-    const description = p.post.stepTwo.description
+    const description = p.post.description
     if (isExpanded.value || description.length <= maxLength) {
       return description
     }
@@ -78,7 +78,7 @@
 
   // Check if the "Read more" button should be shown
   const showReadMore = computed(() => {
-    return !isExpanded.value && p.post.stepTwo.description.length > maxLength
+    return !isExpanded.value && p.post.description.length > maxLength
   })
 
   // =================================================================================================
@@ -139,7 +139,7 @@
 
   // Navigate to the user's profile page
   function openUserProfile () {
-    if (p.post.stepFive?.isAnonymous) return
+    if (p.post.isAnonymous) return
     authStore.user?.uid === p.post.uid ? router.push('/profile') : router.push(`/user-info/${p.post.uid}`)
   }
 </script>
@@ -163,11 +163,11 @@
 
     </header>
     <!-- Sensitive content warning -->
-    <div v-if="post.stepFive.enableTriggerWarning && !showSensitiveContent" class="sensitive-content">
+    <div v-if="post.enableTriggerWarning && !showSensitiveContent" class="sensitive-content">
       <div class="content">
         <p>
           ⚠️This post contains triggers: <span class="text-capitalize">{{
-            post.stepFive?.triggerTags?.join(',')
+            post.triggerTags?.join(',')
           }}</span>
         </p>
         <div class="submit-btn mt-2" @click="showSensitiveContent = true">Show post</div>
@@ -175,17 +175,17 @@
     </div>
     <!-- Post content -->
     <template v-else>
-      <div v-if="post.stepOne.selectedCategories.length > 0" class="post-tags cursor-pointer" @click="openPost">
-        <span>{{ post.stepOne.selectedCategories.map(el => el.label).join(' / ') }}</span>
+      <div v-if="post.selectedCategories.length > 0" class="post-tags cursor-pointer" @click="openPost">
+        <span>{{ post.selectedCategories.map(el => el.label).join(' / ') }}</span>
       </div>
       <h2 class="post-title cursor-pointer" @click="openPost">
-        {{ post.stepTwo.title }}
+        {{ post.title }}
       </h2>
       <p class="post-body cursor-pointer" @click="openPost" v-html="truncatedBody" />
       <button v-if="showReadMore" class="read-more" @click="readMore">Read more</button>
-      <div v-if="post.stepFour.emotionTags" class="post-chips" @click="openPost">
+      <div v-if="post.emotionTags" class="post-chips" @click="openPost">
         <span
-          v-for="chip in post.stepFour.emotionTags"
+          v-for="chip in post.emotionTags"
           :key="chip"
           class="post-chip"
         >
@@ -193,14 +193,14 @@
           {{ chip.label }}
         </span>
       </div>
-      <div v-if="post.stepFour?.recoveryTime || post.stepFour.cost" class="post-meta" @click="openPost">
-        <div v-if="post.stepFour.cost" class="meta-item">
+      <div v-if="post.recoveryTime || post.cost" class="post-meta" @click="openPost">
+        <div v-if="post.cost" class="meta-item">
           <span class="meta-label">💰    Cost:</span>
-          <span>{{ formatNumber(post.stepFour.cost) }}</span>
+          <span>{{ formatNumber(post.cost) }}</span>
         </div>
-        <div v-if="post.stepFour?.recoveryTime" class="meta-item">
+        <div v-if="post.recoveryTime" class="meta-item">
           <span class="meta-label">⏱️   Recovery:</span>
-          <span>{{ post.stepFour?.recoveryTime?.title }}</span>
+          <span>{{ post.recoveryTime?.title }}</span>
         </div>
       </div>
     </template>
@@ -210,7 +210,7 @@
         <v-icon size="18">{{ isLiked ? 'mdi-heart' : 'mdi-heart-outline' }}</v-icon>
         <span>{{ likeCount }}</span>
       </button>
-      <button v-if="post.stepFive.allowComments" class="icon-btn">
+      <button v-if="post.allowComments" class="icon-btn">
         <v-icon size="18">mdi-comment-outline</v-icon>
         <span>{{ commentCount }}</span>
       </button>

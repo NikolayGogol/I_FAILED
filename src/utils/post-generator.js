@@ -25,55 +25,27 @@ export const generateRandomPost = async () => {
 
   try {
     const randomCategory = getRandomElement(categories)
-    const randomEmotionTags = getRandomSubset(emotionTags)
-    const randomRecoveryTime = getRandomElement(recoveryTimeOptions)
-    const randomCost = getRandomElement(costRange)
+    const isAnonymous = Math.random() > 0.5
 
     const postData = {
-      stepOne: { selectedCategories: [randomCategory] },
-      stepTwo: {
-        title: `Random Post Title #${Math.floor(Math.random() * 1000)}`,
-        description: 'This is a randomly generated post description to test the feed and filtering functionality.',
-        date: new Date(),
-        images: [],
-      },
-      stepThree: {
-        whatILearned: 'Many valuable lessons were learned.',
-        keyTakeaways: 'Resilience is key.',
-        whatIdDoDifferently: 'Approach the situation with more caution.',
-        advice: 'Always have a backup plan.',
-      },
-      stepFour: {
-        cost: randomCost,
-        recoveryTime: randomRecoveryTime,
-        emotionTags: randomEmotionTags,
-        tags: ['random', 'generated', 'test'],
-      },
-      stepFive: {
-        isAnonymous: Math.random() > 0.5,
-        visibility: 'Public',
-        allowComments: true,
-        enableTriggerWarning: false,
-        triggerTags: [],
-        scheduleDate: null,
-      },
+      selectedCategories: [randomCategory],
+      title: `Random Post Title #${Math.floor(Math.random() * 1000)}`,
+      description: 'This is a randomly generated post description to test the feed and filtering functionality.',
+      date: new Date(),
+      images: [],
+      isAnonymous,
+      visibility: 'Public',
+      allowComments: true,
+      enableTriggerWarning: false,
+      triggerTags: [],
       createdAt: serverTimestamp(),
       status: 'published',
       publishedAt: serverTimestamp(),
       uid: authStore.user.uid,
       user: {
-        displayName: authStore.user.displayName,
-        photoURL: authStore.user.photoURL || noAvatar,
+        displayName: isAnonymous ? 'Anonymous' : authStore.user.displayName,
+        photoURL: isAnonymous ? noAvatar : authStore.user.photoURL || noAvatar,
       },
-      likes: Math.floor(Math.random() * 100),
-      comments: Math.floor(Math.random() * 50),
-      views: Math.floor(Math.random() * 1000),
-      likedBy: [],
-    }
-
-    if (postData.stepFive.isAnonymous) {
-      postData.user.displayName = 'Anonymous'
-      postData.user.photoURL = noAvatar
     }
 
     await addDoc(collection(db, collection_db), postData)

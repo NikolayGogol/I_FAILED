@@ -20,16 +20,6 @@ export const useCreatePostStore = defineStore('createPost', {
     allowComments: true,
     enableTriggerWarning: false,
     triggerTags: [],
-    // These fields are not in the new form, but keeping them for the createPost logic
-    whatILearned: '',
-    keyTakeaways: '',
-    whatIdDoDifferently: '',
-    advice: '',
-    cost: '',
-    recoveryTime: null,
-    emotionTags: [],
-    tags: [],
-    scheduleDate: null,
   }),
   actions: {
     resetState () {
@@ -43,15 +33,6 @@ export const useCreatePostStore = defineStore('createPost', {
       this.allowComments = true
       this.enableTriggerWarning = false
       this.triggerTags = []
-      this.whatILearned = ''
-      this.keyTakeaways = ''
-      this.whatIdDoDifferently = ''
-      this.advice = ''
-      this.cost = ''
-      this.recoveryTime = null
-      this.emotionTags = []
-      this.tags = []
-      this.scheduleDate = null
     },
     async createPost () {
       const authStore = useAuthStore()
@@ -60,38 +41,19 @@ export const useCreatePostStore = defineStore('createPost', {
       }
 
       const postData = {
-        stepOne: { selectedCategories: this.selectedCategories ? [this.selectedCategories] : [] },
-        stepTwo: {
-          title: this.title,
-          description: this.whatHappened,
-          date: this.whenHappened,
-          images: [], // Placeholder
-        },
-        // Assuming default/empty values for steps 3 and 4 as they are not in the new form
-        stepThree: {
-          whatILearned: this.whatILearned,
-          keyTakeaways: this.keyTakeaways,
-          whatIdDoDifferently: this.whatIdDoDifferently,
-          advice: this.advice,
-        },
-        stepFour: {
-          cost: this.cost,
-          recoveryTime: this.recoveryTime,
-          emotionTags: this.emotionTags,
-          tags: this.tags,
-        },
-        stepFive: {
-          isAnonymous: this.isAnonymous,
-          visibility: this.visibility,
-          allowComments: this.allowComments,
-          enableTriggerWarning: this.enableTriggerWarning,
-          triggerTags: this.triggerTags,
-          scheduleDate: this.scheduleDate,
-        },
+        selectedCategories: this.selectedCategories ? [this.selectedCategories] : [],
+        title: this.title,
+        description: this.whatHappened,
+        date: this.whenHappened,
+        images: [], // Placeholder
+        isAnonymous: this.isAnonymous,
+        visibility: this.visibility,
+        allowComments: this.allowComments,
+        enableTriggerWarning: this.enableTriggerWarning,
+        triggerTags: this.triggerTags,
         createdAt: serverTimestamp(),
-        status: this.scheduleDate ? 'scheduled' : 'published',
-        scheduledAt: this.scheduleDate ? new Date(this.scheduleDate) : null,
-        publishedAt: this.scheduleDate ? null : serverTimestamp(),
+        status: 'published',
+        publishedAt: serverTimestamp(),
         uid: authStore.user.uid,
         user: {
           displayName: this.isAnonymous ? 'Anonymous' : authStore.user.displayName,
@@ -120,7 +82,7 @@ export const useCreatePostStore = defineStore('createPost', {
         }
 
         if (imageUrls.length > 0) {
-          await updateDoc(docRef, { 'stepTwo.images': imageUrls })
+          await updateDoc(docRef, { images: imageUrls })
         }
 
         this.resetState()
