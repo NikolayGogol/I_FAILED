@@ -9,7 +9,7 @@
 
 <script setup>
   import { QuillEditor } from '@vueup/vue-quill'
-  import { ref } from 'vue'
+  import { computed, ref } from 'vue'
   import { useRouter } from 'vue-router'
   import DatePickerInput from '@/components/DatePickerInput.vue'
   import FormInput from '@/components/FormInput.vue'
@@ -26,6 +26,15 @@
   const inputLength = 100
   const quillLength = 5000
   const isLoading = ref(false)
+
+  const isFormValid = computed(() => {
+    return (
+      store.selectedCategories &&
+      store.title.trim() !== '' &&
+      stripHtml(store.whatHappened).trim() !== '' &&
+      store.whenHappened
+    )
+  })
 
   function handleTextChange (value, key) {
     if (stripHtml(value).length >= quillLength) {
@@ -45,6 +54,7 @@
   }
 
   async function submitPost () {
+    if (!isFormValid.value) return
     isLoading.value = true
     const { success } = await store.createPost()
     isLoading.value = false
@@ -75,7 +85,7 @@
 
     <div class="post-card-content mt-6">
       <div class="form-group">
-        <label for="">What area of life did this failure occur in?</label>
+        <label for="">What area of life did this failure occur in? <span class="text-error">*</span></label>
         <v-select
           v-model="store.selectedCategories"
           class="form-field form-select"
@@ -198,7 +208,7 @@
         </ul>
       </div>
       <div class="d-flex mt-6">
-        <v-btn color="primary" :loading="isLoading" @click="submitPost">Post</v-btn>
+        <v-btn color="primary" :disabled="!isFormValid" :loading="isLoading" @click="submitPost">Post</v-btn>
       </div>
     </div>
   </div>
