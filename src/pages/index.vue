@@ -8,10 +8,10 @@
 
 <script setup>
   import { storeToRefs } from 'pinia'
-  import { onMounted, onUnmounted, reactive, ref } from 'vue'
+  import { computed, onMounted, onUnmounted, reactive, ref } from 'vue'
   import { useToast } from 'vue-toastification'
   import PostCard from '@/components/feed/PostCard.vue'
-  import { categories, costRange, emotionTags, recoveryTimeOptions } from '@/models/categories.js'
+  import { categories } from '@/models/categories.js'
   import { useMainStore } from '@/stores/main.js'
   import { generateRandomPost } from '@/utils/post-generator.js'
   import '@/styles/pages/index.scss'
@@ -19,7 +19,6 @@
   const mainStore = useMainStore()
   const { filteredPosts: posts, loading, hasMore, activeTab } = storeToRefs(mainStore)
   const toast = useToast()
-
   const isFilterPanel = ref(false)
   const tabs = [
     { label: 'Latest', value: 'latest' },
@@ -79,11 +78,14 @@
     try {
       await generateRandomPost()
       toast.success('Random post generated successfully!')
-      mainStore.fetchPosts({ tab: activeTab.value, refresh: true })
+      await mainStore.fetchPosts({ tab: activeTab.value, refresh: true })
     } catch {
       toast.error('Failed to generate random post.')
     }
   }
+  const isDevMode = computed(() => {
+    return location.hostname === 'localhost'
+  })
 </script>
 
 <template>
@@ -114,7 +116,7 @@
           <div class="font-weight-semibold cancel-btn" @click="$router.push('/create-post')">
             New failure
           </div>
-          <div class="cancel-btn font-weight-semibold ml-2" @click="handleGeneratePost">
+          <div v-if="isDevMode" class="cancel-btn font-weight-semibold ml-2" @click="handleGeneratePost">
             Generate Post
           </div>
         </div>

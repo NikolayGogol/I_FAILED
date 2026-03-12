@@ -1,6 +1,6 @@
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore'
 import { db } from '@/firebase'
-import {categories, visibilityList} from '@/models/categories'
+import { categories, visibilityList } from '@/models/categories'
 import { noAvatar } from '@/models/no-data'
 import { useAuthStore } from '@/stores/auth'
 

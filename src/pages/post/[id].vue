@@ -19,7 +19,6 @@
   import { useAuthStore } from '@/stores/auth'
   import { usePostCardStore } from '@/stores/post-card.js'
   import { useSinglePostStore } from '@/stores/single-post'
-  import { formatNumber } from '@/utils/format-number.js'
   import 'vue3-emoji-picker/css'
   import '@/styles/pages/single-post.scss'
 
