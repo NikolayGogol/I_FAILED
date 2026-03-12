@@ -187,7 +187,7 @@
     <hr class="user-card-divider">
 
     <!-- User activity stats -->
-    <div class="user-activity-footer">
+    <div v-if="displayActivity" class="user-activity-footer">
       <div class="activity-stat">
         <v-icon icon="mdi-file-outline" />
         <span class="stat-value">{{ displayActivity.posts }}</span>

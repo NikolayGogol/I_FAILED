@@ -57,6 +57,13 @@ export const useWhoToFollowStore = defineStore('whoToFollow', {
         return false
       }
       const currentUserId = authStore.user.uid
+
+      // Check if current user has blocked the target user
+      if (authStore.user.blockedUsers && authStore.user.blockedUsers.includes(userIdToFollow)) {
+        console.warn('You cannot follow a user you have blocked.')
+        return false
+      }
+
       const userToFollowRef = doc(db, VITE_USERS_COLLECTION, userIdToFollow)
 
       // Check if the target user has blocked the current user

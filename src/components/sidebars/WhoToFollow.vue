@@ -88,6 +88,8 @@
       router.push('/login')
       return
     }
+
+    // Check if the user is following
     if (isFollowing(userId)) {
       const success = await whoToFollowStore.unfollowUser(userId)
       if (success) {

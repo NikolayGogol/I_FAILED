@@ -72,9 +72,19 @@
       await router.push('/login')
       return
     }
-    await (isFollowing.value ? profileStore.unfollowUser(userId.value) : profileStore.followUser(userId.value))
+
+    if (isFollowing.value) {
+       await profileStore.unfollowUser(userId.value)
+       toast.info(`Unfollowed ${user.value.displayName}`)
+    } else {
+       const success = await profileStore.followUser(userId.value)
+       if (success !== false) {
+         toast.info(`Followed ${user.value.displayName}`)
+       } else {
+         toast.error(`Failed to follow ${user.value.displayName}`)
+       }
+    }
     await userInfoStore.fetchUser(userId.value)
-    toast.info(isFollowing.value ? `Followed ${user.value.displayName}` : `Unfollowed ${user.value.displayName}`)
   }
 
   // Copy the user's profile link to the clipboard

@@ -83,10 +83,10 @@
     const success = await postMenuStore.blockUser(userId)
     if (success) {
       toast.info('User blocked, and you will no longer see their posts')
+      showBlockDialog.value = false
     } else {
       toast.error(`Failed to block ${userName}`)
     }
-    showBlockDialog.value = false
   }
 
   async function handleUnblock () {
@@ -118,6 +118,7 @@
         <v-icon class="mr-2" icon="mdi-volume-off" />
         Hide this post
       </v-list-item>
+
       <template v-if="!isBlocked">
         <v-list-item class="cursor-pointer" @click="handleFollow">
           <v-icon class="mr-2" :icon="isFollowing ? 'mdi-account-minus-outline' : 'mdi-account-plus-outline'" />
@@ -128,8 +129,9 @@
           Block this user
         </v-list-item>
       </template>
+
       <template v-else>
-        <v-list-item class="cursor-pointer text-danger" @click="handleUnblock">
+         <v-list-item class="cursor-pointer text-danger" @click="handleUnblock">
           <v-icon class="mr-2" icon="mdi-account-off-outline" />
           Unblock this user
         </v-list-item>

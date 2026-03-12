@@ -317,6 +317,29 @@ export const useProfileStore = defineStore('profile', {
         return
       }
 
+      // Check if current user has blocked the target user
+      if (authStore.user.blockedUsers && authStore.user.blockedUsers.includes(targetUserId)) {
+        console.warn('You cannot follow a user you have blocked.')
+        return false
+      }
+
+      const userToFollowRef = doc(db, VITE_USERS_COLLECTION, targetUserId)
+
+      // Check if the target user has blocked the current user
+      try {
+        const userToFollowSnap = await getDoc(userToFollowRef)
+        if (userToFollowSnap.exists()) {
+          const userData = userToFollowSnap.data()
+          if (userData.blockedUsers && userData.blockedUsers.includes(currentUserId)) {
+            console.warn('Cannot follow this user as they have blocked you.')
+            return false
+          }
+        }
+      } catch (error) {
+        console.error('Error checking user block status:', error)
+        return false
+      }
+
       try {
         // Add targetUserId to the current user's 'following' array
         const currentUserRef = doc(db, VITE_USERS_COLLECTION, currentUserId)
