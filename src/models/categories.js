@@ -48,3 +48,26 @@ export const visibilityList = [
     value: 3,
   },
 ]
+
+export const costRange = [
+  {
+    label: 'Free',
+    value: null,
+  },
+  {
+    label: '<$100',
+    value: 100,
+  },
+  {
+    label: '$100 - $1k',
+    value: 500,
+  },
+  {
+    label: '$1k - $5k',
+    value: 5000,
+  },
+  {
+    label: '$5k+',
+    value: 5000,
+  },
+]
