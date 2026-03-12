@@ -7,12 +7,13 @@
 </route>
 
 <script setup>
-  import { computed, onMounted, onUnmounted, reactive, ref } from 'vue'
+  import { storeToRefs } from 'pinia'
+  import { onMounted, onUnmounted, reactive, ref } from 'vue'
   import PostCard from '@/components/feed/PostCard.vue'
   import { categories, costRange, emotionTags, recoveryTimeOptions } from '@/models/categories.js'
   import { useMainStore } from '@/stores/main.js'
+  import { generateRandomPost } from '@/utils/post-generator.js'
   import '@/styles/pages/index.scss'
-  import { storeToRefs } from 'pinia'
 
   const mainStore = useMainStore()
   const { filteredPosts: posts, loading, hasMore, activeTab } = storeToRefs(mainStore)
@@ -71,6 +72,14 @@
     selectedFilter.postedBy = null
     mainStore.applyPostFilters(selectedFilter)
   }
+
+  async function handleGeneratePost () {
+    await generateRandomPost()
+    // Refresh the feed to show the new post
+    mainStore.fetchPosts({ tab: activeTab.value, refresh: true })
+  }
+
+  console.log(import.meta)
 </script>
 
 <template>
@@ -104,6 +113,14 @@
           <v-icon icon="mdi-filter-variant" @click="toggleFilter" />
         </div>
       </div>
+
+      <!-- DEV ONLY: Button to generate random posts -->
+      <div class="text-center my-4">
+        <button class="v-btn v-btn--elevated v-theme--light bg-primary v-btn--density-default v-btn--size-default v-btn--variant-elevated" @click="handleGeneratePost">
+          Generate Random Post
+        </button>
+      </div>
+
       <div v-if="isFilterPanel" class="filter-panel">
         <h5>Category</h5>
         <v-chip-group v-model="selectedFilter.categories" multiple>

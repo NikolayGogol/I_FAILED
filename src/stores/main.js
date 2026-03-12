@@ -43,32 +43,19 @@ export const useMainStore = defineStore('main', {
         // 2. Emoji Match
         const postEmojis = post.stepFour?.emotionTags || []
         const emojiMatch = !emojiTags || emojiTags.length === 0 || emojiTags.some(filterEmoji =>
-          postEmojis.includes(filterEmoji.value),
+          postEmojis.some(postEmoji => postEmoji.value === filterEmoji.value),
         )
 
         // 3. Recovery Time Match
-        const postRecoveryTime = post.stepFour?.recoveryTime
+        const postRecoveryTime = post.stepFour?.recoveryTime?.value
         const recoveryMatch = !recoveryTime || recoveryTime.length === 0 || recoveryTime.some(filterRecovery =>
           filterRecovery.value === postRecoveryTime,
         )
 
         // 4. Cost Range Match
-        const postCostRaw = post.stepFour?.cost
-        const postCost = Number(postCostRaw)
+        const postCost = post.stepFour?.cost?.value
         const costMatch = !costRange || costRange.length === 0 || costRange.some(range => {
-          if (range.label === 'Free') {
-            return !postCostRaw || postCost === 0
-          }
-          if (isNaN(postCost)) {
-            return false
-          }
-          switch (range.label) {
-            case '<$100': return postCost > 0 && postCost < 100
-            case '$100 - $1k': return postCost >= 100 && postCost <= 1000
-            case '$1k - $5k': return postCost > 1000 && postCost <= 5000
-            case '$5k+': return postCost > 5000
-            default: return false
-          }
+          return range.value === postCost
         })
 
         return categoryMatch && emojiMatch && recoveryMatch && costMatch
@@ -114,21 +101,25 @@ export const useMainStore = defineStore('main', {
      */
     async fetchPosts ({ tab, pageSize = 10, refresh = false } = {}) {
       if ((tab && tab !== this.activeTab) || refresh) {
-        if (tab) this.activeTab = tab
+        if (tab) {
+          this.activeTab = tab
+        }
         this.allPosts = []
         this.lastVisible = null
         this.hasMore = true
         this.loading = false
       }
 
-      if (this.loading || !this.hasMore) return
+      if (this.loading || !this.hasMore) {
+        return
+      }
 
       this.loading = true
       const authStore = useAuthStore()
 
       try {
         const postsRef = collection(db, collection_db)
-        let queryConstraints = []
+        const queryConstraints = []
 
         if (this.activeTab === 'popular') {
           queryConstraints.push(orderBy('views', 'desc'))
@@ -159,7 +150,7 @@ export const useMainStore = defineStore('main', {
         if (querySnapshot.empty) {
           this.hasMore = false
         } else {
-          this.lastVisible = querySnapshot.docs[querySnapshot.docs.length - 1]
+          this.lastVisible = querySnapshot.docs.at(-1)
           if (querySnapshot.docs.length < pageSize) {
             this.hasMore = false
           }
@@ -169,7 +160,9 @@ export const useMainStore = defineStore('main', {
 
           for (const postDoc of querySnapshot.docs) {
             const postData = postDoc.data()
-            if (blockedUsers.includes(postData.uid)) continue
+            if (blockedUsers.includes(postData.uid)) {
+              continue
+            }
 
             const finalPost = { id: postDoc.id, ...postData }
             if (postData.uid && !postData.stepFive?.isAnonymous) {
