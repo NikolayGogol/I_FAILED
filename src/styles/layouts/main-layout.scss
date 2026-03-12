@@ -1,0 +1,26 @@
+@use '@/styles/settings.scss' as *;
+@use '@/styles/global/mixins.scss' as *;
+
+.v-container {
+  // Allow overriding max-width via props or other classes
+  // max-width: 1280px;
+  margin: 0 auto;
+
+  &.main-container {
+      max-width: 1440px;
+  }
+
+  @include media-down($breakpoint-sm) {
+    // Reset padding on mobile for full-width components if needed
+    // But Vuetify handles this with 'fluid' prop well usually.
+    // We can ensure minimal padding here if fluid is not used.
+    &.fluid-mobile {
+        padding-left: 0;
+        padding-right: 0;
+    }
+  }
+}
+
+.main-content-wrapper {
+  padding-bottom: 80px;
+}

@@ -1,5 +1,5 @@
-@use '../settings.scss' as *;
-@use '../global/fonts' as *;
+@use '@/styles/settings.scss' as *;
+@use '@/styles/global/fonts' as *;
 
 .not-found-page {
   min-height: 100vh;

@@ -1,4 +1,5 @@
-@use '../../settings.scss' as *;
+@use '@/styles/settings.scss' as *;
+@use '@/styles/global/mixins.scss' as *;
 
 .feed-sidebar {
   // Common styles for both mobile and desktop

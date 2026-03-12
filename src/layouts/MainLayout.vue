@@ -6,6 +6,7 @@
   import { useDisplay } from 'vuetify'
   import Rightbar from '@/components/sidebars/Rightbar.vue'
   import Sidebar from '@/components/sidebars/Sidebar.vue'
+  import '@/styles/layouts/main-layout.scss'
 
   // =================================================================================================
   // State
@@ -13,17 +14,17 @@
   // Controls the visibility of the mobile navigation drawer
   const drawer = ref(false)
   // Vuetify's display utility to handle responsive layout
-  const { mdAndUp } = useDisplay()
+  const { mdAndUp, lgAndUp } = useDisplay()
 </script>
 
 <template>
   <v-app>
     <!-- Mobile Header -->
-    <v-app-bar v-if="!mdAndUp" app color="surface" density="compact">
+    <v-app-bar v-if="!mdAndUp" app color="surface" density="compact" flat border>
       <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
       <v-toolbar-title>
         <router-link to="/">
-          <img alt="Logo" src="@/assets/Logo.png" style="height: 32px; vertical-align: middle;">
+          <img alt="Logo" src="@/assets/Logo.png" style="height: 28px; vertical-align: middle;">
         </router-link>
       </v-toolbar-title>
       <v-spacer />
@@ -36,42 +37,81 @@
       v-model="drawer"
       app
       temporary
+      width="280"
     >
       <Sidebar />
     </v-navigation-drawer>
 
     <v-main>
-      <v-container>
-        <v-row>
+      <!-- Use fluid container on mobile to maximize width, contained on larger screens -->
+      <v-container :fluid="!mdAndUp" class="pa-0 pa-md-4 main-container">
+        <v-row justify="center" no-gutters>
           <!-- Desktop Sidebar (visible on medium screens and up) -->
+          <!-- Takes 3 cols on tablet, 3 on desktop -->
           <v-col
             v-if="mdAndUp"
+            cols="12"
             lg="3"
-            md="2"
+            md="3"
+            xl="2"
+            class="pr-md-4"
           >
-            <Sidebar />
+            <div class="sticky-sidebar">
+              <Sidebar />
+            </div>
           </v-col>
 
           <!-- Main Content -->
+          <!-- Takes full width on mobile, 9 cols on tablet, 6 cols on desktop -->
           <v-col
             cols="12"
             lg="6"
-            md="8"
+            md="9"
+            xl="6"
+            class="px-md-2"
           >
             <!-- The main content of the page is injected here -->
             <slot />
           </v-col>
 
-          <!-- Right Sidebar (visible on medium screens and up) -->
+          <!-- Right Sidebar (visible on large screens and up) -->
+          <!-- Hidden on tablet to give more space to content -->
           <v-col
-            v-if="mdAndUp"
+            v-if="lgAndUp"
+            cols="12"
             lg="3"
-            md="2"
+            xl="3"
+            class="pl-lg-4"
           >
-            <Rightbar />
+            <div class="sticky-sidebar">
+              <Rightbar />
+            </div>
           </v-col>
         </v-row>
       </v-container>
     </v-main>
   </v-app>
 </template>
+
+<style lang="scss" scoped>
+.main-container {
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+.sticky-sidebar {
+  position: sticky;
+  top: 15px;
+  height: calc(100vh - 80px);
+  overflow-y: auto;
+
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Hide scrollbar for IE, Edge and Firefox */
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+</style>

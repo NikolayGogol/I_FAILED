@@ -49,7 +49,7 @@
 
 <template>
   <div class="feed-page">
-    <section class="feed-main">
+    <section class="feed-main px-5">
       <!-- Tabs -->
       <div class="feed-tabs">
         <button

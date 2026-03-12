@@ -1,5 +1,6 @@
-@use '../../settings.scss' as *;
-@use '../../global/fonts' as *;
+@use '@/styles/settings.scss' as *;
+@use '@/styles/global/mixins.scss' as *;
+@use '@/styles/global/fonts.scss' as *;
 @use 'sass:color';
 
 .post-card {
@@ -11,9 +12,20 @@
   transition: box-shadow 0.2s, border-color 0.2s;
   position: relative;
 
+  @include media-down($breakpoint-sm) {
+    padding: $spacing-md; // 16px on mobile
+    margin-bottom: $spacing-md;
+    border-radius: 0; // Full width look on mobile often removes border radius, but let's keep it consistent or small
+    border-left: none;
+    border-right: none;
+    border-radius: 0;
+  }
+
   &:hover {
-    box-shadow: $shadow-sm;
-    border-color: color.adjust($color-border, $lightness: -5%);
+    @include media-up($breakpoint-md) {
+      box-shadow: $shadow-sm;
+      border-color: color.adjust($color-border, $lightness: -5%);
+    }
   }
 
   .sensitive-content {
@@ -101,6 +113,10 @@
     color: $color-text-primary;
     margin-bottom: $spacing-sm;
     line-height: $line-height-base;
+
+    @include media-down($breakpoint-sm) {
+      font-size: 18px; // Slightly smaller on mobile
+    }
   }
 
   .post-body {
@@ -146,6 +162,12 @@
     margin-bottom: $spacing-md;
     padding: $spacing-sm $spacing-md;
     border-radius: $radius-md;
+    background-color: $color-background; // Ensure background is visible
+
+    @include media-down($breakpoint-sm) {
+      flex-direction: column;
+      gap: $spacing-sm;
+    }
 
     .meta-item {
       display: flex;
@@ -168,6 +190,7 @@
     align-items: center;
     border-top: 1px solid $color-border;
     padding-top: $spacing-md;
+    justify-content: space-between; // Space out evenly on mobile
 
     .icon-btn {
       display: flex;
@@ -179,6 +202,10 @@
       margin-right: $spacing-lg;
       transition: color 0.2s;
       font-size: $font-size-sm;
+
+      @include media-down($breakpoint-sm) {
+        margin-right: 0; // Remove right margin on mobile for even spacing
+      }
 
       span {
         margin-left: $spacing-sm;
