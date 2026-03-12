@@ -1,57 +1,116 @@
 @use '../settings' as *;
 
 .create-post-page {
+
+
   .back-btn {
     margin-left: -20px;
+    color: $color-text-primary;
+  }
+
+  .post-card-content {
+    background-color: $color-surface;
+    padding: 24px;
+    border-radius: $radius-md;
+    border: 1px solid $color-border;
+  }
+
+  .tag-chip {
+    background-color: $color-primary;
+    color: white;
+    border-radius: $radius-xs;
+  }
+
+  .selected-tags-list {
+    display: flex;
+    flex-wrap: wrap;
+
+    .tag-chip {
+      font-size: 12px;
+      border-radius: $radius-md;
+      list-style: none;
+    }
+  }
+
+  .form-select {
+    border: 1px solid $color-border;
+    border-radius: $radius-md;
+
+    .v-field__input {
+      border: none;
+    }
+  }
+
+  label {
     color: #1C1C1B;
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+
+  .editor-wrapper {
+    position: relative;
+
+    .ql-toolbar {
+      border-radius: $radius-xs $radius-xs 0 0;
+    }
+
+    .ql-container {
+      border-radius: 0 0 $radius-xs $radius-xs;
+      height: 114px;
+    }
+
+    .ql-editor.ql-blank::before {
+      color: #7F8C8D;
+      font-size: 14px;
+      font-style: normal;
+    }
+
+    .char-counter {
+      position: absolute;
+      bottom: 8px;
+      right: 10px;
+      color: #7F8C8D;
+      font-weight: 400;
+      font-size: 12px;
+    }
   }
 
   .title-wrapper {
     .page-title {
       font-weight: 700;
+      color: $color-text-primary;
       font-size: 32px;
-      color: #1C1C1B;
-      line-height: normal;
     }
 
     .page-subtitle {
-      color: #808079;
+      font-weight: 400;
+      color: $color-text-quaternary;
       font-size: 16px;
     }
   }
 
-  .progress-section {
-    margin-top: 24px;
-
-    .progress-info {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-
-      .step-counter {
-        color: #808079;
-        font-size: 14px;
-      }
-
-      .progress-percentage {
-        color: #454541;
-        font-size: 14px;
-      }
-    }
-  }
-
-  .action-buttons {
-    background-color: white;
-    padding: 0 24px 24px;
+  .setting-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    border: 1px solid $color-border;
-    border-radius: 0 0 $radius-md $radius-md;
-    border-top: 0;
+    background-color: #F9EAD5;
+    padding: 8px 15px;
+    border-radius: $radius-md;
 
-    button {
-      text-transform: unset;
+    .setting-title {
+      color: #1C1C1B;
+      font-size: 16px;
     }
+
+    .setting-desc {
+      color: #808079;
+      font-size: 14px;
+    }
+  }
+
+  .cancel-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 }

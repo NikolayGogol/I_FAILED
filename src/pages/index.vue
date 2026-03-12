@@ -7,12 +7,12 @@
 </route>
 
 <script setup>
-  import { computed, onMounted, onUnmounted, reactive, ref } from 'vue'
+  import { storeToRefs } from 'pinia'
+  import { onMounted, onUnmounted, reactive, ref } from 'vue'
   import PostCard from '@/components/feed/PostCard.vue'
   import { categories, costRange, emotionTags, recoveryTimeOptions } from '@/models/categories.js'
   import { useMainStore } from '@/stores/main.js'
   import '@/styles/pages/index.scss'
-  import { storeToRefs } from 'pinia'
 
   const mainStore = useMainStore()
   const { filteredPosts: posts, loading, hasMore, activeTab } = storeToRefs(mainStore)

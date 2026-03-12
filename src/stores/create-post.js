@@ -14,38 +14,17 @@ const collection_db_scheduled = import.meta.env.VITE_POST_COLLECTION_SCEDULED ||
 
 export const useCreatePostStore = defineStore('createPost', {
   state: () => ({
-    stepOne: {
-      selectedCategories: [],
-    },
-    stepTwo: {
-      title: '',
-      description: '',
-      date: null,
-      whatWentWrong: '',
-      howDidItFeel: '',
-      images: [], // This will hold the array of image objects
-    },
-    stepThree: {
-      whatILearned: '',
-      keyTakeaways: '',
-      whatIdDoDifferently: '',
-      advice: '',
-    },
-    stepFour: {
-      cost: '',
-      recoveryTime: null,
-      emotionTags: [],
-      tags: [],
-    },
-    stepFive: {
-      isAnonymous: false,
-      visibility: visibilityList[0],
-      allowComments: true,
-      enableTriggerWarning: false,
-      scheduleDate: null,
-      triggerTags: [],
-    },
+    selectedCategories: null,
+    title: '',
+    whatHappened: '',
+    whenHappened: null,
+    visibility: null,
+    images: [],
     suggestedTags: [],
+    triggerTags: [],
+    isAnonymous: false,
+    allowComments: true,
+    enableTriggerWarning: true,
   }),
   actions: {
     async fetchSuggestedTags () {
