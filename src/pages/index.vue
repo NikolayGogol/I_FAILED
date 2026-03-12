@@ -12,8 +12,11 @@
   import { categories, costRange, emotionTags, recoveryTimeOptions } from '@/models/categories.js'
   import { useMainStore } from '@/stores/main.js'
   import '@/styles/pages/index.scss'
+  import { storeToRefs } from 'pinia'
 
   const mainStore = useMainStore()
+  const { filteredPosts: posts, loading, hasMore, activeTab } = storeToRefs(mainStore)
+
   const isFilterPanel = ref(false)
   const tabs = [
     { label: 'Latest', value: 'latest' },
@@ -27,25 +30,23 @@
     costRange: [],
     postedBy: null,
   })
-  const activeTab = computed(() => mainStore.activeTab)
-  const posts = computed(() => mainStore.posts)
 
   function selectTab (tab) {
-    // Scroll to the top of the page with smooth animation
     window.scrollTo({ top: 0, behavior: 'smooth' })
-    // Fetch posts for the newly selected tab
-    mainStore.fetchPosts({ tab: tab.value })
+    mainStore.fetchPosts({ tab: tab.value, refresh: true })
   }
 
   function handleScroll () {
     const { scrollTop, scrollHeight, clientHeight } = document.documentElement
     if (scrollHeight - scrollTop - clientHeight < 100) {
-      mainStore.fetchPosts()
+      mainStore.fetchPosts({})
     }
   }
 
   onMounted(() => {
-    mainStore.fetchPosts({ tab: 'latest' })
+    // Clear any persistent filters from previous sessions on mount
+    mainStore.currentFilters = null
+    mainStore.fetchPosts({ tab: 'latest', refresh: true })
     window.addEventListener('scroll', handleScroll)
   })
 
@@ -57,7 +58,10 @@
     isFilterPanel.value = !isFilterPanel.value
   }
 
-  function applyFilters () {}
+  function applyFilters () {
+    mainStore.applyPostFilters(selectedFilter)
+    isFilterPanel.value = false
+  }
 
   function clearFilters () {
     selectedFilter.categories = []
@@ -65,6 +69,7 @@
     selectedFilter.recoveryTime = []
     selectedFilter.costRange = []
     selectedFilter.postedBy = null
+    mainStore.applyPostFilters(selectedFilter)
   }
 </script>
 
@@ -146,7 +151,7 @@
         </div>
       </div>
       <!-- Posts -->
-      <div v-if="mainStore.loading && posts.length === 0" class="text-center py-10">
+      <div v-if="loading && posts.length === 0" class="text-center py-10">
         Loading...
       </div>
       <div v-else-if="posts.length === 0" class="text-center py-10 text-gray-500">
@@ -158,10 +163,10 @@
         :class="{'mt-6': isFilterPanel}"
         :post="post"
       />
-      <div v-if="mainStore.loading && posts.length > 0" class="text-center py-4">
+      <div v-if="loading && posts.length > 0" class="text-center py-4">
         Loading more posts...
       </div>
-      <div v-if="!mainStore.hasMore && posts.length > 0" class="text-center py-4 text-gray-500">
+      <div v-if="!hasMore && posts.length > 0" class="text-center py-4 text-gray-500">
         You've reached the end.
       </div>
     </section>
