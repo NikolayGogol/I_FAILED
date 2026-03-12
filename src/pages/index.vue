@@ -13,9 +13,12 @@
   import { categories, costRange, emotionTags, recoveryTimeOptions } from '@/models/categories.js'
   import { useMainStore } from '@/stores/main.js'
   import '@/styles/pages/index.scss'
+  import { generateRandomPost } from '@/utils/post-generator.js'
+  import { useToast } from 'vue-toastification'
 
   const mainStore = useMainStore()
   const { filteredPosts: posts, loading, hasMore, activeTab } = storeToRefs(mainStore)
+  const toast = useToast()
 
   const isFilterPanel = ref(false)
   const tabs = [
@@ -71,6 +74,16 @@
     selectedFilter.postedBy = null
     mainStore.applyPostFilters(selectedFilter)
   }
+
+  async function handleGeneratePost() {
+    try {
+      await generateRandomPost();
+      toast.success('Random post generated successfully!');
+      mainStore.fetchPosts({ tab: activeTab.value, refresh: true });
+    } catch {
+      toast.error('Failed to generate random post.');
+    }
+  }
 </script>
 
 <template>
@@ -97,8 +110,13 @@
           {'card-open': isFilterPanel},
         ]"
       >
-        <div class="write-post-btn font-weight-semibold" @click="$router.push('/create-post')">
-          New failure
+        <div class="d-flex">
+          <div class="write-post-btn font-weight-semibold" @click="$router.push('/create-post')">
+            New failure
+          </div>
+          <div class="write-post-btn font-weight-semibold ml-2" @click="handleGeneratePost">
+            Generate Post
+          </div>
         </div>
         <div class="composer-filter">
           <v-icon icon="mdi-filter-variant" @click="toggleFilter" />

@@ -10,6 +10,7 @@
   import { useAuthStore } from '@/stores/auth.js'
   import { useProfileStore } from '@/stores/profile.js'
   import '@/styles/components/profile/user-card.scss'
+  import { generateRandomPost } from '@/utils/post-generator.js'
 
   // =================================================================================================
   // Props
@@ -137,6 +138,15 @@
       toast.error('Failed to update profile.')
     }
   }
+
+  async function handleGeneratePost() {
+    try {
+      await generateRandomPost();
+      toast.success('Random post generated successfully!');
+    } catch {
+      toast.error('Failed to generate random post.');
+    }
+  }
 </script>
 
 <template>
@@ -158,7 +168,10 @@
         <!-- User name and edit button -->
         <div class="user-name-row align-center justify-between">
           <h2>{{ displayName }}</h2>
-          <button v-if="isCurrentUser" class="cancel-btn" @click="openEditDialog">Edit profile</button>
+          <div class="d-flex">
+            <button v-if="isCurrentUser" class="cancel-btn" @click="openEditDialog">Edit profile</button>
+            <button v-if="isCurrentUser" class="cancel-btn ml-2" @click="handleGeneratePost">Generate Post</button>
+          </div>
           <slot name="profile-actions" />
         </div>
         <!-- User handle -->
