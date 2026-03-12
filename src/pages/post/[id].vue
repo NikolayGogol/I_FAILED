@@ -83,6 +83,12 @@
     },
   ])
 
+  // Check if the post is owned by the current user
+  const isOwnPost = computed(() => {
+    if (!authStore.user || !post.value) return false
+    return authStore.user.uid === post.value.uid
+  })
+
   onMounted(() => {
     const postId = route.params.id
     if (postId) {
@@ -343,7 +349,7 @@
             <div class="text-caption text-grey">@{{ post.user?.displayName.replaceAll(' ', '_') }}</div>
           </div>
         </div>
-        <div class="post-actions">
+        <div v-if="!isOwnPost" class="post-actions">
           <PostMenu :post="post" />
         </div>
       </div>
