@@ -57,6 +57,15 @@
     isFilterPanel.value = !isFilterPanel.value
   }
 
+  function applyFilters () {}
+
+  function clearFilters () {
+    selectedFilter.categories = []
+    selectedFilter.emojiTags = []
+    selectedFilter.recoveryTime = []
+    selectedFilter.costRange = []
+    selectedFilter.postedBy = null
+  }
 </script>
 
 <template>
@@ -132,8 +141,8 @@
           />
         </v-chip-group>
         <div class="d-flex align-center mt-6">
-          <div class="submit-btn">Apply</div>
-          <div class="clear">Clear all filters</div>
+          <div class="submit-btn" @click="applyFilters">Apply</div>
+          <div class="clear" @click="clearFilters">Clear all filters</div>
         </div>
       </div>
       <!-- Posts -->
