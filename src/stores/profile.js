@@ -136,10 +136,10 @@ export const useProfileStore = defineStore('profile', {
           activities.push({
             type: 'post',
             id: doc.id,
-            title: data.stepTwo?.title || 'Untitled Post',
-            content: data.stepTwo?.description || '',
+            title: data.title || 'Untitled Post',
+            content: data.whatHappened || '',
             createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : new Date(data.createdAt),
-            image: data.stepTwo?.images?.[0] || null,
+            image: data.images?.[0] || null,
           })
         }
 
@@ -203,7 +203,7 @@ export const useProfileStore = defineStore('profile', {
             const post = { id: postDoc.id, ...postData }
 
             // Handle anonymous posts
-            if (post.stepFive?.isAnonymous) {
+            if (post.isAnonymous) {
               post.user = {
                 displayName: 'Anonymous',
                 photoURL: null,

@@ -1,16 +1,12 @@
-import { addDoc, collection, getDocs, limit, orderBy, query, serverTimestamp, updateDoc } from 'firebase/firestore'
+import { addDoc, collection, serverTimestamp, updateDoc } from 'firebase/firestore'
 import { defineStore } from 'pinia'
-import { useFirestore } from 'vuefire'
-// eslint-disable-next-line import/no-duplicates
-import { getDownloadURL, ref, uploadBytes } from '@/firebase' // Correctly import storage from your firebase setup
-// eslint-disable-next-line import/no-duplicates
-import { db, storage } from '@/firebase' // Explicitly import storage
+import { getDownloadURL, ref, uploadBytes } from '@/firebase'
+import { db, storage } from '@/firebase'
 import { visibilityList } from '@/models/categories.js'
 import { noAvatar } from '@/models/no-data.js'
 import { useAuthStore } from '@/stores/auth.js'
 
 const collection_db = import.meta.env.VITE_POST_COLLECTION
-const collection_db_scheduled = import.meta.env.VITE_POST_COLLECTION_SCEDULED || 'scheduledPosts'
 
 export const useCreatePostStore = defineStore('createPost', {
   state: () => ({
@@ -18,143 +14,116 @@ export const useCreatePostStore = defineStore('createPost', {
     title: '',
     whatHappened: '',
     whenHappened: null,
-    visibility: null,
     images: [],
-    suggestedTags: [],
-    triggerTags: [],
     isAnonymous: false,
+    visibility: visibilityList[0],
     allowComments: true,
-    enableTriggerWarning: true,
+    enableTriggerWarning: false,
+    triggerTags: [],
+    // These fields are not in the new form, but keeping them for the createPost logic
+    whatILearned: '',
+    keyTakeaways: '',
+    whatIdDoDifferently: '',
+    advice: '',
+    cost: '',
+    recoveryTime: null,
+    emotionTags: [],
+    tags: [],
+    scheduleDate: null,
   }),
   actions: {
-    async fetchSuggestedTags () {
-      if (this.suggestedTags.length > 0) {
-        return
-      }
-
-      try {
-        const postsRef = collection(db, collection_db)
-        const q = query(postsRef, orderBy('createdAt', 'desc'), limit(50))
-        const querySnapshot = await getDocs(q)
-
-        const tagsSet = new Set()
-        // Correctly iterate over the documents in the snapshot
-        for (const doc of querySnapshot.docs) {
-          const data = doc.data()
-          if (data.stepFour && data.stepFour.tags && Array.isArray(data.stepFour.tags)) {
-            for (const tag of data.stepFour.tags) {
-              tagsSet.add(tag)
-            }
-          }
-        }
-
-        this.suggestedTags = Array.from(tagsSet)
-      } catch (error) {
-        console.error('Error fetching suggested tags:', error)
-      }
-    },
     resetState () {
-      this.stepOne = {
-        selectedCategories: [],
-      }
-      this.stepTwo = {
-        title: '',
-        description: '',
-        date: null,
-        whatWentWrong: '',
-        howDidItFeel: '',
-        images: [],
-      }
-      this.stepThree = {
-        whatILearned: '',
-        keyTakeaways: '',
-        whatIdDoDifferently: '',
-        advice: '',
-      }
-      this.stepFour = {
-        cost: '',
-        recoveryTime: null,
-        emotionTags: [],
-        tags: [],
-      }
-      this.stepFive = {
-        isAnonymous: false,
-        visibility: 'Public',
-        allowComments: true,
-        enableTriggerWarning: false,
-        scheduleDate: null,
-        triggerTags: [],
-      }
+      this.selectedCategories = null
+      this.title = ''
+      this.whatHappened = ''
+      this.whenHappened = null
+      this.images = []
+      this.isAnonymous = false
+      this.visibility = visibilityList[0]
+      this.allowComments = true
+      this.enableTriggerWarning = false
+      this.triggerTags = []
+      this.whatILearned = ''
+      this.keyTakeaways = ''
+      this.whatIdDoDifferently = ''
+      this.advice = ''
+      this.cost = ''
+      this.recoveryTime = null
+      this.emotionTags = []
+      this.tags = []
+      this.scheduleDate = null
     },
     async createPost () {
       const authStore = useAuthStore()
-      const db = useFirestore()
-
       if (!authStore.user) {
         return { success: false, error: 'User is not authenticated.' }
       }
 
-      // 1. Prepare initial post data, ensuring stepTwo.images is empty for now
-      const scheduleDate = this.stepFive.scheduleDate
-      const isScheduled = !!scheduleDate
-
       const postData = {
-        stepOne: this.stepOne,
-        stepTwo: { ...this.stepTwo, images: [] },
-        stepThree: this.stepThree,
-        stepFour: this.stepFour,
-        stepFive: this.stepFive,
+        stepOne: { selectedCategories: this.selectedCategories ? [this.selectedCategories] : [] },
+        stepTwo: {
+          title: this.title,
+          description: this.whatHappened,
+          date: this.whenHappened,
+          images: [], // Placeholder
+        },
+        // Assuming default/empty values for steps 3 and 4 as they are not in the new form
+        stepThree: {
+          whatILearned: this.whatILearned,
+          keyTakeaways: this.keyTakeaways,
+          whatIdDoDifferently: this.whatIdDoDifferently,
+          advice: this.advice,
+        },
+        stepFour: {
+          cost: this.cost,
+          recoveryTime: this.recoveryTime,
+          emotionTags: this.emotionTags,
+          tags: this.tags,
+        },
+        stepFive: {
+          isAnonymous: this.isAnonymous,
+          visibility: this.visibility,
+          allowComments: this.allowComments,
+          enableTriggerWarning: this.enableTriggerWarning,
+          triggerTags: this.triggerTags,
+          scheduleDate: this.scheduleDate,
+        },
         createdAt: serverTimestamp(),
-        status: isScheduled ? 'scheduled' : 'published',
-        scheduledAt: isScheduled ? new Date(scheduleDate) : null,
-        publishedAt: isScheduled ? null : serverTimestamp(),
+        status: this.scheduleDate ? 'scheduled' : 'published',
+        scheduledAt: this.scheduleDate ? new Date(this.scheduleDate) : null,
+        publishedAt: this.scheduleDate ? null : serverTimestamp(),
         uid: authStore.user.uid,
         user: {
-          displayName: this.stepFive.isAnonymous ? 'Anonymous' : authStore.user.displayName,
-          photoURL: this.stepFive.isAnonymous ? noAvatar : authStore.user.photoURL,
+          displayName: this.isAnonymous ? 'Anonymous' : authStore.user.displayName,
+          photoURL: this.isAnonymous ? noAvatar : authStore.user.photoURL,
         },
         likes: 0,
         comments: 0,
         views: 0,
         likedBy: [],
       }
-      console.log(this.stepFive.isAnonymous)
+
       try {
-        // 2. Create the document in Firestore to get a unique ID
-        // If scheduled, save to 'scheduledPosts' collection, otherwise to main collection
-        const targetCollection = isScheduled ? collection_db_scheduled : collection_db
-        const docRef = await addDoc(collection(db, targetCollection), postData)
+        const docRef = await addDoc(collection(db, collection_db), postData)
         const postId = docRef.id
 
-        // 3. Upload images to Firebase Storage
-        const imagesToUpload = this.stepTwo.images
         let imageUrls = []
-
-        if (imagesToUpload && imagesToUpload.length > 0) {
-          const uploadPromises = imagesToUpload.map(imageObject => {
+        if (this.images && this.images.length > 0) {
+          const uploadPromises = this.images.map(imageObject => {
             const imageFile = imageObject.file
-            if (!imageFile) {
-              return Promise.resolve(null)
-            }
-
-            // Use the same storage path structure regardless of collection
+            if (!imageFile) return Promise.resolve(null)
             const storageRef = ref(storage, `posts/${postId}/${Date.now()}_${imageObject.name}`)
             return uploadBytes(storageRef, imageFile).then(snapshot => getDownloadURL(snapshot.ref))
           })
-
           const resolvedUrls = await Promise.all(uploadPromises)
           imageUrls = resolvedUrls.filter(url => url !== null)
         }
 
-        // 4. If images were uploaded, update the document with their URLs in the correct field
         if (imageUrls.length > 0) {
-          // **FIX:** Use dot notation to update the nested 'images' array within 'stepTwo'
           await updateDoc(docRef, { 'stepTwo.images': imageUrls })
         }
 
-        // Reset the store state after successful creation
         this.resetState()
-
         return { success: true, postId }
       } catch (error) {
         console.error('Error creating post:', error)

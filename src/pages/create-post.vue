@@ -10,6 +10,7 @@
 <script setup>
   import { QuillEditor } from '@vueup/vue-quill'
   import { ref } from 'vue'
+  import { useRouter } from 'vue-router'
   import DatePickerInput from '@/components/DatePickerInput.vue'
   import FormInput from '@/components/FormInput.vue'
   import UploadFile from '@/components/UploadFile.vue'
@@ -19,25 +20,41 @@
   import '@vueup/vue-quill/dist/vue-quill.snow.css'
   import '@/styles/pages/create-post.scss'
 
+  const router = useRouter()
+  const store = useCreatePostStore()
   const triggerText = ref('')
   const inputLength = 100
   const quillLength = 5000
-  const store = useCreatePostStore()
+  const isLoading = ref(false)
 
-  //
   function handleTextChange (value, key) {
     if (stripHtml(value).length >= quillLength) {
       store[key] = value.slice(0, quillLength)
     }
   }
-  //
+
   function addTag () {
-    store.triggerTags.push(triggerText.value)
+    if (triggerText.value && !store.triggerTags.includes(triggerText.value)) {
+      store.triggerTags.push(triggerText.value)
+    }
     triggerText.value = ''
   }
 
   function removeTag (index) {
     store.triggerTags.splice(index, 1)
+  }
+
+  async function submitPost () {
+    isLoading.value = true
+    const { success } = await store.createPost()
+    isLoading.value = false
+    if (success) {
+      router.push('/post-success-created')
+      sessionStorage.setItem('post-success-created', 'true')
+    } else {
+      // Handle error, maybe show a notification
+      console.error('Failed to create post')
+    }
   }
 </script>
 
@@ -103,7 +120,7 @@
             theme="snow"
             @text-change="handleTextChange(store.whatHappened, 'whatHappened')"
           />
-          <div class="char-counter">{{ stripHtml(store.whatHappened).length }}/{{ quillLength }}</div>
+          <div class="char-counter">{{ store.whatHappened ? stripHtml(store.whatHappened).length : 0 }}/{{ quillLength }}</div>
         </div>
       </div>
       <div class="form-group mt-6">
@@ -181,7 +198,7 @@
         </ul>
       </div>
       <div class="d-flex mt-6">
-        <div class="submit-btn">Post</div>
+        <v-btn :loading="isLoading" color="primary" @click="submitPost">Post</v-btn>
       </div>
     </div>
   </div>
