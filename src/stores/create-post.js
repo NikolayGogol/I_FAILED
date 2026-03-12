@@ -1,12 +1,12 @@
-import { addDoc, collection, serverTimestamp, updateDoc } from 'firebase/firestore'
+import { addDoc, collection, doc, increment, serverTimestamp, updateDoc } from 'firebase/firestore'
 import { defineStore } from 'pinia'
 import { db, getDownloadURL, ref, storage, uploadBytes } from '@/firebase'
-
 import { visibilityList } from '@/models/categories.js'
 import { noAvatar } from '@/models/no-data.js'
 import { useAuthStore } from '@/stores/auth.js'
 
 const collection_db = import.meta.env.VITE_POST_COLLECTION
+const VITE_USERS_COLLECTION = import.meta.env.VITE_USERS_COLLECTION
 
 export const useCreatePostStore = defineStore('createPost', {
   state: () => ({
@@ -68,6 +68,12 @@ export const useCreatePostStore = defineStore('createPost', {
       try {
         const docRef = await addDoc(collection(db, collection_db), postData)
         const postId = docRef.id
+
+        // Increment user's post count
+        const userRef = doc(db, VITE_USERS_COLLECTION, authStore.user.uid)
+        await updateDoc(userRef, {
+          postCount: increment(1),
+        })
 
         let imageUrls = []
         if (this.images && this.images.length > 0) {

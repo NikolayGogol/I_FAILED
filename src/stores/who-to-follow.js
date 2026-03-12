@@ -14,7 +14,6 @@ import { defineStore } from 'pinia'
 import { db } from '@/firebase'
 import { useAuthStore } from '@/stores/auth'
 const VITE_USERS_COLLECTION = import.meta.env.VITE_USERS_COLLECTION
-const VITE_POST_COLLECTION = import.meta.env.VITE_POST_COLLECTION
 
 export const useWhoToFollowStore = defineStore('whoToFollow', {
   state: () => ({
@@ -37,9 +36,6 @@ export const useWhoToFollowStore = defineStore('whoToFollow', {
         const users = []
         for (const doc of querySnapshot.docs) {
           const user = { id: doc.id, ...doc.data() }
-          const postsQuery = query(collection(db, VITE_POST_COLLECTION), where('uid', '==', user.id))
-          const postsSnapshot = await getDocs(postsQuery)
-          user.postCount = postsSnapshot.size
           users.push(user)
         }
         this.users = users
