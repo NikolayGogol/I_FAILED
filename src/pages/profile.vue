@@ -10,6 +10,7 @@
 <script setup>
   import { storeToRefs } from 'pinia'
   import { onMounted, ref } from 'vue'
+  import { useRouter } from 'vue-router'
   import PostCard from '@/components/feed/PostCard.vue'
   import Activity from '@/components/profile/Activity.vue'
   import UserCard from '@/components/profile/UserCard.vue'
@@ -22,6 +23,7 @@
 
   const { user } = storeToRefs(authStore)
   const { posts, loading, error, userActivity } = storeToRefs(profileStore)
+  const router = useRouter()
   const activeTabIndex = ref(0)
   onMounted(() => {
     if (authStore.user?.uid) {
@@ -41,6 +43,10 @@
 
   function selectTab (tab, index) {
     activeTabIndex.value = index
+  }
+
+  function updatePost (post) {
+    router.push('/recovery/' + post.id)
   }
 </script>
 
@@ -84,7 +90,7 @@
               :post="post"
             >
               <template #recovered-content>
-                <div class="submit-btn">I recovered</div>
+                <div class="submit-btn" @click="updatePost(post)">I recovered</div>
               </template>
             </PostCard>
           </div>

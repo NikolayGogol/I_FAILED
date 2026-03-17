@@ -1,0 +1,16 @@
+@use '../settings' as *;
+
+.recovery-post-page {
+  .images-wrapper, .what-went-wrong, .how-did-it-feel, .when-happened {
+    display: none;
+  }
+
+  .select {
+    border: 1px solid $color-border;
+    border-radius: $radius-md;
+
+    .v-field__input {
+      border: none;
+    }
+  }
+}

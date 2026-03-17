@@ -37,6 +37,14 @@ export const useCreatePostStore = defineStore('createPost', {
     allowComments: true,
     enableTriggerWarning: false,
     triggerTags: [],
+    lessonLearned: {
+      whatILearned: null,
+      keyTakeaways: null,
+      whatIdDoDifferently: null,
+      advice: null,
+      recoveryTime: null,
+      cost: 0,
+    },
   }),
   actions: {
     resetState () {

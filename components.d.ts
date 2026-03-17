@@ -28,6 +28,7 @@ declare module 'vue' {
     PostCard: typeof import('./src/components/feed/PostCard.vue')['default']
     PostMenu: typeof import('./src/components/feed/PostMenu.vue')['default']
     PremiumSettings: typeof import('./src/components/settings/PremiumSettings.vue')['default']
+    PrivacyPosting: typeof import('./src/components/privacy-posting.vue')['default']
     PrivacySettings: typeof import('./src/components/settings/PrivacySettings.vue')['default']
     ProfileCard: typeof import('./src/components/sidebars/ProfileCard.vue')['default']
     Rightbar: typeof import('./src/components/sidebars/Rightbar.vue')['default']

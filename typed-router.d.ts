@@ -35,6 +35,7 @@ declare module 'vue-router/auto-routes' {
     '/post-success-created': RouteRecordInfo<'/post-success-created', '/post-success-created', Record<never, never>, Record<never, never>>,
     '/premium': RouteRecordInfo<'/premium', '/premium', Record<never, never>, Record<never, never>>,
     '/profile': RouteRecordInfo<'/profile', '/profile', Record<never, never>, Record<never, never>>,
+    '/recovery/[id]': RouteRecordInfo<'/recovery/[id]', '/recovery/:id', { id: ParamValue<true> }, { id: ParamValue<false> }>,
     '/register': RouteRecordInfo<'/register', '/register', Record<never, never>, Record<never, never>>,
     '/set-password': RouteRecordInfo<'/set-password', '/set-password', Record<never, never>, Record<never, never>>,
     '/settings': RouteRecordInfo<'/settings', '/settings', Record<never, never>, Record<never, never>>,
@@ -119,6 +120,10 @@ declare module 'vue-router/auto-routes' {
     }
     'src/pages/profile.vue': {
       routes: '/profile'
+      views: never
+    }
+    'src/pages/recovery/[id].vue': {
+      routes: '/recovery/[id]'
       views: never
     }
     'src/pages/register.vue': {
