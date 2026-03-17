@@ -9,7 +9,7 @@ const { onSchedule } = require('firebase-functions/v2/scheduler')
  */
 exports.publishScheduledPosts = onSchedule({
   // Define the schedule for this function to run
-  schedule: 'every 10 minutes',
+  schedule: 'every 1 minutes',
   // Set the timezone for the schedule
   timeZone: 'Europe/Kiev',
 }, async event => {

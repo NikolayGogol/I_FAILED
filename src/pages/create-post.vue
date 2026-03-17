@@ -202,8 +202,6 @@
           class="date-picker mt-1"
           enable-time
           :min-date="new Date()"
-          :minutes-grid-step="10"
-          :minutes-increment="10"
           placeholder="Select date"
         />
       </div>

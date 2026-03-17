@@ -23,8 +23,12 @@ export async function generateRandomPost () {
     const postData = {
       selectedCategories: [randomCategory],
       title: `Random Post Title #${Math.floor(Math.random() * 1000)}`,
-      description: 'This is a randomly generated post description to test the feed and filtering functionality.',
-      date: new Date(),
+      whatHappened: 'This is a randomly generated post description about what happened.',
+      whenHappened: new Date().toISOString(),
+      whatWentWrong: 'This went wrong.',
+      howDidItFeel: 'It felt bad.',
+      emotionTags: [],
+      tags: [],
       images: [],
       isAnonymous,
       visibility: visibilityList[0],
@@ -33,12 +37,17 @@ export async function generateRandomPost () {
       triggerTags: [],
       createdAt: serverTimestamp(),
       status: 'published',
+      scheduledAt: null,
       publishedAt: serverTimestamp(),
       uid: authStore.user.uid,
       user: {
         displayName: isAnonymous ? 'Anonymous' : authStore.user.displayName,
         photoURL: isAnonymous ? noAvatar : authStore.user.photoURL || noAvatar,
       },
+      likes: 0,
+      comments: 0,
+      views: 0,
+      likedBy: [],
     }
 
     await addDoc(collection(db, collection_db), postData)
