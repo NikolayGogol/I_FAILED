@@ -11,7 +11,7 @@ export const usePopularTagsStore = defineStore('popularTags', {
   actions: {
     /**
      * Fetches all posts from the Firestore collection and calculates the most popular tags.
-     * It iterates through each post, collects tags from `stepFour.tags`, counts their occurrences,
+     * It iterates through each post, collects tags from `tags`, counts their occurrences,
      * sorts them in descending order of popularity, and stores the top 5 tags in the state.
      */
     async getPopularTags () {
@@ -24,7 +24,7 @@ export const usePopularTagsStore = defineStore('popularTags', {
         for (const doc of querySnapshot.docs) {
           const post = doc.data()
           // Check if tags exist and is an array
-          const tags = post.stepFour?.tags
+          const tags = post.tags
           if (Array.isArray(tags) && tags.length > 0) {
             allTags.push(...tags)
           }

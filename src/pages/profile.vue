@@ -82,7 +82,11 @@
               v-for="post in posts"
               :key="post.id"
               :post="post"
-            />
+            >
+              <template #recovered-content>
+                <div class="submit-btn">I recovered</div>
+              </template>
+            </PostCard>
           </div>
         </template>
         <activity v-if="activeTabIndex === 1" />

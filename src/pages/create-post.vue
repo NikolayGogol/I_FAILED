@@ -65,6 +65,8 @@
       console.error('Failed to create post')
     }
   }
+
+  const currentDate = computed(() => new Date())
 </script>
 
 <template>
@@ -201,7 +203,7 @@
           v-model="store.scheduleDate"
           class="date-picker mt-1"
           enable-time
-          :min-date="new Date()"
+          :min-date="currentDate"
           placeholder="Select date"
         />
       </div>

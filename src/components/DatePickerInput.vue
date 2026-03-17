@@ -29,14 +29,6 @@
       type: Date,
       default: null,
     },
-    minutesGridStep: {
-      type: Number,
-      default: 1,
-    },
-    minutesIncrement: {
-      type: Number,
-      default: 1,
-    },
   })
 
   const emit = defineEmits(['update:modelValue'])
@@ -49,10 +41,13 @@
     if (!modelData) return
 
     const d = new Date(modelData)
-    const minutes = d.getMinutes()
-    const roundedMinutes = Math.round(minutes / 10) * 10
-    d.setMinutes(roundedMinutes)
+    // Round to nearest 10 minutes only if there is a minutes value
+    // to prevent restricting future minute selections if we just clicked a date.
+    // Actually, VueDatePicker handles minute stepping. We just need to make sure
+    // we are passing the values correctly without overwriting them unintentionally.
+    // If the component has `minutes-increment="10"`, it does the rounding for us in the UI.
     d.setSeconds(0)
+    d.setMilliseconds(0)
     emit('update:modelValue', d)
   }
 </script>
@@ -68,14 +63,11 @@
       input-class-name="dp-custom-input"
       :max-date="maxDate"
       :min-date="minDate"
-      :minutes-grid-step="minutesGridStep"
-      :minutes-increment="minutesIncrement"
       :placeholder="placeholder"
       :time-config="{
         enableTimePicker: enableTime,
-        minutesIncrement,
-        minutesGridStep
       }"
+      :minutes-increment="10"
       @update:model-value="handleDateUpdate"
     >
       <template #input-icon>

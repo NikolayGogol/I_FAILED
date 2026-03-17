@@ -2,6 +2,7 @@
   <aside class="feed-rightbar">
     <ProfileCard />
     <WhoToFollow />
+    <PopularTags />
   </aside>
 </template>
 

@@ -158,6 +158,7 @@
         <div class="post-author-handle">@{{ post.user.displayName.replaceAll(' ', '_') }}</div>
       </div>
       <v-spacer />
+      <slot name="recovered-content" />
       <!-- Post options menu -->
       <PostMenu v-if="!isOwnPost" :post="post" />
 
