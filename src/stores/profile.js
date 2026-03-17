@@ -1,7 +1,18 @@
 // =================================================================================================
 // Imports
 // =================================================================================================
-import { arrayRemove, arrayUnion, collection, doc, getDoc, getDocs, query, updateDoc, where } from 'firebase/firestore'
+import {
+  arrayRemove,
+  arrayUnion,
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  orderBy,
+  query,
+  updateDoc,
+  where
+} from 'firebase/firestore'
 import { getDownloadURL, ref as storageRef, uploadBytes } from 'firebase/storage'
 import { defineStore } from 'pinia'
 import { auth, db, storage, updateProfile } from '@/firebase'
@@ -37,7 +48,7 @@ export const useProfileStore = defineStore('profile', {
 
       try {
         const postsRef = collection(db, VITE_POST_COLLECTION)
-        const q = query(postsRef, where('uid', '==', userId))
+        const q = query(postsRef, where('uid', '==', userId), orderBy('createdAt', 'desc'))
         const querySnapshot = await getDocs(q)
 
         const posts = []
