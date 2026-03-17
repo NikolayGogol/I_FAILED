@@ -7,14 +7,21 @@ import { useAuthStore } from '@/stores/auth.js'
 
 const collection_db = import.meta.env.VITE_POST_COLLECTION
 const VITE_USERS_COLLECTION = import.meta.env.VITE_USERS_COLLECTION
-
+const collection_db_scheduled = import.meta.env.VITE_POST_COLLECTION_SCEDULED
+//
 export const useCreatePostStore = defineStore('createPost', {
   state: () => ({
     selectedCategories: null,
     title: '',
     whatHappened: '',
     whenHappened: null,
+    scheduleDate: null,
+    whatWentWrong: null,
+    howDidItFeel: null,
     images: [],
+    emotionTags: [],
+    tags: [],
+    suggestedTags: [],
     isAnonymous: false,
     visibility: visibilityList[0],
     allowComments: true,
@@ -39,12 +46,18 @@ export const useCreatePostStore = defineStore('createPost', {
       if (!authStore.user) {
         return { success: false, error: 'User is not authenticated.' }
       }
+      const scheduleDate = this.scheduleDate
+      const isScheduled = !!scheduleDate
 
       const postData = {
         selectedCategories: this.selectedCategories ? [this.selectedCategories] : [],
         title: this.title,
-        description: this.whatHappened,
-        date: this.whenHappened,
+        whatHappened: this.whatHappened,
+        whenHappened: this.whenHappened,
+        whatWentWrong: this.whatWentWrong,
+        howDidItFeel: this.howDidItFeel,
+        emotionTags: this.emotionTags,
+        tags: this.tags,
         images: [], // Placeholder
         isAnonymous: this.isAnonymous,
         visibility: this.visibility,
@@ -52,8 +65,9 @@ export const useCreatePostStore = defineStore('createPost', {
         enableTriggerWarning: this.enableTriggerWarning,
         triggerTags: this.triggerTags,
         createdAt: serverTimestamp(),
-        status: 'published',
-        publishedAt: serverTimestamp(),
+        status: isScheduled ? 'scheduled' : 'published',
+        scheduledAt: isScheduled ? new Date(scheduleDate) : null,
+        publishedAt: isScheduled ? null : serverTimestamp(),
         uid: authStore.user.uid,
         user: {
           displayName: this.isAnonymous ? 'Anonymous' : authStore.user.displayName,
@@ -66,7 +80,8 @@ export const useCreatePostStore = defineStore('createPost', {
       }
 
       try {
-        const docRef = await addDoc(collection(db, collection_db), postData)
+        const targetCollection = isScheduled ? collection_db_scheduled : collection_db
+        const docRef = await addDoc(collection(db, targetCollection), postData)
         const postId = docRef.id
 
         // Increment user's post count

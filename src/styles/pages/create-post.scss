@@ -8,6 +8,7 @@
     color: $color-text-primary;
   }
 
+
   .post-card-content {
     background-color: $color-surface;
     padding: 24px;
@@ -15,10 +16,56 @@
     border: 1px solid $color-border;
   }
 
+  h5 {
+    color: $color-text-primary;
+    font-weight: 600;
+    font-size: 18px;
+    margin-bottom: 16px;
+  }
+
   .tag-chip {
     background-color: $color-primary;
     color: white;
     border-radius: $radius-xs;
+  }
+
+  .v-expansion-panel {
+    .v-expansion-panel-text__wrapper {
+      padding: 0;
+    }
+
+    .v-expansion-panel__shadow,
+    .v-expansion-panel-title__overlay {
+      display: none;
+    }
+
+    .v-expansion-panel-title {
+      color: $color-text-primary;
+      font-weight: 600;
+      font-size: 18px;
+      padding-left: 0;
+      padding-right: 0;
+    }
+  }
+
+  .dp__input_wrap {
+    input {
+      font-size: 16px;
+    }
+  }
+
+  .v-chip--variant-outlined {
+    border-color: $color-border;
+  }
+
+  .v-chip--selected {
+    color: #6E240F !important;
+    border-color: $color-tag-bg;
+    background-color: $color-tag-bg;
+  }
+
+  .v-chip__filter {
+    display: none;
   }
 
   .selected-tags-list {
@@ -42,7 +89,7 @@
   }
 
   label {
-    color: #1C1C1B;
+    color: $color-text-primary;
     font-size: 14px;
     margin-bottom: 8px;
   }
@@ -98,7 +145,7 @@
     border-radius: $radius-md;
 
     .setting-title {
-      color: #1C1C1B;
+      color: $color-text-primary;
       font-size: 16px;
     }
 

@@ -14,6 +14,7 @@ declare module 'vue' {
     AboutAccountModal: typeof import('./src/components/profile/AboutAccountModal.vue')['default']
     AccountSettings: typeof import('./src/components/settings/AccountSettings.vue')['default']
     Activity: typeof import('./src/components/profile/Activity.vue')['default']
+    AdditionalInfoPost: typeof import('./src/components/additional-info-post.vue')['default']
     ContentSettings: typeof import('./src/components/settings/ContentSettings.vue')['default']
     DatePickerInput: typeof import('./src/components/DatePickerInput.vue')['default']
     FacebookLoginButton: typeof import('./src/components/FacebookLoginButton.vue')['default']

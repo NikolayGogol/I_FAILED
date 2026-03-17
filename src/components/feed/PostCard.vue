@@ -69,7 +69,7 @@
 
   // Get the truncated body of the post
   const truncatedBody = computed(() => {
-    const description = p.post.description
+    const description = p.post.whatHappened
     if (isExpanded.value || description.length <= maxLength) {
       return description
     }
@@ -78,7 +78,7 @@
 
   // Check if the "Read more" button should be shown
   const showReadMore = computed(() => {
-    return !isExpanded.value && p.post.description.length > maxLength
+    return !isExpanded.value && p.post.whatHappened.length > maxLength
   })
 
   // =================================================================================================

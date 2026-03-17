@@ -1,9 +1,9 @@
 <route lang="json">
 {
-  "meta": {
-    "layout": "MainLayout",
-    "auth": true
-  }
+"meta": {
+"layout": "MainLayout",
+"auth": true
+}
 }
 </route>
 
@@ -11,9 +11,9 @@
   import { QuillEditor } from '@vueup/vue-quill'
   import { computed, ref } from 'vue'
   import { useRouter } from 'vue-router'
+  import AdditionalInfoPost from '@/components/additional-info-post.vue'
   import DatePickerInput from '@/components/DatePickerInput.vue'
   import FormInput from '@/components/FormInput.vue'
-  import UploadFile from '@/components/UploadFile.vue'
   import { categories, visibilityList } from '@/models/categories.js'
   import { useCreatePostStore } from '@/stores/create-post.js'
   import { stripHtml } from '@/utils/html.js'
@@ -29,10 +29,9 @@
 
   const isFormValid = computed(() => {
     return (
-      store.selectedCategories &&
-      store.title.trim() !== '' &&
-      stripHtml(store.whatHappened).trim() !== '' &&
-      store.whenHappened
+      store.selectedCategories
+      && store.title.trim() !== ''
+      && stripHtml(store.whatHappened).trim() !== ''
     )
   })
 
@@ -84,30 +83,7 @@
     </div>
 
     <div class="post-card-content mt-6">
-      <div class="form-group">
-        <label for="">What area of life did this failure occur in? <span class="text-error">*</span></label>
-        <v-select
-          v-model="store.selectedCategories"
-          class="form-field form-select"
-          color="primary"
-          hide-details
-          item-title="label"
-          :items="categories"
-          placeholder="Choose an option"
-          return-object
-          variant="outlined"
-        />
-      </div>
-      <div class="form-group mt-6">
-        <div class="label">Images</div>
-        <UploadFile
-          v-model="store.images"
-          class="mb-6"
-          :max-files="3"
-          multiple
-          :quality="20"
-        />
-      </div>
+      <h5>Failure Details</h5>
       <div class="form-group">
         <label class="form-label">Title <span class="text-error">*</span></label>
         <FormInput
@@ -130,18 +106,30 @@
             theme="snow"
             @text-change="handleTextChange(store.whatHappened, 'whatHappened')"
           />
-          <div class="char-counter">{{ store.whatHappened ? stripHtml(store.whatHappened).length : 0 }}/{{ quillLength }}</div>
+          <div class="char-counter">{{ store.whatHappened ? stripHtml(store.whatHappened).length : 0 }}/{{
+            quillLength
+          }}
+          </div>
         </div>
       </div>
       <div class="form-group mt-6">
-        <label class="form-label">When did it happen? <span class="text-error">*</span></label>
-        <DatePickerInput
-          v-model="store.whenHappened"
-          :enable-time="false"
-          :max-date="new Date()"
-          placeholder="Select date"
+        <label for="">Category <span class="text-error">*</span></label>
+        <v-select
+          v-model="store.selectedCategories"
+          class="form-field form-select"
+          color="primary"
+          hide-details
+          item-title="label"
+          :items="categories"
+          placeholder="Choose a category"
+          return-object
+          variant="outlined"
         />
       </div>
+      <v-divider class="mt-6" />
+      <additional-info-post class="my-3" />
+      <v-divider />
+      <h5 class="mt-6">Privacy & Posting</h5>
       <div class="setting-row mt-6">
         <div>
           <div class="setting-title">Post as Anonymous</div>
@@ -206,6 +194,18 @@
             <span class="remove-tag cursor-pointer" @click="removeTag(index)">×</span>
           </li>
         </ul>
+      </div>
+      <div class="form-group mt-6">
+        <label class="form-label">Schedule post (optional)</label>
+        <DatePickerInput
+          v-model="store.scheduleDate"
+          class="date-picker mt-1"
+          enable-time
+          :min-date="new Date()"
+          :minutes-grid-step="10"
+          :minutes-increment="10"
+          placeholder="Select date"
+        />
       </div>
       <div class="d-flex mt-6">
         <v-btn color="primary" :disabled="!isFormValid" :loading="isLoading" @click="submitPost">Post</v-btn>

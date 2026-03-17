@@ -8,7 +8,6 @@ import {
   limit,
   query,
   updateDoc,
-  where,
 } from 'firebase/firestore'
 import { defineStore } from 'pinia'
 import { db } from '@/firebase'
