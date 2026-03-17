@@ -71,9 +71,9 @@
     <!-- Show More Button -->
     <div v-if="hasMoreTags" class="text-center mt-2">
       <v-btn
-        variant="text"
         color="primary"
         size="small"
+        variant="text"
         @click="showMoreTags"
       >
         Show more

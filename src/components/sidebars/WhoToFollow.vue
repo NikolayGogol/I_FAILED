@@ -198,9 +198,9 @@
       <!-- Show More Button -->
       <div v-if="hasMoreUsers" class="text-center mt-2">
         <v-btn
-          variant="text"
           color="primary"
           size="small"
+          variant="text"
           @click="showMoreUsers"
         >
           Show more

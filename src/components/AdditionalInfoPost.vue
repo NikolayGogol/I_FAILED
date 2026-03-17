@@ -1,5 +1,6 @@
 <script setup>
   import { QuillEditor } from '@vueup/vue-quill'
+  import { onMounted } from 'vue'
   import { emotionTags } from '@/models/categories.js'
   import { useCreatePostStore } from '@/stores/create-post.js'
   import { stripHtml } from '@/utils/html.js'
@@ -8,6 +9,9 @@
   const store = useCreatePostStore()
   const quillLength = 5000
   //
+  onMounted(() => {
+    store.fetchSuggestedTags()
+  })
   function handleTextChange (value, key) {
     if (stripHtml(value).length >= quillLength) {
       store[key] = value.slice(0, quillLength)

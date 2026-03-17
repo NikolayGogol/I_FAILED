@@ -1,6 +1,6 @@
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore'
 import { db } from '@/firebase'
-import { categories, visibilityList } from '@/models/categories'
+import { categories, emotionTags, visibilityList } from '@/models/categories'
 import { noAvatar } from '@/models/no-data'
 import { useAuthStore } from '@/stores/auth'
 
@@ -8,6 +8,14 @@ const collection_db = import.meta.env.VITE_POST_COLLECTION
 
 // Helper to get a random element from an array
 const getRandomElement = arr => arr[Math.floor(Math.random() * arr.length)]
+
+// Helper to get multiple random elements from an array
+function getRandomElements (arr, num) {
+  const shuffled = [...arr].toSorted(() => 0.5 - Math.random())
+  return shuffled.slice(0, num)
+}
+
+const predefinedTags = ['failure', 'learning', 'growth', 'mistake', 'career', 'life', 'startup', 'health', 'finance']
 
 export async function generateRandomPost () {
   const authStore = useAuthStore()
@@ -20,6 +28,14 @@ export async function generateRandomPost () {
     const randomCategory = getRandomElement(categories)
     const isAnonymous = Math.random() > 0.5
 
+    // Get 1 to 3 random emotion tags
+    const numEmotions = Math.floor(Math.random() * 3) + 1
+    const randomEmotionTags = getRandomElements(emotionTags, numEmotions)
+
+    // Get 1 to 4 random string tags
+    const numTags = Math.floor(Math.random() * 4) + 1
+    const randomTags = getRandomElements(predefinedTags, numTags)
+
     const postData = {
       selectedCategories: [randomCategory],
       title: `Random Post Title #${Math.floor(Math.random() * 1000)}`,
@@ -27,8 +43,8 @@ export async function generateRandomPost () {
       whenHappened: new Date().toISOString(),
       whatWentWrong: 'This went wrong.',
       howDidItFeel: 'It felt bad.',
-      emotionTags: [],
-      tags: [],
+      emotionTags: randomEmotionTags,
+      tags: randomTags,
       images: [],
       isAnonymous,
       visibility: visibilityList[0],

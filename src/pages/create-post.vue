@@ -11,7 +11,7 @@
   import { QuillEditor } from '@vueup/vue-quill'
   import { computed, ref } from 'vue'
   import { useRouter } from 'vue-router'
-  import AdditionalInfoPost from '@/components/additional-info-post.vue'
+  import AdditionalInfoPost from '@/components/AdditionalInfoPost.vue'
   import DatePickerInput from '@/components/DatePickerInput.vue'
   import FormInput from '@/components/FormInput.vue'
   import { categories, visibilityList } from '@/models/categories.js'

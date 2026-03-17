@@ -1,4 +1,14 @@
-import { addDoc, collection, doc, increment, serverTimestamp, updateDoc } from 'firebase/firestore'
+import {
+  addDoc,
+  collection,
+  doc,
+  getDocs,
+  increment, limit,
+  orderBy,
+  query,
+  serverTimestamp,
+  updateDoc,
+} from 'firebase/firestore'
 import { defineStore } from 'pinia'
 import { db, getDownloadURL, ref, storage, uploadBytes } from '@/firebase'
 import { visibilityList } from '@/models/categories.js'
@@ -113,6 +123,30 @@ export const useCreatePostStore = defineStore('createPost', {
       } catch (error) {
         console.error('Error creating post:', error)
         return { success: false, error: error.message }
+      }
+    },
+    async fetchSuggestedTags () {
+      if (this.suggestedTags.length > 0) {
+        return
+      }
+      try {
+        const postsRef = collection(db, collection_db)
+        const q = query(postsRef, orderBy('createdAt', 'desc'), limit(50))
+        const querySnapshot = await getDocs(q)
+        const tagsSet = new Set()
+        // Correctly iterate over the documents in the snapshot
+        for (const doc of querySnapshot.docs) {
+          const data = doc.data()
+          if (data && data.tags && Array.isArray(data.tags)) {
+            for (const tag of data.tags) {
+              tagsSet.add(tag)
+            }
+          }
+        }
+
+        this.suggestedTags = Array.from(tagsSet)
+      } catch (error) {
+        console.error('Error fetching suggested tags:', error)
       }
     },
   },
