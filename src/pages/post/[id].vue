@@ -362,11 +362,33 @@
         {{ post.title }}
       </h1>
 
-      <section v-if="post.description" class="single-post-page__section mb-6">
+      <section v-if="post.whatHappened" class="single-post-page__section mb-6">
         <h2 class="section-title">What Happened</h2>
-        <div v-html="post.description" />
+        <div v-html="post.whatHappened" />
       </section>
 
+      <section v-if="post?.whatWentWrong" class="single-post-page__section mb-6">
+        <h2 class="section-title">What Went Wrong</h2>
+        <div v-html="post?.whatWentWrong" />
+      </section>
+      <h3>Additional Details</h3>
+
+      <div v-if="post?.emotionTags.length" class="d-flex">
+        <span class="font-weight-semibold mr-2">Emotions:</span>
+        <v-chip
+          v-for="(chip, index) in post?.emotionTags"
+          :key="index"
+          class="mr-2"
+          size="small"
+        > {{ chip.emoji }} {{ chip.label }}
+        </v-chip>
+      </div>
+      <div v-if="post.tags.length > 0" class="d-flex mt-2">
+        <span class="font-weight-semibold mr-2">Tags:</span>
+        <ul class="tag-list">
+          <li v-for="tag in post.tags" :key="tag" class="tag">{{ tag }}</li>
+        </ul>
+      </div>
       <v-divider v-if="post.images?.length > 0" class="my-6" />
       <img
         v-for="img in post.images"

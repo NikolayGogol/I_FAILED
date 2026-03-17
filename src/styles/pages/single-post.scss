@@ -92,11 +92,40 @@
     margin-bottom: 12px;
   }
 
+  h3 {
+    color: $color-text-primary;
+    font-weight: 600;
+    font-size: 24px;
+    margin-bottom: 12px;
+
+    @include media-down($breakpoint-sm) {
+      font-size: 20px;
+    }
+  }
+
   .v-chip {
     border: 1px solid $color-border;
 
     .v-chip__underlay {
       display: none;
+    }
+  }
+
+  .tag-list {
+    display: flex;
+    flex-wrap: wrap; // Allow wrapping
+    gap: 5px; // Gap between tags
+
+    li {
+      list-style: none;
+      color: $color-surface;
+      background-color: $color-primary;
+      font-weight: 400;
+      font-size: 12px;
+      line-height: normal;
+      padding: 3px 8px; // Slightly more padding
+      border-radius: $radius-xs;
+      // margin-right: 10px; // Removed in favor of gap
     }
   }
 
@@ -131,8 +160,8 @@
         white-space: nowrap;
 
         @include media-down($breakpoint-sm) {
-           white-space: normal; // Allow wrapping on small screens
-           text-align: center;
+          white-space: normal; // Allow wrapping on small screens
+          text-align: center;
         }
       }
 
@@ -194,8 +223,8 @@
         z-index: 100;
 
         @include media-down($breakpoint-sm) {
-            right: auto;
-            left: 0; // Prevent overflow on mobile
+          right: auto;
+          left: 0; // Prevent overflow on mobile
         }
       }
     }
@@ -232,11 +261,11 @@
     }
 
     .comment-item__replies {
-        @include media-down($breakpoint-sm) {
-            margin-left: 16px !important; // Reduce nesting indent on mobile
-            border-left: 2px solid $color-border;
-            padding-left: 8px;
-        }
+      @include media-down($breakpoint-sm) {
+        margin-left: 16px !important; // Reduce nesting indent on mobile
+        border-left: 2px solid $color-border;
+        padding-left: 8px;
+      }
     }
 
     .date {

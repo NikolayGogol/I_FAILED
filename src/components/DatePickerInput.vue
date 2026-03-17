@@ -63,11 +63,11 @@
       input-class-name="dp-custom-input"
       :max-date="maxDate"
       :min-date="minDate"
+      :minutes-increment="10"
       :placeholder="placeholder"
       :time-config="{
         enableTimePicker: enableTime,
       }"
-      :minutes-increment="10"
       @update:model-value="handleDateUpdate"
     >
       <template #input-icon>
