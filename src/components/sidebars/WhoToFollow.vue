@@ -196,16 +196,14 @@
       </div>
 
       <!-- Show More Button -->
-      <div v-if="hasMoreUsers" class="text-center mt-2">
-        <v-btn
-          color="primary"
-          size="small"
-          variant="text"
+      <div v-if="hasMoreUsers" class="mt-2">
+        <div
+          class="text-decoration-underline px-0 font-weight-semibold cursor-pointer"
+          style="font-size: 14px;"
           @click="showMoreUsers"
         >
           Show more
-        </v-btn>
-      </div>
-    </template>
+        </div>
+      </div></template>
   </section>
 </template>

@@ -11,7 +11,7 @@ import {
   orderBy,
   query,
   updateDoc,
-  where
+  where,
 } from 'firebase/firestore'
 import { getDownloadURL, ref as storageRef, uploadBytes } from 'firebase/storage'
 import { defineStore } from 'pinia'

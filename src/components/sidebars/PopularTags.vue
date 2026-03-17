@@ -69,15 +69,14 @@
     </div>
 
     <!-- Show More Button -->
-    <div v-if="hasMoreTags" class="text-center mt-2">
-      <v-btn
-        color="primary"
-        size="small"
-        variant="text"
+    <div v-if="hasMoreTags" class="mt-2">
+      <div
+        class="text-decoration-underline px-0 font-weight-semibold cursor-pointer"
+        style="font-size: 14px;"
         @click="showMoreTags"
       >
         Show more
-      </v-btn>
+      </div>
     </div>
   </section>
   <div class="footer-link py-2">
