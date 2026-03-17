@@ -1,5 +1,5 @@
 <script setup>
-  import { onMounted } from 'vue'
+  import { computed, onMounted, ref } from 'vue'
   import { usePopularTagsStore } from '@/stores/popular-tags'
   import '@/styles/components/sidebars/popular-tags.scss'
 
@@ -32,6 +32,20 @@
     },
   ]
 
+  const displayLimit = ref(5)
+
+  const visibleTags = computed(() => {
+    return popularTagsStore.allTags.slice(0, displayLimit.value)
+  })
+
+  const hasMoreTags = computed(() => {
+    return popularTagsStore.allTags.length > displayLimit.value
+  })
+
+  function showMoreTags () {
+    displayLimit.value += 5
+  }
+
   onMounted(() => {
     popularTagsStore.getPopularTags()
   })
@@ -43,7 +57,7 @@
       <h3 class="font-weight-semibold">Popular now</h3>
     </header>
     <div
-      v-for="tag in popularTagsStore.tags"
+      v-for="tag in visibleTags"
       :key="tag"
       class="popular-row"
     >
@@ -51,6 +65,18 @@
       <v-spacer />
       <v-btn icon size="small" variant="text">
         <v-icon>mdi-dots-horizontal</v-icon>
+      </v-btn>
+    </div>
+
+    <!-- Show More Button -->
+    <div v-if="hasMoreTags" class="text-center mt-2">
+      <v-btn
+        variant="text"
+        color="primary"
+        size="small"
+        @click="showMoreTags"
+      >
+        Show more
       </v-btn>
     </div>
   </section>

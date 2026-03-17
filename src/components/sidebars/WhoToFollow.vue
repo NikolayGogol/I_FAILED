@@ -2,7 +2,7 @@
   // =================================================================================================
   // Imports
   // =================================================================================================
-  import { computed, onMounted } from 'vue'
+  import { computed, onMounted, ref } from 'vue'
   import { useRouter } from 'vue-router'
   import { useToast } from 'vue-toastification'
   import { useAuthStore } from '@/stores/auth'
@@ -16,6 +16,11 @@
   const authStore = useAuthStore()
   const toast = useToast()
   const router = useRouter()
+
+  // =================================================================================================
+  // Local State
+  // =================================================================================================
+  const displayLimit = ref(5)
 
   // =================================================================================================
   // Lifecycle Hooks
@@ -39,11 +44,19 @@
     })
   })
 
-  // Sort users by post count in descending order and take the top 5
-  const sortedUsers = computed(() => {
+  // Sort users by post count in descending order
+  const allSortedUsers = computed(() => {
     return [...filteredUsers.value]
       .toSorted((a, b) => (b.postCount || 0) - (a.postCount || 0))
-      .slice(0, 5)
+  })
+
+  // Take users up to the display limit
+  const visibleUsers = computed(() => {
+    return allSortedUsers.value.slice(0, displayLimit.value)
+  })
+
+  const hasMoreUsers = computed(() => {
+    return allSortedUsers.value.length > displayLimit.value
   })
 
   // =================================================================================================
@@ -111,6 +124,10 @@
   function openUserProfile (user) {
     router.push(`/user-info/${user.id}`)
   }
+
+  function showMoreUsers () {
+    displayLimit.value += 5
+  }
 </script>
 <template>
   <section class="right-card follow-card">
@@ -129,7 +146,7 @@
     <!-- User list -->
     <template v-else>
       <div
-        v-for="user in sortedUsers"
+        v-for="user in visibleUsers"
         :key="user.id"
         class="follow-row py-2"
       >
@@ -176,6 +193,18 @@
         >
           {{ isFollowing(user.id) ? 'Unfollow' : 'Follow' }}
         </div>
+      </div>
+
+      <!-- Show More Button -->
+      <div v-if="hasMoreUsers" class="text-center mt-2">
+        <v-btn
+          variant="text"
+          color="primary"
+          size="small"
+          @click="showMoreUsers"
+        >
+          Show more
+        </v-btn>
       </div>
     </template>
   </section>
