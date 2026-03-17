@@ -58,6 +58,14 @@ export const useCreatePostStore = defineStore('createPost', {
       this.allowComments = true
       this.enableTriggerWarning = false
       this.triggerTags = []
+      this.lessonLearned = {
+        whatILearned: null,
+        keyTakeaways: null,
+        whatIdDoDifferently: null,
+        advice: null,
+        recoveryTime: null,
+        cost: 0,
+      }
     },
     async createPost () {
       const authStore = useAuthStore()

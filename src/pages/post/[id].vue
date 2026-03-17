@@ -19,6 +19,7 @@
   import { useAuthStore } from '@/stores/auth'
   import { usePostCardStore } from '@/stores/post-card.js'
   import { useSinglePostStore } from '@/stores/single-post'
+  import { formatNumber } from '@/utils/format-number.js'
   import 'vue3-emoji-picker/css'
   import '@/styles/pages/single-post.scss'
 
@@ -371,8 +372,38 @@
         <h2 class="section-title">What Went Wrong</h2>
         <div v-html="post?.whatWentWrong" />
       </section>
-      <h3>Additional Details</h3>
 
+      <div
+        v-if="post?.lessonLearned?.whatILearned || post?.lessonLearned?.keyTakeaways"
+        class="bg-orange-accent-1 pa-6 rounded-lg mb-6"
+      >
+        <section v-if="post.lessonLearned?.whatILearned">
+          <h2 class="section-title">What I Learned</h2>
+          <div v-html="post.lessonLearned.whatILearned" />
+        </section>
+        <section v-if="post.lessonLearned?.keyTakeaways">
+          <h2 class="section-title">Key Takeaways</h2>
+          <div v-html="post.lessonLearned.keyTakeaways " />
+        </section>
+      </div>
+      <section v-if="post?.lessonLearned?.whatIdDoDifferently" class="bg-orange-accent-1 pa-6 rounded-lg mb-6">
+        <h2 class="section-title">What I'd Do Differently</h2>
+        <div v-html="post.lessonLearned.whatIdDoDifferently" />
+      </section>
+      <section v-if="post?.lessonLearned?.advice" class="bg-orange-accent-1 pa-6 rounded-lg mb-6">
+        <h2 class="section-title">Advice for Others</h2>
+        <div v-html="post?.lessonLearned.advice" />
+      </section>
+
+      <h3>Additional Details</h3>
+      <div v-if="post?.lessonLearned?.cost" class="d-flex mb-2">
+        <span class="font-weight-semibold mr-2">Cost:</span>
+        <span class="text-grey-darken-4">{{ formatNumber(post.lessonLearned?.cost) }}</span>
+      </div>
+      <div v-if="post?.lessonLearned?.recoveryTime" class="d-flex mb-2">
+        <span class="font-weight-semibold mr-2">Recovery Time:</span>
+        <span class="text-grey-darken-4">{{ post.lessonLearned?.recoveryTime?.title }}</span>
+      </div>
       <div v-if="post?.emotionTags.length" class="d-flex">
         <span class="font-weight-semibold mr-2">Emotions:</span>
         <v-chip

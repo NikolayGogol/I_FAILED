@@ -8,7 +8,8 @@
 </route>
 <script setup>
   import { QuillEditor } from '@vueup/vue-quill'
-  import { useRoute } from 'vue-router'
+  import { useRoute, useRouter } from 'vue-router'
+  import { useToast } from 'vue-toastification'
   import { recoveryTimeOptions } from '@/models/categories.js'
   import { useCreatePostStore } from '@/stores/create-post.js'
   import { useRecoveryPostStore } from '@/stores/recovery-post.js'
@@ -19,31 +20,51 @@
   import '@vueup/vue-quill/dist/vue-quill.snow.css'
   //
   const route = useRoute()
+  const router = useRouter()
+  const toast = useToast()
   const store = useCreatePostStore()
   const recoveryPostStore = useRecoveryPostStore()
   const quillLength = 5000
   const singlePostStore = useSinglePostStore()
-  const createPostStore = useCreatePostStore()
   //
   singlePostStore.getPostById(route.params.id)
     .then(res => {
-      createPostStore.emotionTags = res.emotionTags
-      createPostStore.tags = res.tags
+      store.emotionTags = res.emotionTags
+      store.tags = res.tags
+      store.isAnonymous = res.isAnonymous
+      store.visibility = res.visibility
+      store.allowComments = res.allowComments
+      store.enableTriggerWarning = res.enableTriggerWarning
+      store.triggerTags = store.enableTriggerWarning ? res.triggerTags : []
+      store.scheduleDate = store.scheduledAt ? res.scheduledAt : null
     })
   function handleTextChange (value, key) {
     if (stripHtml(value).length >= quillLength) {
       store[key] = value.slice(0, quillLength)
     }
   }
-
-  function recoveryPost () {
+  function getFieldsWithValues (obj) {
+    return Object.fromEntries(
+      Object.entries(obj).filter(([_, value]) => {
+        if (typeof value === 'boolean') return true
+        if (Array.isArray(value)) return value.length > 0
+        return value !== null && value !== undefined && value !== ''
+      }),
+    )
+  }
+  async function recoveryPost () {
     const obj = {
-      emotionTags: store.emotionTags,
-      tags: store.tags,
       id: route.params.id,
-      lessonLearned: store.lessonLearned
+      ...getFieldsWithValues(store.$state),
     }
-    recoveryPostStore.recoveryPost(obj)
+    const response = await recoveryPostStore.recoveryPost(obj)
+    if (response.success) {
+      toast.success('Post recovered successfully!')
+      store.resetState()
+      await router.push('/profile')
+    } else {
+      toast.error(response.error || 'Failed to recover post')
+    }
   }
 </script>
 

@@ -176,7 +176,7 @@
     </div>
     <!-- Post content -->
     <template v-else>
-      <div v-if="post.selectedCategories.length > 0" class="post-tags cursor-pointer" @click="openPost">
+      <div v-if="post.selectedCategories?.length > 0" class="post-tags cursor-pointer" @click="openPost">
         <span>{{ post.selectedCategories.map(el => el.label).join(' / ') }}</span>
       </div>
       <h2 class="post-title cursor-pointer" @click="openPost">
@@ -194,14 +194,14 @@
           {{ chip.label }}
         </span>
       </div>
-      <div v-if="post.recoveryTime || post.cost" class="post-meta" @click="openPost">
-        <div v-if="post.cost" class="meta-item">
+      <div v-if="post?.lessonLearned?.recoveryTime || post?.lessonLearned?.cost" class="post-meta" @click="openPost">
+        <div v-if="post.lessonLearned.cost" class="meta-item">
           <span class="meta-label">💰    Cost:</span>
-          <span>{{ formatNumber(post.cost) }}</span>
+          <span>{{ formatNumber(post.lessonLearned.cost) }}</span>
         </div>
-        <div v-if="post.recoveryTime" class="meta-item">
+        <div v-if="post.lessonLearned.recoveryTime" class="meta-item">
           <span class="meta-label">⏱️   Recovery:</span>
-          <span>{{ post.recoveryTime?.title }}</span>
+          <span>{{ post.lessonLearned.recoveryTime?.title }}</span>
         </div>
       </div>
     </template>

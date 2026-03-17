@@ -89,7 +89,7 @@
               :key="post.id"
               :post="post"
             >
-              <template #recovered-content>
+              <template v-if="!post.lessonLearned" #recovered-content>
                 <div class="submit-btn" @click="updatePost(post)">I recovered</div>
               </template>
             </PostCard>
