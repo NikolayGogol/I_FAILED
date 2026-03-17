@@ -11,10 +11,10 @@ import {
   query,
   serverTimestamp,
   updateDoc,
-  where
+  where,
 } from 'firebase/firestore'
-import {defineStore} from 'pinia'
-import {db} from '@/firebase'
+import { defineStore } from 'pinia'
+import { db } from '@/firebase'
 
 const collection_db = import.meta.env.VITE_POST_COLLECTION
 const comments_collection = import.meta.env.VITE_COMMENTS
@@ -22,16 +22,16 @@ const comments_collection = import.meta.env.VITE_COMMENTS
 export const useSinglePostStore = defineStore('singlePost', {
   state: () => ({}),
   actions: {
-    async getPostById(id) {
+    async getPostById (id) {
       try {
         const docRef = doc(db, collection_db, id)
         const docSnap = await getDoc(docRef)
-        return docSnap.exists() ? {id: docSnap.id, ...docSnap.data()} : 'Post not found.'
+        return docSnap.exists() ? { id: docSnap.id, ...docSnap.data() } : 'Post not found.'
       } catch {
         return 'Failed to load the post.'
       }
     },
-    async incrementViewCount(id) {
+    async incrementViewCount (id) {
       try {
         const docRef = doc(db, collection_db, id)
         await updateDoc(docRef, {
@@ -41,7 +41,7 @@ export const useSinglePostStore = defineStore('singlePost', {
         console.error('Error incrementing view count:', error)
       }
     },
-    async addComment(postId, user, text) {
+    async addComment (postId, user, text) {
       try {
         await addDoc(collection(db, comments_collection), {
           postId,
@@ -60,7 +60,7 @@ export const useSinglePostStore = defineStore('singlePost', {
         throw error
       }
     },
-    async addReply(postId, parentId, user, text) {
+    async addReply (postId, parentId, user, text) {
       try {
         await addDoc(collection(db, comments_collection), {
           postId,
@@ -79,7 +79,7 @@ export const useSinglePostStore = defineStore('singlePost', {
         throw error
       }
     },
-    async toggleCommentLike(commentId, userId, isLiked) {
+    async toggleCommentLike (commentId, userId, isLiked) {
       try {
         const docRef = doc(db, comments_collection, commentId)
         await updateDoc(docRef, {
@@ -89,7 +89,7 @@ export const useSinglePostStore = defineStore('singlePost', {
         console.error('Error toggling like:', error)
       }
     },
-    async getComments(postId) {
+    async getComments (postId) {
       try {
         const q = query(
           collection(db, comments_collection),
@@ -97,7 +97,7 @@ export const useSinglePostStore = defineStore('singlePost', {
           orderBy('createdAt', 'desc'),
         )
         const querySnapshot = await getDocs(q)
-        return querySnapshot.docs.map(doc => ({id: doc.id, ...doc.data()}))
+        return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
       } catch (error) {
         console.error('Error getting comments:', error)
         return []

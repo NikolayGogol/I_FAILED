@@ -1,16 +1,19 @@
 <route lang="json">
 {
-  "meta": {
-    "layout": "MainLayout",
-    "auth": true
-  }
+"meta": {
+"layout": "MainLayout",
+"auth": true
+}
 }
 </route>
 <script setup>
   import { QuillEditor } from '@vueup/vue-quill'
+  import { serverTimestamp } from 'firebase/firestore'
   import { useRoute, useRouter } from 'vue-router'
   import { useToast } from 'vue-toastification'
   import { recoveryTimeOptions } from '@/models/categories.js'
+  import { noAvatar } from '@/models/no-data.js'
+  import { useAuthStore } from '@/stores/auth.js'
   import { useCreatePostStore } from '@/stores/create-post.js'
   import { useRecoveryPostStore } from '@/stores/recovery-post.js'
   import { useSinglePostStore } from '@/stores/single-post.js'
@@ -26,6 +29,7 @@
   const recoveryPostStore = useRecoveryPostStore()
   const quillLength = 5000
   const singlePostStore = useSinglePostStore()
+  const authStore = useAuthStore()
   //
   singlePostStore.getPostById(route.params.id)
     .then(res => {
@@ -38,11 +42,13 @@
       store.triggerTags = store.enableTriggerWarning ? res.triggerTags : []
       store.scheduleDate = store.scheduledAt ? res.scheduledAt : null
     })
+
   function handleTextChange (value, key) {
     if (stripHtml(value).length >= quillLength) {
       store[key] = value.slice(0, quillLength)
     }
   }
+
   function getFieldsWithValues (obj) {
     return Object.fromEntries(
       Object.entries(obj).filter(([_, value]) => {
@@ -52,11 +58,27 @@
       }),
     )
   }
+
   async function recoveryPost () {
+    const scheduleDate = store.scheduleDate
+    const isScheduled = !!scheduleDate
+
     const obj = {
       id: route.params.id,
       ...getFieldsWithValues(store.$state),
-    }
+      status: isScheduled ? 'scheduled' : 'published',
+      scheduledAt: isScheduled ? new Date(scheduleDate) : null,
+      publishedAt: isScheduled ? null : serverTimestamp(),
+      user: store.isAnonymous
+        ? {
+          displayName: 'Anonymous',
+          photoURL: noAvatar,
+        }
+        : {
+          displayName: authStore.user.displayName,
+          photoURL: authStore.user.photoURL,
+        } }
+
     const response = await recoveryPostStore.recoveryPost(obj)
     if (response.success) {
       toast.success('Post recovered successfully!')
@@ -120,7 +142,10 @@
             theme="snow"
             @text-change="handleTextChange(store.lessonLearned.whatIdDoDifferently, 'whatIdDoDifferently')"
           />
-          <div class="char-counter">{{ stripHtml(store.lessonLearned.whatIdDoDifferently).length }}/{{ quillLength }}</div>
+          <div class="char-counter">{{ stripHtml(store.lessonLearned.whatIdDoDifferently).length }}/{{
+            quillLength
+          }}
+          </div>
         </div>
       </div>
       <div class="form-group mt-6">
