@@ -122,9 +122,9 @@
   })
 
   const readingTime = computed(() => {
-    if (!post.value?.description) return '1 min read'
+    if (!post.value?.whatHappened) return '1 min read'
 
-    const content = post.value.description
+    const content = post.value.whatHappened
     const text = content.replace(/<[^>]*>/g, '')
     const wordCount = text.trim().split(/\s+/).length
     const time = Math.ceil(wordCount / 300)
@@ -240,9 +240,10 @@
 
   const userInitial = computed(() => {
     try {
-      return post.value?.user?.displayName?.charAt(0).toUpperCase() || ''
+      if (post.value?.isAnonymous) return 'A'
+      return post.value?.user?.displayName?.charAt(0).toUpperCase() || 'U'
     } catch {
-      return 'GG'
+      return 'U'
     }
   })
 
@@ -328,7 +329,7 @@
         <div class="d-flex align-start">
           <v-avatar class="mr-4" color="grey-lighten-2" size="48">
             <v-img
-              v-if="post.user?.photoURL"
+              v-if="!post.isAnonymous && post.user?.photoURL"
               alt="User avatar"
               class="w-100 img-cover"
               :src="post.user.photoURL"
@@ -337,10 +338,10 @@
           </v-avatar>
           <div>
             <div class="d-flex">
-              <div class="font-weight-bold">{{ post.user?.displayName }}</div>
+              <div class="font-weight-bold">{{ post.isAnonymous ? 'Anonymous' : post.user?.displayName }}</div>
               <div class="create-at">{{ timeAgo }}</div>
             </div>
-            <div class="text-caption text-grey">@{{ post.user?.displayName.replaceAll(' ', '_') }}</div>
+            <div v-if="!post.isAnonymous" class="text-caption text-grey">@{{ post.user?.displayName?.replaceAll(' ', '_') }}</div>
           </div>
         </div>
         <div v-if="!isOwnPost" class="post-actions">
@@ -404,7 +405,7 @@
         <span class="font-weight-semibold mr-2">Recovery Time:</span>
         <span class="text-grey-darken-4">{{ post.lessonLearned?.recoveryTime?.title }}</span>
       </div>
-      <div v-if="post?.emotionTags.length" class="d-flex">
+      <div v-if="post?.emotionTags?.length" class="d-flex">
         <span class="font-weight-semibold mr-2">Emotions:</span>
         <v-chip
           v-for="(chip, index) in post?.emotionTags"
@@ -414,7 +415,7 @@
         > {{ chip.emoji }} {{ chip.label }}
         </v-chip>
       </div>
-      <div v-if="post.tags.length > 0" class="d-flex mt-2">
+      <div v-if="post.tags?.length > 0" class="d-flex mt-2">
         <span class="font-weight-semibold mr-2">Tags:</span>
         <ul class="tag-list">
           <li v-for="tag in post.tags" :key="tag" class="tag">{{ tag }}</li>
@@ -540,7 +541,7 @@
               <div class="comment-item__header d-flex align-center mb-1">
                 <div class="d-block">
                   <span class="username font-weight-bold mr-2">{{ comment.user?.displayName }}</span>
-                  <div class="text-caption text-grey">@{{ post.user?.displayName.replaceAll(' ', '_') }}</div>
+                  <div class="text-caption text-grey">@{{ post.user?.displayName?.replaceAll(' ', '_') }}</div>
                 </div>
 
                 <span class="date text-caption text-grey">{{ formatCommentDate(comment.createdAt) }}</span>
@@ -656,7 +657,7 @@
                       <div class="d-flex">
                         <div class="d-block">
                           <span class="font-weight-bold text-body-2 mr-2">{{ reply.user?.displayName }}</span>
-                          <div class="text-caption text-grey">@{{ reply.user?.displayName.replaceAll(' ', '_') }}</div>
+                          <div class="text-caption text-grey">@{{ reply.user?.displayName?.replaceAll(' ', '_') }}</div>
                         </div>
                         <span class="text-caption text-grey">{{ formatCommentDate(reply.createdAt) }}</span>
                       </div>
@@ -773,7 +774,7 @@
                             <div class="d-block">
                               <span class="font-weight-bold text-body-2 mr-2">{{ subReply.user?.displayName }}</span>
                               <div class="text-caption text-grey">@{{
-                                subReply.user?.displayName.replaceAll(' ', '_')
+                                subReply.user?.displayName?.replaceAll(' ', '_')
                               }}
                               </div>
                             </div>
