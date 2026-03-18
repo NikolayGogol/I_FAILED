@@ -43,7 +43,7 @@
 </script>
 
 <template>
-  <v-dialog v-model="dialog" class="about-account-dialog" max-width="600px">
+  <v-dialog v-model="dialog" class="about-account-dialog d-none d-sm-block" max-width="600px">
     <v-card>
       <v-card-title>
         About account
@@ -73,4 +73,34 @@
       <div class="cancel-btn" @click="dialog = false">Close</div>
     </v-card>
   </v-dialog>
+  <MobileSlide v-model="dialog" class="about-account-dialog">
+    <v-card>
+      <v-card-title>
+        About account
+      </v-card-title>
+      <v-card-text>
+        <div class="user-avatar">
+          <v-img
+            v-if="photoURL"
+            alt="Profile"
+            cover
+            :src="photoURL"
+          />
+          <span v-else class="initials-span">{{ initials }}</span>
+        </div>
+        <h2>{{ displayName }}</h2>
+        <p class="text-medium-emphasis">@{{ username }}</p>
+      </v-card-text>
+      <ul class="user-list mt-6">
+        <li class="d-flex align-center">
+          <div class="icon" v-html="getIcon('calendar')" />
+          <div class="d-flex flex-column align-start ml-4">
+            <h6>Joining date</h6>
+            <p>{{ joinDate }}</p>
+          </div>
+        </li>
+      </ul>
+      <div class="cancel-btn" @click="dialog = false">Close</div>
+    </v-card>
+  </MobileSlide>
 </template>

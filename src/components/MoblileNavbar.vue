@@ -3,7 +3,6 @@
   import { computed, ref } from 'vue'
   import { useRouter } from 'vue-router'
   import MobileSlide from '@/components/MobileSlide.vue'
-  import Sidebar from '@/components/sidebars/Sidebar.vue'
   import { useAuthStore } from '@/stores/auth.js'
   import '@/styles/components/mobile-navbar.scss'
 

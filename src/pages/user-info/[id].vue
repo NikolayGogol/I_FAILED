@@ -32,7 +32,7 @@
   const route = useRoute()
   const router = useRouter()
   const toast = useToast()
-
+  const isMobileAction = ref(false)
   // =================================================================================================
   // State
   // =================================================================================================
@@ -103,6 +103,7 @@
   // Open the "About this account" dialog
   function aboutAccount () {
     aboutDialog.value = true
+    isMobileAction.value = false
   }
 
   // =================================================================================================
@@ -201,38 +202,13 @@
           </button>
         </template>
         <template #dropdown-actions>
-          <v-menu location="bottom end" open-on-hover>
-            <template #activator="{ props }">
-              <v-btn
-                class="border rounded-lg"
-                icon="mdi-dots-horizontal"
-                size="small"
-                variant="text"
-                v-bind="props"
-              />
-            </template>
-            <v-list>
-              <v-list-item @click="aboutAccount">
-                <v-list-item-title>
-                  <v-icon class="mr-2" icon="mdi-information-outline" />
-                  About this account
-                </v-list-item-title>
-              </v-list-item>
-              <v-list-item @click="copyProfileLink">
-                <v-list-item-title>
-                  <v-icon class="mr-2" icon="mdi-paperclip" />
-                  Copy link to profile
-                </v-list-item-title>
-              </v-list-item>
-              <v-list-item v-if="!isCurrentUser" class="text-error" @click="blockUser">
-                <v-list-item-title>
-                  <v-icon class="mr-2" icon="mdi-block-helper" />
-                  Block this user
-                </v-list-item-title>
-              </v-list-item>
-            </v-list>
-          </v-menu>
-
+          <v-btn
+            class="border rounded-lg"
+            icon="mdi-dots-horizontal"
+            size="small"
+            variant="text"
+            @click="isMobileAction = true"
+          />
         </template>
       </UserCard>
 
@@ -274,5 +250,27 @@
     </section>
     <!-- "About this account" modal -->
     <AboutAccountModal v-model="aboutDialog" :user="user" />
+    <MobileSlide v-model="isMobileAction">
+      <v-list>
+        <v-list-item @click="aboutAccount">
+          <v-list-item-title>
+            <v-icon class="mr-2" icon="mdi-information-outline" />
+            About this account
+          </v-list-item-title>
+        </v-list-item>
+        <v-list-item @click="copyProfileLink">
+          <v-list-item-title>
+            <v-icon class="mr-2" icon="mdi-paperclip" />
+            Copy link to profile
+          </v-list-item-title>
+        </v-list-item>
+        <v-list-item v-if="!isCurrentUser" class="text-error" @click="blockUser">
+          <v-list-item-title>
+            <v-icon class="mr-2" icon="mdi-block-helper" />
+            Block this user
+          </v-list-item-title>
+        </v-list-item>
+      </v-list>
+    </MobileSlide>
   </div>
 </template>

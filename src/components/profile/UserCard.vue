@@ -215,11 +215,11 @@
           @click="openEditDialog"
           v-html="getIcon('pencil')"
         />
-        <slot name="dropdown-actions"></slot>
+        <slot name="dropdown-actions" />
       </div>
       <p class="user-bio mt-2">{{
-          displayUser?.bio || 'Entrepreneur learning from startup failures. Sharing my journey to help others.'
-        }}</p>
+        displayUser?.bio || 'Entrepreneur learning from startup failures. Sharing my journey to help others.'
+      }}</p>
       <div class="user-meta d-flex align-center my-3">
         <v-icon class="mr-1" icon="mdi-calendar-blank-outline" />
         <span class="join-date">Joined {{ joinDate }}</span>
@@ -228,10 +228,7 @@
         <span><strong>{{ followersCount }}</strong> followers</span>
         <span class="ml-3"><strong>{{ followingCount }}</strong> following</span>
       </div>
-      <slot name="follow-action"></slot>
-<!--      <div class="d-flex mt-4">-->
-<!--        <div class="cancel-btn">Follow</div>-->
-<!--      </div>-->
+      <slot name="follow-action" />
     </div>
     <!-- User activity stats -->
     <div v-if="displayActivity" class="user-activity-footer">
@@ -260,7 +257,7 @@
     </div>
 
     <!-- Edit Profile Dialog -->
-    <v-dialog v-model="editDialog" max-width="500px">
+    <v-dialog v-model="editDialog" class="d-none d-sm-block" max-width="500px">
       <v-card class="edit-profile-dialog">
         <div class="d-flex justify-end">
           <v-icon class="cursor-pointer" icon="mdi-close" @click="editDialog = false" />
@@ -326,5 +323,71 @@
         </v-row>
       </v-card>
     </v-dialog>
+    <MobileSlide v-model="editDialog" class="d-sm-none">
+      <v-card class="edit-profile-dialog">
+        <div class="d-flex justify-end">
+          <v-icon class="cursor-pointer" icon="mdi-close" @click="editDialog = false" />
+        </div>
+        <v-card-title class="text-center">Edit Profile</v-card-title>
+        <v-card-text>
+          <!-- Avatar editing section -->
+          <div class="edit-avatar-section position-relative">
+            <div class="edit-avatar">
+              <v-img
+                v-if="photoPreviewUrl"
+                alt="Profile Preview"
+                cover
+                :src="photoPreviewUrl"
+              />
+              <span v-else>{{ initials }}</span>
+            </div>
+            <input
+              id="photo-upload"
+              accept="image/*"
+              hidden
+              type="file"
+              @change="onFileChange"
+            >
+            <label class="upload-btn" for="photo-upload">
+              <v-icon icon="mdi-camera-outline" />
+            </label>
+          </div>
+
+          <!-- Form inputs for display name and bio -->
+          <form-input
+            v-model="newDisplayName"
+            density="comfortable"
+            hide-details
+            label="Display Name"
+            variant="outlined"
+          />
+          <div class="mt-2">
+            <form-textarea
+              v-model="newBio"
+              auto-grow
+              density="comfortable"
+              hide-details
+              label="Bio"
+              rows="3"
+              variant="outlined"
+            />
+          </div>
+        </v-card-text>
+        <!-- Dialog actions -->
+        <v-row class="mt-1 px-4">
+          <v-col>
+            <div class="cancel-btn" @click="editDialog = false">Cancel</div>
+          </v-col>
+          <v-col>
+            <div
+              class="submit-btn"
+              @click="handleUpdateProfile"
+            >
+              Save
+            </div>
+          </v-col>
+        </v-row>
+      </v-card>
+    </MobileSlide>
   </div>
 </template>
