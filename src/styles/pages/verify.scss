@@ -14,10 +14,19 @@
     text-decoration: none;
     display: inline-flex;
     align-items: center;
+    @include media-down($breakpoint-sm) {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+    }
 
     .v-icon {
       margin-right: $spacing-xs;
     }
+  }
+
+  .auth-logo-mobile {
+    width: 48px;
   }
 
   .welcome-title {
@@ -35,19 +44,9 @@
     }
   }
 
-  .verify-form-fields {
-    .otp-inputs {
-      .form-custom-input {
-        width: 96px;
-        height: 76px;
-
-        input {
-          text-align: center;
-          height: 100%;
-          font-size: 20px;
-          font-weight: 600;
-        }
-      }
+  .otp-field-wrapper {
+    input {
+      background-color: $color-surface;
     }
   }
 
@@ -85,6 +84,7 @@
   .confirm-btn {
     margin-top: $spacing-lg;
     width: 100%;
+    text-transform: unset;
     @include media-up($breakpoint-sm) {
       width: auto;
     }

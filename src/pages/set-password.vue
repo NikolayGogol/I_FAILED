@@ -12,10 +12,12 @@
       <v-icon size="small">mdi-arrow-left</v-icon>
       Back
     </router-link>
-
+    <div class="d-flex justify-center d-md-none">
+      <img alt="" class="auth-logo-mobile" src="../assets/Logo.png">
+    </div>
     <h1 class="welcome-title font-weight-semibold">Set password</h1>
 
-    <div class="reset-prompt">
+    <div class="reset-prompt d-none d-sm-block">
       <span>Enter your new password below.</span>
     </div>
 
@@ -46,7 +48,7 @@
         variant="outlined"
       />
 
-      <div class="d-flex justify-center mt-6">
+      <div class="d-flex justify-center md-mt-6">
         <v-btn
           class="reset-password-btn rounded-lg"
           color="primary"
@@ -119,7 +121,3 @@
     }
   }
 </script>
-
-<style scoped>
-/* Styles are imported from set-password.scss */
-</style>

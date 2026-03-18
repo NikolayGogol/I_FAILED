@@ -107,7 +107,7 @@
       toast.success('Code verified successfully!')
 
       router.push({
-        path: '/reset-password', // Assuming this is the next step
+        path: '/set-password', // Assuming this is the next step
         query: { email: email.value, code: verificationCode },
       })
     } catch (error) {
@@ -158,7 +158,9 @@
       <v-icon size="small">mdi-arrow-left</v-icon>
       Back
     </router-link>
-
+    <div class="d-flex justify-center d-md-none">
+      <img alt="" class="auth-logo-mobile" src="../assets/Logo.png">
+    </div>
     <h1 class="welcome-title font-weight-semibold">Enter verification code</h1>
 
     <div class="verify-prompt">
@@ -167,9 +169,6 @@
 
     <v-form class="verify-form-fields" @submit.prevent="handleVerify">
       <div class="otp-inputs d-flex justify-center ga-3 w-100">
-        <!-- Using standard v-text-field or a custom input if form-input is not standard -->
-        <!-- Assuming form-input is a wrapper around v-text-field or input -->
-        <!-- We use :ref function to store refs in array -->
         <div v-for="(digit, index) in 6" :key="index" class="otp-field-wrapper">
           <input
             :ref="el => { if (el) inputRefs[index] = el }"
@@ -199,7 +198,7 @@
 
       <div class="d-flex justify-center">
         <v-btn
-          class="rounded-lg mt-4"
+          class="rounded-lg confirm-btn "
           color="primary"
           :disabled="loading || !isCodeComplete"
           :loading="loading"

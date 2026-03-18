@@ -84,6 +84,9 @@
 
 <template>
   <div class="register-form">
+    <div class="d-flex justify-center d-md-none">
+      <img alt="" class="auth-logo-mobile" src="../assets/Logo.png">
+    </div>
     <h1 class="welcome-title font-weight-semibold text-center">Sign up</h1>
 
     <div class="auth-prompt text-center">
@@ -92,11 +95,11 @@
     </div>
 
     <div class="social-buttons mt-4">
-      <v-row>
-        <v-col>
+      <v-row no-gutters>
+        <v-col class="pr-1 pr-md-2" cols="6">
           <google-login-button />
         </v-col>
-        <v-col>
+        <v-col class="pl-1 pl-md-2" cols="6">
           <facebook-login-button />
         </v-col>
       </v-row>
@@ -167,7 +170,7 @@
         />
       </div>
 
-      <div class="d-flex justify-center mt-10">
+      <div class="d-flex justify-center mb-5 mb-md-0 md-mt-10">
         <v-btn
           class="register-btn rounded-lg"
           color="primary"

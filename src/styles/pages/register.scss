@@ -8,6 +8,10 @@
   margin: 0 auto;
   padding: $spacing-md;
 
+  .auth-logo-mobile {
+    width: 48px;
+  }
+
   .welcome-title {
     text-align: center;
     color: $color-text-primary;
@@ -41,17 +45,6 @@
     }
   }
 
-  .social-buttons {
-    margin-top: $spacing-lg;
-
-    .v-row {
-      flex-direction: column;
-      @include media-up($breakpoint-sm) {
-        flex-direction: row;
-      }
-    }
-  }
-
   .separator-wrapper {
     display: flex;
     align-items: center;
@@ -77,6 +70,7 @@
   .register-btn {
     margin-top: $spacing-lg;
     width: 100%;
+    text-transform: unset;
     @include media-up($breakpoint-sm) {
       width: auto;
     }
@@ -97,7 +91,7 @@
 
     .v-field__append-inner {
       background-color: $color-surface;
-      border-radius: 0  $radius-md $radius-md 0;
+      border-radius: 0 $radius-md $radius-md 0;
 
     }
   }

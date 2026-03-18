@@ -26,7 +26,7 @@ export const useRecoveryPostStore = defineStore('recovery-post', {
           status: isScheduled ? 'scheduled' : 'published',
           scheduledAt: isScheduled ? new Date(updateData.scheduleDate) : null,
           // Only update publishedAt if we are publishing it right now
-          ...( !isScheduled && { publishedAt: serverTimestamp() } ),
+          ...(!isScheduled && { publishedAt: serverTimestamp() }),
         }
 
         // Remove scheduleDate as we use scheduledAt in DB
@@ -42,32 +42,32 @@ export const useRecoveryPostStore = defineStore('recovery-post', {
         let isMoving = true
 
         if (!docSnap.exists()) {
-           // It might already be in the target collection
-           currentDocRef = doc(db, targetCollection, id)
-           docSnap = await getDoc(currentDocRef)
-           isMoving = false
+          // It might already be in the target collection
+          currentDocRef = doc(db, targetCollection, id)
+          docSnap = await getDoc(currentDocRef)
+          isMoving = false
         }
 
         if (!docSnap.exists()) {
-            throw new Error('Post not found in either collection.')
+          throw new Error('Post not found in either collection.')
         }
 
         if (isMoving) {
-            // We need to move the document
-            const existingData = docSnap.data()
-            const newData = { ...existingData, ...formattedData }
+          // We need to move the document
+          const existingData = docSnap.data()
+          const newData = { ...existingData, ...formattedData }
 
-            // Create in target collection
-            const newDocRef = doc(db, targetCollection, id)
-            await setDoc(newDocRef, newData)
+          // Create in target collection
+          const newDocRef = doc(db, targetCollection, id)
+          await setDoc(newDocRef, newData)
 
-            // Delete from source collection
-            await deleteDoc(currentDocRef)
-            console.log(`Post moved to ${targetCollection} and updated successfully!`, id)
+          // Delete from source collection
+          await deleteDoc(currentDocRef)
+          console.log(`Post moved to ${targetCollection} and updated successfully!`, id)
         } else {
-            // Simply update in place
-            await updateDoc(currentDocRef, formattedData)
-            console.log(`Post updated successfully in ${targetCollection}!`, id)
+          // Simply update in place
+          await updateDoc(currentDocRef, formattedData)
+          console.log(`Post updated successfully in ${targetCollection}!`, id)
         }
 
         return { success: true }

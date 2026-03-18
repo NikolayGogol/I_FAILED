@@ -8,6 +8,10 @@
   margin: 0 auto;
   padding: $spacing-md;
 
+  .auth-logo-mobile {
+    width: 48px;
+  }
+
   .welcome-title {
     color: $color-text-primary;
     font-size: $font-size-xl;
@@ -45,15 +49,6 @@
     }
   }
 
-  .social-buttons {
-    .v-row {
-      flex-direction: column;
-      @include media-up($breakpoint-sm) {
-        flex-direction: row;
-      }
-    }
-  }
-
   .separator-wrapper {
     margin: $spacing-lg 0;
   }
@@ -65,20 +60,20 @@
   }
 
   .form-options {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: $spacing-md;
-    margin: $spacing-lg 0;
+    .v-label {
+      color: $color-text-secondary;
+    }
 
-    @include media-up($breakpoint-sm) {
-      flex-direction: row;
-      align-items: center;
-      justify-content: space-between;
+    .v-label, a {
+      @include media-down($breakpoint-sm) {
+        font-size: 14px;
+      }
     }
   }
 
   .login-btn {
     width: 100%;
+    text-transform: unset;
     @include media-up($breakpoint-sm) {
       width: auto;
     }

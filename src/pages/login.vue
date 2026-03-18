@@ -1,28 +1,32 @@
 <route lang="json">
 {
-  "meta": {
-    "layout": "AuthLayout"
-  }
+"meta": {
+"layout": "AuthLayout"
+}
 }
 </route>
 
 <template>
   <div class="login-form">
+    <div class="d-flex justify-center d-md-none">
+      <img alt="" class="auth-logo-mobile" src="../assets/Logo.png">
+    </div>
     <h1 class="welcome-title font-weight-semibold text-center">Welcome!</h1>
     <div class="auth-prompt text-center">
       <span>Don't have an account? </span>
       <router-link
         class="auth-link"
         to="/register"
-      >Join here</router-link>
+      >Join here
+      </router-link>
     </div>
 
     <div class="social-buttons mt-4">
-      <v-row>
-        <v-col>
+      <v-row no-gutters>
+        <v-col class="pr-1 pr-md-2" cols="6">
           <google-login-button />
         </v-col>
-        <v-col>
+        <v-col class="pl-1 pl-md-2" cols="6">
           <facebook-login-button />
         </v-col>
       </v-row>
@@ -53,11 +57,11 @@
         type="email"
         variant="outlined"
       />
-
+      <div class="mb-3 d-md-none" />
       <form-input
         v-model="password"
         autocomplete="new-password"
-        class="form-field mt-4"
+        class="form-field md-mt-4"
         density="comfortable"
         hide-details="auto"
         label="Password"
