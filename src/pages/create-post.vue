@@ -13,7 +13,7 @@
   import { useRouter } from 'vue-router'
   import AdditionalInfoPost from '@/components/AdditionalInfoPost.vue'
   import FormInput from '@/components/FormInput.vue'
-  import PrivacyPosting from '@/components/privacy-posting.vue'
+  import PrivacyPosting from '@/components/PrivacyPosting.vue'
   import { categories } from '@/models/categories.js'
   import { useCreatePostStore } from '@/stores/create-post.js'
   import { stripHtml } from '@/utils/html.js'

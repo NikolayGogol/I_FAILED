@@ -1,0 +1,61 @@
+@use '../settings.scss' as *;
+
+.mobile-slide-wrapper {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+  background-color: rgba(#000, .6);
+  z-index: 99;
+
+  .drawer-content {
+    background-color: $color-surface;
+    padding: 20px;
+    position: relative;
+    border-radius: $spacing-md $spacing-md 0 0;
+    width: 100%;
+
+    .line {
+      width: 32px;
+      height: 3px;
+      background-color: #C0C0BD;
+      border-radius: $spacing-md;
+      position: absolute;
+      top: 5px;
+      left: 50%;
+      transform: translateX(-50%);
+
+      /* Розширюємо зону для захоплення пальцем */
+      &::after {
+        content: '';
+        position: absolute;
+        top: -15px;
+        bottom: -15px;
+        left: -20px;
+        right: -20px;
+      }
+    }
+  }
+}
+
+/* Vue Transitions */
+.mobile-slide-enter-active,
+.mobile-slide-leave-active {
+  transition: opacity 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+
+  .drawer-content {
+    transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  }
+}
+
+.mobile-slide-enter-from,
+.mobile-slide-leave-to {
+  opacity: 0;
+
+  .drawer-content {
+    transform: translateY(100%);
+  }
+}

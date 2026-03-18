@@ -94,7 +94,7 @@
 </script>
 
 <template>
-  <div class="feed-page">
+  <div class="feed-page mt-4 mt-md-0">
     <section class="feed-main px-5">
       <!-- Tabs -->
       <div class="feed-tabs">
