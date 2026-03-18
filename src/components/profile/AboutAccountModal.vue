@@ -74,7 +74,7 @@
     </v-card>
   </v-dialog>
   <MobileSlide v-model="dialog" class="about-account-dialog">
-    <v-card>
+    <v-card class="elevation-0">
       <v-card-title>
         About account
       </v-card-title>

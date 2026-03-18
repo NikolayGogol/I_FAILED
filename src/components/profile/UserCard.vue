@@ -324,7 +324,7 @@
       </v-card>
     </v-dialog>
     <MobileSlide v-model="editDialog" class="d-sm-none">
-      <v-card class="edit-profile-dialog">
+      <v-card class="edit-profile-dialog elevation-0">
         <div class="d-flex justify-end">
           <v-icon class="cursor-pointer" icon="mdi-close" @click="editDialog = false" />
         </div>
