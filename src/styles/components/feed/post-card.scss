@@ -14,11 +14,7 @@
 
   @include media-down($breakpoint-sm) {
     padding: $spacing-md; // 16px on mobile
-    margin-bottom: $spacing-md;
-    border-radius: 0; // Full width look on mobile often removes border radius, but let's keep it consistent or small
-    border-left: none;
-    border-right: none;
-    border-radius: 0;
+    margin-bottom: $spacing-sm-md;
   }
 
   &:hover {

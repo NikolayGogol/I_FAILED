@@ -207,11 +207,11 @@
     </template>
     <!-- Post footer with actions -->
     <footer class="post-footer" @click="openPost">
-      <button class="icon-btn" :class="{ 'liked': isLiked }" :disabled="isLiking" @click.stop.prevent="handleLike">
+      <button class="icon-btn mr-4" :class="{ 'liked': isLiked }" :disabled="isLiking" @click.stop.prevent="handleLike">
         <v-icon size="18">{{ isLiked ? 'mdi-heart' : 'mdi-heart-outline' }}</v-icon>
         <span>{{ likeCount }}</span>
       </button>
-      <button v-if="post.allowComments" class="icon-btn">
+      <button v-if="post.allowComments" class="icon-btn mr-4">
         <v-icon size="18">mdi-comment-outline</v-icon>
         <span>{{ commentCount }}</span>
       </button>
@@ -220,7 +220,7 @@
         <span>{{ post.views }}</span>
       </button>
       <v-spacer />
-      <button class="icon-btn">
+      <button class="icon-btn mr-4">
         <v-icon size="18">mdi-bookmark-outline</v-icon>
       </button>
       <button class="icon-btn">
