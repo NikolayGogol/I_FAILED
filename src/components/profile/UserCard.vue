@@ -1,7 +1,7 @@
 <script setup>
-  // =================================================================================================
-  // Imports
-  // =================================================================================================
+// =================================================================================================
+// Imports
+// =================================================================================================
   import dayjs from 'dayjs'
   import { storeToRefs } from 'pinia'
   import { computed, onMounted, ref } from 'vue'
@@ -143,9 +143,9 @@
 
 <template>
   <div class="user-card">
-    <div class="user-card-header">
+    <div class="user-card-header d-none d-sm-flex">
       <!-- User avatar -->
-      <div class="user-avatar w-100 d-none d-sm-block">
+      <div class="user-avatar">
         <v-img
           v-if="photoURL"
           alt="Profile"
@@ -155,49 +155,8 @@
         />
         <span v-else>{{ initials }}</span>
       </div>
-      <div class="mobile-view w-100 d-flex align-center justify-space-between d-sm-none">
-        <div class="d-flex d-flex align-center">
-          <div class="user-avatar">
-            <v-img
-              v-if="photoURL"
-              alt="Profile"
-              class="h-100"
-              cover
-              :src="photoURL"
-            />
-            <span v-else>{{ initials }}</span>
-          </div>
-          <div class="user-name-row d-flex flex-column align-start ml-3">
-            <h2>{{ displayName }}</h2>
-            <p class="user-email">@{{ displayName.replaceAll(' ', '_') }}</p>
-          </div>
-        </div>
-        <div class="d-flex">
-          <div
-            v-if="isCurrentUser"
-            class="border pa-2 rounded-lg d-flex align-center justify-center"
-            @click="openEditDialog"
-            v-html="getIcon('pencil')"
-          />
-        </div>
-      </div>
-      <div class="mobile-content d-sm-none">
-        <p class="user-bio">{{ displayUser?.bio || 'Entrepreneur learning from startup failures. Sharing my journey to help others.' }}</p>
-        <div class="user-meta py-2 d-flex align-center">
-          <v-icon class="mr-1" icon="mdi-calendar-blank-outline" />
-          <span class="join-date">Joined {{ joinDate }}</span>
-        </div>
-        <div class="user-stats">
-          <span><strong>{{ followersCount }}</strong> followers</span>
-          <span class="ml-4"><strong>{{ followingCount }}</strong> following</span>
-        </div>
-        <div class="d-flex my-4">
-          <div class="user-badge">
-            Failure Age: 24.5 years
-          </div>
-        </div>
-      </div>
-      <div class="user-main-info w-100 d-none d-sm-block">
+
+      <div class="user-main-info w-100">
         <!-- User name and edit button -->
         <div class="user-name-row align-center justify-between">
           <h2>{{ displayName }}</h2>
@@ -209,7 +168,9 @@
         <!-- User handle -->
         <p class="user-email">@{{ displayName.replaceAll(' ', '_') }}</p>
         <!-- User bio -->
-        <p class="user-bio">{{ displayUser?.bio || 'Entrepreneur learning from startup failures. Sharing my journey to help others.' }}</p>
+        <p class="user-bio">{{
+          displayUser?.bio || 'Entrepreneur learning from startup failures. Sharing my journey to help others.'
+        }}</p>
         <!-- User meta data -->
         <div class="user-meta d-flex align-center">
           <v-icon class="mr-1" icon="mdi-calendar-blank-outline" />
@@ -229,8 +190,47 @@
       </div>
     </div>
 
-    <hr class="user-card-divider d-none d-md-block">
-
+    <hr class="user-card-divider d-none d-sm-flex">
+    <div class="mobile-view d-sm-none mb-4">
+      <div class="d-flex align-center justify-space-between">
+        <div class="d-flex align-center">
+          <div class="user-avatar mr-3">
+            <v-img
+              v-if="photoURL"
+              alt="Profile"
+              class="h-100"
+              cover
+              :src="photoURL"
+            />
+            <span v-else>{{ initials }}</span>
+          </div>
+          <div class="user-name-row">
+            <h2>{{ displayName }}</h2>
+            <p class="user-email">@{{ displayName.replaceAll(' ', '_') }}</p>
+          </div>
+        </div>
+        <div
+          v-if="isCurrentUser"
+          class="border pa-2 rounded-lg d-flex align-center justify-center"
+          @click="openEditDialog"
+          v-html="getIcon('pencil')"
+        />
+      </div>
+      <p class="user-bio mt-2">{{
+          displayUser?.bio || 'Entrepreneur learning from startup failures. Sharing my journey to help others.'
+        }}</p>
+      <div class="user-meta d-flex align-center my-3">
+        <v-icon class="mr-1" icon="mdi-calendar-blank-outline" />
+        <span class="join-date">Joined {{ joinDate }}</span>
+      </div>
+      <div class="user-stats">
+        <span><strong>{{ followersCount }}</strong> followers</span>
+        <span class="ml-3"><strong>{{ followingCount }}</strong> following</span>
+      </div>
+      <div class="d-flex mt-4">
+        <div class="cancel-btn">Follow</div>
+      </div>
+    </div>
     <!-- User activity stats -->
     <div v-if="displayActivity" class="user-activity-footer">
       <div class="activity-stat">
@@ -246,14 +246,14 @@
       <div class="activity-stat">
         <v-icon icon="mdi-heart-outline" />
         <span class="stat-value">{{ displayActivity.reactionsReceived }}</span>
-        <span class="stat-label d-sm-none">Reactions</span>
         <span class="stat-label d-none d-sm-block">Reactions Received</span>
+        <span class="stat-label d-sm-none">Received</span>
       </div>
       <div class="activity-stat">
         <v-icon icon="mdi-heart-outline" />
         <span class="stat-value">{{ displayActivity.reactionsGiven }}</span>
-        <span class="stat-label d-sm-none">Given</span>
         <span class="stat-label d-none d-sm-block">Reactions Given</span>
+        <span class="stat-label d-sm-none"> Given</span>
       </div>
     </div>
 
