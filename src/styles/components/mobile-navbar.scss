@@ -3,6 +3,11 @@
 .mobile-navbar {
   border-bottom: 1px solid $color-border;
   padding: 12px 20px;
+  position: sticky;
+  top: 0;
+  left: 0;
+  background-color: $color-background;
+  z-index: 9;
 
   .logo {
     width: 32px;

@@ -9,7 +9,7 @@
   display: flex;
   align-items: flex-end;
   background-color: rgba(#000, .6);
-  z-index: 99;
+  z-index: 999;
 
   .drawer-content {
     background-color: $color-surface;

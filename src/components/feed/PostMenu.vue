@@ -2,9 +2,11 @@
   import { computed, ref } from 'vue'
   import { useRouter } from 'vue-router'
   import { useToast } from 'vue-toastification'
+  import { useDisplay } from 'vuetify/framework'
   import { useAuthStore } from '@/stores/auth.js'
   import { usePostMenuStore } from '@/stores/post-menu.js'
   import '@/styles/components/feed/post-menu.scss'
+  const { smAndDown } = useDisplay()
 
   const props = defineProps({
     post: {
@@ -17,7 +19,7 @@
   const postMenuStore = usePostMenuStore()
   const router = useRouter()
   const toast = useToast()
-
+  const mobileDrawer = ref(false)
   const showBlockDialog = ref(false)
 
   const isFollowing = computed(() => {
@@ -107,12 +109,51 @@
 </script>
 
 <template>
-  <v-menu v-if="!post?.isAnonymous" open-on-hover>
-    <template #activator="{ props: menuProps }">
-      <v-btn icon size="small" v-bind="menuProps" variant="text">
-        <v-icon>mdi-dots-horizontal</v-icon>
-      </v-btn>
-    </template>
+  <div v-if="!smAndDown">
+    <v-menu v-if="!post?.isAnonymous" open-on-hover>
+      <template #activator="{ props: menuProps }">
+        <v-btn icon size="small" v-bind="menuProps" variant="text">
+          <v-icon>mdi-dots-horizontal</v-icon>
+        </v-btn>
+      </template>
+      <v-list class="rounded-lg">
+        <v-list-item class="cursor-pointer" @click="handleMutePost">
+          <v-icon class="mr-2" icon="mdi-volume-off" />
+          Hide this post
+        </v-list-item>
+
+        <template v-if="!isBlocked">
+          <v-list-item class="cursor-pointer" @click="handleFollow">
+            <v-icon class="mr-2" :icon="isFollowing ? 'mdi-account-minus-outline' : 'mdi-account-plus-outline'" />
+            {{ isFollowing ? 'Unfollow' : 'Follow' }} @{{ post.user.displayName.replaceAll(' ', '_') }}
+          </v-list-item>
+          <v-list-item class="cursor-pointer text-danger" @click="handleBlock">
+            <v-icon class="mr-2" icon="mdi-block-helper" />
+            Block this user
+          </v-list-item>
+        </template>
+
+        <template v-else>
+          <v-list-item class="cursor-pointer text-danger" @click="handleUnblock">
+            <v-icon class="mr-2" icon="mdi-account-off-outline" />
+            Unblock this user
+          </v-list-item>
+        </template>
+      </v-list>
+    </v-menu>
+  </div>
+  <div v-else>
+    <v-btn
+      v-if="!post?.isAnonymous"
+      icon
+      size="small"
+      variant="text"
+      @click="mobileDrawer = true"
+    >
+      <v-icon>mdi-dots-horizontal</v-icon>
+    </v-btn>
+  </div>
+  <MobileSlide v-model="mobileDrawer">
     <v-list class="rounded-lg">
       <v-list-item class="cursor-pointer" @click="handleMutePost">
         <v-icon class="mr-2" icon="mdi-volume-off" />
@@ -137,8 +178,7 @@
         </v-list-item>
       </template>
     </v-list>
-  </v-menu>
-
+  </MobileSlide>
   <v-dialog v-model="showBlockDialog" max-width="480">
     <div class="bg-white rounded-lg py-6 px-6">
       <h6 class="text-h6 text-center">Block @{{ post.user.displayName }}?</h6>

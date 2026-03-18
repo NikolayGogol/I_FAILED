@@ -320,9 +320,9 @@
 <template>
 
   <div v-if="post" class="single-post-page">
-    <div class="d-block">
+    <div class="d-flex align-center d-sm-block">
       <v-icon class="cursor-pointer" icon="mdi-arrow-left" @click="$router.go(-1)" />
-      <h1 class="font-weight-bold text-grey-darken-3">Post</h1>
+      <h1 class="font-weight-bold text-grey-darken-3 ml-3 ml-sm-0">Post</h1>
     </div>
     <div class="bg mt-4">
       <div class="single-post-page__header w-100 d-flex align-center justify-space-between">
@@ -405,15 +405,17 @@
         <span class="font-weight-semibold mr-2">Recovery Time:</span>
         <span class="text-grey-darken-4">{{ post.lessonLearned?.recoveryTime?.title }}</span>
       </div>
-      <div v-if="post?.emotionTags?.length" class="d-flex">
+      <div v-if="post?.emotionTags?.length" class="d-flex flex-column sm-flex-row sm-align-center">
         <span class="font-weight-semibold mr-2">Emotions:</span>
-        <v-chip
-          v-for="(chip, index) in post?.emotionTags"
-          :key="index"
-          class="mr-2"
-          size="small"
-        > {{ chip.emoji }} {{ chip.label }}
-        </v-chip>
+        <div class=" d-flex">
+          <v-chip
+            v-for="(chip, index) in post?.emotionTags"
+            :key="index"
+            class="mr-2"
+            size="small"
+          > {{ chip.emoji }} {{ chip.label }}
+          </v-chip>
+        </div>
       </div>
       <div v-if="post.tags?.length > 0" class="d-flex mt-2">
         <span class="font-weight-semibold mr-2">Tags:</span>
@@ -431,7 +433,7 @@
       >
       <v-divider class="my-6" />
       <h3>React to This Story</h3>
-      <ul class="reaction-list ga-2">
+      <ul class="reaction-list ga-1 sm-ga-2">
         <li
           v-for="(item, index) in reactions"
           :key="index"

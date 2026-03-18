@@ -2,6 +2,8 @@
 @use '@/styles/global/mixins.scss' as *;
 
 .single-post-page {
+  padding: 0 20px;
+
   .bg {
     background-color: $color-surface;
     border-radius: $radius-lg;
@@ -9,10 +11,7 @@
     padding: 15px 25px;
 
     @include media-down($breakpoint-sm) {
-      padding: $spacing-md; // Less padding on mobile
-      border-radius: 0; // Full width
-      border-left: none;
-      border-right: none;
+      padding: $spacing-md-sm; // Less padding on mobile
     }
   }
 
@@ -132,7 +131,6 @@
   .reaction-list {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px; // Add gap
 
     li {
       list-style: none;
@@ -147,6 +145,12 @@
       padding: 15px;
       cursor: pointer;
       flex: 1 1 100px; // Flex grow/shrink, min-width
+      @include media-down($breakpoint-sm) {
+        flex: unset;
+        width: 32%;
+        max-width: none;
+        padding: 5px;
+      }
 
       &.active {
         background-color: $color-accent-bg;

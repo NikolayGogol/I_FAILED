@@ -67,10 +67,10 @@
       />
       <div class="title-wrapper">
         <h1 class="page-title">Share Your Failure</h1>
-        <p class="page-subtitle">Help others learn from your experience</p>
+        <p class="page-subtitle d-none d-sm-block">Help others learn from your experience</p>
       </div>
     </div>
-
+    <p class="page-subtitle d-sm-none">Help others learn from your experience</p>
     <div class="post-card-content mt-6">
       <h5>Failure Details</h5>
       <div class="form-group">
