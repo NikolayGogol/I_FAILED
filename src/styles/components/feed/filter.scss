@@ -1,0 +1,74 @@
+@use '../../settings' as *;
+
+.filter-panel {
+  background-color: $color-surface;
+  border-radius: 0 0 $radius-md $radius-md;
+  border: 1px solid $color-border;
+  position: relative;
+  border-top: 0;
+  padding: 10px 24px 24px;
+  @include media-down($breakpoint-sm) {
+    border: none;
+    padding: 0;
+  }
+
+  &:after {
+    content: '';
+    width: calc(100% - 48px);
+    height: 1px;
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: $color-border;
+    @include media-down($breakpoint-sm) {
+      display: none;
+    }
+  }
+
+  .title {
+    color: $color-text-primary;
+    font-weight: 700;
+    font-size: 18px;
+    margin-bottom: 16px;
+  }
+
+  h5 {
+    color: $color-text-secondary;
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+
+  .clear {
+    cursor: pointer;
+    color: $color-text-quaternary;
+    font-weight: 600;
+    font-size: 14px;
+    margin-left: 24px;
+  }
+
+  .v-slide-group__content {
+    flex-wrap: wrap;
+    white-space: unset;
+    flex: unset;
+  }
+
+  .v-chip--selected {
+    border-color: $color-primary !important;
+  }
+
+  .v-chip--variant-tonal {
+    background-color: $color-surface;
+    border: 1px solid $color-border;
+
+    .v-chip__underlay, .v-chip__overlay {
+      display: none;
+    }
+  }
+
+  .v-slide-group__prev, .v-slide-group__next {
+    display: none;
+  }
+}

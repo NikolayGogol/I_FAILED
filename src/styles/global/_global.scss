@@ -1,4 +1,5 @@
 @use '../settings.scss' as *;
+@use '../global/mixins.scss' as *;
 @use 'fonts';
 
 * {
@@ -22,6 +23,9 @@
   text-align: center;
   font-size: 16px;
   font-weight: 600;
+  @include media-down($breakpoint-sm) {
+    font-size: 14px;
+  }
 }
 
 .submit-btn {
@@ -33,6 +37,9 @@
   padding: $spacing-sm $spacing-md;
   font-size: 16px;
   font-weight: 600;
+  @include media-down($breakpoint-sm) {
+    font-size: 14px;
+  }
 }
 
 .text-description {
@@ -54,6 +61,7 @@
     display: none;
   }
 }
+
 .Vue-Toastification__container {
   padding-left: 15px;
   padding-right: 15px;

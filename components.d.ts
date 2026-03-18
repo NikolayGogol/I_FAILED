@@ -18,6 +18,7 @@ declare module 'vue' {
     ContentSettings: typeof import('./src/components/settings/ContentSettings.vue')['default']
     DatePickerInput: typeof import('./src/components/DatePickerInput.vue')['default']
     FacebookLoginButton: typeof import('./src/components/FacebookLoginButton.vue')['default']
+    Filter: typeof import('./src/components/feed/Filter.vue')['default']
     FormAutocomplete: typeof import('./src/components/FormAutocomplete.vue')['default']
     FormInput: typeof import('./src/components/FormInput.vue')['default']
     FormTextarea: typeof import('./src/components/FormTextarea.vue')['default']

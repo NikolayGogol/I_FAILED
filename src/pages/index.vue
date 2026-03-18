@@ -10,12 +10,14 @@
   import { storeToRefs } from 'pinia'
   import { computed, onMounted, onUnmounted, reactive, ref } from 'vue'
   import { useToast } from 'vue-toastification'
+  import { useDisplay } from 'vuetify'
+  import Filter from '@/components/feed/Filter.vue'
   import PostCard from '@/components/feed/PostCard.vue'
-  import { categories } from '@/models/categories.js'
   import { useAuthStore } from '@/stores/auth.js'
   import { useMainStore } from '@/stores/main.js'
   import { generateRandomPost } from '@/utils/post-generator.js'
   import '@/styles/pages/index.scss'
+  const { smAndUp } = useDisplay()
   //
   const mainStore = useMainStore()
   const authStore = useAuthStore()
@@ -29,13 +31,6 @@
   if (authStore.user) {
     tabs.push({ label: 'For You', value: 'for-you' })
   }
-  const selectedFilter = reactive({
-    categories: [],
-    emojiTags: [],
-    recoveryTime: [],
-    costRange: [],
-    postedBy: null,
-  })
 
   function selectTab (tab) {
     window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -62,20 +57,6 @@
 
   function toggleFilter () {
     isFilterPanel.value = !isFilterPanel.value
-  }
-
-  function applyFilters () {
-    mainStore.applyPostFilters(selectedFilter)
-    isFilterPanel.value = false
-  }
-
-  function clearFilters () {
-    selectedFilter.categories = []
-    selectedFilter.emojiTags = []
-    selectedFilter.recoveryTime = []
-    selectedFilter.costRange = []
-    selectedFilter.postedBy = null
-    mainStore.applyPostFilters(selectedFilter)
   }
 
   async function handleGeneratePost () {
@@ -113,15 +94,15 @@
       <div
         class="composer-card"
         :class="[
-          {'mb-6': !isFilterPanel},
-          {'card-open': isFilterPanel},
+          {'mb-2 sm-mb-6': !isFilterPanel},
+          {'card-open': smAndUp && isFilterPanel},
         ]"
       >
         <div class="d-flex">
           <div class="font-weight-semibold cancel-btn" @click="$router.push('/create-post')">
             New failure
           </div>
-          <div v-if="isDevMode" class="cancel-btn font-weight-semibold ml-2" @click="handleGeneratePost">
+          <div v-if="isDevMode" class="cancel-btn font-weight-semibold ml-2 d-none d-md-block" @click="handleGeneratePost">
             Generate Post
           </div>
         </div>
@@ -129,22 +110,14 @@
           <v-icon icon="mdi-filter-variant" @click="toggleFilter" />
         </div>
       </div>
-      <div v-if="isFilterPanel" class="filter-panel">
-        <h5>Category</h5>
-        <v-chip-group v-model="selectedFilter.categories" multiple>
-          <v-chip
-            v-for="item in categories"
-            :key="item.id"
-            color="primary"
-            :text="item.label"
-            :value="item"
-          />
-        </v-chip-group>
-        <div class="d-flex align-center mt-6">
-          <div class="submit-btn" @click="applyFilters">Apply</div>
-          <div class="clear" @click="clearFilters">Clear all filters</div>
-        </div>
-      </div>
+      <template v-if="isFilterPanel && smAndUp">
+        <Filter />
+      </template>
+      <template v-if="!smAndUp">
+        <MobileSlide v-model="isFilterPanel">
+          <Filter title="Filter" />
+        </MobileSlide>
+      </template>
       <!-- Posts -->
       <div v-if="loading && posts.length === 0" class="text-center py-10">
         Loading...
@@ -155,7 +128,7 @@
       <PostCard
         v-for="post in posts"
         :key="post.id"
-        :class="{'mt-6': isFilterPanel}"
+        :class="{'mt-2 sm-mt-6': isFilterPanel}"
         :post="post"
       />
       <div v-if="loading && posts.length > 0" class="text-center py-4">
