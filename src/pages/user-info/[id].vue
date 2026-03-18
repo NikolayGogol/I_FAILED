@@ -194,7 +194,7 @@
         <template #follow-action>
           <button
             v-if="!isCurrentUser"
-            class="cancel-btn mt-3 mr-2"
+            class="cancel-btn mt-3 mr-2 w-50"
             @click="toggleFollow"
           >
             {{ isFollowing ? 'Unfollow' : 'Follow' }}
