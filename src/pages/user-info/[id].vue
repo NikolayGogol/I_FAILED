@@ -191,6 +191,49 @@
             </v-menu>
           </div>
         </template>
+        <template #follow-action>
+          <button
+            v-if="!isCurrentUser"
+            class="cancel-btn mt-3 mr-2"
+            @click="toggleFollow"
+          >
+            {{ isFollowing ? 'Unfollow' : 'Follow' }}
+          </button>
+        </template>
+        <template #dropdown-actions>
+          <v-menu location="bottom end" open-on-hover>
+            <template #activator="{ props }">
+              <v-btn
+                class="border rounded-lg"
+                icon="mdi-dots-horizontal"
+                size="small"
+                variant="text"
+                v-bind="props"
+              />
+            </template>
+            <v-list>
+              <v-list-item @click="aboutAccount">
+                <v-list-item-title>
+                  <v-icon class="mr-2" icon="mdi-information-outline" />
+                  About this account
+                </v-list-item-title>
+              </v-list-item>
+              <v-list-item @click="copyProfileLink">
+                <v-list-item-title>
+                  <v-icon class="mr-2" icon="mdi-paperclip" />
+                  Copy link to profile
+                </v-list-item-title>
+              </v-list-item>
+              <v-list-item v-if="!isCurrentUser" class="text-error" @click="blockUser">
+                <v-list-item-title>
+                  <v-icon class="mr-2" icon="mdi-block-helper" />
+                  Block this user
+                </v-list-item-title>
+              </v-list-item>
+            </v-list>
+          </v-menu>
+
+        </template>
       </UserCard>
 
       <!-- User's content feed -->

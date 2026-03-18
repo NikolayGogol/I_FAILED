@@ -215,6 +215,7 @@
           @click="openEditDialog"
           v-html="getIcon('pencil')"
         />
+        <slot name="dropdown-actions"></slot>
       </div>
       <p class="user-bio mt-2">{{
           displayUser?.bio || 'Entrepreneur learning from startup failures. Sharing my journey to help others.'
@@ -227,9 +228,10 @@
         <span><strong>{{ followersCount }}</strong> followers</span>
         <span class="ml-3"><strong>{{ followingCount }}</strong> following</span>
       </div>
-      <div class="d-flex mt-4">
-        <div class="cancel-btn">Follow</div>
-      </div>
+      <slot name="follow-action"></slot>
+<!--      <div class="d-flex mt-4">-->
+<!--        <div class="cancel-btn">Follow</div>-->
+<!--      </div>-->
     </div>
     <!-- User activity stats -->
     <div v-if="displayActivity" class="user-activity-footer">
