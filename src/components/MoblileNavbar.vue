@@ -1,13 +1,17 @@
 <script setup>
 
   import { computed, ref } from 'vue'
+  import { useRouter } from 'vue-router'
   import MobileSlide from '@/components/MobileSlide.vue'
   import Sidebar from '@/components/sidebars/Sidebar.vue'
   import { useAuthStore } from '@/stores/auth.js'
   import '@/styles/components/mobile-navbar.scss'
 
+  const logoutDialog = ref(false)
+
   const drawer = ref(false)
   const authStore = useAuthStore()
+  const router = useRouter()
   //
   const currentUserName = computed(() => authStore.user?.displayName)
   const currentUserPhoto = computed(() => authStore.user?.photoURL)
@@ -23,6 +27,22 @@
     }
     return (parts[0].charAt(0) + parts[1].charAt(0)).toUpperCase()
   })
+
+  function goTo (path) {
+    router.push(path)
+    drawer.value = false
+  }
+
+  function handleLogout () {
+    logoutDialog.value = true
+  }
+
+  async function confirmLogout () {
+    await authStore.logout()
+    logoutDialog.value = false
+    drawer.value = false
+    await router.push('/login')
+  }
 </script>
 
 <template>
@@ -48,8 +68,59 @@
       </div>
     </div>
     <MobileSlide v-model="drawer">
-      Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquid autem cum, dolor dolorem ducimus eligendi excepturi, exercitationem facilis fugit itaque laborum natus nemo perferendis perspiciatis quia sint tenetur velit voluptates!
+      <ul class="mobile-navbar-list">
+        <li v-if="authStore.user" @click="goTo('/profile')">
+          <div class="profile-avatar mr-3" @click="drawer = true">
+            <v-img
+              v-if="currentUserPhoto"
+              alt="Profile"
+              class="h-100 rounded-xl"
+              cover
+              :src="currentUserPhoto"
+            />
+            <span v-else>{{ currentUserInitials }}</span>
+          </div>
+          Profile
+        </li>
+        <li v-if="authStore.user" @click="goTo('/settings')">
+          <v-icon class="mr-4" icon="mdi-cog-outline" />
+          Settings
+        </li>
+        <li
+          v-if="authStore.user"
+          class="text-danger"
+          @click="handleLogout"
+        >
+          <v-icon class="mr-4" icon="mdi-logout" />
+          Sign out
+        </li>
+        <li v-else class="text-danger" @click="goTo('/login')">
+          <v-icon class="mr-4" icon="mdi-logout" />
+          Sign in
+        </li>
+      </ul>
     </MobileSlide>
+    <v-dialog v-model="logoutDialog" max-width="400">
+      <v-card class="logout-dialog-card py-6">
+        <v-card-title class="text-center">Sign out?</v-card-title>
+        <v-card-text class="text-center pt-0">
+          Are you sure you want to sign out?
+        </v-card-text>
+        <v-row class="px-6">
+          <v-col>
+            <div class="cancel-btn" @click="logoutDialog = false">Cancel</div>
+          </v-col>
+          <v-col>
+            <div
+              class="submit-btn"
+              @click="confirmLogout"
+            >Sign out
+            </div>
+          </v-col>
+        </v-row>
+      </v-card>
+    </v-dialog>
+
     <!--    <v-navigation-drawer-->
     <!--      v-if="!mdAndUp"-->
     <!--      v-model="drawer"-->
