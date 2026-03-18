@@ -2,13 +2,16 @@
 
   import { computed, ref } from 'vue'
   import { useRouter } from 'vue-router'
+  import { useDisplay } from 'vuetify'
   import MobileSlide from '@/components/MobileSlide.vue'
   import { useAuthStore } from '@/stores/auth.js'
   import '@/styles/components/mobile-navbar.scss'
+  const { mdAndUp } = useDisplay()
 
   const logoutDialog = ref(false)
 
   const drawer = ref(false)
+  const aside = ref(false)
   const authStore = useAuthStore()
   const router = useRouter()
   //
@@ -48,7 +51,7 @@
   <v-container class="mobile-navbar">
     <div class="d-flex align-center justify-space-between">
       <div class="d-flex align-center">
-        <v-icon icon="mdi-menu" />
+        <v-icon icon="mdi-menu" @click="aside = !aside" />
         <img alt="" class="logo ml-4" src="../assets/Logo.png" @click="$router.push('/')">
       </div>
       <div class="d-flex align-center">
@@ -119,16 +122,16 @@
         </v-row>
       </v-card>
     </v-dialog>
-
-    <!--    <v-navigation-drawer-->
-    <!--      v-if="!mdAndUp"-->
-    <!--      v-model="drawer"-->
-    <!--      app-->
-    <!--      temporary-->
-    <!--      width="280"-->
-    <!--    >-->
-    <!--      <Sidebar />-->
-    <!--    </v-navigation-drawer>-->
+    <v-navigation-drawer
+      v-if="!mdAndUp"
+      v-model="aside"
+      app
+      temporary
+      width="280"
+    >
+      <v-icon class="mt-3 ml-3" icon="mdi-close" @click="aside = false" />
+      <Sidebar />
+    </v-navigation-drawer>
   </v-container>
 </template>
 

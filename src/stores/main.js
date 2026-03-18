@@ -1,7 +1,18 @@
 // =================================================================================================
 // Imports
 // =================================================================================================
-import { collection, doc, getCountFromServer, getDoc, getDocs, limit, orderBy, query, startAfter, where } from 'firebase/firestore'
+import {
+  collection,
+  doc,
+  getCountFromServer,
+  getDoc,
+  getDocs,
+  limit,
+  orderBy,
+  query,
+  startAfter,
+  where,
+} from 'firebase/firestore'
 import { defineStore } from 'pinia'
 import { db } from '@/firebase'
 import { useAuthStore } from '@/stores/auth'
@@ -23,6 +34,7 @@ export const useMainStore = defineStore('main', {
     loading: false,
     activeTab: 'latest',
     totalPosts: 0, // State to hold the total count
+    lessonsShared: 0, // State to hold the total count
     currentFilters: null,
     allPosts: [], // To store all fetched posts before filtering
   }),
@@ -63,15 +75,20 @@ export const useMainStore = defineStore('main', {
             return false
           }
           switch (range.label) {
-            case '<$100': { return postCost > 0 && postCost < 100
+            case '<$100': {
+              return postCost > 0 && postCost < 100
             }
-            case '$100 - $1k': { return postCost >= 100 && postCost <= 1000
+            case '$100 - $1k': {
+              return postCost >= 100 && postCost <= 1000
             }
-            case '$1k - $5k': { return postCost > 1000 && postCost <= 5000
+            case '$1k - $5k': {
+              return postCost > 1000 && postCost <= 5000
             }
-            case '$5k+': { return postCost > 5000
+            case '$5k+': {
+              return postCost > 5000
             }
-            default: { return false
+            default: {
+              return false
             }
           }
         })
@@ -89,6 +106,9 @@ export const useMainStore = defineStore('main', {
         const postsRef = collection(db, collection_db)
         const snapshot = await getCountFromServer(postsRef)
         this.totalPosts = snapshot.data().count
+        const q = query(postsRef, where('lessonLearned', '!=', null))
+        const snapshot2 = await getCountFromServer(q)
+        this.lessonsShared = snapshot2.data().count
       } catch (error) {
         console.error('Error fetching total post count:', error)
       }
@@ -186,7 +206,12 @@ export const useMainStore = defineStore('main', {
             if (postData.uid && !postData.isAnonymous) {
               const userRef = doc(db, USER_COLLECTION, postData.uid)
               const userSnap = await getDoc(userRef)
-              finalPost.user = userSnap.exists() ? { ...finalPost.user, ...userSnap.data(), uid: userSnap.id } : { ...finalPost.user, uid: postData.uid }
+              finalPost.user = userSnap.exists()
+                ? {
+                    ...finalPost.user, ...userSnap.data(),
+                    uid: userSnap.id,
+                  }
+                : { ...finalPost.user, uid: postData.uid }
             }
             newPosts.push(finalPost)
           }

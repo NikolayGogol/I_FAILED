@@ -13,6 +13,7 @@
 
   // Use a computed property to reactively get the total posts count from the store
   const totalPosts = computed(() => mainStore.totalPosts)
+  const lessonsShared = computed(() => mainStore.lessonsShared)
 
   // Fetch the total count when the component is mounted
   onMounted(() => {
@@ -55,7 +56,7 @@
       </div>
       <div class="stat-row">
         <span>Lessons Shared</span>
-        <span class="stat-value font-weight-bold">0</span>
+        <span class="stat-value font-weight-bold">{{ lessonsShared }}</span>
       </div>
     </section>
 
