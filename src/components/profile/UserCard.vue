@@ -7,6 +7,7 @@
   import { computed, onMounted, ref } from 'vue'
   import { useToast } from 'vue-toastification'
   import FormTextarea from '@/components/FormTextarea.vue'
+  import { getIcon } from '@/models/icons.js'
   import { useAuthStore } from '@/stores/auth.js'
   import { useProfileStore } from '@/stores/profile.js'
   import '@/styles/components/profile/user-card.scss'
@@ -144,7 +145,7 @@
   <div class="user-card">
     <div class="user-card-header">
       <!-- User avatar -->
-      <div class="user-avatar">
+      <div class="user-avatar w-100 d-none d-sm-block">
         <v-img
           v-if="photoURL"
           alt="Profile"
@@ -154,8 +155,49 @@
         />
         <span v-else>{{ initials }}</span>
       </div>
-
-      <div class="user-main-info w-100">
+      <div class="mobile-view w-100 d-flex align-center justify-space-between d-sm-none">
+        <div class="d-flex d-flex align-center">
+          <div class="user-avatar">
+            <v-img
+              v-if="photoURL"
+              alt="Profile"
+              class="h-100"
+              cover
+              :src="photoURL"
+            />
+            <span v-else>{{ initials }}</span>
+          </div>
+          <div class="user-name-row d-flex flex-column align-start ml-3">
+            <h2>{{ displayName }}</h2>
+            <p class="user-email">@{{ displayName.replaceAll(' ', '_') }}</p>
+          </div>
+        </div>
+        <div class="d-flex">
+          <div
+            v-if="isCurrentUser"
+            class="border pa-2 rounded-lg d-flex align-center justify-center"
+            @click="openEditDialog"
+            v-html="getIcon('pencil')"
+          />
+        </div>
+      </div>
+      <div class="mobile-content d-sm-none">
+        <p class="user-bio">{{ displayUser?.bio || 'Entrepreneur learning from startup failures. Sharing my journey to help others.' }}</p>
+        <div class="user-meta py-2 d-flex align-center">
+          <v-icon class="mr-1" icon="mdi-calendar-blank-outline" />
+          <span class="join-date">Joined {{ joinDate }}</span>
+        </div>
+        <div class="user-stats">
+          <span><strong>{{ followersCount }}</strong> followers</span>
+          <span class="ml-4"><strong>{{ followingCount }}</strong> following</span>
+        </div>
+        <div class="d-flex my-4">
+          <div class="user-badge">
+            Failure Age: 24.5 years
+          </div>
+        </div>
+      </div>
+      <div class="user-main-info w-100 d-none d-sm-block">
         <!-- User name and edit button -->
         <div class="user-name-row align-center justify-between">
           <h2>{{ displayName }}</h2>
@@ -187,7 +229,7 @@
       </div>
     </div>
 
-    <hr class="user-card-divider">
+    <hr class="user-card-divider d-none d-md-block">
 
     <!-- User activity stats -->
     <div v-if="displayActivity" class="user-activity-footer">
@@ -204,12 +246,14 @@
       <div class="activity-stat">
         <v-icon icon="mdi-heart-outline" />
         <span class="stat-value">{{ displayActivity.reactionsReceived }}</span>
-        <span class="stat-label">Reactions Received</span>
+        <span class="stat-label d-sm-none">Reactions</span>
+        <span class="stat-label d-none d-sm-block">Reactions Received</span>
       </div>
       <div class="activity-stat">
         <v-icon icon="mdi-heart-outline" />
         <span class="stat-value">{{ displayActivity.reactionsGiven }}</span>
-        <span class="stat-label">Reactions Given</span>
+        <span class="stat-label d-sm-none">Given</span>
+        <span class="stat-label d-none d-sm-block">Reactions Given</span>
       </div>
     </div>
 

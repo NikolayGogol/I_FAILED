@@ -51,6 +51,9 @@
       border-radius: $radius-lg;
       padding: $spacing-md;
       margin-bottom: $spacing-lg;
+      @include media-down($breakpoint-sm) {
+        margin-bottom: 10px;
+      }
 
       .create-post-content {
         display: flex;
@@ -97,6 +100,9 @@
       display: flex;
       flex-direction: column;
       gap: $spacing-lg;
+      @include media-down($breakpoint-sm) {
+        gap: $spacing-sm-md;
+      }
     }
   }
 }

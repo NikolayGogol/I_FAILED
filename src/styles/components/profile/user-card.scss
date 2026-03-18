@@ -8,10 +8,8 @@
   padding: 24px;
 
   @include media-down($breakpoint-sm) {
-    padding: $spacing-md;
-    border-radius: 0;
-    border-left: none;
-    border-right: none;
+    margin-top: 24px;
+    padding: 12px;
   }
 
   .user-card-header {
@@ -134,15 +132,16 @@
       }
     }
 
-    .user-badge {
-      background-color: #F9EAD5;
-      color: #D65A1F;
-      padding: 8px 12px;
-      border-radius: $radius-xs;
-      display: inline-block;
-      font-weight: 600;
-      font-size: 12px;
-    }
+  }
+
+  .user-badge {
+    background-color: #F9EAD5;
+    color: #D65A1F;
+    padding: 8px 12px;
+    border-radius: $radius-xs;
+    display: inline-block;
+    font-weight: 600;
+    font-size: 12px;
   }
 
   .user-card-divider {
@@ -151,15 +150,67 @@
     margin: $spacing-xl 0;
   }
 
+  .mobile-view {
+    .user-avatar {
+      width: 56px;
+      height: 56px;
+    }
+
+    .user-name-row {
+      h2 {
+        font-weight: 700;
+        font-size: 16px;
+        color: $color-text-primary;
+      }
+
+      .user-email {
+        color: $color-text-quaternary;
+        font-size: 14px;
+      }
+    }
+  }
+
+  .mobile-content {
+    .user-bio {
+      font-size: 14px;
+      color: $color-text-primary;
+      text-align: left;
+    }
+
+    .user-meta {
+      color: $color-text-quaternary;
+      font-size: 14px;
+    }
+
+    .user-stats {
+      display: flex;
+      justify-content: flex-start;
+
+      span {
+        color: $color-text-quaternary;
+        font-size: 14px;
+
+        strong {
+          color: $color-text-primary;
+          margin-right: 5px;
+          font-size: 16px;
+        }
+      }
+    }
+  }
+
   .user-activity-footer {
     display: flex;
     justify-content: space-around;
     flex-wrap: wrap;
-    gap: $spacing-md;
+    @include media-up($breakpoint-sm) {
+      gap: $spacing-md;
+    }
+
 
     .activity-stat {
       text-align: center;
-      width: 45%; // Two items per row on mobile
+      width: 25%; // Two items per row on mobile
 
       @include media-up($breakpoint-sm) {
         width: 22%; // Four items on larger screens
@@ -180,6 +231,9 @@
       .stat-label {
         font-size: 14px;
         color: $color-text-secondary;
+        @include media-down($breakpoint-sm) {
+          font-size: 12px;
+        }
       }
     }
   }
