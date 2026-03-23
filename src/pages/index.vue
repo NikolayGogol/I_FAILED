@@ -34,9 +34,6 @@
 
   function selectTab (tab) {
     window.scrollTo({ top: 0, behavior: 'smooth' })
-    if (tab.value === 'for-you') {
-      console.log('for you')
-    }
     mainStore.fetchPosts({ tab: tab.value, refresh: true })
   }
 
