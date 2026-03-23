@@ -6,6 +6,7 @@
   import { useAuthStore } from '@/stores/auth.js'
   import { usePostMenuStore } from '@/stores/post-menu.js'
   import '@/styles/components/feed/post-menu.scss'
+  import {getIcon} from "@/models/icons.js";
   const { smAndDown } = useDisplay()
 
   const props = defineProps({
@@ -118,7 +119,7 @@
       </template>
       <v-list class="rounded-xl elevation-1">
         <v-list-item class="cursor-pointer" @click="handleMutePost">
-          <v-icon class="mr-2" icon="mdi-volume-off" />
+          <div class="mr-2" v-html="getIcon('mute')" />
           Hide this post
         </v-list-item>
 
@@ -198,3 +199,9 @@
     </div>
   </v-dialog>
 </template>
+<style scoped lang="scss">
+:deep(.v-list-item__content) {
+  display: flex;
+  align-items: center;
+}
+</style>

@@ -1,9 +1,9 @@
 const icons = [
   {
     name: 'home',
-    icon: '<svg width="22" height="22" class="fill-current" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">\n'
+    icon: String.raw`<svg width="22" height="22" class="fill-current" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">\n'
       + '<path d="M20.75 9.11089V13.9239C20.75 16.1641 20.75 17.2843 20.314 18.1399C19.9305 18.8925 19.3186 19.5045 18.566 19.888C17.7103 20.3239 16.5902 20.3239 14.35 20.3239H13.5278V16.2596C13.5278 14.7255 12.2841 13.4818 10.75 13.4818C9.21588 13.4818 7.97223 14.7255 7.97223 16.2596V20.3239L7.15003 20.3239C4.90981 20.3239 3.78971 20.3239 2.93406 19.888C2.1814 19.5045 1.56948 18.8925 1.18598 18.1399C0.750007 17.2842 0.750006 16.1641 0.750004 13.9239L0.75 9.11091C0.749999 7.64267 0.749996 6.90851 0.977019 6.26372C1.17774 5.69362 1.50503 5.17643 1.93432 4.75099C2.41987 4.26979 3.08333 3.95552 4.41026 3.32698L8.0103 1.62171C9.01695 1.14487 9.52029 0.906453 10.0459 0.812458C10.5117 0.72918 10.9884 0.729181 11.4542 0.812461C11.9798 0.906458 12.4831 1.14488 13.4898 1.62172L17.0898 3.32697C18.4167 3.95552 19.0801 4.26979 19.5657 4.75098C19.995 5.17643 20.3223 5.69362 20.523 6.26371C20.75 6.9085 20.75 7.64263 20.75 9.11089Z" fill="#808079" stroke="#808079" stroke-width="1.5" stroke-linecap="round"/>\n'
-      + '</svg>',
+      + '</svg>`,
   },
   {
     name: 'search',
@@ -109,22 +109,40 @@ const icons = [
       + '</svg>\n',
   },
   {
-    name: '',
-    icon: '',
+    name: 'people',
+    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">\n' +
+      '<path d="M17.7891 6.15815H21.9996" stroke="#1C1C1B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>\n' +
+      '<path d="M19.8955 8.26326V4.05273" stroke="#1C1C1B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>\n' +
+      '<path d="M16.7368 18.7892V19.8418C16.7368 20.4228 16.2653 20.8944 15.6842 20.8944H3.05263C2.47158 20.8944 2 20.4228 2 19.8418V18.7892V18.7723C2 15.5871 5.64 13.5176 9.36842 13.5176C13.0968 13.5176 16.7368 15.5881 16.7368 18.7723" stroke="#1C1C1B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>\n' +
+      '<path d="M11.9683 4.07661C13.4038 5.5121 13.4038 7.83948 11.9683 9.27496C10.5328 10.7104 8.20546 10.7104 6.76997 9.27496C5.33449 7.83948 5.33449 5.5121 6.76997 4.07661C8.20546 2.64113 10.5328 2.64113 11.9683 4.07661" stroke="#1C1C1B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>\n' +
+      '</svg>\n',
   },
   {
-    name: '',
-    icon: '',
+    name: 'mute',
+    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">\n' +
+      '<path d="M7.125 15.7509H6C5.80109 15.7509 5.61032 15.6719 5.46967 15.5313C5.32902 15.3906 5.25 15.1998 5.25 15.0009V9.00092C5.25 8.80201 5.32902 8.61124 5.46967 8.47059C5.61032 8.32994 5.80109 8.25092 6 8.25092H11.25L16.1895 3.31142C17.1345 2.36642 18.75 3.03617 18.75 4.37192V4.50092M18.75 10.8759V19.6299C18.75 20.9657 17.1345 21.6354 16.1895 20.6904L12.75 17.2509M5.25 21.0009L21.75 4.50092" stroke="#1C1C1B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>\n' +
+      '</svg>\n',
   },
   {
-    name: '',
-    icon: '',
+    name: 'stop',
+    icon: '<svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">\n' +
+      '<path d="M10.75 20.75C16.2728 20.75 20.75 16.2728 20.75 10.75C20.75 5.22715 16.2728 0.75 10.75 0.75C5.22715 0.75 0.75 5.22715 0.75 10.75C0.75 16.2728 5.22715 20.75 10.75 20.75Z" stroke="#C8372B" stroke-width="1.5"/>\n' +
+      '<path d="M3.75 17.75L17.75 3.75" stroke="#C8372B" stroke-width="1.5"/>\n' +
+      '</svg>\n',
   },
   {
     name: '',
     icon: '',
   },
 ]
-export function getIcon (name) {
-  return icons.find(icon => icon.name.toLowerCase().trim() === name.toLowerCase().trim())?.icon || ''
+export function getIcon (name, w = 0, h = 0) {
+  let i = icons.find(icon => icon.name.toLowerCase().trim() === name.toLowerCase().trim())?.icon
+  if (i && w > 0) {
+    i = i.replace(/width="[^"]*"/, `width="${w}"`)
+  }
+  if (i && h > 0) {
+    i = i.replace(/height="[^"]*"/, `height="${h}"`)
+  }
+  console.log(i)
+  return i
 }

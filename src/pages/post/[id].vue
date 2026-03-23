@@ -24,7 +24,7 @@
   import { usePostCardStore } from '@/stores/post-card.js'
   import { useCommentMenuStore } from '@/stores/single-post/comment-menu.js'
   import { useSinglePostStore } from '@/stores/single-post/single-post.js'
-  import {floatNumber, formatNumber} from '@/utils/format-number.js'
+  import { floatNumber, formatNumber } from '@/utils/format-number.js'
   import 'vue3-emoji-picker/css'
   import '@/styles/pages/single-post.scss'
 
