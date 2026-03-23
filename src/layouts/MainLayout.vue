@@ -71,7 +71,8 @@
 .sticky-sidebar {
   position: sticky;
   top: 15px;
-  height: calc(100vh - 80px);
+  height: 100vh;
+  //height: calc(100vh - 80px);
   overflow-y: auto;
 
   /* Hide scrollbar for Chrome, Safari and Opera */
