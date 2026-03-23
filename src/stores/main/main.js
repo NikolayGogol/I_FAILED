@@ -39,6 +39,9 @@ export const useMainStore = defineStore('main', {
     currentFilters: null,
     allPosts: [], // To store all fetched posts before filtering
     savedFiltersBeforeForYou: null,
+    // Cache user docs to avoid repeated Firestore reads in the feed.
+    // Key: uid, Value: { ...userDocData, uid }
+    userCache: {},
   }),
   getters: {
     filteredPosts (state) {
@@ -190,7 +193,7 @@ export const useMainStore = defineStore('main', {
      * Loads categories the user reads most (from `VITE_USER_CATEGORY_READS_COLLECTION`)
      * and returns normalized objects suitable for post filtering: { id, label, count }.
      */
-    async fetchTopCategoriesForUserForYou ({ userId, limit = 5 } = {}) {
+    async fetchTopCategoriesForUserForYou ({ userId, limit: topLimit = 5 } = {}) {
       if (!userId) {
         return []
       }
@@ -199,29 +202,49 @@ export const useMainStore = defineStore('main', {
         return []
       }
       try {
-        const q = query(
-          collection(db, user_category_reads_collection),
-          where('uid', '==', userId),
-        )
-        const snapshot = await getDocs(q)
+        // Use server-side ordering to avoid fetching all docs + client sorting.
+        // If the required composite index is missing, we fall back to client sorting.
+        try {
+          const q = query(
+            collection(db, user_category_reads_collection),
+            where('uid', '==', userId),
+            orderBy('count', 'desc'),
+            limit(topLimit),
+          )
+          const snapshot = await getDocs(q)
+          return snapshot.docs.map(d => {
+            const data = d.data() || {}
+            return {
+              id: data.categoryId,
+              label: data.categoryLabel,
+              count: data.count || 0,
+            }
+          })
+        } catch {
+          const q = query(
+            collection(db, user_category_reads_collection),
+            where('uid', '==', userId),
+          )
+          const snapshot = await getDocs(q)
 
-        const rawDocs = snapshot.docs.map(d => {
-          const data = d.data() || {}
-          return {
-            docId: d.id,
-            categoryId: data.categoryId,
-            categoryLabel: data.categoryLabel,
-            count: data.count || 0,
-          }
-        })
+          const rawDocs = snapshot.docs.map(d => {
+            const data = d.data() || {}
+            return {
+              docId: d.id,
+              categoryId: data.categoryId,
+              categoryLabel: data.categoryLabel,
+              count: data.count || 0,
+            }
+          })
 
-        rawDocs.sort((a, b) => (b.count || 0) - (a.count || 0))
+          rawDocs.sort((a, b) => (b.count || 0) - (a.count || 0))
 
-        return rawDocs.slice(0, limit).map(d => ({
-          id: d.categoryId,
-          label: d.categoryLabel,
-          count: d.count,
-        }))
+          return rawDocs.slice(0, topLimit).map(d => ({
+            id: d.categoryId,
+            label: d.categoryLabel,
+            count: d.count,
+          }))
+        }
       } catch (error) {
         console.error('[For You] Error fetching top categories:', error)
         return []
@@ -307,6 +330,12 @@ export const useMainStore = defineStore('main', {
         const postsRef = collection(db, collection_db)
         const queryConstraints = []
 
+        // For the first "For You" load, fetch more posts so we hit enough matches
+        // before the client-side bucketing logic in `filteredPosts`.
+        const effectivePageSize = (this.activeTab === 'for-you' && this.allPosts.length === 0)
+          ? Math.max(pageSize * 3, 20)
+          : pageSize
+
         if (this.activeTab === 'for-you' // Set category filters based on what the user reads most.
           && (!this.currentFilters || !this.currentFilters.categories || this.currentFilters.categories.length === 0)) {
           const topCategories = await this.fetchTopCategoriesForUserForYou({
@@ -332,7 +361,7 @@ export const useMainStore = defineStore('main', {
         if (this.lastVisible) {
           queryConstraints.push(startAfter(this.lastVisible))
         }
-        queryConstraints.push(limit(pageSize))
+        queryConstraints.push(limit(effectivePageSize))
 
         const q = query(postsRef, ...queryConstraints)
         const querySnapshot = await getDocs(q)
@@ -341,12 +370,40 @@ export const useMainStore = defineStore('main', {
           this.hasMore = false
         } else {
           this.lastVisible = querySnapshot.docs.at(-1)
-          if (querySnapshot.docs.length < pageSize) {
+          if (querySnapshot.docs.length < effectivePageSize) {
             this.hasMore = false
           }
 
           const newPosts = []
           const blockedUsers = authStore.user?.blockedUsers || []
+          const userUidsToFetch = new Set()
+
+          for (const postDoc of querySnapshot.docs) {
+            const postData = postDoc.data()
+            if (blockedUsers.includes(postData.uid)) {
+              continue
+            }
+
+            if (postData.uid && !postData.isAnonymous && !this.userCache[postData.uid]) {
+              userUidsToFetch.add(postData.uid)
+            }
+          }
+
+          // Fetch all needed users in parallel (and cache them) to avoid N+1 reads.
+          if (userUidsToFetch.size > 0) {
+            await Promise.all(Array.from(userUidsToFetch).map(async uid => {
+              try {
+                const userRef = doc(db, USER_COLLECTION, uid)
+                const userSnap = await getDoc(userRef)
+                const data = userSnap.exists() ? userSnap.data() : null
+                this.userCache[uid] = data
+                  ? { ...data, uid }
+                  : { uid }
+              } catch {
+                this.userCache[uid] = { uid }
+              }
+            }))
+          }
 
           for (const postDoc of querySnapshot.docs) {
             const postData = postDoc.data()
@@ -356,14 +413,8 @@ export const useMainStore = defineStore('main', {
 
             const finalPost = { id: postDoc.id, ...postData }
             if (postData.uid && !postData.isAnonymous) {
-              const userRef = doc(db, USER_COLLECTION, postData.uid)
-              const userSnap = await getDoc(userRef)
-              finalPost.user = userSnap.exists()
-                ? {
-                    ...finalPost.user, ...userSnap.data(),
-                    uid: userSnap.id,
-                  }
-                : { ...finalPost.user, uid: postData.uid }
+              const cachedUser = this.userCache[postData.uid]
+              finalPost.user = cachedUser ? { ...finalPost.user, ...cachedUser, uid: postData.uid } : { ...finalPost.user, uid: postData.uid }
             }
             newPosts.push(finalPost)
           }
