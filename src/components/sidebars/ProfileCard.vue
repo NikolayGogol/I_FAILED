@@ -52,11 +52,11 @@
 
 <template>
   <section class="right-card profile-card">
-    <div class="profile-top w-100">
+    <div v-if="currentUserName" class="profile-top w-100">
       <v-menu class="w-100" content-class="profile-menu" open-on-hover>
         <template #activator="{ props }">
           <div class="d-flex align-center justify-between w-100" v-bind="props">
-            <template v-if="currentUserName">
+            <template>
               <div class="profile-avatar mr-2">
                 <v-img
                   v-if="currentUserPhoto"
@@ -105,19 +105,15 @@
               Sign out
             </v-list-item-title>
           </v-list-item>
-          <v-list-item
-            v-else
-            @click="goTo('/login')"
-          >
-            <v-list-item-title>
-              <v-icon icon="mdi-logout" />
-              Sign in
-            </v-list-item-title>
-          </v-list-item>
         </v-list>
       </v-menu>
     </div>
-
+    <v-card v-else class="rounded-xl elevation-0 pa-3 login-in-panel">
+      <v-card-title class="pa-0">Want to join our community? </v-card-title>
+      <v-card-subtitle class="pa-0">Sign up today to for more stories!</v-card-subtitle>
+      <div class="cancel-btn mt-4" @click="goTo('/register')">Sign up</div>
+      <div class="submit-btn mt-2" @click="goTo('/login')">Login</div>
+    </v-card>
     <form-input
       v-model="search"
       class="profile-search"

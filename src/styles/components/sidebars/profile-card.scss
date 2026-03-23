@@ -56,6 +56,21 @@
       border: none;
     }
   }
+
+  .login-in-panel {
+    border: 1px solid $color-border;
+
+    .v-card-title {
+      color: $color-text-primary;
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .v-card-subtitle {
+      color: $color-text-quaternary;
+      font-size: 14px;
+    }
+  }
 }
 
 // Styles for the v-menu content
