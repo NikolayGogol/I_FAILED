@@ -163,7 +163,6 @@
     margin-bottom: $spacing-md;
     padding: $spacing-sm $spacing-md;
     border-radius: $radius-md;
-    background-color: $color-background; // Ensure background is visible
 
     @include media-down($breakpoint-sm) {
       flex-direction: column;
@@ -175,12 +174,11 @@
       font-size: $font-size-xs;
 
       .meta-label {
-        color: $color-text-secondary;
+        color: $color-text-quaternary;
       }
 
       span:not(.meta-label) {
-        font-weight: 600;
-        color: $color-text-primary;
+        color: $color-text-quaternary;
         margin-left: $spacing-sm-md;
       }
     }
@@ -201,7 +199,6 @@
       color: $color-text-secondary;
       cursor: pointer;
       transition: color 0.2s;
-      font-size: $font-size-sm;
 
       @include media-down($breakpoint-sm) {
         margin-right: 0; // Remove right margin on mobile for even spacing
@@ -209,16 +206,30 @@
 
       span {
         margin-left: $spacing-sm;
-        font-size: $font-size-xs;
+        font-size: $font-size-sm;
         font-weight: 500;
       }
 
-      &:hover {
-        color: $color-primary;
+      svg {
+        width: 20px;
+      }
+
+      &.hover {
+        &:hover {
+          svg {
+            * {
+              stroke: $color-primary;
+            }
+          }
+        }
       }
 
       &.liked {
-        color: $color-primary;
+        svg {
+          * {
+            stroke: $color-primary;
+          }
+        }
       }
     }
   }

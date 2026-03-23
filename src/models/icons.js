@@ -74,6 +74,41 @@ const icons = [
       + '</svg>\n',
   },
   {
+    name: 'share',
+    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">\n'
+      + '<path d="M18 8C19.6569 8 21 6.65685 21 5C21 3.34315 19.6569 2 18 2C16.3431 2 15 3.34315 15 5C15 6.65685 16.3431 8 18 8Z" stroke="#808079" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>\n'
+      + '<path d="M6 15C7.65685 15 9 13.6569 9 12C9 10.3431 7.65685 9 6 9C4.34315 9 3 10.3431 3 12C3 13.6569 4.34315 15 6 15Z" stroke="#808079" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>\n'
+      + '<path d="M18 22C19.6569 22 21 20.6569 21 19C21 17.3431 19.6569 16 18 16C16.3431 16 15 17.3431 15 19C15 20.6569 16.3431 22 18 22Z" stroke="#808079" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>\n'
+      + '<path d="M8.58984 13.5098L15.4198 17.4898" stroke="#808079" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>\n'
+      + '<path d="M15.4098 6.50977L8.58984 10.4898" stroke="#808079" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>\n'
+      + '</svg>\n',
+  },
+  {
+    name: 'bookmark',
+    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">\n'
+      + '<path d="M20 19.1132V8.4C20 6.15979 20 5.03969 19.564 4.18404C19.1805 3.43139 18.5686 2.81947 17.816 2.43597C16.9603 2 15.8402 2 13.6 2H10.4C8.15979 2 7.03969 2 6.18404 2.43597C5.43139 2.81947 4.81947 3.43139 4.43597 4.18404C4 5.03969 4 6.15979 4 8.4V19.1132C4 20.0554 4 20.5265 4.1972 20.792C4.36909 21.0234 4.6325 21.1694 4.91987 21.1925C5.24954 21.219 5.64902 20.9694 6.448 20.47L9.45601 18.59C10.3789 18.0132 10.8404 17.7248 11.3352 17.6123C11.7728 17.5129 12.2272 17.5129 12.6648 17.6123C13.1596 17.7248 13.6211 18.0132 14.544 18.59L17.552 20.47C18.351 20.9694 18.7505 21.219 19.0801 21.1925C19.3675 21.1694 19.6309 21.0234 19.8028 20.792C20 20.5265 20 20.0554 20 19.1132Z" stroke="#808079" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>\n'
+      + '</svg>\n',
+  },
+  {
+    name: 'eye',
+    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">\n'
+      + '<path d="M15 12C15 12.7956 14.6839 13.5587 14.1213 14.1213C13.5587 14.6839 12.7956 15 12 15C11.2044 15 10.4413 14.6839 9.87868 14.1213C9.31607 13.5587 9 12.7956 9 12C9 11.2044 9.31607 10.4413 9.87868 9.87868C10.4413 9.31607 11.2044 9 12 9C12.7956 9 13.5587 9.31607 14.1213 9.87868C14.6839 10.4413 15 11.2044 15 12Z" stroke="#808079" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>\n'
+      + '<path d="M2 12C3.6 7.903 7.336 5 12 5C16.664 5 20.4 7.903 22 12C20.4 16.097 16.664 19 12 19C7.336 19 3.6 16.097 2 12Z" stroke="#808079" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>\n'
+      + '</svg>\n',
+  },
+  {
+    name: 'message',
+    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">\n'
+      + '<path d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z" stroke="#808079" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>\n'
+      + '</svg>\n',
+  },
+  {
+    name: 'heart',
+    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">\n'
+      + '<path d="M12 22.0001C12.5 22.0001 22 17.0003 22 10.0004C22 6.50057 19.5 4.04405 16.5 4.00064C15 3.97894 13.5 4.50006 12 6.50006C10.5 4.50006 8.97405 4.00064 7.5 4.00064C4.5 4.00064 2 6.50057 2 10.0004C2 17.0003 11.5 22.0001 12 22.0001Z" stroke="#808079" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>\n'
+      + '</svg>\n',
+  },
+  {
     name: '',
     icon: '',
   },

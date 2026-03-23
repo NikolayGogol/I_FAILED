@@ -8,6 +8,7 @@
   import { useRoute, useRouter } from 'vue-router'
   import PostMenu from '@/components/feed/PostMenu.vue'
   import { auth } from '@/firebase'
+  import { getIcon } from '@/models/icons.js'
   import { useAuthStore } from '@/stores/auth.js'
   import { usePostCardStore } from '@/stores/post-card.js'
   import { formatNumber } from '@/utils/format-number.js'
@@ -239,24 +240,24 @@
     </template>
     <!-- Post footer with actions -->
     <footer class="post-footer">
-      <button class="icon-btn mr-4" :class="{ 'liked': isLiked }" :disabled="isLiking" @click.stop.prevent="handleLike">
-        <v-icon size="18">{{ isLiked ? 'mdi-heart' : 'mdi-heart-outline' }}</v-icon>
+      <button class="icon-btn mr-4 hover" :class="{ 'liked': isLiked }" :disabled="isLiking" @click.stop.prevent="handleLike">
+        <div class="d-flex" v-html="getIcon('heart')" />
         <span>{{ likeCount }}</span>
       </button>
       <button v-if="post.allowComments" class="icon-btn mr-4">
-        <v-icon size="18">mdi-comment-outline</v-icon>
+        <div class="d-flex" v-html="getIcon('message')" />
         <span>{{ commentCount }}</span>
       </button>
       <button class="icon-btn">
-        <v-icon size="18">mdi-eye-outline</v-icon>
+        <div class="d-flex" v-html="getIcon('eye')" />
         <span>{{ post.views }}</span>
       </button>
       <v-spacer />
-      <button class="icon-btn mr-4">
-        <v-icon size="18">mdi-bookmark-outline</v-icon>
+      <button class="icon-btn mr-4 hover">
+        <div class="d-flex" v-html="getIcon('bookmark')" />
       </button>
-      <button class="icon-btn">
-        <v-icon size="18">mdi-share-variant</v-icon>
+      <button class="icon-btn hover">
+        <div class="d-flex" v-html="getIcon('share')" />
       </button>
     </footer>
   </div>

@@ -66,3 +66,11 @@
   padding-left: 15px;
   padding-right: 15px;
 }
+
+.hover-underline {
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}

@@ -19,6 +19,7 @@
   import PostMenu from '@/components/feed/PostMenu.vue'
   import MentionTextarea from '@/components/MentionTextarea.vue'
   import { auth } from '@/firebase'
+  import { getIcon } from '@/models/icons.js'
   import { useAuthStore } from '@/stores/auth'
   import { usePostCardStore } from '@/stores/post-card.js'
   import { useCommentMenuStore } from '@/stores/single-post/comment-menu.js'
@@ -32,7 +33,16 @@
   const route = useRoute()
   const router = useRouter()
   const toast = useToast()
-  const { getPostById, incrementViewCount, incrementCategoryRead, addComment, addReply, toggleCommentLike, getComments, getUsersForMentions } = useSinglePostStore()
+  const {
+    getPostById,
+    incrementViewCount,
+    incrementCategoryRead,
+    addComment,
+    addReply,
+    toggleCommentLike,
+    getComments,
+    getUsersForMentions,
+  } = useSinglePostStore()
   const { deleteComment, updateComment } = useCommentMenuStore()
   const postCardStore = usePostCardStore()
   const authStore = useAuthStore()
@@ -441,7 +451,9 @@
               <div class="font-weight-bold">{{ post.isAnonymous ? 'Anonymous' : post.user?.displayName }}</div>
               <div class="create-at">{{ timeAgo }}</div>
             </div>
-            <div v-if="!post.isAnonymous" class="text-caption text-grey">@{{ post.user?.displayName?.replaceAll(' ', '_') }}</div>
+            <div v-if="!post.isAnonymous" class="text-caption text-grey">
+              @{{ post.user?.displayName?.replaceAll(' ', '_') }}
+            </div>
           </div>
         </div>
         <div v-if="!isOwnPost" class="post-actions">
@@ -562,22 +574,22 @@
         <div class="d-flex">
           <div
             class="item cursor-pointer"
-            :class="{ 'text-primary': isLiked }"
+            :class="{'liked': isLiked }"
             @click="handlePostLike"
           >
-            <v-icon :icon="isLiked ? 'mdi-heart' : 'mdi-heart-outline'" />
+            <div class="d-flex" v-html="getIcon('heart')" />
             <span class="ml-2">{{ likeCount }}</span>
           </div>
           <div class="item ml-4">
-            <v-icon icon="mdi-comment-outline" />
+            <div class="d-flex" v-html="getIcon('message')" />
             <span class="ml-2">{{ comments.length }}</span>
           </div>
           <div class="item ml-4">
-            <v-icon icon="mdi-eye-outline" />
+            <div class="d-flex" v-html="getIcon('eye')" />
             <span class="ml-2">{{ post.views || 0 }}</span>
           </div>
         </div>
-        <v-icon class="cursor-pointer" icon="mdi-share-variant-outline" @click="handleShare" />
+        <div class="d-flex cursor-pointer icon-hover" @click="handleShare" v-html="getIcon('share')" />
       </div>
     </div>
 
@@ -655,13 +667,20 @@
             <div class="flex-grow-1">
               <div class="comment-item__header d-flex align-center mb-1">
                 <div class="d-block">
-                  <span class="username font-weight-bold mr-2">{{ comment.user?.displayName }}</span>
+                  <div class="d-flex">
+                    <span class="username font-weight-bold mr-2">{{ comment.user?.displayName }}</span>
+                    <span class="date text-caption text-grey">{{ formatCommentDate(comment.createdAt) }}</span>
+                  </div>
                   <div class="text-caption text-grey">@{{ post.user?.displayName?.replaceAll(' ', '_') }}</div>
                 </div>
 
-                <span class="date text-caption text-grey">{{ formatCommentDate(comment.createdAt) }}</span>
                 <v-spacer />
-                <CommentMenu :comment="comment" @copy-link="handleCopyCommentLink(comment.id)" @delete="handleDeleteComment(comment.id)" @edit="handleEditComment(comment)" />
+                <CommentMenu
+                  :comment="comment"
+                  @copy-link="handleCopyCommentLink(comment.id)"
+                  @delete="handleDeleteComment(comment.id)"
+                  @edit="handleEditComment(comment)"
+                />
               </div>
               <div v-if="editingCommentId === comment.id">
                 <MentionTextarea
@@ -681,32 +700,27 @@
 
               <div class="comment-item__actions d-flex align-center mb-2">
                 <div
-                  class="px-0 text-grey-darken-1 cursor-pointer"
+                  class="px-0 text-grey-darken-1 cursor-pointer d-flex align-center"
                   @click="toggleLike(comment)"
                 >
-                  <v-icon
-                    :color="comment.likes?.includes(authStore.user?.uid) ? 'primary' : ''"
-                    icon="mdi-heart-outline"
-                    size="18px"
-                    start
+                  <div
+                    class="d-flex mr-3 icon-hover w-15"
+                    :class="{'liked stroke': comment.likes?.includes(authStore.user?.uid)}"
+                    v-html="getIcon('heart')"
                   />
                   {{ comment.likes?.length || 0 }}
                 </div>
                 <div
-                  class="px-0 text-grey-darken-1 cursor-pointer ml-3"
+                  class="px-0 d-flex cursor-pointer ml-3"
                 >
-                  <v-icon
-                    icon="mdi-comment-outline"
-                    size="18px"
-                    start
-                  />
+                  <div class="d-flex mr-3 w-15" v-html="getIcon('message')" />
                   {{ comment.replies?.length || 0 }}
                 </div>
 
                 <div
                   v-if="isAuth"
-                  class="px-0 text-primary ml-5 cursor-pointer"
-                  style="font-size: 14px;"
+                  class="px-0 text-primary ml-5 hover-underline"
+                  style="font-size: 12px;"
                   @click="showReplyInput[comment.id] = !showReplyInput[comment.id]"
                 >
                   Reply
@@ -772,7 +786,7 @@
               <!-- Replies -->
               <div v-if="comment.replies?.length" class="comment-item__replies ml-8 mt-2">
                 <div v-for="reply in comment.replies" :id="reply.id" :key="reply.id" class="reply-item mb-3">
-                  <div class="d-flex align-start mb-1">
+                  <div class="d-flex align-start mb-1 w-100">
                     <v-avatar class="mr-2" color="grey-lighten-2" size="44">
                       <v-img
                         v-if="reply.user?.photoURL"
@@ -785,15 +799,26 @@
                         reply.user?.displayName?.charAt(0).toUpperCase() || 'U'
                       }}</span>
                     </v-avatar>
-                    <div class="d-flex flex-column">
-                      <div class="d-flex">
-                        <div class="d-block">
-                          <span class="font-weight-bold text-body-2 mr-2">{{ reply.user?.displayName }}</span>
-                          <div class="text-caption text-grey">@{{ reply.user?.displayName?.replaceAll(' ', '_') }}</div>
+                    <div class="d-flex flex-column w-100">
+                      <div class="d-flex justify-space-between">
+                        <div class="d-flex align-start">
+                          <div class="d-block">
+                            <div class="d-flex">
+                              <span class="font-weight-bold text-body-2 mr-2">{{ reply.user?.displayName }}</span>
+                              <span class="date text-caption text-grey">{{ formatCommentDate(reply.createdAt) }}</span>
+                            </div>
+                            <div class="text-caption text-grey">@{{
+                              reply.user?.displayName?.replaceAll(' ', '_')
+                            }}
+                            </div>
+                          </div>
                         </div>
-                        <span class="text-caption text-grey">{{ formatCommentDate(reply.createdAt) }}</span>
-                        <v-spacer />
-                        <CommentMenu :comment="reply" @copy-link="handleCopyCommentLink(reply.id)" @delete="handleDeleteComment(reply.id)" @edit="handleEditComment(reply)" />
+                        <CommentMenu
+                          :comment="reply"
+                          @copy-link="handleCopyCommentLink(reply.id)"
+                          @delete="handleDeleteComment(reply.id)"
+                          @edit="handleEditComment(reply)"
+                        />
                       </div>
                       <div v-if="editingCommentId === reply.id">
                         <MentionTextarea
@@ -813,31 +838,25 @@
                         <div class="text-body-2" v-html="renderCommentText(reply.text)" />
                         <div class="d-flex align-center mt-1">
                           <div
-                            class="px-0 text-grey-darken-1 cursor-pointer"
+                            class="px-0 d-flex hover-underline align-center cursor-pointer"
                             @click="toggleLike(reply)"
                           >
-                            <v-icon
-                              :color="reply.likes?.includes(authStore.user?.uid) ? 'primary' : ''"
-                              icon="mdi-heart-outline"
-                              size="14px"
-                              start
+                            <div
+                              class="d-flex mr-3 w-15"
+                              :class="{ 'liked stroke': reply.likes?.includes(authStore.user?.uid) }"
+                              v-html="getIcon('heart')"
                             />
                             <span class="text-caption">{{ reply.likes?.length || 0 }}</span>
                           </div>
                           <div
-                            class="px-0 text-grey-darken-1 cursor-pointer"
+                            class="px-0 d-flex align-center cursor-pointer"
                             @click="toggleLike(reply)"
                           >
-                            <v-icon
-                              class="ml-3"
-                              icon="mdi-comment-outline"
-                              size="14px"
-                              start
-                            />
+                            <div class="d-flex mx-3 w-15" v-html="getIcon('message')" />
                             <span class="text-caption">{{ reply.replies?.length || 0 }}</span>
                           </div>
                           <div
-                            class="px-0 text-primary ml-3 cursor-pointer"
+                            class="px-0 text-primary ml-3 hover-underline"
                             style="font-size: 12px;"
                             @click="showReplyInput[reply.id] = !showReplyInput[reply.id]"
                           >
@@ -905,7 +924,7 @@
                   <!-- Level 2 Replies -->
                   <div v-if="reply.replies?.length" class="comment-item__replies ml-8 mt-2">
                     <div v-for="subReply in reply.replies" :id="subReply.id" :key="subReply.id" class="reply-item mb-3">
-                      <div class="d-flex align-start mb-1">
+                      <div class="d-flex align-start mb-1 w-100">
                         <v-avatar class="mr-2" color="grey-lighten-2" size="44">
                           <v-img
                             v-if="subReply.user?.photoURL"
@@ -918,18 +937,25 @@
                             subReply.user?.displayName?.charAt(0).toUpperCase() || 'U'
                           }}</span>
                         </v-avatar>
-                        <div class="d-flex flex-column">
+                        <div class="d-flex flex-column w-100">
                           <div class="d-flex">
                             <div class="d-block">
-                              <span class="font-weight-bold text-body-2 mr-2">{{ subReply.user?.displayName }}</span>
+                              <div class="d-flex">
+                                <span class="font-weight-bold text-body-2 mr-2">{{ subReply.user?.displayName }}</span>
+                                <span class="date text-caption text-grey">{{ formatCommentDate(subReply.createdAt) }}</span>
+                              </div>
                               <div class="text-caption text-grey">@{{
                                 subReply.user?.displayName?.replaceAll(' ', '_')
                               }}
                               </div>
                             </div>
-                            <span class="text-caption text-grey">{{ formatCommentDate(subReply.createdAt) }}</span>
                             <v-spacer />
-                            <CommentMenu :comment="subReply" @copy-link="handleCopyCommentLink(subReply.id)" @delete="handleDeleteComment(subReply.id)" @edit="handleEditComment(subReply)" />
+                            <CommentMenu
+                              :comment="subReply"
+                              @copy-link="handleCopyCommentLink(subReply.id)"
+                              @delete="handleDeleteComment(subReply.id)"
+                              @edit="handleEditComment(subReply)"
+                            />
                           </div>
                           <div v-if="editingCommentId === subReply.id">
                             <MentionTextarea
@@ -949,14 +975,13 @@
                             <div class="text-body-2" v-html="renderCommentText(subReply.text)" />
                             <div class="d-flex align-center mt-1">
                               <div
-                                class="px-0 text-grey-darken-1 cursor-pointer"
+                                class="px-0 d-flex align-center cursor-pointer"
                                 @click="toggleLike(subReply)"
                               >
-                                <v-icon
-                                  :color="subReply.likes?.includes(authStore.user?.uid) ? 'primary' : ''"
-                                  icon="mdi-heart-outline"
-                                  size="14px"
-                                  start
+                                <div
+                                  class="d-flex mr-3 w-15"
+                                  :class="{ 'liked stroke': subReply.likes?.includes(authStore.user?.uid) }"
+                                  v-html="getIcon('heart')"
                                 />
                                 <span class="text-caption">{{ subReply.likes?.length || 0 }}</span>
                               </div>

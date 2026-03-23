@@ -4,6 +4,30 @@
 .single-post-page {
   padding: 0 20px;
 
+  .stroke {
+    svg {
+      * {
+        stroke: $color-primary;
+      }
+    }
+  }
+
+  .w-15 {
+    svg {
+      width: 15px;
+    }
+  }
+
+  .icon-hover {
+    &:hover {
+      svg {
+        * {
+          stroke: $color-primary;
+        }
+      }
+    }
+  }
+
   .bg {
     background-color: $color-surface;
     border-radius: $radius-lg;
@@ -182,12 +206,15 @@
     align-items: center;
 
     .item {
-      color: $color-text-quaternary;
-      font-size: 16px;
-      font-weight: 400;
+      display: flex;
+      align-items: center;
 
-      i {
-        font-size: 20px;
+      &.liked {
+        svg {
+          * {
+            stroke: $color-primary;
+          }
+        }
       }
     }
   }
