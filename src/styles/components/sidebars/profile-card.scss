@@ -1,6 +1,26 @@
 @use '../../settings.scss' as *;
 
 .profile-card {
+  .footer-link {
+    margin-top: $spacing-md;
+    display: flex;
+    flex-wrap: wrap;
+
+    a {
+      text-decoration: none;
+      white-space: nowrap;
+      color: $color-text-tertiary;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+
+      &:before {
+        content: '•';
+        margin-right: $spacing-xs;
+      }
+    }
+  }
+
   .profile-top {
     background-color: $color-surface;
     border: 1px solid $color-border;

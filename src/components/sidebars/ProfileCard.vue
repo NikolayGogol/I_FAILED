@@ -19,6 +19,33 @@
       icon: 'mdi-cog',
     },
   ]
+  const footerLink = [
+    {
+      label: 'Terms of Service',
+      path: '#',
+    },
+    {
+      label: 'Privacy Policy',
+      path: '#',
+    },
+    {
+      label: 'Cookie Policy',
+      path: '#',
+    },
+    {
+      label: 'Accessibility',
+      path: '#',
+    },
+    {
+      label: 'Ads',
+      path: '#',
+    },
+    {
+      label: 'More',
+      path: '#',
+    },
+  ]
+
   const router = useRouter()
   //
   const currentUserName = computed(() => authStore.user?.displayName)
@@ -42,7 +69,6 @@
   async function confirmLogout () {
     await authStore.logout()
     logoutDialog.value = false
-    router.push('/login')
   }
 
   function goTo (path) {
@@ -56,23 +82,21 @@
       <v-menu class="w-100" content-class="profile-menu" open-on-hover>
         <template #activator="{ props }">
           <div class="d-flex align-center justify-between w-100" v-bind="props">
-            <template>
-              <div class="profile-avatar mr-2">
-                <v-img
-                  v-if="currentUserPhoto"
-                  alt="Profile"
-                  class="h-100"
-                  cover
-                  :src="currentUserPhoto"
-                />
-                <span v-else>{{ currentUserInitials }}</span>
+            <div class="profile-avatar mr-2">
+              <v-img
+                v-if="currentUserPhoto"
+                alt="Profile"
+                class="h-100"
+                cover
+                :src="currentUserPhoto"
+              />
+              <span v-else>{{ currentUserInitials }}</span>
+            </div>
+            <div class="profile-info">
+              <div class="profile-name">
+                {{ currentUserName }}
               </div>
-              <div class="profile-info">
-                <div class="profile-name">
-                  {{ currentUserName }}
-                </div>
-              </div>
-            </template>
+            </div>
             <v-spacer />
             <v-icon
               v-bind="props"
@@ -115,6 +139,7 @@
       <div class="submit-btn mt-2" @click="goTo('/login')">Login</div>
     </v-card>
     <form-input
+      v-if="currentUserName"
       v-model="search"
       class="profile-search"
       density="compact"
@@ -123,7 +148,11 @@
       prepend-inner-icon="mdi-magnify"
       variant="outlined"
     />
-
+    <div v-if="!currentUserName" class="footer-link py-2">
+      <div v-for="(nav, index) in footerLink" :key="index" class="px-2 py-1">
+        <router-link :to="nav.path">{{ nav.label }}</router-link>
+      </div>
+    </div>
     <!-- Logout Confirmation Dialog -->
     <v-dialog v-model="logoutDialog" max-width="400">
       <v-card class="logout-dialog-card py-6">
