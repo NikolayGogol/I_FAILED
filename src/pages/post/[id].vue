@@ -284,6 +284,7 @@
   })
 
   async function submitComment (event) {
+    if (isSubmitting.value) return
     if (event && event.shiftKey) return
     if (!authStore.user) {
       await router.push('/login')
@@ -305,10 +306,12 @@
   }
 
   async function submitReply (commentId, event) {
+    if (isSubmitting.value) return
     if (event && event.shiftKey) return
     const text = replyText.value[commentId]
     if (!text?.trim()) return
 
+    isSubmitting.value = true
     try {
       await addReply(post.value.id, commentId, authStore.user, text)
       replyText.value[commentId] = ''
@@ -316,6 +319,8 @@
       await loadComments(post.value.id)
     } catch (error) {
       console.error('Failed to submit reply:', error)
+    } finally {
+      isSubmitting.value = false
     }
   }
 
@@ -627,7 +632,7 @@
                 :class="{ 'disabled': !newComment.trim() }"
                 @click="submitComment(null)"
               >
-                Post Comment
+                Post
               </div>
             </div>
           </div>
