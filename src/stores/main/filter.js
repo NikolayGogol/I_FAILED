@@ -23,8 +23,7 @@ export const useFilterStore = defineStore('filter', () => {
         costRange: selectedFilter.costRange.map(c => c.value),
         postedBy: selectedFilter.postedBy,
       }
-      const response = await api.get('/posts', { params })
-      mainStore.posts = response.data
+      console.log(params);
     } catch (error) {
       console.error('Error applying filters:', error)
     }

@@ -27,8 +27,26 @@
         display: flex;
         align-items: center;
         padding: $spacing-sm 0;
+        transition: all .3s ease-in-out;
 
         &.router-link-active {
+          color: #6E240F;
+          font-weight: 600;
+
+          svg {
+            &.fill-current {
+              * {
+                fill: #6E240F;
+              }
+            }
+
+            * {
+              stroke: #6E240F;
+            }
+          }
+        }
+
+        &:hover {
           color: #6E240F;
           font-weight: 600;
 
