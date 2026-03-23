@@ -24,7 +24,7 @@
   import { usePostCardStore } from '@/stores/post-card.js'
   import { useCommentMenuStore } from '@/stores/single-post/comment-menu.js'
   import { useSinglePostStore } from '@/stores/single-post/single-post.js'
-  import { formatNumber } from '@/utils/format-number.js'
+  import {floatNumber, formatNumber} from '@/utils/format-number.js'
   import 'vue3-emoji-picker/css'
   import '@/styles/pages/single-post.scss'
 
@@ -567,7 +567,7 @@
         >
           <p class="emoji">{{ item.emoji }}</p>
           <p class="label text-center">{{ item.label }}</p>
-          <p class="count text-center font-weight-bold">{{ item.count }}</p>
+          <p class="count text-center font-weight-bold text-uppercase">{{ floatNumber(item.count, '0a.0', '') }}</p>
         </li>
       </ul>
       <div class="footer">
@@ -578,7 +578,7 @@
             @click="handlePostLike"
           >
             <div class="d-flex" v-html="getIcon('heart')" />
-            <span class="ml-2">{{ likeCount }}</span>
+            <span class="ml-2 text-uppercase">{{ formatNumber(likeCount, '0a.0', '') }}</span>
           </div>
           <div class="item ml-4">
             <div class="d-flex" v-html="getIcon('message')" />
@@ -586,7 +586,7 @@
           </div>
           <div class="item ml-4">
             <div class="d-flex" v-html="getIcon('eye')" />
-            <span class="ml-2">{{ post.views || 0 }}</span>
+            <span class="ml-2 text-uppercase">{{ formatNumber(post.views, '0a.0', '') }}</span>
           </div>
         </div>
         <div class="d-flex cursor-pointer icon-hover" @click="handleShare" v-html="getIcon('share')" />

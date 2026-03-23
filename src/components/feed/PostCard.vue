@@ -6,12 +6,13 @@
   // =================================================================================================
   import { computed, onMounted, ref } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
+  import { useToast } from 'vue-toastification'
   import PostMenu from '@/components/feed/PostMenu.vue'
   import { auth } from '@/firebase'
   import { getIcon } from '@/models/icons.js'
   import { useAuthStore } from '@/stores/auth.js'
   import { usePostCardStore } from '@/stores/post-card.js'
-  import { formatNumber } from '@/utils/format-number.js'
+  import { floatNumber, formatNumber } from '@/utils/format-number.js'
   import '@/styles/components/feed/post-card.scss'
 
   dayjs.extend(relativeTime)
@@ -33,6 +34,7 @@
   const authStore = useAuthStore()
   const router = useRouter()
   const route = useRoute()
+  const toast = useToast()
 
   // =================================================================================================
   // State
@@ -154,6 +156,15 @@
     }
     return ''
   }
+
+  function handleShare () {
+    const url = `${window.location.origin}/post/${p.post.id}`
+    navigator.clipboard.writeText(url).then(() => {
+      toast.success('Link copied to clipboard!')
+    }).catch(() => {
+      toast.error('Failed to copy link')
+    })
+  }
 </script>
 
 <template>
@@ -242,21 +253,21 @@
     <footer class="post-footer">
       <button class="icon-btn mr-4 hover" :class="{ 'liked': isLiked }" :disabled="isLiking" @click.stop.prevent="handleLike">
         <div class="d-flex" v-html="getIcon('heart')" />
-        <span>{{ likeCount }}</span>
+        <span class="text-uppercase">{{ floatNumber(likeCount, '0a.0', '') }}</span>
       </button>
       <button v-if="post.allowComments" class="icon-btn mr-4">
         <div class="d-flex" v-html="getIcon('message')" />
-        <span>{{ commentCount }}</span>
+        <span class="text-uppercase">{{ floatNumber(commentCount, '0a.0', '') }}</span>
       </button>
       <button class="icon-btn">
         <div class="d-flex" v-html="getIcon('eye')" />
-        <span>{{ post.views }}</span>
+        <span class="text-uppercase">{{ floatNumber(post.views, '0a.0', '') }}</span>
       </button>
       <v-spacer />
       <button class="icon-btn mr-4 hover">
         <div class="d-flex" v-html="getIcon('bookmark')" />
       </button>
-      <button class="icon-btn hover">
+      <button class="icon-btn hover" @click.stop="handleShare">
         <div class="d-flex" v-html="getIcon('share')" />
       </button>
     </footer>
