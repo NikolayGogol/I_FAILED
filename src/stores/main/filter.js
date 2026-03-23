@@ -17,13 +17,16 @@ export const useFilterStore = defineStore('filter', () => {
   async function applyFilters () {
     try {
       const params = {
-        categories: selectedFilter.categories.map(c => c.id),
+        // Keep category objects (id + label) so both:
+        // 1) client filtering can match reliably
+        // 2) we can build Firestore queries with the same shape
+        categories: selectedFilter.categories.map(c => ({ id: c.id, label: c.label })),
         emojiTags: selectedFilter.emojiTags.map(t => t.value),
         recoveryTime: selectedFilter.recoveryTime.map(t => t.value),
         costRange: selectedFilter.costRange.map(c => c.value),
         postedBy: selectedFilter.postedBy,
       }
-      console.log(params);
+      mainStore.applyPostFilters(params)
     } catch (error) {
       console.error('Error applying filters:', error)
     }
@@ -35,7 +38,7 @@ export const useFilterStore = defineStore('filter', () => {
     selectedFilter.recoveryTime = []
     selectedFilter.costRange = []
     selectedFilter.postedBy = null
-    mainStore.posts = []
+    mainStore.applyPostFilters(null)
   }
 
   return {

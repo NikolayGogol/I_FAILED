@@ -11,6 +11,7 @@ require('dotenv').config() // Load environment variables from .env
 admin.initializeApp()
 
 const authRoutes = require('./routes/auth')
+const postsRoutes = require('./routes/posts')
 const { publishScheduledPosts } = require('./scheduled/publish-posts')
 
 const app = express()
@@ -33,6 +34,7 @@ app.get('/status', (req, res) => {
 
 // Mount the routers
 app.use(authRoutes)
+app.use(postsRoutes)
 
 // Export the API as a single Cloud Function
 exports.api = onRequest(app)

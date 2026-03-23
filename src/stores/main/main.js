@@ -16,6 +16,8 @@ import {
 import { defineStore } from 'pinia'
 import { db } from '@/firebase.js'
 import { useAuthStore } from '@/stores/auth.js'
+import { categories as categoryModels, emotionTags as emotionTagModels } from '@/models/categories.js'
+import api from '@/axios.js'
 
 // =================================================================================================
 // Constants
@@ -50,13 +52,21 @@ export const useMainStore = defineStore('main', {
         return state.allPosts
       }
       const matched = state.allPosts.filter(post => {
-        const { categories } = state.currentFilters
+        const {
+          categories,
+          emojiTags,
+          recoveryTime,
+          costRange,
+          postedBy,
+        } = state.currentFilters || {}
 
-        // 1. Category Match
+        // =========================
+        // 1) Category Match
+        // =========================
         const postCategories = post.selectedCategories || []
         const categoryMatch = !categories || categories.length === 0 || categories.some(filterCat => {
-          const filterId = normalize(filterCat.id)
-          const filterLabel = normalize(filterCat.label)
+          const filterId = normalize(filterCat?.id ?? filterCat)
+          const filterLabel = normalize(filterCat?.label ?? '')
 
           return postCategories.some(postCat => {
             // Be tolerant to different Firestore shapes:
@@ -69,14 +79,67 @@ export const useMainStore = defineStore('main', {
               return pc === filterId || pc === filterLabel
             }
 
-            const postId = normalize(postCat?.id || postCat?.categoryId || postCat?.value)
-            const postLabel = normalize(postCat?.label || postCat?.categoryLabel)
+            const postId = normalize(postCat?.id ?? postCat?.categoryId ?? postCat?.value)
+            const postLabel = normalize(postCat?.label ?? postCat?.categoryLabel)
 
-            return postId === filterId
-              || postLabel === filterLabel
+            return postId === filterId || postLabel === filterLabel
           })
         })
-        return categoryMatch
+
+        // =========================
+        // 2) Emotion Tags Match
+        // =========================
+        const postEmotionValues = (post.emotionTags || []).map(t => {
+          if (typeof t === 'string') return t
+          return t?.value ?? t?.label ?? ''
+        })
+        const emotionMatch = !emojiTags || emojiTags.length === 0 || emojiTags.some(tagVal => {
+          const tv = normalize(tagVal)
+          return postEmotionValues.some(pv => normalize(pv) === tv)
+        })
+
+        // =========================
+        // 3) Recovery Time Match
+        // =========================
+        const postRecovery = post?.lessonLearned?.recoveryTime
+        const postRecoveryVal = typeof postRecovery === 'string'
+          ? postRecovery
+          : postRecovery?.value ?? postRecovery?.title ?? ''
+        const recoveryMatch = !recoveryTime || recoveryTime.length === 0 || recoveryTime.some(rv => normalize(postRecoveryVal) === normalize(rv))
+
+        // =========================
+        // 4) Cost Range Match
+        // =========================
+        const parseCost = v => {
+          if (v === undefined || v === null || v === '') return null
+          if (typeof v === 'number' && !Number.isNaN(v)) return v
+          const direct = Number(v)
+          if (!Number.isNaN(direct)) return direct
+          const cleaned = String(v).replace(/[^0-9.]/g, '')
+          if (!cleaned) return null
+          const parsed = Number(cleaned)
+          return Number.isNaN(parsed) ? null : parsed
+        }
+
+        const costNum = parseCost(post?.lessonLearned?.cost)
+        const costMatch = !costRange || costRange.length === 0 || costRange.some(rangeVal => {
+          if (costNum === null) return false
+          const rv = normalize(rangeVal)
+
+          if (rv === 'free') return costNum <= 0
+          if (rv === '<100') return costNum > 0 && costNum < 100
+          if (rv === '100-1000') return costNum >= 100 && costNum <= 1000
+          if (rv === '1000-5000') return costNum >= 1000 && costNum <= 5000
+          if (rv === '>5000') return costNum > 5000
+          return false
+        })
+
+        // =========================
+        // 5) Posted By Match
+        // =========================
+        const postedByMatch = !postedBy || normalize(post.uid) === normalize(postedBy)
+
+        return categoryMatch && emotionMatch && recoveryMatch && costMatch && postedByMatch
       })
 
       // For "For You" we want a feed ordered by user interest counts (not by createdAt only).
@@ -273,14 +336,16 @@ export const useMainStore = defineStore('main', {
      */
     applyPostFilters (filters) {
       // Clone the filters to prevent reactivity issues
-      const clonedFilters = structuredClone(filters)
-      const hasFilters = Object.values(clonedFilters).some(f => f && f.length > 0)
+      const clonedFilters = filters ? structuredClone(filters) : null
+      const hasFilters = !!clonedFilters && Object.values(clonedFilters).some(f => {
+        if (Array.isArray(f)) return f.length > 0
+        return !!f
+      })
+
       this.currentFilters = hasFilters ? clonedFilters : null
 
-      // After applying filters, check if we need to fetch more posts
-      if (this.filteredPosts.length < 5 && this.hasMore) {
-        this.fetchPosts({})
-      }
+      // Reload feed from scratch so the first page matches current filters.
+      this.fetchPosts({ tab: this.activeTab, refresh: true })
     },
 
     /**
@@ -304,7 +369,10 @@ export const useMainStore = defineStore('main', {
               this.savedFiltersBeforeForYou = this.currentFilters
                 ? structuredClone(this.currentFilters)
                 : null
-              this.currentFilters = null
+              // Preserve other filter fields, but force categories to be recalculated.
+              this.currentFilters = this.currentFilters
+                ? { ...this.currentFilters, categories: [] }
+                : null
             } else if (prevTab === 'for-you') {
               // Restore manual filters when leaving the "For You" tab.
               this.currentFilters = this.savedFiltersBeforeForYou
@@ -327,9 +395,6 @@ export const useMainStore = defineStore('main', {
       this.loading = true
 
       try {
-        const postsRef = collection(db, collection_db)
-        const queryConstraints = []
-
         // For the first "For You" load, fetch more posts so we hit enough matches
         // before the client-side bucketing logic in `filteredPosts`.
         const effectivePageSize = (this.activeTab === 'for-you' && this.allPosts.length === 0)
@@ -347,83 +412,85 @@ export const useMainStore = defineStore('main', {
             .filter(c => c && c.id && c.label)
             .map(c => ({ id: c.id, label: c.label, count: c.count }))
 
-          this.currentFilters = filterCategories.length > 0
-            ? { categories: filterCategories }
-            : null
+          if (filterCategories.length > 0) {
+            const prev = this.currentFilters || {}
+            this.currentFilters = { ...prev, categories: filterCategories }
+          } else {
+            this.currentFilters = this.currentFilters
+              ? { ...this.currentFilters, categories: [] }
+              : null
+          }
         }
 
-        if (this.activeTab === 'popular') {
-          queryConstraints.push(orderBy('views', 'desc'))
-        } else {
-          queryConstraints.push(orderBy('createdAt', 'desc'))
+        // Fetch already-filtered posts from backend to avoid Firestore "requires an index".
+        // Backend sorts by `createdAt`/`views`, then applies filters in memory.
+        const payload = {
+          tab: this.activeTab,
+          pageSize: effectivePageSize,
+          cursor: this.lastVisible,
+          filters: this.currentFilters,
         }
 
-        if (this.lastVisible) {
-          queryConstraints.push(startAfter(this.lastVisible))
+        const response = await api.post('posts/feed', payload)
+        const responseData = response?.data || {}
+        const backendPosts = Array.isArray(responseData.posts) ? responseData.posts : []
+        const nextCursorDocId = responseData.nextCursorDocId ?? null
+        const hasMoreFromBackend = responseData.hasMore ?? false
+
+        this.lastVisible = nextCursorDocId
+        this.hasMore = hasMoreFromBackend
+
+        const newPosts = []
+        const blockedUsers = authStore.user?.blockedUsers || []
+        const userUidsToFetch = new Set()
+
+        for (const post of backendPosts) {
+          const postData = post || {}
+          if (blockedUsers.includes(postData.uid)) continue
+
+          if (postData.uid && !postData.isAnonymous && !this.userCache[postData.uid]) {
+            userUidsToFetch.add(postData.uid)
+          }
         }
-        queryConstraints.push(limit(effectivePageSize))
 
-        const q = query(postsRef, ...queryConstraints)
-        const querySnapshot = await getDocs(q)
-
-        if (querySnapshot.empty) {
-          this.hasMore = false
-        } else {
-          this.lastVisible = querySnapshot.docs.at(-1)
-          if (querySnapshot.docs.length < effectivePageSize) {
-            this.hasMore = false
-          }
-
-          const newPosts = []
-          const blockedUsers = authStore.user?.blockedUsers || []
-          const userUidsToFetch = new Set()
-
-          for (const postDoc of querySnapshot.docs) {
-            const postData = postDoc.data()
-            if (blockedUsers.includes(postData.uid)) {
-              continue
+        // Fetch all needed users in parallel (and cache them) to avoid N+1 reads.
+        if (userUidsToFetch.size > 0) {
+          await Promise.all(Array.from(userUidsToFetch).map(async uid => {
+            try {
+              const userRef = doc(db, USER_COLLECTION, uid)
+              const userSnap = await getDoc(userRef)
+              const data = userSnap.exists() ? userSnap.data() : null
+              this.userCache[uid] = data
+                ? { ...data, uid }
+                : { uid }
+            } catch {
+              this.userCache[uid] = { uid }
             }
+          }))
+        }
 
-            if (postData.uid && !postData.isAnonymous && !this.userCache[postData.uid]) {
-              userUidsToFetch.add(postData.uid)
-            }
+        for (const post of backendPosts) {
+          const postData = post || {}
+          if (blockedUsers.includes(postData.uid)) continue
+
+          const finalPost = { ...postData }
+          // Backend returns `{ id, ...docData }`. Keep it consistent with existing UI.
+          if (!finalPost.id && postData.id === undefined) {
+            // no-op (id should exist)
           }
 
-          // Fetch all needed users in parallel (and cache them) to avoid N+1 reads.
-          if (userUidsToFetch.size > 0) {
-            await Promise.all(Array.from(userUidsToFetch).map(async uid => {
-              try {
-                const userRef = doc(db, USER_COLLECTION, uid)
-                const userSnap = await getDoc(userRef)
-                const data = userSnap.exists() ? userSnap.data() : null
-                this.userCache[uid] = data
-                  ? { ...data, uid }
-                  : { uid }
-              } catch {
-                this.userCache[uid] = { uid }
-              }
-            }))
+          if (postData.uid && !postData.isAnonymous) {
+            const cachedUser = this.userCache[postData.uid]
+            finalPost.user = cachedUser ? { ...finalPost.user, ...cachedUser, uid: postData.uid } : { ...finalPost.user, uid: postData.uid }
           }
 
-          for (const postDoc of querySnapshot.docs) {
-            const postData = postDoc.data()
-            if (blockedUsers.includes(postData.uid)) {
-              continue
-            }
+          newPosts.push(finalPost)
+        }
 
-            const finalPost = { id: postDoc.id, ...postData }
-            if (postData.uid && !postData.isAnonymous) {
-              const cachedUser = this.userCache[postData.uid]
-              finalPost.user = cachedUser ? { ...finalPost.user, ...cachedUser, uid: postData.uid } : { ...finalPost.user, uid: postData.uid }
-            }
-            newPosts.push(finalPost)
-          }
+        this.allPosts.push(...newPosts)
 
-          this.allPosts.push(...newPosts)
-
-          if (this.filteredPosts.length < 5 && this.hasMore) {
-            setTimeout(() => this.fetchPosts({}), 100)
-          }
+        if (this.filteredPosts.length < 5 && this.hasMore) {
+          setTimeout(() => this.fetchPosts({}), 100)
         }
       } catch (error) {
         console.error('Error fetching posts:', error)
