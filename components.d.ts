@@ -24,6 +24,8 @@ declare module 'vue' {
     FormTextarea: typeof import('./src/components/FormTextarea.vue')['default']
     GoogleLoginButton: typeof import('./src/components/GoogleLoginButton.vue')['default']
     HelpSettings: typeof import('./src/components/settings/HelpSettings.vue')['default']
+    MentionPopover: typeof import('./src/components/MentionPopover.vue')['default']
+    MentionTextarea: typeof import('./src/components/MentionTextarea.vue')['default']
     MobileSlide: typeof import('./src/components/MobileSlide.vue')['default']
     MoblileNavbar: typeof import('./src/components/MoblileNavbar.vue')['default']
     NotificationSettings: typeof import('./src/components/settings/NotificationSettings.vue')['default']

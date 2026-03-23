@@ -20,6 +20,7 @@ import { db } from '@/firebase'
 const collection_db = import.meta.env.VITE_POST_COLLECTION
 const comments_collection = import.meta.env.VITE_COMMENTS
 const user_category_reads_collection = import.meta.env.VITE_USER_CATEGORY_READS_COLLECTION
+const VITE_USERS_COLLECTION = import.meta.env.VITE_USERS_COLLECTION
 
 function getDocId ({ userId, categoryId }) {
   // Firestore doc IDs cannot contain `/`, so we encode anything potentially unsafe.
@@ -160,6 +161,19 @@ export const useSinglePostStore = defineStore('singlePost', {
         return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
       } catch (error) {
         console.error('Error getting comments:', error)
+        return []
+      }
+    },
+    async getUsersForMentions () {
+      try {
+        const q = query(collection(db, VITE_USERS_COLLECTION))
+        const querySnapshot = await getDocs(q)
+        return querySnapshot.docs.map(doc => {
+          const { displayName, photoURL } = doc.data()
+          return { uid: doc.id, displayName, photoURL }
+        })
+      } catch (error) {
+        console.error('Error getting users for mentions:', error)
         return []
       }
     },

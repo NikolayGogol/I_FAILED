@@ -15,6 +15,7 @@
   import { useRoute, useRouter } from 'vue-router'
   import { useToast } from 'vue-toastification'
   import PostMenu from '@/components/feed/PostMenu.vue'
+  import MentionTextarea from '@/components/MentionTextarea.vue'
   import { auth } from '@/firebase'
   import { useAuthStore } from '@/stores/auth'
   import { usePostCardStore } from '@/stores/post-card.js'
@@ -28,7 +29,7 @@
   const route = useRoute()
   const router = useRouter()
   const toast = useToast()
-  const { getPostById, incrementViewCount, incrementCategoryRead, addComment, addReply, toggleCommentLike, getComments } = useSinglePostStore()
+  const { getPostById, incrementViewCount, incrementCategoryRead, addComment, addReply, toggleCommentLike, getComments, getUsersForMentions } = useSinglePostStore()
   const postCardStore = usePostCardStore()
   const authStore = useAuthStore()
   const post = ref(null)
@@ -39,6 +40,7 @@
   const showReplyInput = ref({})
   const showEmojiPicker = ref(false)
   const showReplyEmojiPicker = ref({})
+  const users = ref([])
   const isAuth = computed(() => !!authStore.user)
   // Like logic state
   const isLiked = ref(false)
@@ -121,6 +123,13 @@
         }
       })
       loadComments(postId)
+      getUsersForMentions().then(res => {
+        users.value = res.map(user => ({
+          value: user.uid,
+          label: user.displayName,
+          photoURL: user.photoURL,
+        }))
+      })
     }
   })
 
@@ -323,6 +332,11 @@
     replyText.value[commentId] += emoji.i
     showReplyEmojiPicker.value[commentId] = false
   }
+
+  function renderCommentText (text) {
+    if (!text) return ''
+    return text.replace(/@\[([^\]]+)\]\(([^)]+)\)/g, '<a href="/user-info/$2" class="font-weight-bold text-primary">@$1</a>')
+  }
 </script>
 
 <template>
@@ -510,11 +524,12 @@
           </v-avatar>
           <div class="flex-grow-1">
             <div class="position-relative">
-              <FormTextarea
+              <MentionTextarea
                 v-model="newComment"
                 height="89"
                 hide-details
                 placeholder="Write a comment..."
+                :users="users"
                 @keydown.enter.prevent="submitComment"
               />
               <div class="emoji-picker-container">
@@ -568,7 +583,7 @@
 
                 <span class="date text-caption text-grey">{{ formatCommentDate(comment.createdAt) }}</span>
               </div>
-              <div class="comment-item__content mb-2">{{ comment.text }}</div>
+              <div class="comment-item__content mb-2" v-html="renderCommentText(comment.text)" />
 
               <div class="comment-item__actions d-flex align-center mb-2">
                 <div
@@ -620,9 +635,10 @@
                   </v-avatar>
                   <div class="d-block w-100">
                     <div class="position-relative">
-                      <FormTextarea
+                      <MentionTextarea
                         :model-value="replyText[comment.id] || ''"
                         placeholder="Share your thoughts..."
+                        :users="users"
                         @keydown.enter.prevent="submitReply(comment.id, $event)"
                         @update:model-value="val => replyText[comment.id] = val"
                       />
@@ -684,7 +700,7 @@
                         <span class="text-caption text-grey">{{ formatCommentDate(reply.createdAt) }}</span>
                       </div>
                       <div class="mt-2">
-                        <div class="text-body-2">{{ reply.text }}</div>
+                        <div class="text-body-2" v-html="renderCommentText(reply.text)" />
                         <div class="d-flex align-center mt-1">
                           <div
                             class="px-0 text-grey-darken-1 cursor-pointer"
@@ -738,9 +754,10 @@
                       </v-avatar>
                       <div class="d-block w-100">
                         <div class="position-relative">
-                          <FormTextarea
+                          <MentionTextarea
                             :model-value="replyText[reply.id] || ''"
                             placeholder="Share your thoughts..."
+                            :users="users"
                             @keydown.enter.prevent="submitReply(reply.id, $event)"
                             @update:model-value="val => replyText[reply.id] = val"
                           />
@@ -803,7 +820,7 @@
                             <span class="text-caption text-grey">{{ formatCommentDate(subReply.createdAt) }}</span>
                           </div>
                           <div class="mt-2">
-                            <div class="text-body-2">{{ subReply.text }}</div>
+                            <div class="text-body-2" v-html="renderCommentText(subReply.text)" />
                             <div class="d-flex align-center mt-1">
                               <div
                                 class="px-0 text-grey-darken-1 cursor-pointer"
