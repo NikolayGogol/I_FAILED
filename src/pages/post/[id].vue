@@ -28,7 +28,7 @@
   const route = useRoute()
   const router = useRouter()
   const toast = useToast()
-  const { getPostById, incrementViewCount, addComment, addReply, toggleCommentLike, getComments } = useSinglePostStore()
+  const { getPostById, incrementViewCount, incrementCategoryRead, addComment, addReply, toggleCommentLike, getComments } = useSinglePostStore()
   const postCardStore = usePostCardStore()
   const authStore = useAuthStore()
   const post = ref(null)
@@ -95,6 +95,14 @@
       getPostById(postId).then(res => {
         post.value = res
         incrementViewCount(postId)
+
+        // Track user category reading stats.
+        if (auth.currentUser?.uid && res?.selectedCategories?.[0]) {
+          incrementCategoryRead({
+            userId: auth.currentUser.uid,
+            category: res.selectedCategories[0],
+          })
+        }
 
         // Initialize like state
         if (auth.currentUser && res.likedBy?.includes(auth.currentUser.uid)) {

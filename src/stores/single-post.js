@@ -10,6 +10,7 @@ import {
   orderBy,
   query,
   serverTimestamp,
+  setDoc,
   updateDoc,
   where,
 } from 'firebase/firestore'
@@ -18,9 +19,17 @@ import { db } from '@/firebase'
 
 const collection_db = import.meta.env.VITE_POST_COLLECTION
 const comments_collection = import.meta.env.VITE_COMMENTS
+const user_category_reads_collection = import.meta.env.VITE_USER_CATEGORY_READS_COLLECTION
+
+function getDocId ({ userId, categoryId }) {
+  // Firestore doc IDs cannot contain `/`, so we encode anything potentially unsafe.
+  return `${userId}__${encodeURIComponent(String(categoryId))}`
+}
 
 export const useSinglePostStore = defineStore('singlePost', {
-  state: () => ({}),
+  state: () => ({
+    topCategories: [],
+  }),
   actions: {
     async getPostById (id) {
       try {
@@ -41,6 +50,57 @@ export const useSinglePostStore = defineStore('singlePost', {
         console.error('Error incrementing view count:', error)
       }
     },
+
+    async incrementCategoryRead ({ userId, category }) {
+      if (!userId || !category) {
+        return
+      }
+
+      const categoryId = category.id || category.label
+      const categoryLabel = category.label || categoryId
+      if (!categoryId) {
+        return
+      }
+
+      const docRef = doc(db, user_category_reads_collection, getDocId({ userId, categoryId }))
+      await setDoc(docRef, {
+        uid: userId,
+        categoryId,
+        categoryLabel,
+        count: increment(1),
+        lastReadAt: serverTimestamp(),
+      }, { merge: true })
+    },
+
+    async fetchTopCategoriesForUser ({ userId, limit = 5 }) {
+      if (!userId) {
+        return []
+      }
+
+      try {
+        const q = query(
+          collection(db, user_category_reads_collection),
+          where('uid', '==', userId),
+        )
+        const snapshot = await getDocs(q)
+
+        const counts = snapshot.docs.map(d => d.data())
+          .map(d => ({
+            categoryId: d.categoryId,
+            categoryLabel: d.categoryLabel,
+            count: d.count || 0,
+          }))
+
+        counts.sort((a, b) => b.count - a.count)
+        this.topCategories = counts.slice(0, limit)
+        return this.topCategories
+      } catch (error) {
+        console.error('Error fetching top categories:', error)
+        this.topCategories = []
+        return []
+      }
+    },
+
     async addComment (postId, user, text) {
       try {
         await addDoc(collection(db, comments_collection), {
