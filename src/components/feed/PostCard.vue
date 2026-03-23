@@ -1,7 +1,9 @@
 <script setup>
-// =================================================================================================
-// Imports
-// =================================================================================================
+  import dayjs from 'dayjs'
+  import relativeTime from 'dayjs/plugin/relativeTime'
+  // =================================================================================================
+  // Imports
+  // =================================================================================================
   import { computed, onMounted, ref } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import PostMenu from '@/components/feed/PostMenu.vue'
@@ -10,6 +12,8 @@
   import { usePostCardStore } from '@/stores/post-card.js'
   import { formatNumber } from '@/utils/format-number.js'
   import '@/styles/components/feed/post-card.scss'
+
+  dayjs.extend(relativeTime)
 
   // =================================================================================================
   // Props
@@ -142,6 +146,13 @@
     if (p.post.isAnonymous) return
     authStore.user?.uid === p.post.uid ? router.push('/profile') : router.push(`/user-info/${p.post.uid}`)
   }
+
+  function timeAgo (time) {
+    if (time?._seconds) {
+      return dayjs.unix(time._seconds).fromNow()
+    }
+    return ''
+  }
 </script>
 
 <template>
@@ -154,7 +165,10 @@
         <span v-else>{{ userInitial }}</span>
       </div>
       <div class="post-author cursor-pointer" @click="openUserProfile">
-        <div class="post-author-name">{{ post.user.displayName }}</div>
+        <div class="d-flex align-center">
+          <div class="post-author-name">{{ post.user.displayName }}</div>
+          <p class="ml-2"> • {{ timeAgo(post.createdAt) }}</p>
+        </div>
         <div class="post-author-handle">@{{ post.user.displayName.replaceAll(' ', '_') }}</div>
       </div>
       <v-spacer />
