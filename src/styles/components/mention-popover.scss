@@ -1,12 +1,20 @@
+@import '../settings';
+
 .mention-popover {
   position: absolute;
-  background: white;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: $color-surface;
+  border: 1px solid $color-border;
+  border-radius: $radius-xs;
+  box-shadow: $shadow-sm;
   z-index: 1000;
   max-height: 200px;
   overflow-y: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;  /* Internet Explorer 10+ */
+
+  &::-webkit-scrollbar {
+    display: none; /* Safari and Chrome */
+  }
 
   ul {
     list-style: none;
@@ -16,18 +24,18 @@
     li {
       display: flex;
       align-items: center;
-      padding: 8px 12px;
+      padding: $spacing-sm $spacing-md-sm;
       cursor: pointer;
 
       &:hover {
-        background: #f0f0f0;
+        background: $color-background;
       }
 
       .avatar {
         width: 24px;
         height: 24px;
-        border-radius: 50%;
-        margin-right: 8px;
+        border-radius: $radius-full;
+        margin-right: $spacing-sm;
       }
     }
   }

@@ -132,7 +132,7 @@
     popoverStyle.value = {
       top: `${rect.bottom - wrapperRect.top}px`,
       left: `${rect.left - wrapperRect.left}px`,
-      width: `${rect.width}px`,
+      width: `auto`,
     }
   }
 
@@ -165,7 +165,11 @@
             class="avatar"
             :src="user.photoURL"
           >
-          <span>{{ user.label }}</span>
+          <div class="d-flex flex-column">
+            <p>{{ user.label }}</p>
+            <p class="text-muted">@{{ user.label.replaceAll(' ', '_') }}</p>
+          </div>
+
         </li>
         <li v-if="filteredUsers.length === 0" class="no-results">
           No users found

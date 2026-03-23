@@ -1,43 +1,57 @@
+@import '../settings';
+
 .mention-textarea-wrapper {
   position: relative;
 
   .mention-popover {
     position: absolute;
-    background: white;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    background: $color-surface;
+    border: 1px solid $color-border;
+    border-radius: $radius-xs;
+    box-shadow: $shadow-lg;
     z-index: 1000;
     max-height: 200px;
     overflow-y: auto;
     width: 250px;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* Internet Explorer 10+ */
+
+    &::-webkit-scrollbar {
+      display: none; /* Safari and Chrome */
+    }
 
     ul {
       list-style: none;
-      padding: 4px;
+      padding: $spacing-xs;
       margin: 0;
 
       li {
         display: flex;
         align-items: center;
-        padding: 8px 12px;
+        padding: $spacing-sm $spacing-md-sm;
         cursor: pointer;
-        border-radius: 4px;
+        border-radius: $spacing-xs;
+        border-bottom: 1px solid $color-border;
+
+        .text-muted {
+          color: $color-text-quaternary;
+          font-size: 14px;
+        }
 
         &:hover,
         &.selected {
-          background: #f0f0f0;
+          background: $color-background;
         }
 
         .avatar {
-          width: 24px;
-          height: 24px;
-          border-radius: 50%;
-          margin-right: 10px;
+          width: 45px;
+          height: 45px;
+          border-radius: $radius-full;
+          margin-right: $spacing-sm-md;
         }
 
         &.no-results {
-          color: #888;
+          color: $color-text-quaternary;
           cursor: default;
         }
       }
