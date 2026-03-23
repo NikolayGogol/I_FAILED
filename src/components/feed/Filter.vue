@@ -4,7 +4,16 @@
   import '@/styles/components/feed/filter.scss'
 
   const filterStore = useFilterStore()
-
+  const radios = [
+    {
+      label: 'Anonymous only',
+      value: 'anonymous',
+    },
+    {
+      label: 'Non-anonymous only',
+      value: 'public',
+    },
+  ]
   defineProps({
     title: {
       type: String,
@@ -60,8 +69,18 @@
         :value="item"
       />
     </v-chip-group>
-
-    <div class="d-flex align-center mt-6">
+    <!--   -->
+    <h5 class="mt-3">Posted by</h5>
+    <v-radio-group v-model="filterStore.selectedFilter.postedBy" color="primary">
+      <v-radio
+        v-for="radio in radios"
+        :key="radio.value"
+        class="radio"
+        :label="radio.label"
+        :value="radio"
+      />
+    </v-radio-group>
+    <div class="d-flex align-center mt-2">
       <div class="submit-btn" @click="filterStore.applyFilters">Apply</div>
       <div class="clear" @click="filterStore.clearFilters">Clear all filters</div>
     </div>
@@ -70,5 +89,18 @@
 </template>
 
 <style scoped lang="scss">
+:deep(.v-selection-control-group) {
+  flex-direction: row;
+}
+
+:deep(.v-selection-control) {
+  flex: unset;
+}
+.radio {
+  &:deep(label) {
+    color: #1C1C1B;
+    font-size: 12px;
+  }
+}
 
 </style>
