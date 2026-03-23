@@ -133,11 +133,13 @@ export const useMainStore = defineStore('main', {
     /**
      * Fetches posts from Firestore with pagination.
      * @param {object} options - The options for fetching posts.
-     * @param {string} options.tab - The tab to fetch posts for ('latest', 'popular', 'for-you').
+     * @param {string} options.tab - The tab to fetch posts for ('latest', 'popular').
      * @param {number} options.pageSize - The number of posts to fetch per page.
      * @param {boolean} options.refresh - Whether to refresh the posts list.
      */
     async fetchPosts ({ tab, pageSize = 10, refresh = false } = {}) {
+      const authStore = useAuthStore()
+
       if ((tab && tab !== this.activeTab) || refresh) {
         if (tab) {
           this.activeTab = tab
@@ -148,12 +150,21 @@ export const useMainStore = defineStore('main', {
         this.loading = false
       }
 
+      // "For You" tab is intentionally empty right now.
+      // We avoid any Firestore query to ensure no posts render.
+      if (this.activeTab === 'for-you') {
+        this.allPosts = []
+        this.lastVisible = null
+        this.hasMore = false
+        this.loading = false
+        return
+      }
+
       if (this.loading || !this.hasMore) {
         return
       }
 
       this.loading = true
-      const authStore = useAuthStore()
 
       try {
         const postsRef = collection(db, collection_db)
@@ -163,18 +174,6 @@ export const useMainStore = defineStore('main', {
           queryConstraints.push(orderBy('views', 'desc'))
         } else {
           queryConstraints.push(orderBy('createdAt', 'desc'))
-        }
-
-        if (this.activeTab === 'for-you') {
-          const following = authStore.user?.following || []
-          if (following.length > 0) {
-            queryConstraints.push(where('uid', 'in', following.slice(0, 10)))
-          } else {
-            this.allPosts = []
-            this.hasMore = false
-            this.loading = false
-            return
-          }
         }
 
         if (this.lastVisible) {
