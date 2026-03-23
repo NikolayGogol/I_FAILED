@@ -14,6 +14,7 @@
   import Filter from '@/components/feed/Filter.vue'
   import PostCard from '@/components/feed/PostCard.vue'
   import { useAuthStore } from '@/stores/auth.js'
+  import { useFilterStore } from '@/stores/main/filter.js'
   import { useMainStore } from '@/stores/main/main.js'
   import { generateRandomPost } from '@/utils/post-generator.js'
   import '@/styles/pages/index.scss'
@@ -21,7 +22,9 @@
   //
   const mainStore = useMainStore()
   const authStore = useAuthStore()
+  const filterStore = useFilterStore()
   const { filteredPosts: posts, loading, hasMore, activeTab } = storeToRefs(mainStore)
+  const { selectedFilter } = storeToRefs(filterStore)
   const toast = useToast()
   const isFilterPanel = ref(false)
   const postPerPage = 5
@@ -71,6 +74,30 @@
     }
   }
 
+  const activeFilterCount = computed(() => {
+    const filters = selectedFilter.value
+    if (!filters) {
+      return 0
+    }
+    let count = 0
+    if (filters.categories?.length) {
+      count += filters.categories.length
+    }
+    if (filters.emojiTags?.length) {
+      count += filters.emojiTags.length
+    }
+    if (filters.recoveryTime?.length) {
+      count += filters.recoveryTime.length
+    }
+    if (filters.costRange?.length) {
+      count += filters.costRange.length
+    }
+    if (filters.postedBy) {
+      count += 1
+    }
+    return count
+  })
+
   const isDevMode = computed(() => {
     return location.hostname === 'localhost'
   })
@@ -109,15 +136,23 @@
           </div>
         </div>
         <div class="composer-filter">
-          <v-icon icon="mdi-filter-variant" @click="toggleFilter" />
+          <v-badge
+            v-if="activeFilterCount > 0"
+            color="primary"
+            :content="activeFilterCount"
+            floating
+          >
+            <v-icon icon="mdi-filter-variant" @click="toggleFilter" />
+          </v-badge>
+          <v-icon v-else icon="mdi-filter-variant" @click="toggleFilter" />
         </div>
       </div>
-      <template v-if="isFilterPanel && smAndUp">
-        <Filter />
-      </template>
+      <v-slide-y-transition>
+        <Filter v-if="isFilterPanel && smAndUp" @close="isFilterPanel = false" />
+      </v-slide-y-transition>
       <template v-if="!smAndUp">
         <MobileSlide v-model="isFilterPanel">
-          <Filter title="Filter" />
+          <Filter title="Filter" @close="isFilterPanel = false" />
         </MobileSlide>
       </template>
       <!-- Posts -->

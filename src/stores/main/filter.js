@@ -27,9 +27,11 @@ export const useFilterStore = defineStore('filter', () => {
         // (but we still support an object shape as a fallback).
         postedBy: selectedFilter.postedBy?.value ?? selectedFilter.postedBy,
       }
-      mainStore.applyPostFilters(params)
+      await mainStore.applyPostFilters(params)
+      return mainStore.filteredPosts.length > 0
     } catch (error) {
       console.error('Error applying filters:', error)
+      return false
     }
   }
 
