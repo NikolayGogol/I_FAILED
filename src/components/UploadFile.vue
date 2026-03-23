@@ -29,6 +29,7 @@
   const emit = defineEmits(['update:modelValue'])
 
   const previewItems = ref([])
+  const acceptedTypes = 'image/png, image/jpeg, image/gif, image/webp'
 
   // Helper to format file size
   function formatSize (bytes) {
@@ -99,7 +100,7 @@
 
     return new Promise(async (resolve, reject) => {
       try {
-        const fullFile = await compress(file, 100)
+        const fullFile = await compress(file, 80)
         const thumbFile = await compress(file, props.quality, 500)
 
         const fileObject = {
@@ -119,7 +120,15 @@
   }
 
   async function onFileChange (event) {
-    const files = Array.from(event.target.files)
+    let files = Array.from(event.target.files)
+
+    // Filter out SVG files
+    const svgFiles = files.filter(file => file.type === 'image/svg+xml')
+    if (svgFiles.length > 0) {
+      toast.error('SVG files are not supported.')
+      files = files.filter(file => file.type !== 'image/svg+xml')
+    }
+
     if (files.length > 0) {
       try {
         // Compress files and get formatted objects
@@ -237,7 +246,7 @@
     </div>
     <input
       id="input-file"
-      :accept="'image/*'"
+      :accept="acceptedTypes"
       class="d-none"
       :multiple="multiple"
       type="file"
@@ -246,7 +255,7 @@
     <input
       v-if="multiple"
       id="input-file-add"
-      :accept="'image/*'"
+      :accept="acceptedTypes"
       class="d-none"
       multiple
       type="file"
