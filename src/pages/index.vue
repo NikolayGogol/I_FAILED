@@ -24,6 +24,8 @@
   const { filteredPosts: posts, loading, hasMore, activeTab } = storeToRefs(mainStore)
   const toast = useToast()
   const isFilterPanel = ref(false)
+  const postPerPage = 5
+  const loadPerPage = 3
   const tabs = reactive([
     { label: 'Latest', value: 'latest' },
     { label: 'Popular', value: 'popular' },
@@ -34,20 +36,20 @@
 
   function selectTab (tab) {
     window.scrollTo({ top: 0, behavior: 'smooth' })
-    mainStore.fetchPosts({ tab: tab.value, refresh: true })
+    mainStore.fetchPosts({ tab: tab.value, pageSize: postPerPage, refresh: true })
   }
 
   function handleScroll () {
     const { scrollTop, scrollHeight, clientHeight } = document.documentElement
     if (scrollHeight - scrollTop - clientHeight < 100) {
-      mainStore.fetchPosts({})
+      mainStore.fetchPosts({ pageSize: loadPerPage })
     }
   }
 
   onMounted(() => {
     // Clear any persistent filters from previous sessions on mount
     mainStore.currentFilters = null
-    mainStore.fetchPosts({ tab: 'latest', refresh: true })
+    mainStore.fetchPosts({ tab: 'latest', pageSize: postPerPage, refresh: true })
     window.addEventListener('scroll', handleScroll)
   })
 
@@ -63,7 +65,7 @@
     try {
       await generateRandomPost()
       toast.success('Random post generated successfully!')
-      await mainStore.fetchPosts({ tab: activeTab.value, refresh: true })
+      await mainStore.fetchPosts({ tab: activeTab.value, pageSize: postPerPage, refresh: true })
     } catch {
       toast.error('Failed to generate random post.')
     }
