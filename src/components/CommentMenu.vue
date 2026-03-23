@@ -1,5 +1,5 @@
 <template>
-  <v-menu class="comment-menu-wrapper">
+  <v-menu class="comment-menu-wrapper ">
     <template #activator="{ props }">
       <v-btn
         v-bind="props"
@@ -8,7 +8,7 @@
         variant="text"
       />
     </template>
-    <v-list color="primary">
+    <v-list class="rounded-xl elevation-1" color="primary">
       <v-list-item v-if="isOwnComment" @click="emit('edit')">
         <v-list-item-title class="d-flex align-items-center">
           <div class="mr-3 pencil-icon" v-html="getIcon('pencil')" />
@@ -34,7 +34,7 @@
 <script setup>
   import { computed } from 'vue'
   import { getIcon } from '@/models/icons.js'
-  import { useAuthStore } from '@/stores/auth'
+  import { useAuthStore } from '@/stores/auth.js'
   import '@/styles/components/comment-menu.scss'
 
   const props = defineProps({

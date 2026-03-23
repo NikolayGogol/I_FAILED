@@ -15,7 +15,7 @@
   import { useRoute, useRouter } from 'vue-router'
   import { useToast } from 'vue-toastification'
   import ConfirmationModal from '@/components/ConfirmationModal.vue'
-  import CommentMenu from '@/components/feed/CommentMenu.vue'
+  import CommentMenu from '@/components/CommentMenu.vue'
   import PostMenu from '@/components/feed/PostMenu.vue'
   import MentionTextarea from '@/components/MentionTextarea.vue'
   import { auth } from '@/firebase'

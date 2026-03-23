@@ -116,7 +116,7 @@
           <v-icon>mdi-dots-horizontal</v-icon>
         </v-btn>
       </template>
-      <v-list class="rounded-lg">
+      <v-list class="rounded-xl elevation-1">
         <v-list-item class="cursor-pointer" @click="handleMutePost">
           <v-icon class="mr-2" icon="mdi-volume-off" />
           Hide this post
