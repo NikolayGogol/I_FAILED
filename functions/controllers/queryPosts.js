@@ -3,38 +3,61 @@ const admin = require('firebase-admin')
 const db = admin.firestore()
 
 function normalizeString (v) {
-  if (v === undefined || v === null) return ''
+  if (v === undefined || v === null) {
+    return ''
+  }
   return String(v).trim().toLowerCase()
 }
 
 function parseCost (v) {
-  if (v === undefined || v === null || v === '') return null
-  if (typeof v === 'number' && !Number.isNaN(v)) return v
+  if (v === undefined || v === null || v === '') {
+    return null
+  }
+  if (typeof v === 'number' && !Number.isNaN(v)) {
+    return v
+  }
   const direct = Number(v)
-  if (!Number.isNaN(direct)) return direct
+  if (!Number.isNaN(direct)) {
+    return direct
+  }
   const cleaned = String(v).replace(/[^0-9.]/g, '')
-  if (!cleaned) return null
+  if (!cleaned) {
+    return null
+  }
   const parsed = Number(cleaned)
   return Number.isNaN(parsed) ? null : parsed
 }
 
 function buildCostPredicate (costRange) {
   const ranges = Array.isArray(costRange) ? costRange : []
-  return (costNum) => {
-    if (costNum === null) return false
+  return costNum => {
+    if (costNum === null) {
+      return false
+    }
 
     return ranges.some(rv => {
       const r = normalizeString(rv)
-      if (r === 'free') return costNum <= 0
-      if (r === '<100') return costNum > 0 && costNum < 100
-      if (r === '100-1000') return costNum >= 100 && costNum <= 1000
-      if (r === '1000-5000') return costNum >= 1000 && costNum <= 5000
-      if (r === '>5000') return costNum > 5000
+      if (r === 'free') {
+        return costNum <= 0
+      }
+      if (r === '<100') {
+        return costNum > 0 && costNum < 100
+      }
+      if (r === '100-1000') {
+        return costNum >= 100 && costNum <= 1000
+      }
+      if (r === '1000-5000') {
+        return costNum >= 1000 && costNum <= 5000
+      }
+      if (r === '>5000') {
+        return costNum > 5000
+      }
       return false
     })
   }
 }
 
+// eslint-disable-next-line complexity
 function matchesFilters (postData, filters) {
   const f = filters || {}
 
@@ -45,8 +68,8 @@ function matchesFilters (postData, filters) {
   const postedBy = f.postedBy || null
 
   // 1) postedBy
-  if (postedBy) {
-    if (normalizeString(postData?.uid) !== normalizeString(postedBy)) return false
+  if (postedBy && normalizeString(postData?.uid) !== normalizeString(postedBy)) {
+    return false
   }
 
   // 2) categories
@@ -58,7 +81,9 @@ function matchesFilters (postData, filters) {
       const filterId = normalizeString(filterCat?.id ?? filterCat)
       const filterLabel = normalizeString(filterCat?.label ?? '')
 
-      if (!filterId && !filterLabel) continue
+      if (!filterId && !filterLabel) {
+        continue
+      }
 
       for (const pc of postCats) {
         if (typeof pc === 'string') {
@@ -76,20 +101,26 @@ function matchesFilters (postData, filters) {
           }
         }
       }
-      if (matched) break
+      if (matched) {
+        break
+      }
     }
 
-    if (!matched) return false
+    if (!matched) {
+      return false
+    }
   }
 
   // 3) emojiTags
   if (emojiTags.length > 0) {
-    const postEmotionValues = (Array.isArray(postData?.emotionTags) ? postData.emotionTags : [])
+    const postEmotionValues = new Set((Array.isArray(postData?.emotionTags) ? postData.emotionTags : [])
       .map(t => (typeof t === 'string' ? t : (t?.value ?? t?.label ?? '')))
-      .map(normalizeString)
+      .map(element => normalizeString(element)))
 
-    const match = emojiTags.some(tagVal => postEmotionValues.includes(normalizeString(tagVal)))
-    if (!match) return false
+    const match = emojiTags.some(tagVal => postEmotionValues.has(normalizeString(tagVal)))
+    if (!match) {
+      return false
+    }
   }
 
   // 4) recoveryTime
@@ -100,14 +131,18 @@ function matchesFilters (postData, filters) {
       : (postRecovery?.value ?? postRecovery?.title ?? '')
 
     const match = recoveryTime.some(rv => normalizeString(rv) === normalizeString(postRecoveryVal))
-    if (!match) return false
+    if (!match) {
+      return false
+    }
   }
 
   // 5) costRange
   if (costRange.length > 0) {
     const costNum = parseCost(postData?.lessonLearned?.cost)
     const costPred = buildCostPredicate(costRange)
-    if (!costPred(costNum)) return false
+    if (!costPred(costNum)) {
+      return false
+    }
   }
 
   return true
@@ -128,22 +163,35 @@ exports.queryPostsFeed = async (req, res) => {
     const POST_COLLECTION = process.env.POST_COLLECTION
     const postsRef = db.collection(POST_COLLECTION)
 
+    // We only sort by a single field here to avoid Firestore's composite index requirements.
+    // All other filter types are evaluated in memory.
     const orderField = activeTab === 'popular' ? 'views' : 'createdAt'
     const orderDirection = 'desc'
+
+    // How many documents we pull per Firestore request.
+    // We fetch more than `effectivePageSize` because many candidates may not match filters.
     const batchLimit = Math.min(100, Math.max(30, effectivePageSize * 5))
+
+    // Cap the scan to prevent very expensive calls when filters are restrictive.
     const maxBatches = 10
 
-    // Cursor is last document id from previous page.
+    // Cursor is the last document id from the previous page.
+    // We implement the cursor via `startAfter(cursorDocSnap)` (not by result count).
     let cursorDocSnap = null
     if (cursor) {
       const cursorDoc = await postsRef.doc(cursor).get()
       cursorDocSnap = cursorDoc.exists ? cursorDoc : null
     }
 
+    // Final filtered results returned to the client.
     const results = []
     let lastDocId = null
+
+    // Indicates if there might be more matches after the returned page.
     let hasMore = false
 
+    // We keep scanning subsequent pages from Firestore until we collect enough matches,
+    // or until we determine the Firestore feed is exhausted.
     for (let batches = 0; batches < maxBatches; batches++) {
       let q = postsRef.orderBy(orderField, orderDirection).limit(batchLimit)
       if (cursorDocSnap) {
@@ -151,7 +199,9 @@ exports.queryPostsFeed = async (req, res) => {
       }
 
       const snapshot = await q.get()
-      if (snapshot.empty) break
+      if (snapshot.empty) {
+        break
+      }
 
       // We must track the last DOCUMENT we actually processed.
       // Otherwise we can skip candidate documents and the next page becomes "empty".
@@ -164,6 +214,8 @@ exports.queryPostsFeed = async (req, res) => {
           // We only stop scanning once we have enough matches.
           // Cursor will point to the last analyzed docSnap, not to the last doc in snapshot.
           if (results.length >= effectivePageSize) {
+            // If we still have docs left after the cursor in this same Firestore batch,
+            // there could be more matches, so we keep `hasMore=true`.
             const moreDocsAfterCursorInThisBatch = i < snapshot.docs.length - 1
             hasMore = moreDocsAfterCursorInThisBatch || snapshot.size === batchLimit
             break
@@ -178,11 +230,15 @@ exports.queryPostsFeed = async (req, res) => {
       }
 
       // Prepare cursor for the next batch scan.
-      cursorDocSnap = snapshot.docs[snapshot.docs.length - 1] || null
+      // Cursor points to the last doc in the batch, not only the last matching doc.
+      // This lets the next request resume correctly in the Firestore ordering.
+      cursorDocSnap = snapshot.docs.at(-1) || null
 
-      // If the snapshot isn't full, Firestore likely reached the end.
+      // If the snapshot isn't full, Firestore likely reached the end of the feed.
       hasMore = snapshot.size === batchLimit
-      if (!hasMore) break
+      if (!hasMore) {
+        break
+      }
     }
 
     res.status(200).json({
@@ -200,4 +256,3 @@ exports.queryPostsFeed = async (req, res) => {
     })
   }
 }
-

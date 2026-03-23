@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia'
 import { reactive } from 'vue'
 import { useMainStore } from '@/stores/main/main.js'
-import api from '@/axios.js'
 
 export const useFilterStore = defineStore('filter', () => {
   const mainStore = useMainStore()

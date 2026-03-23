@@ -9,4 +9,3 @@ const router = express.Router()
 router.post('/posts/feed', queryPostsFeed)
 
 module.exports = router
-

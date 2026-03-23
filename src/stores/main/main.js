@@ -10,14 +10,12 @@ import {
   limit,
   orderBy,
   query,
-  startAfter,
   where,
 } from 'firebase/firestore'
 import { defineStore } from 'pinia'
+import api from '@/axios.js'
 import { db } from '@/firebase.js'
 import { useAuthStore } from '@/stores/auth.js'
-import { categories as categoryModels, emotionTags as emotionTagModels } from '@/models/categories.js'
-import api from '@/axios.js'
 
 // =================================================================================================
 // Constants
@@ -90,7 +88,9 @@ export const useMainStore = defineStore('main', {
         // 2) Emotion Tags Match
         // =========================
         const postEmotionValues = (post.emotionTags || []).map(t => {
-          if (typeof t === 'string') return t
+          if (typeof t === 'string') {
+            return t
+          }
           return t?.value ?? t?.label ?? ''
         })
         const emotionMatch = !emojiTags || emojiTags.length === 0 || emojiTags.some(tagVal => {
@@ -111,26 +111,46 @@ export const useMainStore = defineStore('main', {
         // 4) Cost Range Match
         // =========================
         const parseCost = v => {
-          if (v === undefined || v === null || v === '') return null
-          if (typeof v === 'number' && !Number.isNaN(v)) return v
+          if (v === undefined || v === null || v === '') {
+            return null
+          }
+          if (typeof v === 'number' && !Number.isNaN(v)) {
+            return v
+          }
           const direct = Number(v)
-          if (!Number.isNaN(direct)) return direct
+          if (!Number.isNaN(direct)) {
+            return direct
+          }
           const cleaned = String(v).replace(/[^0-9.]/g, '')
-          if (!cleaned) return null
+          if (!cleaned) {
+            return null
+          }
           const parsed = Number(cleaned)
           return Number.isNaN(parsed) ? null : parsed
         }
 
         const costNum = parseCost(post?.lessonLearned?.cost)
         const costMatch = !costRange || costRange.length === 0 || costRange.some(rangeVal => {
-          if (costNum === null) return false
+          if (costNum === null) {
+            return false
+          }
           const rv = normalize(rangeVal)
 
-          if (rv === 'free') return costNum <= 0
-          if (rv === '<100') return costNum > 0 && costNum < 100
-          if (rv === '100-1000') return costNum >= 100 && costNum <= 1000
-          if (rv === '1000-5000') return costNum >= 1000 && costNum <= 5000
-          if (rv === '>5000') return costNum > 5000
+          if (rv === 'free') {
+            return costNum <= 0
+          }
+          if (rv === '<100') {
+            return costNum > 0 && costNum < 100
+          }
+          if (rv === '100-1000') {
+            return costNum >= 100 && costNum <= 1000
+          }
+          if (rv === '1000-5000') {
+            return costNum >= 1000 && costNum <= 5000
+          }
+          if (rv === '>5000') {
+            return costNum > 5000
+          }
           return false
         })
 
@@ -338,7 +358,9 @@ export const useMainStore = defineStore('main', {
       // Clone the filters to prevent reactivity issues
       const clonedFilters = filters ? structuredClone(filters) : null
       const hasFilters = !!clonedFilters && Object.values(clonedFilters).some(f => {
-        if (Array.isArray(f)) return f.length > 0
+        if (Array.isArray(f)) {
+          return f.length > 0
+        }
         return !!f
       })
 
@@ -446,7 +468,9 @@ export const useMainStore = defineStore('main', {
 
         for (const post of backendPosts) {
           const postData = post || {}
-          if (blockedUsers.includes(postData.uid)) continue
+          if (blockedUsers.includes(postData.uid)) {
+            continue
+          }
 
           if (postData.uid && !postData.isAnonymous && !this.userCache[postData.uid]) {
             userUidsToFetch.add(postData.uid)
@@ -471,7 +495,9 @@ export const useMainStore = defineStore('main', {
 
         for (const post of backendPosts) {
           const postData = post || {}
-          if (blockedUsers.includes(postData.uid)) continue
+          if (blockedUsers.includes(postData.uid)) {
+            continue
+          }
 
           const finalPost = { ...postData }
           // Backend returns `{ id, ...docData }`. Keep it consistent with existing UI.
