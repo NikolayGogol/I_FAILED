@@ -1,18 +1,10 @@
 <script setup>
-  import { reactive } from 'vue'
   import { categories, costRange, emotionTags, recoveryTimeOptions } from '@/models/categories.js'
-  import { useMainStore } from '@/stores/main/main.js'
+  import { useFilterStore } from '@/stores/main/filter.js'
   import '@/styles/components/feed/filter.scss'
 
-  const mainStore = useMainStore()
-  //
-  const selectedFilter = reactive({
-    categories: [],
-    emojiTags: [],
-    recoveryTime: [],
-    costRange: [],
-    postedBy: null,
-  })
+  const filterStore = useFilterStore()
+
   defineProps({
     title: {
       type: String,
@@ -20,27 +12,13 @@
       default: '',
     },
   })
-
-  //
-  function applyFilters () {
-    console.log(selectedFilter)
-  }
-
-  function clearFilters () {
-    selectedFilter.categories = []
-    selectedFilter.emojiTags = []
-    selectedFilter.recoveryTime = []
-    selectedFilter.costRange = []
-    selectedFilter.postedBy = null
-    mainStore.applyPostFilters(selectedFilter)
-  }
 </script>
 
 <template>
   <div class="filter-panel">
     <div v-if="title" class="title">{{ title }}</div>
     <h5>Category</h5>
-    <v-chip-group v-model="selectedFilter.categories" multiple>
+    <v-chip-group v-model="filterStore.selectedFilter.categories" multiple>
       <v-chip
         v-for="item in categories"
         :key="item.id"
@@ -51,7 +29,7 @@
     </v-chip-group>
     <!--    -->
     <h5 class="mt-3">Emotion Tags</h5>
-    <v-chip-group v-model="selectedFilter.emojiTags" multiple>
+    <v-chip-group v-model="filterStore.selectedFilter.emojiTags" multiple>
       <v-chip
         v-for="item in emotionTags"
         :key="item.id"
@@ -62,7 +40,7 @@
     </v-chip-group>
     <!--    -->
     <h5 class="mt-3">Recovery time</h5>
-    <v-chip-group v-model="selectedFilter.recoveryTime" multiple>
+    <v-chip-group v-model="filterStore.selectedFilter.recoveryTime" multiple>
       <v-chip
         v-for="item in recoveryTimeOptions"
         :key="item.value"
@@ -73,7 +51,7 @@
     </v-chip-group>
     <!--    -->
     <h5 class="mt-3">Cost Range</h5>
-    <v-chip-group v-model="selectedFilter.costRange" multiple>
+    <v-chip-group v-model="filterStore.selectedFilter.costRange" multiple>
       <v-chip
         v-for="item in costRange"
         :key="item.value"
@@ -84,8 +62,8 @@
     </v-chip-group>
 
     <div class="d-flex align-center mt-6">
-      <div class="submit-btn" @click="applyFilters">Apply</div>
-      <div class="clear" @click="clearFilters">Clear all filters</div>
+      <div class="submit-btn" @click="filterStore.applyFilters">Apply</div>
+      <div class="clear" @click="filterStore.clearFilters">Clear all filters</div>
     </div>
   </div>
 
