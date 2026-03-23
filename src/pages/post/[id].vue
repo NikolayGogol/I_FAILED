@@ -10,16 +10,19 @@
 <script setup>
   import dayjs from 'dayjs'
   import relativeTime from 'dayjs/plugin/relativeTime'
-  import { computed, onMounted, ref } from 'vue'
+  import { computed, nextTick, onMounted, ref } from 'vue'
   import EmojiPicker from 'vue3-emoji-picker'
   import { useRoute, useRouter } from 'vue-router'
   import { useToast } from 'vue-toastification'
+  import ConfirmationModal from '@/components/ConfirmationModal.vue'
+  import CommentMenu from '@/components/feed/CommentMenu.vue'
   import PostMenu from '@/components/feed/PostMenu.vue'
   import MentionTextarea from '@/components/MentionTextarea.vue'
   import { auth } from '@/firebase'
   import { useAuthStore } from '@/stores/auth'
   import { usePostCardStore } from '@/stores/post-card.js'
-  import { useSinglePostStore } from '@/stores/single-post'
+  import { useCommentMenuStore } from '@/stores/single-post/comment-menu.js'
+  import { useSinglePostStore } from '@/stores/single-post/single-post.js'
   import { formatNumber } from '@/utils/format-number.js'
   import 'vue3-emoji-picker/css'
   import '@/styles/pages/single-post.scss'
@@ -30,6 +33,7 @@
   const router = useRouter()
   const toast = useToast()
   const { getPostById, incrementViewCount, incrementCategoryRead, addComment, addReply, toggleCommentLike, getComments, getUsersForMentions } = useSinglePostStore()
+  const { deleteComment, updateComment } = useCommentMenuStore()
   const postCardStore = usePostCardStore()
   const authStore = useAuthStore()
   const post = ref(null)
@@ -41,6 +45,10 @@
   const showEmojiPicker = ref(false)
   const showReplyEmojiPicker = ref({})
   const users = ref([])
+  const editingCommentId = ref(null)
+  const editingText = ref('')
+  const showDeleteModal = ref(false)
+  const commentToDeleteId = ref(null)
   const isAuth = computed(() => !!authStore.user)
   // Like logic state
   const isLiked = ref(false)
@@ -122,7 +130,18 @@
           }
         }
       })
-      loadComments(postId)
+      loadComments(postId).then(() => {
+        if (route.hash) {
+          const commentId = route.hash.slice(1)
+          nextTick(() => {
+            // eslint-disable-next-line unicorn/prefer-query-selector
+            const element = document.getElementById(commentId)
+            if (element) {
+              element.scrollIntoView({ behavior: 'smooth' })
+            }
+          })
+        }
+      })
       getUsersForMentions().then(res => {
         users.value = res.map(user => ({
           value: user.uid,
@@ -337,11 +356,65 @@
     if (!text) return ''
     return text.replace(/@\[([^\]]+)\]\(([^)]+)\)/g, '<a href="/user-info/$2" class="font-weight-bold text-primary">@$1</a>')
   }
+
+  function handleEditComment (comment) {
+    editingCommentId.value = comment.id
+    editingText.value = comment.text
+  }
+
+  async function handleUpdateComment () {
+    if (!editingCommentId.value || !editingText.value.trim()) return
+    try {
+      await updateComment(editingCommentId.value, editingText.value)
+      editingCommentId.value = null
+      editingText.value = ''
+      await loadComments(post.value.id)
+    } catch (error) {
+      console.error('Failed to update comment:', error)
+    }
+  }
+
+  function handleDeleteComment (commentId) {
+    commentToDeleteId.value = commentId
+    showDeleteModal.value = true
+  }
+
+  async function confirmDelete () {
+    if (commentToDeleteId.value) {
+      try {
+        await deleteComment(commentToDeleteId.value)
+        await loadComments(post.value.id)
+      } catch (error) {
+        console.error('Failed to delete comment:', error)
+      } finally {
+        showDeleteModal.value = false
+        commentToDeleteId.value = null
+      }
+    }
+  }
+
+  function handleCopyCommentLink (commentId) {
+    const url = `${window.location.origin}/post/${post.value.id}#${commentId}`
+    navigator.clipboard.writeText(url).then(() => {
+      toast.success('Comment link copied to clipboard!')
+    }).catch(() => {
+      toast.error('Failed to copy link')
+    })
+  }
 </script>
 
 <template>
 
   <div v-if="post" class="single-post-page">
+    <ConfirmationModal
+      confirm-text="Delete"
+      message="Are you sure you want to delete this comment? This action cannot be undone."
+      :show="showDeleteModal"
+      title="Delete Comment"
+      @cancel="showDeleteModal = false"
+      @confirm="confirmDelete"
+      @update:show="showDeleteModal = $event"
+    />
     <div class="d-flex align-center d-sm-block">
       <v-icon class="cursor-pointer" icon="mdi-arrow-left" @click="$router.go(-1)" />
       <h1 class="font-weight-bold text-grey-darken-3 ml-3 ml-sm-0">Post</h1>
@@ -561,7 +634,7 @@
         </div>
       </div>
       <template v-if="comments.length > 0">
-        <div v-for="comment in comments" :key="comment.id" class="comment-item mb-4 mt-7">
+        <div v-for="comment in comments" :id="comment.id" :key="comment.id" class="comment-item mb-4 mt-7">
           <div class="d-flex">
             <v-avatar class="mr-3" color="grey-lighten-2" size="44">
               <v-img
@@ -582,8 +655,24 @@
                 </div>
 
                 <span class="date text-caption text-grey">{{ formatCommentDate(comment.createdAt) }}</span>
+                <v-spacer />
+                <CommentMenu :comment="comment" @copy-link="handleCopyCommentLink(comment.id)" @delete="handleDeleteComment(comment.id)" @edit="handleEditComment(comment)" />
               </div>
-              <div class="comment-item__content mb-2" v-html="renderCommentText(comment.text)" />
+              <div v-if="editingCommentId === comment.id">
+                <MentionTextarea
+                  v-model="editingText"
+                  height="89"
+                  hide-details
+                  placeholder="Edit your comment..."
+                  :users="users"
+                  @keydown.enter.prevent="handleUpdateComment"
+                />
+                <div class="d-flex justify-start mt-2">
+                  <div class="submit-btn" @click="handleUpdateComment">Save</div>
+                  <div class="cancel-btn ml-4" @click="editingCommentId = null">Cancel</div>
+                </div>
+              </div>
+              <div v-else class="comment-item__content mb-2" v-html="renderCommentText(comment.text)" />
 
               <div class="comment-item__actions d-flex align-center mb-2">
                 <div
@@ -677,7 +766,7 @@
 
               <!-- Replies -->
               <div v-if="comment.replies?.length" class="comment-item__replies ml-8 mt-2">
-                <div v-for="reply in comment.replies" :key="reply.id" class="reply-item mb-3">
+                <div v-for="reply in comment.replies" :id="reply.id" :key="reply.id" class="reply-item mb-3">
                   <div class="d-flex align-start mb-1">
                     <v-avatar class="mr-2" color="grey-lighten-2" size="44">
                       <v-img
@@ -698,8 +787,24 @@
                           <div class="text-caption text-grey">@{{ reply.user?.displayName?.replaceAll(' ', '_') }}</div>
                         </div>
                         <span class="text-caption text-grey">{{ formatCommentDate(reply.createdAt) }}</span>
+                        <v-spacer />
+                        <CommentMenu :comment="reply" @copy-link="handleCopyCommentLink(reply.id)" @delete="handleDeleteComment(reply.id)" @edit="handleEditComment(reply)" />
                       </div>
-                      <div class="mt-2">
+                      <div v-if="editingCommentId === reply.id">
+                        <MentionTextarea
+                          v-model="editingText"
+                          height="89"
+                          hide-details
+                          placeholder="Edit your reply..."
+                          :users="users"
+                          @keydown.enter.prevent="handleUpdateComment"
+                        />
+                        <div class="d-flex justify-start mt-2">
+                          <div class="submit-btn" @click="handleUpdateComment">Save</div>
+                          <div class="cancel-btn ml-4" @click="editingCommentId = null">Cancel</div>
+                        </div>
+                      </div>
+                      <div v-else class="mt-2">
                         <div class="text-body-2" v-html="renderCommentText(reply.text)" />
                         <div class="d-flex align-center mt-1">
                           <div
@@ -794,7 +899,7 @@
 
                   <!-- Level 2 Replies -->
                   <div v-if="reply.replies?.length" class="comment-item__replies ml-8 mt-2">
-                    <div v-for="subReply in reply.replies" :key="subReply.id" class="reply-item mb-3">
+                    <div v-for="subReply in reply.replies" :id="subReply.id" :key="subReply.id" class="reply-item mb-3">
                       <div class="d-flex align-start mb-1">
                         <v-avatar class="mr-2" color="grey-lighten-2" size="44">
                           <v-img
@@ -818,8 +923,24 @@
                               </div>
                             </div>
                             <span class="text-caption text-grey">{{ formatCommentDate(subReply.createdAt) }}</span>
+                            <v-spacer />
+                            <CommentMenu :comment="subReply" @copy-link="handleCopyCommentLink(subReply.id)" @delete="handleDeleteComment(subReply.id)" @edit="handleEditComment(subReply)" />
                           </div>
-                          <div class="mt-2">
+                          <div v-if="editingCommentId === subReply.id">
+                            <MentionTextarea
+                              v-model="editingText"
+                              height="89"
+                              hide-details
+                              placeholder="Edit your reply..."
+                              :users="users"
+                              @keydown.enter.prevent="handleUpdateComment"
+                            />
+                            <div class="d-flex justify-start mt-2">
+                              <div class="submit-btn" @click="handleUpdateComment">Save</div>
+                              <div class="cancel-btn ml-4" @click="editingCommentId = null">Cancel</div>
+                            </div>
+                          </div>
+                          <div v-else class="mt-2">
                             <div class="text-body-2" v-html="renderCommentText(subReply.text)" />
                             <div class="d-flex align-center mt-1">
                               <div

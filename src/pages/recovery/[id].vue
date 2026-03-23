@@ -16,7 +16,7 @@
   import { useAuthStore } from '@/stores/auth.js'
   import { useCreatePostStore } from '@/stores/create-post.js'
   import { useRecoveryPostStore } from '@/stores/recovery-post.js'
-  import { useSinglePostStore } from '@/stores/single-post.js'
+  import { useSinglePostStore } from '@/stores/single-post/single-post.js'
   import { stripHtml } from '@/utils/html.js'
   import '@/styles/pages/create-post.scss'
   import '@/styles/pages/recovery-post.scss'

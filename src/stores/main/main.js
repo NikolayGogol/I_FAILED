@@ -14,8 +14,8 @@ import {
   where,
 } from 'firebase/firestore'
 import { defineStore } from 'pinia'
-import { db } from '@/firebase'
-import { useAuthStore } from '@/stores/auth'
+import { db } from '@/firebase.js'
+import { useAuthStore } from '@/stores/auth.js'
 
 // =================================================================================================
 // Constants

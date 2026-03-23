@@ -1,0 +1,14 @@
+@use '../settings' as *;
+
+.comment-menu-wrapper {
+  .v-list-item {
+    color: $color-text-primary;
+  }
+  .pencil-icon {
+    svg {
+      * {
+        stroke: $color-text-primary;
+      }
+    }
+  }
+}

@@ -14,7 +14,7 @@
   import Filter from '@/components/feed/Filter.vue'
   import PostCard from '@/components/feed/PostCard.vue'
   import { useAuthStore } from '@/stores/auth.js'
-  import { useMainStore } from '@/stores/main.js'
+  import { useMainStore } from '@/stores/main/main.js'
   import { generateRandomPost } from '@/utils/post-generator.js'
   import '@/styles/pages/index.scss'
   const { smAndUp } = useDisplay()

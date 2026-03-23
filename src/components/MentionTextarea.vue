@@ -31,7 +31,7 @@
     selectedIndex.value = 0
   })
 
-  watch(() => props.modelValue, (newValue) => {
+  watch(() => props.modelValue, newValue => {
     displayValue.value = renderMentions(newValue)
   })
 
@@ -43,6 +43,7 @@
     if (atIndex === -1) {
       showPopover.value = false
     } else {
+      // eslint-disable-next-line unicorn/prefer-string-slice
       const query = value.substring(atIndex + 1, caretPos)
       if (/\s/.test(query)) {
         showPopover.value = false
@@ -102,15 +103,15 @@
     const caretPos = textarea.selectionStart
     const atIndex = text.lastIndexOf('@', caretPos - 1)
 
-    const newDisplayValue =
-      text.slice(0, atIndex) +
-      `@${user.label} ` +
-      text.slice(caretPos)
+    const newDisplayValue
+      = text.slice(0, atIndex)
+        + `@${user.label} `
+        + text.slice(caretPos)
 
-    const newModelValue =
-      props.modelValue.slice(0, atIndex) +
-      `@[${user.label}](${user.value}) ` +
-      props.modelValue.slice(caretPos)
+    const newModelValue
+      = props.modelValue.slice(0, atIndex)
+        + `@[${user.label}](${user.value}) `
+        + props.modelValue.slice(caretPos)
 
     displayValue.value = newDisplayValue
     emit('update:modelValue', newModelValue)
@@ -135,7 +136,7 @@
     }
   }
 
-  function renderMentions(text) {
+  function renderMentions (text) {
     if (!text) return ''
     return text.replace(/@\[([^\]]+)\]\(([^)]+)\)/g, '@$1')
   }

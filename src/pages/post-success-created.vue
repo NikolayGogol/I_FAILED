@@ -9,7 +9,7 @@
 <script setup>
 
   import { useRouter } from 'vue-router'
-  import { useMainStore } from '@/stores/main'
+  import { useMainStore } from '@/stores/main/main.js'
 
   const flag = sessionStorage.getItem('post-success-created')
   const router = useRouter()

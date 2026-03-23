@@ -4,7 +4,7 @@
   import ProfileCard from '@/components/sidebars/ProfileCard.vue'
   import { feedNavItems } from '@/models/feed'
   import { getIcon } from '@/models/icons.js'
-  import { useMainStore } from '@/stores/main.js'
+  import { useMainStore } from '@/stores/main/main.js'
   import '@/styles/components/sidebars/sidebar.scss'
 
   const navItems = feedNavItems

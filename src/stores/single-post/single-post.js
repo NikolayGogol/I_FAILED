@@ -15,7 +15,7 @@ import {
   where,
 } from 'firebase/firestore'
 import { defineStore } from 'pinia'
-import { db } from '@/firebase'
+import { db } from '@/firebase.js'
 
 const collection_db = import.meta.env.VITE_POST_COLLECTION
 const comments_collection = import.meta.env.VITE_COMMENTS

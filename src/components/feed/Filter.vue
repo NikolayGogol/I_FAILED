@@ -1,7 +1,7 @@
 <script setup>
   import { reactive } from 'vue'
   import { categories } from '@/models/categories.js'
-  import { useMainStore } from '@/stores/main.js'
+  import { useMainStore } from '@/stores/main/main.js'
   import '@/styles/components/feed/filter.scss'
   const mainStore = useMainStore()
   //
