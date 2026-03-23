@@ -432,13 +432,25 @@
         </ul>
       </div>
       <v-divider v-if="post.images?.length > 0" class="my-6" />
-      <img
+      <v-img
         v-for="img in post.images"
-        :key="img"
-        :alt="img"
-        class="w-100"
-        :src="img"
+        :key="img.thumb"
+        :alt="post.title"
+        :aspect-ratio="16/9"
+        class="w-100 rounded-xl mb-3"
+        cover
+        :lazy-src="img.thumb"
+        :src="img.full"
       >
+        <template #placeholder>
+          <div class="d-flex align-center justify-center fill-height bg-grey-lighten-4">
+            <v-progress-circular
+              color="primary"
+              indeterminate
+            />
+          </div>
+        </template>
+      </v-img>
       <v-divider class="my-6" />
       <h3>React to This Story</h3>
       <ul class="reaction-list ga-1 sm-ga-2">

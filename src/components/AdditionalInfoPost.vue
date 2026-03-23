@@ -50,7 +50,7 @@
             class="mb-6"
             :max-files="3"
             multiple
-            :quality="20"
+            :quality="40"
           />
         </div>
         <div class="what-went-wrong form-group mt-6">

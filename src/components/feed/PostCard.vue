@@ -187,10 +187,21 @@
       <v-img
         v-if="post.images[0]"
         :alt="post.title"
+        :aspect-ratio="16/9"
         class="mb-4 rounded-xl"
         cover
-        :src="post.images[0]"
-      />
+        :lazy-src="post.images[0].thumb"
+        :src="post.images[0].thumb"
+      >
+        <template #placeholder>
+          <div class="d-flex align-center justify-center fill-height bg-grey-lighten-4">
+            <v-progress-circular
+              color="primary"
+              indeterminate
+            />
+          </div>
+        </template>
+      </v-img>
       <div v-if="post.emotionTags" class="post-chips">
         <span
           v-for="chip in post.emotionTags"

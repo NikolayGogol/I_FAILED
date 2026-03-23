@@ -48,14 +48,21 @@
 
     const files = Array.isArray(newVal) ? newVal : [newVal]
     previewItems.value = files.map(item => {
-      // If it's our custom object structure
+      // If it's our new custom object structure with thumb
+      if (item.thumb instanceof File) {
+        return {
+          url: URL.createObjectURL(item.thumb),
+          size: formatSize(item.size), // size of full image
+        }
+      }
+      // If it's our old custom object structure
       if (item.file instanceof File) {
         return {
           url: URL.createObjectURL(item.file),
           size: formatSize(item.size),
         }
       }
-      // Fallback for direct File objects (though we should be emitting objects now)
+      // Fallback for direct File objects
       if (item instanceof File) {
         return {
           url: URL.createObjectURL(item),
@@ -71,31 +78,43 @@
   }, { immediate: true })
 
   function compressImage (file) {
-    return new Promise((resolve, reject) => {
-      new Compressor(file, {
-        quality: props.quality / 100,
-        success (result) {
-          // Create a new File object from the Blob result
-          const compressedFile = new File([result], file.name, {
-            type: result.type,
-            lastModified: Date.now(),
-          })
-
-          // Create the requested object structure
-          const fileObject = {
-            name: compressedFile.name,
-            size: compressedFile.size,
-            file: compressedFile,
-            type: compressedFile.type,
-            format: compressedFile.type.split('/')[1] || '',
-          }
-
-          resolve(fileObject)
-        },
-        error (err) {
-          reject(err)
-        },
+    const compress = (fileToCompress, quality, width) => {
+      return new Promise((resolve, reject) => {
+        new Compressor(fileToCompress, {
+          quality: quality / 100,
+          width,
+          success (result) {
+            const compressedFile = new File([result], file.name, {
+              type: result.type,
+              lastModified: Date.now(),
+            })
+            resolve(compressedFile)
+          },
+          error (err) {
+            reject(err)
+          },
+        })
       })
+    }
+
+    return new Promise(async (resolve, reject) => {
+      try {
+        const fullFile = await compress(file, 100)
+        const thumbFile = await compress(file, props.quality, 500)
+
+        const fileObject = {
+          name: fullFile.name,
+          size: fullFile.size,
+          type: fullFile.type,
+          format: fullFile.type.split('/')[1] || '',
+          full: fullFile,
+          thumb: thumbFile,
+        }
+
+        resolve(fileObject)
+      } catch (error) {
+        reject(error)
+      }
     })
   }
 

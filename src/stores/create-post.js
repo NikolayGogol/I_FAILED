@@ -52,7 +52,12 @@ export const useCreatePostStore = defineStore('createPost', {
       this.title = ''
       this.whatHappened = ''
       this.whenHappened = null
+      this.scheduleDate = null
+      this.whatWentWrong = null
+      this.howDidItFeel = null
       this.images = []
+      this.emotionTags = []
+      this.tags = []
       this.isAnonymous = false
       this.visibility = visibilityList[0]
       this.allowComments = true
@@ -116,22 +121,35 @@ export const useCreatePostStore = defineStore('createPost', {
           postCount: increment(1),
         })
 
-        let imageUrls = []
+        let imageObjects = []
         if (this.images && this.images.length > 0) {
-          const uploadPromises = this.images.map(imageObject => {
-            const imageFile = imageObject.file
-            if (!imageFile) {
-              return Promise.resolve(null)
+          const uploadPromises = this.images.map(async imageObject => {
+            const thumbFile = imageObject.thumb
+            const fullFile = imageObject.full
+
+            if (!thumbFile || !fullFile) {
+              return null // Return null to be filtered out later
             }
-            const storageRef = ref(storage, `posts/${postId}/${Date.now()}_${imageObject.name}`)
-            return uploadBytes(storageRef, imageFile).then(snapshot => getDownloadURL(snapshot.ref))
+
+            const timestamp = Date.now()
+            const thumbStorageRef = ref(storage, `posts/${postId}/${timestamp}_${imageObject.name}_thumb`)
+            const fullStorageRef = ref(storage, `posts/${postId}/${timestamp}_${imageObject.name}_full`)
+
+            // Upload both files concurrently
+            const thumbUploadTask = uploadBytes(thumbStorageRef, thumbFile).then(snapshot => getDownloadURL(snapshot.ref))
+            const fullUploadTask = uploadBytes(fullStorageRef, fullFile).then(snapshot => getDownloadURL(snapshot.ref))
+
+            const [thumbUrl, fullUrl] = await Promise.all([thumbUploadTask, fullUploadTask])
+
+            return { thumb: thumbUrl, full: fullUrl, name: imageObject.name }
           })
-          const resolvedUrls = await Promise.all(uploadPromises)
-          imageUrls = resolvedUrls.filter(url => url !== null)
+
+          const resolvedImageObjects = await Promise.all(uploadPromises)
+          imageObjects = resolvedImageObjects.filter(obj => obj !== null)
         }
 
-        if (imageUrls.length > 0) {
-          await updateDoc(docRef, { images: imageUrls })
+        if (imageObjects.length > 0) {
+          await updateDoc(docRef, { images: imageObjects })
         }
 
         this.resetState()
