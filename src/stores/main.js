@@ -44,56 +44,14 @@ export const useMainStore = defineStore('main', {
         return state.allPosts
       }
       return state.allPosts.filter(post => {
-        const { categories, emojiTags, recoveryTime, costRange } = state.currentFilters
+        const { categories } = state.currentFilters
 
         // 1. Category Match
         const postCategories = post.selectedCategories || []
         const categoryMatch = !categories || categories.length === 0 || categories.some(filterCat =>
           postCategories.some(postCat => postCat.id === filterCat.id),
         )
-
-        // 2. Emoji Match
-        const postEmojis = post.emotionTags || []
-        const emojiMatch = !emojiTags || emojiTags.length === 0 || emojiTags.some(filterEmoji =>
-          postEmojis.includes(filterEmoji.value),
-        )
-
-        // 3. Recovery Time Match
-        const postRecoveryTime = post.recoveryTime
-        const recoveryMatch = !recoveryTime || recoveryTime.length === 0 || recoveryTime.some(filterRecovery =>
-          filterRecovery.value === postRecoveryTime,
-        )
-
-        // 4. Cost Range Match
-        const postCostRaw = post.cost
-        const postCost = Number(postCostRaw)
-        const costMatch = !costRange || costRange.length === 0 || costRange.some(range => {
-          if (range.label === 'Free') {
-            return !postCostRaw || postCost === 0
-          }
-          if (Number.isNaN(postCost)) {
-            return false
-          }
-          switch (range.label) {
-            case '<$100': {
-              return postCost > 0 && postCost < 100
-            }
-            case '$100 - $1k': {
-              return postCost >= 100 && postCost <= 1000
-            }
-            case '$1k - $5k': {
-              return postCost > 1000 && postCost <= 5000
-            }
-            case '$5k+': {
-              return postCost > 5000
-            }
-            default: {
-              return false
-            }
-          }
-        })
-
-        return categoryMatch && emojiMatch && recoveryMatch && costMatch
+        return categoryMatch
       })
     },
   },

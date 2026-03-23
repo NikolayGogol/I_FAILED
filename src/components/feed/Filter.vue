@@ -21,7 +21,7 @@
   })
   //
   function applyFilters () {
-    mainStore.applyPostFilters(selectedFilter)
+    console.log(selectedFilter)
   }
 
   function clearFilters () {
