@@ -1,8 +1,9 @@
 <script setup>
   import { reactive } from 'vue'
-  import { categories } from '@/models/categories.js'
+  import { categories, costRange, emotionTags, recoveryTimeOptions } from '@/models/categories.js'
   import { useMainStore } from '@/stores/main/main.js'
   import '@/styles/components/feed/filter.scss'
+
   const mainStore = useMainStore()
   //
   const selectedFilter = reactive({
@@ -19,6 +20,7 @@
       default: '',
     },
   })
+
   //
   function applyFilters () {
     console.log(selectedFilter)
@@ -47,6 +49,40 @@
         :value="item"
       />
     </v-chip-group>
+    <!--    -->
+    <h5 class="mt-3">Emotion Tags</h5>
+    <v-chip-group v-model="selectedFilter.emojiTags" multiple>
+      <v-chip
+        v-for="item in emotionTags"
+        :key="item.id"
+        color="primary"
+        :text="`${item.emoji} ${item.label}`"
+        :value="item"
+      />
+    </v-chip-group>
+    <!--    -->
+    <h5 class="mt-3">Recovery time</h5>
+    <v-chip-group v-model="selectedFilter.recoveryTime" multiple>
+      <v-chip
+        v-for="item in recoveryTimeOptions"
+        :key="item.value"
+        color="primary"
+        :text="item.title"
+        :value="item"
+      />
+    </v-chip-group>
+    <!--    -->
+    <h5 class="mt-3">Cost Range</h5>
+    <v-chip-group v-model="selectedFilter.costRange" multiple>
+      <v-chip
+        v-for="item in costRange"
+        :key="item.value"
+        color="primary"
+        :text="item.label"
+        :value="item"
+      />
+    </v-chip-group>
+
     <div class="d-flex align-center mt-6">
       <div class="submit-btn" @click="applyFilters">Apply</div>
       <div class="clear" @click="clearFilters">Clear all filters</div>
