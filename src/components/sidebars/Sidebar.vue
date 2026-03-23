@@ -4,13 +4,15 @@
   import ProfileCard from '@/components/sidebars/ProfileCard.vue'
   import { feedNavItems } from '@/models/feed'
   import { getIcon } from '@/models/icons.js'
+  import { useAuthStore } from '@/stores/auth.js'
   import { useMainStore } from '@/stores/main/main.js'
   import '@/styles/components/sidebars/sidebar.scss'
 
   const navItems = feedNavItems
   const router = useRouter()
   const mainStore = useMainStore()
-
+  const authStore = useAuthStore()
+  const currentUserName = computed(() => authStore.user?.displayName)
   // Use a computed property to reactively get the total posts count from the store
   const totalPosts = computed(() => mainStore.totalPosts)
   const lessonsShared = computed(() => mainStore.lessonsShared)
@@ -24,13 +26,13 @@
   <aside class="feed-sidebar">
     <ProfileCard class="mobile-profile-card" />
 
-    <div class="sidebar-logo">
+    <div v-if="currentUserName" class="sidebar-logo">
       <span class="logo-mark cursor-pointer" @click="router.push('/')">
         <img alt="" src="../../assets/Logo.png">
       </span>
     </div>
 
-    <nav class="sidebar-nav">
+    <nav v-if="currentUserName" class="sidebar-nav">
       <div class="sidebar-section d-flex flex-column">
         <router-link
           v-for="item in navItems"
@@ -61,6 +63,7 @@
     </section>
 
     <v-btn
+      v-if="currentUserName"
       class="create-post-btn rounded-lg w-100"
       color="primary"
       height="44"
