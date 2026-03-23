@@ -68,8 +68,24 @@ function matchesFilters (postData, filters) {
   const postedBy = f.postedBy || null
 
   // 1) postedBy
-  if (postedBy && normalizeString(postData?.uid) !== normalizeString(postedBy)) {
-    return false
+  if (postedBy) {
+    // In the UI, `postedBy` values are:
+    // - 'anonymous' => only anonymous posts
+    // - 'public' => only non-anonymous posts
+    if (postedBy === 'anonymous') {
+      if (!postData?.isAnonymous) {
+        return false
+      }
+    } else if (postedBy === 'public') {
+      if (postData?.isAnonymous) {
+        return false
+      }
+    } else {
+      // Fallback: if someone passes a uid, match by uid.
+      if (normalizeString(postData?.uid) !== normalizeString(postedBy)) {
+        return false
+      }
+    }
   }
 
   // 2) categories

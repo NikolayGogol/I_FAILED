@@ -23,7 +23,9 @@ export const useFilterStore = defineStore('filter', () => {
         emojiTags: selectedFilter.emojiTags.map(t => t.value),
         recoveryTime: selectedFilter.recoveryTime.map(t => t.value),
         costRange: selectedFilter.costRange.map(c => c.value),
-        postedBy: selectedFilter.postedBy,
+        // `postedBy` is stored as string values like 'anonymous' / 'public'
+        // (but we still support an object shape as a fallback).
+        postedBy: selectedFilter.postedBy?.value ?? selectedFilter.postedBy,
       }
       mainStore.applyPostFilters(params)
     } catch (error) {

@@ -77,7 +77,7 @@
         :key="radio.value"
         class="radio"
         :label="radio.label"
-        :value="radio"
+        :value="radio.value"
       />
     </v-radio-group>
     <div class="d-flex align-center mt-2">

@@ -157,7 +157,24 @@ export const useMainStore = defineStore('main', {
         // =========================
         // 5) Posted By Match
         // =========================
-        const postedByMatch = !postedBy || normalize(post.uid) === normalize(postedBy)
+        const postedByMatch = (() => {
+          if (!postedBy) {
+            return true
+          }
+
+          // In the UI, `postedBy` values are:
+          // - 'anonymous' => only anonymous posts
+          // - 'public' => only non-anonymous posts
+          if (postedBy === 'anonymous') {
+            return !!post.isAnonymous
+          }
+          if (postedBy === 'public') {
+            return !post.isAnonymous
+          }
+
+          // Fallback: if someone passes a uid, match by uid.
+          return normalize(post.uid) === normalize(postedBy)
+        })()
 
         return categoryMatch && emotionMatch && recoveryMatch && costMatch && postedByMatch
       })
@@ -355,16 +372,34 @@ export const useMainStore = defineStore('main', {
      * @param {object} filters - The filters object.
      */
     applyPostFilters (filters) {
-      // Clone the filters to prevent reactivity issues
-      const clonedFilters = filters ? structuredClone(filters) : null
-      const hasFilters = !!clonedFilters && Object.values(clonedFilters).some(f => {
+      // Avoid `structuredClone` because Vue/Pinia data can contain proxies
+      // that are not cloneable. We manually build a safe, plain object.
+      // eslint-disable-next-line @stylistic/multiline-ternary
+      const safeFilters = filters ? {
+        categories: Array.isArray(filters.categories)
+          ? filters.categories
+              .map(c => ({
+                id: c?.id,
+                label: c?.label,
+                // Preserve optional `count` used by the "for-you" bucketing logic.
+                count: c?.count,
+              }))
+              .filter(c => c.id || c.label)
+          : [],
+        emojiTags: Array.isArray(filters.emojiTags) ? [...filters.emojiTags] : [],
+        recoveryTime: Array.isArray(filters.recoveryTime) ? [...filters.recoveryTime] : [],
+        costRange: Array.isArray(filters.costRange) ? [...filters.costRange] : [],
+        postedBy: filters.postedBy?.value ?? filters.postedBy ?? null,
+      } : null
+
+      const hasFilters = !!safeFilters && Object.values(safeFilters).some(f => {
         if (Array.isArray(f)) {
           return f.length > 0
         }
         return !!f
       })
 
-      this.currentFilters = hasFilters ? clonedFilters : null
+      this.currentFilters = hasFilters ? safeFilters : null
 
       // Reload feed from scratch so the first page matches current filters.
       this.fetchPosts({ tab: this.activeTab, refresh: true })
