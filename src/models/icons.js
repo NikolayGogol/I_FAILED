@@ -166,6 +166,5 @@ export function getIcon (name, w = 0, h = 0) {
   if (i && h > 0) {
     i = i.replace(/height="[^"]*"/, `height="${h}"`)
   }
-  console.log(i)
   return i
 }

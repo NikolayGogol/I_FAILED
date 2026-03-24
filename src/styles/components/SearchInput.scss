@@ -1,3 +1,115 @@
 .profile-search {
-  // Add your search input styles here
+  position: relative;
+  width: 100%;
+
+  .search-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    z-index: 30;
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #d6dbe3;
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 10px 30px rgba(8, 15, 40, 0.12);
+  }
+
+  .search-help {
+    margin-bottom: 10px;
+    color: #607087;
+    font-size: 12px;
+    line-height: 1.4;
+
+    code {
+      margin-right: 6px;
+      padding: 1px 6px;
+      border-radius: 6px;
+      background: #f1f5fb;
+      color: #3d4a5d;
+      font-size: 11px;
+      white-space: nowrap;
+    }
+  }
+
+  .search-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  .search-btn {
+    height: 30px;
+    padding: 0 10px;
+    border: none;
+    border-radius: 8px;
+    font-size: 12px;
+    cursor: pointer;
+  }
+
+  .search-btn.clear {
+    background: #eef2f7;
+    color: #1f2d3d;
+  }
+
+  .search-btn.close {
+    background: #3f7fff;
+    color: #fff;
+  }
+
+  .search-state {
+    padding: 8px 4px;
+    color: #6f7c8f;
+    font-size: 13px;
+  }
+
+  .search-error {
+    color: #c53030;
+  }
+
+  .search-results {
+    max-height: 320px;
+    margin: 0;
+    padding: 0;
+    overflow: auto;
+    list-style: none;
+  }
+
+  .search-item {
+    padding: 10px;
+    border: 1px solid #edf1f7;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+
+    &:not(:last-child) {
+      margin-bottom: 8px;
+    }
+
+    &:hover {
+      background: #f7faff;
+    }
+  }
+
+  .search-item__title {
+    font-weight: 600;
+    font-size: 14px;
+    color: #1f2d3d;
+  }
+
+  .search-item__meta {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 4px;
+    color: #74839b;
+    font-size: 12px;
+  }
+
+  .search-item__excerpt {
+    margin-top: 6px;
+    color: #334155;
+    font-size: 13px;
+    line-height: 1.35;
+  }
 }
