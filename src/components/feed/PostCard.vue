@@ -46,6 +46,9 @@
   const isLiking = ref(false) // To disable the button during the request
   const commentCount = ref(0)
   const showSensitiveContent = ref(false)
+  const isBookmarked = ref(false)
+  const bookmarkCount = ref(p.post.bookmarks || 0)
+  const isBookmarking = ref(false)
 
   // =================================================================================================
   // Computed Properties
@@ -93,8 +96,13 @@
   // =================================================================================================
   onMounted(async () => {
     const currentUser = auth.currentUser
-    if (currentUser && p.post.likedBy?.includes(currentUser.uid)) {
-      isLiked.value = true
+    if (currentUser) {
+      if (p.post.likedBy?.includes(currentUser.uid)) {
+        isLiked.value = true
+      }
+      if (p.post.bookmarkedBy?.includes(currentUser.uid)) {
+        isBookmarked.value = true
+      }
     }
     commentCount.value = await postCardStore.getCommentCount(p.post.id)
   })
@@ -137,6 +145,44 @@
     }
 
     isLiking.value = false
+  }
+
+  async function handleBookmark () {
+    if (!authStore.user) {
+      await router.push('/login')
+      return
+    }
+    if (isBookmarking.value) return
+
+    isBookmarking.value = true
+
+    const originalIsBookmarked = isBookmarked.value
+    const originalBookmarkCount = bookmarkCount.value
+    const newIsBookmarked = !isBookmarked.value
+
+    // Optimistic UI update
+    isBookmarked.value = newIsBookmarked
+    bookmarkCount.value += newIsBookmarked ? 1 : -1
+
+    const result = await postCardStore.toggleBookmark({
+      postId: p.post.id,
+      bookmarked: newIsBookmarked,
+    })
+
+    if (result.success) {
+      if (newIsBookmarked) {
+        toast.success('Post bookmarked!')
+      } else {
+        toast.info('Post removed from bookmarks.')
+      }
+    } else {
+      isBookmarked.value = originalIsBookmarked
+      bookmarkCount.value = originalBookmarkCount
+      toast.error('Failed to update bookmark')
+      console.error('Failed to update bookmark status:', result.error)
+    }
+
+    isBookmarking.value = false
   }
 
   // Navigate to the single post page
@@ -254,7 +300,12 @@
     </template>
     <!-- Post footer with actions -->
     <footer class="post-footer">
-      <button class="icon-btn mr-4 hover" :class="{ 'liked': isLiked }" :disabled="isLiking" @click.stop.prevent="handleLike">
+      <button
+        class="icon-btn mr-4 hover"
+        :class="{ 'liked': isLiked }"
+        :disabled="isLiking"
+        @click.stop.prevent="handleLike"
+      >
         <div class="d-flex" v-html="getIcon('heart')" />
         <span class="text-uppercase">{{ floatNumber(likeCount) }}</span>
       </button>
@@ -267,7 +318,13 @@
         <span class="text-uppercase">{{ floatNumber(post.views) }}</span>
       </button>
       <v-spacer />
-      <button class="icon-btn mr-4 hover">
+      <button
+        class="icon-btn mr-4 hover"
+        :class="{ 'bookmarked': isBookmarked }"
+        :disabled="isBookmarking"
+        @click.stop.prevent="handleBookmark"
+      >
+        <span class="mr-2 text-uppercase">{{ floatNumber(bookmarkCount) }}</span>
         <div class="d-flex" v-html="getIcon('bookmark')" />
       </button>
       <button class="icon-btn hover" @click.stop="handleShare">
