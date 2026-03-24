@@ -580,7 +580,7 @@
             <div class="d-flex" v-html="getIcon('heart')" />
             <span class="ml-2 text-uppercase">{{ floatNumber(likeCount) }}</span>
           </div>
-          <div class="item ml-4" v-if="post.allowComments">
+          <div v-if="post.allowComments" class="item ml-4">
             <div class="d-flex" v-html="getIcon('message')" />
             <span class="ml-2">{{ floatNumber(comments.length) }}</span>
           </div>
