@@ -10,7 +10,7 @@
 <script setup>
   import dayjs from 'dayjs'
   import relativeTime from 'dayjs/plugin/relativeTime'
-  import { computed, nextTick, onMounted, ref } from 'vue'
+  import { computed, nextTick, onMounted, ref, watch } from 'vue'
   import EmojiPicker from 'vue3-emoji-picker'
   import { useRoute, useRouter } from 'vue-router'
   import { useToast } from 'vue-toastification'
@@ -112,46 +112,7 @@
   onMounted(() => {
     const postId = route.params.id
     if (postId) {
-      getPostById(postId).then(res => {
-        post.value = res
-        incrementViewCount(postId)
-
-        // Track user category reading stats.
-        if (auth.currentUser?.uid && res?.selectedCategories?.[0]) {
-          incrementCategoryRead({
-            userId: auth.currentUser.uid,
-            category: res.selectedCategories[0],
-          })
-        }
-
-        // Initialize like state
-        if (auth.currentUser && res.likedBy?.includes(auth.currentUser.uid)) {
-          isLiked.value = true
-        }
-        likeCount.value = res.likes || 0
-
-        // Initialize reactions state
-        if (res.reactions) {
-          for (const reaction of reactions.value) {
-            reaction.count = res.reactions[reaction.id]?.count || 0
-            if (auth.currentUser && res.reactions[reaction.id]?.users?.includes(auth.currentUser.uid)) {
-              reaction.active = true
-            }
-          }
-        }
-      })
-      loadComments(postId).then(() => {
-        if (route.hash) {
-          const commentId = route.hash.slice(1)
-          nextTick(() => {
-            // eslint-disable-next-line unicorn/prefer-query-selector
-            const element = document.getElementById(commentId)
-            if (element) {
-              element.scrollIntoView({ behavior: 'smooth' })
-            }
-          })
-        }
-      })
+      init(postId)
       getUsersForMentions().then(res => {
         users.value = res.map(user => ({
           value: user.uid,
@@ -162,6 +123,51 @@
     }
   })
 
+  function init (postId) {
+    getPostById(postId).then(res => {
+      post.value = res
+      incrementViewCount(postId)
+
+      // Track user category reading stats.
+      if (auth.currentUser?.uid && res?.selectedCategories?.[0]) {
+        incrementCategoryRead({
+          userId: auth.currentUser.uid,
+          category: res.selectedCategories[0],
+        })
+      }
+
+      // Initialize like state
+      if (auth.currentUser && res.likedBy?.includes(auth.currentUser.uid)) {
+        isLiked.value = true
+      }
+      likeCount.value = res.likes || 0
+
+      // Initialize reactions state
+      if (res.reactions) {
+        for (const reaction of reactions.value) {
+          reaction.count = res.reactions[reaction.id]?.count || 0
+          if (auth.currentUser && res.reactions[reaction.id]?.users?.includes(auth.currentUser.uid)) {
+            reaction.active = true
+          }
+        }
+      }
+    })
+    loadComments(postId).then(() => {
+      if (route.hash) {
+        const commentId = route.hash.slice(1)
+        nextTick(() => {
+          // eslint-disable-next-line unicorn/prefer-query-selector
+          const element = document.getElementById(commentId)
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth' })
+          }
+        })
+      }
+    })
+  }
+  watch(() => route.params, val => {
+    init(val.id)
+  })
   const timeAgo = computed(() => {
     if (!post.value?.createdAt) return ''
     return dayjs.unix(post.value.createdAt.seconds).fromNow()
@@ -942,7 +948,9 @@
                             <div class="d-block">
                               <div class="d-flex">
                                 <span class="font-weight-bold text-body-2 mr-2">{{ subReply.user?.displayName }}</span>
-                                <span class="date text-caption text-grey">{{ formatCommentDate(subReply.createdAt) }}</span>
+                                <span class="date text-caption text-grey">{{
+                                  formatCommentDate(subReply.createdAt)
+                                }}</span>
                               </div>
                               <div class="text-caption text-grey">@{{
                                 subReply.user?.displayName?.replaceAll(' ', '_')
