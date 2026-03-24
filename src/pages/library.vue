@@ -5,6 +5,19 @@
   }
 }
 </route>
+<script setup>
+  import { storeToRefs } from 'pinia'
+  import { onMounted } from 'vue'
+  import { useLibraryStore } from '@/stores/library'
+  import '@/styles/pages/library.scss'
+
+  const libraryStore = useLibraryStore()
+  const { bookmarkedPosts, loading, error } = storeToRefs(libraryStore)
+  onMounted(() => {
+    libraryStore.fetchBookmarkedPosts()
+  })
+
+</script>
 
 <template>
   <div class="library-page">
@@ -24,12 +37,7 @@
 
       <div v-else-if="bookmarkedPosts.length > 0" class="library-grid">
         <div v-for="bookmark in bookmarkedPosts" :key="bookmark.id" class="library-card">
-          <div class="library-icon">
-            <v-icon color="primary">mdi-bookmark-outline</v-icon>
-          </div>
-          <div class="library-content">
-            <h3>{{ bookmark.id || 'No title' }}</h3>
-          </div>
+          <PostCard :post="bookmark"></PostCard>
         </div>
       </div>
 
@@ -39,25 +47,3 @@
     </section>
   </div>
 </template>
-
-<script setup>
-  import dayjs from 'dayjs'
-  import { storeToRefs } from 'pinia'
-  import { computed, onMounted } from 'vue'
-  import { useLibraryStore } from '@/stores/library'
-  import '@/styles/pages/library.scss'
-
-  const libraryStore = useLibraryStore()
-  const { bookmarkedPosts, loading, error } = storeToRefs(libraryStore)
-
-  onMounted(() => {
-    libraryStore.fetchBookmarkedPosts()
-  })
-
-  function formatDate (timestamp) {
-    if (timestamp?.seconds) {
-      return dayjs.unix(timestamp.seconds).format('MMM D, YYYY')
-    }
-    return 'date not available'
-  }
-</script>

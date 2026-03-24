@@ -79,6 +79,7 @@ export const usePostCardStore = defineStore('postCard', {
           })
           const q = query(bookmarksCollectionRef, where('userId', '==', uid), where('postId', '==', postId))
           const querySnapshot = await getDocs(q)
+          // eslint-disable-next-line unicorn/no-array-for-each
           querySnapshot.forEach(async document => {
             await deleteDoc(doc(db, VITE_BOOKMARKS_COLLECTION, document.id))
           })
