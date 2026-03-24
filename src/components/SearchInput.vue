@@ -1,11 +1,11 @@
 <script setup>
+  import dayjs from 'dayjs'
   import { storeToRefs } from 'pinia'
-  import { computed, onBeforeUnmount, ref, watch } from 'vue'
+  import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
   import { useRouter } from 'vue-router'
   import FormInput from '@/components/FormInput.vue'
   import { useSearchStore } from '@/stores/search'
   import '@/styles/components/SearchInput.scss'
-  import dayjs from "dayjs";
 
   const router = useRouter()
   const searchStore = useSearchStore()
@@ -13,6 +13,7 @@
 
   const debounceMs = 350
   const timerId = ref(null)
+  const searchContainer = ref(null)
 
   const dropdownVisible = computed(() => opened.value && hasSearchParams.value)
 
@@ -54,6 +55,12 @@
     return ''
   }
 
+  function handleClickOutside (event) {
+    if (searchContainer.value && !searchContainer.value.contains(event.target)) {
+      closeDropdown()
+    }
+  }
+
   watch(
     () => search.value,
     () => {
@@ -65,15 +72,20 @@
     },
   )
 
+  onMounted(() => {
+    document.addEventListener('click', handleClickOutside)
+  })
+
   onBeforeUnmount(() => {
     if (timerId.value) {
       clearTimeout(timerId.value)
     }
+    document.removeEventListener('click', handleClickOutside)
   })
 </script>
 
 <template>
-  <div class="profile-search">
+  <div ref="searchContainer" class="profile-search">
     <FormInput
       v-model="search"
       density="compact"
