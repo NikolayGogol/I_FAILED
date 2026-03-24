@@ -1,10 +1,10 @@
-import { collection, doc, getDoc, getDocs, query, where } from 'firebase/firestore'
+import { collection, getDocs, query, where } from 'firebase/firestore'
 import { defineStore } from 'pinia'
 import { db } from '@/firebase'
 import { useAuthStore } from '@/stores/auth.js'
+import { useSinglePostStore } from '@/stores/single-post/single-post.js'
 
 const VITE_BOOKMARKS_COLLECTION = import.meta.env.VITE_BOOKMARKS
-const VITE_POST_COLLECTION = import.meta.env.VITE_POST_COLLECTION
 
 export const useLibraryStore = defineStore('library', {
   state: () => ({
@@ -19,6 +19,8 @@ export const useLibraryStore = defineStore('library', {
 
       try {
         const authStore = useAuthStore()
+        const SinglePostStore = useSinglePostStore()
+
         const uid = authStore.user?.uid
 
         if (!uid) {
@@ -40,9 +42,18 @@ export const useLibraryStore = defineStore('library', {
           return
         }
 
-        this.bookmarkedPosts = snapshot.docs.map(doc => ({
-          id: doc.id,
+        const postIds = snapshot.docs.map(doc => ({
+          id: doc.data().postId,
         }))
+        if (postIds.length === 0) {
+          return
+        } else {
+          for (const item of postIds) {
+            // eslint-disable-next-line unicorn/no-single-promise-in-promise-methods
+            const res = await Promise.all([SinglePostStore.getPostById(item.id)])
+            this.bookmarkedPosts.push(res[0])
+          }
+        }
       } catch (error) {
         console.error('Error fetching bookmarked posts:', error)
         this.error = error.message
