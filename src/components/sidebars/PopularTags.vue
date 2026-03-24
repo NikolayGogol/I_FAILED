@@ -32,7 +32,7 @@
     },
   ]
 
-  const displayLimit = ref(5)
+  const displayLimit = ref(4)
 
   const visibleTags = computed(() => {
     return popularTagsStore.allTags.slice(0, displayLimit.value)

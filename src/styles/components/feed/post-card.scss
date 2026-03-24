@@ -148,7 +148,7 @@
     margin-bottom: $spacing-md;
 
     .post-chip {
-      background-color: $color-background;
+      border: 1px solid $color-border;
       color: $color-text-secondary;
       padding: $chip-padding;
       border-radius: $radius-full;

@@ -256,15 +256,15 @@
     <footer class="post-footer">
       <button class="icon-btn mr-4 hover" :class="{ 'liked': isLiked }" :disabled="isLiking" @click.stop.prevent="handleLike">
         <div class="d-flex" v-html="getIcon('heart')" />
-        <span class="text-uppercase">{{ floatNumber(likeCount, '0a.0', '') }}</span>
+        <span class="text-uppercase">{{ floatNumber(likeCount) }}</span>
       </button>
       <button v-if="post.allowComments" class="icon-btn mr-4">
         <div class="d-flex" v-html="getIcon('message')" />
-        <span class="text-uppercase">{{ floatNumber(commentCount, '0a.0', '') }}</span>
+        <span class="text-uppercase">{{ floatNumber(commentCount) }}</span>
       </button>
       <button class="icon-btn">
         <div class="d-flex" v-html="getIcon('eye')" />
-        <span class="text-uppercase">{{ floatNumber(post.views, '0a.0', '') }}</span>
+        <span class="text-uppercase">{{ floatNumber(post.views) }}</span>
       </button>
       <v-spacer />
       <button class="icon-btn mr-4 hover">
