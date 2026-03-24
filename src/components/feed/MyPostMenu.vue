@@ -1,34 +1,35 @@
 <script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { useToast } from 'vue-toastification'
-import { usePostStore } from '@/stores/post'
+  import { ref } from 'vue'
+  import { useRouter } from 'vue-router'
+  import { useToast } from 'vue-toastification'
+  import { usePostStore } from '@/stores/post'
 
-const props = defineProps({
-  post: {
-    type: Object,
-    required: true,
-  },
-})
+  const props = defineProps({
+    post: {
+      type: Object,
+      required: true,
+    },
+  })
+  const emit = defineEmits(['refresh'])
+  const router = useRouter()
+  const toast = useToast()
+  const postStore = usePostStore()
+  const showDeleteDialog = ref(false)
 
-const router = useRouter()
-const toast = useToast()
-const postStore = usePostStore()
-const showDeleteDialog = ref(false)
-
-function editPost() {
-  router.push(`/edit-post/${props.post.id}`)
-}
-
-async function confirmDelete() {
-  const success = await postStore.deletePost(props.post.id)
-  if (success) {
-    toast.success('Post deleted')
-    showDeleteDialog.value = false
-  } else {
-    toast.error('Failed to delete post')
+  function editPost () {
+    router.push(`/edit-post/${props.post.id}`)
   }
-}
+
+  async function confirmDelete () {
+    const success = await postStore.deletePost(props.post.id)
+    if (success) {
+      toast.success('Post deleted')
+      showDeleteDialog.value = false
+      emit('refresh')
+    } else {
+      toast.error('Failed to delete post')
+    }
+  }
 </script>
 
 <template>

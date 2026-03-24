@@ -91,7 +91,10 @@
             >
               <template v-if="!post.lessonLearned" #recovered-content>
                 <div class="submit-btn" @click="updatePost(post)">I recovered</div>
-                <my-post-menu :post="post"></my-post-menu>
+                <my-post-menu :post="post" @refresh="profileStore.fetchUserPosts(authStore.user.uid)" />
+              </template>
+              <template v-else #recovered-content>
+                <my-post-menu :post="post" @refresh="profileStore.fetchUserPosts(authStore.user.uid)" />
               </template>
             </PostCard>
           </div>
