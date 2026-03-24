@@ -41,10 +41,10 @@
 </template>
 
 <script setup>
-  import { onMounted, computed } from 'vue'
-  import { useLibraryStore } from '@/stores/library'
-  import { storeToRefs } from 'pinia'
   import dayjs from 'dayjs'
+  import { storeToRefs } from 'pinia'
+  import { computed, onMounted } from 'vue'
+  import { useLibraryStore } from '@/stores/library'
   import '@/styles/pages/library.scss'
 
   const libraryStore = useLibraryStore()
@@ -54,7 +54,7 @@
     libraryStore.fetchBookmarkedPosts()
   })
 
-  const formatDate = (timestamp) => {
+  function formatDate (timestamp) {
     if (timestamp?.seconds) {
       return dayjs.unix(timestamp.seconds).format('MMM D, YYYY')
     }
