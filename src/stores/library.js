@@ -16,7 +16,7 @@ export const useLibraryStore = defineStore('library', {
     hasMore: true, // Becomes false when all posts are loaded
   }),
   actions: {
-    async fetchBookmarkedPostIds() {
+    async fetchBookmarkedPostIds () {
       this.loading = true
       this.error = null
       this.bookmarkedPosts = []
@@ -57,8 +57,10 @@ export const useLibraryStore = defineStore('library', {
       }
     },
 
-    async loadMoreBookmarks(pageSize = 5) {
-      if (this.loadingMore || !this.hasMore) return
+    async loadMoreBookmarks (pageSize = 5) {
+      if (this.loadingMore || !this.hasMore) {
+        return
+      }
 
       this.loadingMore = true
       this.error = null
@@ -79,7 +81,7 @@ export const useLibraryStore = defineStore('library', {
         const promises = idsToLoad.map(id => singlePostStore.getPostById(id))
         const newPosts = await Promise.all(promises)
 
-        this.bookmarkedPosts.push(...newPosts.filter(post => post)) // Add new posts, filtering out any nulls
+        this.bookmarkedPosts.push(...newPosts.filter(Boolean)) // Add new posts, filtering out any nulls
 
         if (this.bookmarkedPosts.length >= this.bookmarkedPostIds.length) {
           this.hasMore = false

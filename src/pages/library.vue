@@ -6,47 +6,47 @@
 }
 </route>
 <script setup>
-import { storeToRefs } from 'pinia'
-import { onMounted, onUnmounted, ref } from 'vue'
-import { useLibraryStore } from '@/stores/library'
-import '@/styles/pages/library.scss'
+  import { storeToRefs } from 'pinia'
+  import { onMounted, onUnmounted, ref } from 'vue'
+  import { useLibraryStore } from '@/stores/library'
+  import '@/styles/pages/library.scss'
 
-const libraryStore = useLibraryStore()
-const { bookmarkedPosts, loading, error, hasMore, loadingMore } = storeToRefs(libraryStore)
-const observerTarget = ref(null)
-let observer
+  const libraryStore = useLibraryStore()
+  const { bookmarkedPosts, loading, error, hasMore, loadingMore } = storeToRefs(libraryStore)
+  const observerTarget = ref(null)
+  let observer
 
-onMounted(async () => {
-  // Fetch initial set of post IDs
-  await libraryStore.fetchBookmarkedPostIds()
-  // Load the first page of bookmarks if IDs were found
-  if (libraryStore.hasMore) {
-    await libraryStore.loadMoreBookmarks()
-  }
+  onMounted(async () => {
+    // Fetch initial set of post IDs
+    await libraryStore.fetchBookmarkedPostIds()
+    // Load the first page of bookmarks if IDs were found
+    if (libraryStore.hasMore) {
+      await libraryStore.loadMoreBookmarks()
+    }
 
-  // Set up the Intersection Observer
-  observer = new IntersectionObserver(
-    (entries) => {
-      if (entries[0].isIntersecting && hasMore.value && !loadingMore.value) {
-        libraryStore.loadMoreBookmarks()
-      }
-    },
-    {
-      rootMargin: '200px', // Load more when the user is 200px away from the bottom
-    },
-  )
+    // Set up the Intersection Observer
+    observer = new IntersectionObserver(
+      entries => {
+        if (entries[0].isIntersecting && hasMore.value && !loadingMore.value) {
+          libraryStore.loadMoreBookmarks()
+        }
+      },
+      {
+        rootMargin: '200px', // Load more when the user is 200px away from the bottom
+      },
+    )
 
-  if (observerTarget.value) {
-    observer.observe(observerTarget.value)
-  }
-})
+    if (observerTarget.value) {
+      observer.observe(observerTarget.value)
+    }
+  })
 
-onUnmounted(() => {
-  // Clean up the observer
-  if (observer && observerTarget.value) {
-    observer.unobserve(observerTarget.value)
-  }
-})
+  onUnmounted(() => {
+    // Clean up the observer
+    if (observer && observerTarget.value) {
+      observer.unobserve(observerTarget.value)
+    }
+  })
 </script>
 
 <template>
@@ -67,7 +67,7 @@ onUnmounted(() => {
 
       <div v-else-if="bookmarkedPosts.length > 0" class="library-grid">
         <div v-for="bookmark in bookmarkedPosts" :key="bookmark.id" class="library-card">
-          <PostCard :post="bookmark"></PostCard>
+          <PostCard :post="bookmark" />
         </div>
       </div>
 
@@ -76,7 +76,7 @@ onUnmounted(() => {
       </div>
 
       <!-- Observer Target -->
-      <div ref="observerTarget" class="observer-target"></div>
+      <div ref="observerTarget" class="observer-target" />
 
       <!-- Loading indicator for lazy loading -->
       <div v-if="loadingMore" class="loading-more">
