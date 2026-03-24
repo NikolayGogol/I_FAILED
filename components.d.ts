@@ -30,6 +30,7 @@ declare module 'vue' {
     MentionTextarea: typeof import('./src/components/MentionTextarea.vue')['default']
     MobileSlide: typeof import('./src/components/MobileSlide.vue')['default']
     MoblileNavbar: typeof import('./src/components/MoblileNavbar.vue')['default']
+    MyPostMenu: typeof import('./src/components/feed/MyPostMenu.vue')['default']
     NotificationSettings: typeof import('./src/components/settings/NotificationSettings.vue')['default']
     PopularTags: typeof import('./src/components/sidebars/PopularTags.vue')['default']
     PostCard: typeof import('./src/components/feed/PostCard.vue')['default']

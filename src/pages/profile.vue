@@ -91,6 +91,7 @@
             >
               <template v-if="!post.lessonLearned" #recovered-content>
                 <div class="submit-btn" @click="updatePost(post)">I recovered</div>
+                <my-post-menu :post="post"></my-post-menu>
               </template>
             </PostCard>
           </div>
