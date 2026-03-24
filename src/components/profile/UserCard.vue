@@ -11,6 +11,7 @@
   import { useAuthStore } from '@/stores/auth.js'
   import { useProfileStore } from '@/stores/profile.js'
   import '@/styles/components/profile/user-card.scss'
+import {floatNumber} from "@/utils/format-number.js";
 
   // =================================================================================================
   // Props
@@ -233,24 +234,24 @@
     <!-- User activity stats -->
     <div v-if="displayActivity" class="user-activity-footer">
       <div class="activity-stat">
-        <v-icon icon="mdi-file-outline" />
-        <span class="stat-value">{{ displayActivity.posts }}</span>
+       <div class="" v-html="getIcon('document')"></div>
+        <span class="stat-value text-uppercase">{{ floatNumber(displayActivity.posts) }}</span>
         <span class="stat-label">Posts</span>
       </div>
       <div class="activity-stat">
-        <v-icon icon="mdi-comment-outline" />
-        <span class="stat-value">{{ displayActivity.comments }}</span>
+        <div class="" v-html="getIcon('message')"></div>
+        <span class="stat-value text-uppercase">{{ floatNumber(displayActivity.comments) }}</span>
         <span class="stat-label">Comments</span>
       </div>
       <div class="activity-stat">
-        <v-icon icon="mdi-heart-outline" />
-        <span class="stat-value">{{ displayActivity.reactionsReceived }}</span>
-        <span class="stat-label d-none d-sm-block">Reactions Received</span>
+        <div class="" v-html="getIcon('heart')"></div>
+        <span class="stat-value text-uppercase">{{ floatNumber(displayActivity.reactionsReceived) }}</span>
+        <span class="stat-label d-none d-sm-block text-no-wrap">Reactions Received</span>
         <span class="stat-label d-sm-none">Received</span>
       </div>
       <div class="activity-stat">
-        <v-icon icon="mdi-heart-outline" />
-        <span class="stat-value">{{ displayActivity.reactionsGiven }}</span>
+        <div class="" v-html="getIcon('heart')"></div>
+        <span class="stat-value text-uppercase">{{ floatNumber(displayActivity.reactionsGiven) }}</span>
         <span class="stat-label d-none d-sm-block">Reactions Given</span>
         <span class="stat-label d-sm-none"> Given</span>
       </div>

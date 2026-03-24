@@ -154,6 +154,9 @@
     if (time?._seconds) {
       return dayjs.unix(time._seconds).fromNow()
     }
+    if (time?.seconds) {
+      return dayjs.unix(time._seconds).fromNow()
+    }
     return ''
   }
 
