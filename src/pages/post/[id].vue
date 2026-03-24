@@ -582,7 +582,7 @@
           </div>
           <div class="item ml-4">
             <div class="d-flex" v-html="getIcon('message')" />
-            <span class="ml-2">{{ comments.length }}</span>
+            <span class="ml-2">{{ floatNumber(comments.length) }}</span>
           </div>
           <div class="item ml-4">
             <div class="d-flex" v-html="getIcon('eye')" />
