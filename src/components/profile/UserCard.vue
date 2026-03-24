@@ -44,6 +44,7 @@
   const newBio = ref('')
   const newPhotoFile = ref(null)
   const photoPreviewUrl = ref(null)
+  const isUpdating = ref(false)
 
   // =================================================================================================
   // Computed Properties
@@ -127,6 +128,7 @@
 
   // Handle the profile update
   async function handleUpdateProfile () {
+    isUpdating.value = true
     try {
       await profileStore.updateUserProfile({
         displayName: newDisplayName.value,
@@ -138,6 +140,7 @@
     } catch {
       toast.error('Failed to update profile.')
     }
+    isUpdating.value = false
   }
 
 </script>
@@ -316,9 +319,17 @@
           <v-col>
             <div
               class="submit-btn"
+              :disabled="isUpdating"
               @click="handleUpdateProfile"
             >
-              Save
+              <v-progress-circular
+                v-if="isUpdating"
+                class="mr-2"
+                indeterminate
+                size="20"
+                width="2"
+              />
+              <span v-else>Save</span>
             </div>
           </v-col>
         </v-row>
@@ -382,9 +393,17 @@
           <v-col>
             <div
               class="submit-btn"
+              :disabled="isUpdating"
               @click="handleUpdateProfile"
             >
-              Save
+              <v-progress-circular
+                v-if="isUpdating"
+                class="mr-2"
+                indeterminate
+                size="20"
+                width="2"
+              />
+              <span v-else>Save</span>
             </div>
           </v-col>
         </v-row>

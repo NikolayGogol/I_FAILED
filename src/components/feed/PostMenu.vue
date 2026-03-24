@@ -22,6 +22,7 @@
   const toast = useToast()
   const mobileDrawer = ref(false)
   const showBlockDialog = ref(false)
+  const isBlocking = ref(false)
 
   const isFollowing = computed(() => {
     if (!authStore.user || !authStore.user.following) return false
@@ -80,6 +81,7 @@
       await router.push('/login')
       return
     }
+    isBlocking.value = true
     const userId = props.post.uid
     const userName = props.post.user.displayName
 
@@ -90,6 +92,7 @@
     } else {
       toast.error(`Failed to block ${userName}`)
     }
+    isBlocking.value = false
   }
 
   async function handleUnblock () {
@@ -193,7 +196,16 @@
           <div class="cancel-btn" @click="showBlockDialog = false">Cancel</div>
         </v-col>
         <v-col>
-          <div class="submit-btn" @click="confirmBlock">Block</div>
+          <div class="submit-btn" :disabled="isBlocking" @click="confirmBlock">
+            <v-progress-circular
+              v-if="isBlocking"
+              class="mr-2"
+              indeterminate
+              size="20"
+              width="2"
+            />
+            <span v-else>Block</span>
+          </div>
         </v-col>
       </v-row>
     </div>

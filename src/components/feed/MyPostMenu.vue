@@ -15,20 +15,23 @@
   const toast = useToast()
   const postStore = usePostStore()
   const showDeleteDialog = ref(false)
+  const isDeleting = ref(false)
 
   function editPost () {
     router.push(`/edit-post/${props.post.id}`)
   }
 
   async function confirmDelete () {
+    isDeleting.value = true
     const success = await postStore.deletePost(props.post.id)
     if (success) {
-      toast.success('Post deleted')
+      toast.info('Post deleted')
       showDeleteDialog.value = false
       emit('refresh')
     } else {
       toast.error('Failed to delete post')
     }
+    isDeleting.value = false
   }
 </script>
 
@@ -62,7 +65,16 @@
             <div class="cancel-btn" @click="showDeleteDialog = false">Cancel</div>
           </v-col>
           <v-col>
-            <div class="submit-btn" @click="confirmDelete">Delete</div>
+            <div class="submit-btn" :disabled="isDeleting" @click="confirmDelete">
+              <v-progress-circular
+                v-if="isDeleting"
+                class="mr-2"
+                indeterminate
+                size="20"
+                width="2"
+              />
+              <span v-else>Delete</span>
+            </div>
           </v-col>
         </v-row>
       </div>

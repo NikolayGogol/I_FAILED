@@ -7,6 +7,7 @@
 
   const authStore = useAuthStore()
   const logoutDialog = ref(false)
+  const isLoggingOut = ref(false)
   const items = [
     {
       title: 'Profile',
@@ -67,7 +68,9 @@
   }
 
   async function confirmLogout () {
+    isLoggingOut.value = true
     await authStore.logout()
+    isLoggingOut.value = false
     logoutDialog.value = false
   }
 
@@ -158,8 +161,18 @@
           <v-col>
             <div
               class="submit-btn"
+              :disabled="isLoggingOut"
               @click="confirmLogout"
-            >Sign out</div>
+            >
+              <v-progress-circular
+                v-if="isLoggingOut"
+                class="mr-2"
+                indeterminate
+                size="20"
+                width="2"
+              />
+              <span v-else>Sign out</span>
+            </div>
           </v-col>
         </v-row>
       </v-card>
