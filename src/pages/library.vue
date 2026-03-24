@@ -14,22 +14,50 @@
         <p>Your saved posts and resources.</p>
       </div>
 
-      <div class="library-grid">
-        <div v-for="i in 4" :key="i" class="library-card">
+      <div v-if="loading" class="loading-state">
+        <p>Loading your saved posts...</p>
+      </div>
+
+      <div v-else-if="error" class="error-state">
+        <p>Error: {{ error }}</p>
+      </div>
+
+      <div v-else-if="bookmarkedPosts.length > 0" class="library-grid">
+        <div v-for="bookmark in bookmarkedPosts" :key="bookmark.id" class="library-card">
           <div class="library-icon">
             <v-icon color="primary">mdi-bookmark-outline</v-icon>
           </div>
           <div class="library-content">
-            <h3>Saved Article {{ i }}</h3>
-            <p>A detailed breakdown of why my SaaS failed.</p>
-            <span class="library-date">Saved on Oct 12</span>
+            <h3>{{ bookmark.id || 'No title' }}</h3>
           </div>
         </div>
+      </div>
+
+      <div v-else class="empty-state">
+        <p>You haven't saved any posts yet.</p>
       </div>
     </section>
   </div>
 </template>
 
 <script setup>
+  import { onMounted, computed } from 'vue'
+  import { useLibraryStore } from '@/stores/library'
+  import { storeToRefs } from 'pinia'
+  import dayjs from 'dayjs'
   import '@/styles/pages/library.scss'
+
+  const libraryStore = useLibraryStore()
+  const { bookmarkedPosts, loading, error } = storeToRefs(libraryStore)
+
+  onMounted(() => {
+    libraryStore.fetchBookmarkedPosts()
+  })
+
+  const formatDate = (timestamp) => {
+    if (timestamp?.seconds) {
+      return dayjs.unix(timestamp.seconds).format('MMM D, YYYY')
+    }
+    return 'date not available'
+  }
 </script>
