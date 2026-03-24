@@ -3,10 +3,10 @@
   import { useRouter } from 'vue-router'
   import { useToast } from 'vue-toastification'
   import { useDisplay } from 'vuetify/framework'
+  import { getIcon } from '@/models/icons.js'
   import { useAuthStore } from '@/stores/auth.js'
   import { usePostMenuStore } from '@/stores/post-menu.js'
   import '@/styles/components/feed/post-menu.scss'
-  import {getIcon} from "@/models/icons.js";
   const { smAndDown } = useDisplay()
 
   const props = defineProps({

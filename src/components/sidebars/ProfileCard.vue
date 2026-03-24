@@ -1,11 +1,11 @@
 <script setup>
   import { computed, ref } from 'vue'
   import { useRouter } from 'vue-router'
+  import SearchInput from '@/components/SearchInput.vue'
   import { useAuthStore } from '@/stores/auth'
   import '@/styles/components/sidebars/profile-card.scss'
 
   const authStore = useAuthStore()
-  const search = ref('')
   const logoutDialog = ref(false)
   const items = [
     {
@@ -138,16 +138,7 @@
       <div class="cancel-btn mt-4" @click="goTo('/register')">Sign up</div>
       <div class="submit-btn mt-2" @click="goTo('/login')">Login</div>
     </v-card>
-    <form-input
-      v-if="currentUserName"
-      v-model="search"
-      class="profile-search"
-      density="compact"
-      hide-details
-      placeholder="Search"
-      prepend-inner-icon="mdi-magnify"
-      variant="outlined"
-    />
+    <SearchInput v-if="currentUserName" />
     <div v-if="!currentUserName" class="footer-link py-2">
       <div v-for="(nav, index) in footerLink" :key="index" class="px-2 py-1">
         <router-link :to="nav.path">{{ nav.label }}</router-link>

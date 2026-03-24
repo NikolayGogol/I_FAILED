@@ -10,8 +10,8 @@
   import { getIcon } from '@/models/icons.js'
   import { useAuthStore } from '@/stores/auth.js'
   import { useProfileStore } from '@/stores/profile.js'
+  import { floatNumber } from '@/utils/format-number.js'
   import '@/styles/components/profile/user-card.scss'
-import {floatNumber} from "@/utils/format-number.js";
 
   // =================================================================================================
   // Props
@@ -234,23 +234,23 @@ import {floatNumber} from "@/utils/format-number.js";
     <!-- User activity stats -->
     <div v-if="displayActivity" class="user-activity-footer">
       <div class="activity-stat">
-       <div class="" v-html="getIcon('document')"></div>
+        <div class="" v-html="getIcon('document')" />
         <span class="stat-value text-uppercase">{{ floatNumber(displayActivity.posts) }}</span>
         <span class="stat-label">Posts</span>
       </div>
       <div class="activity-stat">
-        <div class="" v-html="getIcon('message')"></div>
+        <div class="" v-html="getIcon('message')" />
         <span class="stat-value text-uppercase">{{ floatNumber(displayActivity.comments) }}</span>
         <span class="stat-label">Comments</span>
       </div>
       <div class="activity-stat">
-        <div class="" v-html="getIcon('heart')"></div>
+        <div class="" v-html="getIcon('heart')" />
         <span class="stat-value text-uppercase">{{ floatNumber(displayActivity.reactionsReceived) }}</span>
         <span class="stat-label d-none d-sm-block text-no-wrap">Reactions Received</span>
         <span class="stat-label d-sm-none">Received</span>
       </div>
       <div class="activity-stat">
-        <div class="" v-html="getIcon('heart')"></div>
+        <div class="" v-html="getIcon('heart')" />
         <span class="stat-value text-uppercase">{{ floatNumber(displayActivity.reactionsGiven) }}</span>
         <span class="stat-label d-none d-sm-block">Reactions Given</span>
         <span class="stat-label d-sm-none"> Given</span>

@@ -41,6 +41,7 @@ declare module 'vue' {
     Rightbar: typeof import('./src/components/sidebars/Rightbar.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    SearchInput: typeof import('./src/components/SearchInput.vue')['default']
     SecuritySettings: typeof import('./src/components/settings/SecuritySettings.vue')['default']
     Sidebar: typeof import('./src/components/sidebars/Sidebar.vue')['default']
     UploadFile: typeof import('./src/components/UploadFile.vue')['default']
