@@ -10,7 +10,7 @@
 <script setup>
   import { QuillEditor } from '@vueup/vue-quill'
   import { computed, ref } from 'vue'
-  import { useRouter } from 'vue-router'
+  import { useRoute, useRouter } from 'vue-router'
   import AdditionalInfoPost from '@/components/AdditionalInfoPost.vue'
   import FormInput from '@/components/FormInput.vue'
   import PrivacyPosting from '@/components/PrivacyPosting.vue'
@@ -21,6 +21,7 @@
   import '@/styles/pages/create-post.scss'
 
   const router = useRouter()
+  const route = useRoute()
   const store = useCreatePostStore()
   const inputLength = 100
   const quillLength = 5000
@@ -52,6 +53,10 @@
       // Handle error, maybe show a notification
       console.error('Failed to create post')
     }
+  }
+
+  function updatePost () {
+    console.log('updatePost')
   }
 
 </script>
@@ -120,7 +125,20 @@
       <v-divider />
       <PrivacyPosting />
       <div class="d-flex mt-6">
-        <v-btn color="primary" :disabled="!isFormValid" :loading="isLoading" @click="submitPost">Post</v-btn>
+        <v-btn
+          v-if="!route?.params?.id"
+          color="primary"
+          :disabled="!isFormValid"
+          :loading="isLoading"
+          @click="submitPost"
+        >Post</v-btn>
+        <v-btn
+          v-else
+          color="primary"
+          :disabled="!isFormValid"
+          :loading="isLoading"
+          @click="updatePost"
+        >Update Post</v-btn>
       </div>
     </div>
   </div>

@@ -23,6 +23,7 @@ declare module 'vue-router/auto-routes' {
     '/check-inbox': RouteRecordInfo<'/check-inbox', '/check-inbox', Record<never, never>, Record<never, never>>,
     '/congrats': RouteRecordInfo<'/congrats', '/congrats', Record<never, never>, Record<never, never>>,
     '/create-post': RouteRecordInfo<'/create-post', '/create-post', Record<never, never>, Record<never, never>>,
+    '/edit-post/[id]': RouteRecordInfo<'/edit-post/[id]', '/edit-post/:id', { id: ParamValue<true> }, { id: ParamValue<false> }>,
     '/explore': RouteRecordInfo<'/explore', '/explore', Record<never, never>, Record<never, never>>,
     '/failure-age': RouteRecordInfo<'/failure-age', '/failure-age', Record<never, never>, Record<never, never>>,
     '/failure-resume': RouteRecordInfo<'/failure-resume', '/failure-resume', Record<never, never>, Record<never, never>>,
@@ -72,6 +73,10 @@ declare module 'vue-router/auto-routes' {
     }
     'src/pages/create-post.vue': {
       routes: '/create-post'
+      views: never
+    }
+    'src/pages/edit-post/[id].vue': {
+      routes: '/edit-post/[id]'
       views: never
     }
     'src/pages/explore.vue': {
