@@ -19,6 +19,7 @@
   import { usePopularStore } from '@/stores/feed/popular'
   import { useFilterStore } from '@/stores/main/filter.js'
   import '@/styles/pages/index.scss'
+  import {generateRandomPost} from "@/utils/post-generator.js";
 
   const { smAndUp } = useDisplay()
   const authStore = useAuthStore()
@@ -88,6 +89,9 @@
     }
     isFilterPanel.value = false
   }
+  async function handleGeneratePost () {
+    await generateRandomPost()
+  }
 </script>
 
 <template>
@@ -111,6 +115,9 @@
         <div class="d-flex">
           <div class="font-weight-semibold cancel-btn" @click="$router.push('/create-post')">
             New failure
+          </div>
+          <div v-if="isDevMode" class="cancel-btn font-weight-semibold ml-2 d-none d-md-block" @click="handleGeneratePost">
+            Generate Post
           </div>
         </div>
         <div class="composer-filter">
