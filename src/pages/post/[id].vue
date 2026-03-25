@@ -484,12 +484,12 @@
 
       <section v-if="post.whatHappened" class="single-post-page__section mb-6">
         <h2 class="section-title">What Happened</h2>
-        <div v-html="post.whatHappened" />
+        <div class="word-break" v-html="post.whatHappened" />
       </section>
 
       <section v-if="post?.whatWentWrong" class="single-post-page__section mb-6">
         <h2 class="section-title">What Went Wrong</h2>
-        <div v-html="post?.whatWentWrong" />
+        <div class="word-break" v-html="post?.whatWentWrong" />
       </section>
 
       <div
@@ -498,20 +498,20 @@
       >
         <section v-if="post.lessonLearned?.whatILearned">
           <h2 class="section-title">What I Learned</h2>
-          <div v-html="post.lessonLearned.whatILearned" />
+          <div class="word-break" v-html="post.lessonLearned.whatILearned" />
         </section>
         <section v-if="post.lessonLearned?.keyTakeaways">
           <h2 class="section-title">Key Takeaways</h2>
-          <div v-html="post.lessonLearned.keyTakeaways " />
+          <div class="word-break" v-html="post.lessonLearned.keyTakeaways " />
         </section>
       </div>
       <section v-if="post?.lessonLearned?.whatIdDoDifferently" class="bg-orange-accent-1 pa-6 rounded-lg mb-6">
         <h2 class="section-title">What I'd Do Differently</h2>
-        <div v-html="post.lessonLearned.whatIdDoDifferently" />
+        <div class="word-break" v-html="post.lessonLearned.whatIdDoDifferently" />
       </section>
       <section v-if="post?.lessonLearned?.advice" class="bg-orange-accent-1 pa-6 rounded-lg mb-6">
         <h2 class="section-title">Advice for Others</h2>
-        <div v-html="post?.lessonLearned.advice" />
+        <div class="word-break" v-html="post?.lessonLearned.advice" />
       </section>
 
       <h3>Additional Details</h3>

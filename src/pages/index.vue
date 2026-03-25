@@ -7,7 +7,7 @@
 </route>
 
 <script setup>
-  import { computed, reactive, ref } from 'vue'
+  import { computed, markRaw, reactive, ref } from 'vue'
   import { useDisplay } from 'vuetify'
   import Filter from '@/components/feed/Filter.vue'
   import ForYouTab from '@/components/feed/tabs/ForYouTab.vue'
@@ -31,13 +31,13 @@
 
   // Define the tabs for the feed
   const tabs = reactive([
-    { label: 'Latest', value: 'latest', component: LatestTab },
-    { label: 'Popular', value: 'popular', component: PopularTab },
+    { label: 'Latest', value: 'latest', component: markRaw(LatestTab) },
+    { label: 'Popular', value: 'popular', component: markRaw(PopularTab) },
   ])
 
   // Add "For You" tab if the user is authenticated
   if (authStore.user) {
-    tabs.push({ label: 'For You', value: 'for-you', component: ForYouTab })
+    tabs.push({ label: 'For You', value: 'for-you', component: markRaw(ForYouTab) })
   }
 
   /**
