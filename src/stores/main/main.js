@@ -195,6 +195,8 @@ export const useMainStore = defineStore('main', {
 
         // Distribute posts into buckets
         for (const post of matched) {
+          if (post.isAnonymous) continue // Exclude anonymous posts from "For You" feed
+
           if (followedUsers.includes(post.uid)) {
             buckets.user.push(post)
           } else if (post.tags && post.tags.some(tag => followedTags.includes(tag))) {
