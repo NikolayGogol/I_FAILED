@@ -50,7 +50,7 @@
       return dayjs.unix(time._seconds).fromNow()
     }
     if (time?.seconds) {
-      return dayjs.unix(time._seconds).fromNow()
+      return dayjs.unix(time.seconds).fromNow()
     }
     return ''
   }
@@ -88,12 +88,13 @@
   <div ref="searchContainer" class="profile-search">
     <FormInput
       v-model="search"
+      autocomplete="off"
       density="compact"
       hide-details
       placeholder="Search posts (title, content, category, tags, user...)"
       prepend-inner-icon="mdi-magnify"
       variant="outlined"
-      @focus="openDropdown"
+      @click="openDropdown"
     />
 
     <div v-if="dropdownVisible" class="search-dropdown">
@@ -118,3 +119,13 @@
     </div>
   </div>
 </template>
+
+<style scoped lang="scss">
+.search-item__excerpt {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+</style>
