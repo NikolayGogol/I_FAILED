@@ -19,16 +19,29 @@ export const useForYouStore = defineStore('forYou', {
   }),
   getters: {
     /**
-     * Filters posts based on client-side rules, like "not interested" tags.
+     * Filters posts based on client-side rules, like "not interested" tags and own posts.
      * @param {object} state - The store's state.
      * @returns {Array} The filtered posts.
      */
     filteredPosts(state) {
       const authStore = useAuthStore();
-      const notInterestedTags = authStore.user?.notInterestedTags || [];
+      if (!authStore.user) {
+        return state.posts; // Return all posts if user is not logged in
+      }
+
+      const notInterestedTags = authStore.user.notInterestedTags || [];
+      const currentUserId = authStore.user.uid;
 
       return state.posts.filter(post => {
-        return !notInterestedTags.some(tag => post.tags?.includes(tag));
+        // Exclude user's own posts
+        if (post.uid === currentUserId) {
+          return false;
+        }
+        // Exclude posts with tags the user is not interested in
+        if (post.tags && post.tags.some(tag => notInterestedTags.includes(tag))) {
+          return false;
+        }
+        return true;
       });
     },
   },
