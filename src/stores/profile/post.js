@@ -1,7 +1,7 @@
 import { deleteDoc, doc, getDoc } from 'firebase/firestore'
-import { defineStore } from 'pinia'
-import { db, storage, ref } from '@/firebase.js'
 import { deleteObject } from 'firebase/storage'
+import { defineStore } from 'pinia'
+import { db, ref, storage } from '@/firebase.js'
 
 export const usePostStore = defineStore('post', {
   actions: {
@@ -12,10 +12,14 @@ export const usePostStore = defineStore('post', {
         const data = postSnap.exists() ? postSnap.data() : null
 
         // URL shape: https://.../o/<encodedPath>?alt=media&token=...
-        const getStorageRefFromDownloadURL = (downloadURL) => {
-          if (typeof downloadURL !== 'string') return null
+        const getStorageRefFromDownloadURL = downloadURL => {
+          if (typeof downloadURL !== 'string') {
+            return null
+          }
           const match = downloadURL.match(/\/o\/([^?]+)/)
-          if (!match) return null
+          if (!match) {
+            return null
+          }
           const encodedPath = match[1]
           const decodedPath = decodeURIComponent(encodedPath.replace(/\+/g, '%20'))
           return ref(storage, decodedPath)
@@ -25,13 +29,21 @@ export const usePostStore = defineStore('post', {
         const images = Array.isArray(data?.images) ? data.images : []
         const urls = new Set()
         for (const img of images) {
-          if (!img) continue
-          if (typeof img.thumb === 'string') urls.add(img.thumb)
-          if (typeof img.full === 'string') urls.add(img.full)
+          if (!img) {
+            continue
+          }
+          if (typeof img.thumb === 'string') {
+            urls.add(img.thumb)
+          }
+          if (typeof img.full === 'string') {
+            urls.add(img.full)
+          }
         }
 
         const deleteOps = Array.from(urls).map(url => {
-          if (typeof url !== 'string' || url.length === 0) return Promise.resolve()
+          if (typeof url !== 'string' || url.length === 0) {
+            return Promise.resolve()
+          }
           try {
             if (url.startsWith('http')) {
               const storageRef = getStorageRefFromDownloadURL(url)

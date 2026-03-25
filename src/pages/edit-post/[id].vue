@@ -30,7 +30,7 @@
           createPostStore.allowComments = res.allowComments
           createPostStore.enableTriggerWarning = res.enableTriggerWarning
           // UI controls this via DatePicker => expects a JS Date (or null).
-          const toJsDate = (value) => {
+          const toJsDate = value => {
             if (!value) return null
             if (value instanceof Date) return value
             if (typeof value?.toDate === 'function') return value.toDate()

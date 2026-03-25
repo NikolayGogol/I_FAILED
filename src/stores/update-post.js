@@ -1,7 +1,7 @@
 import { doc, getDoc, serverTimestamp, updateDoc } from 'firebase/firestore'
+import { deleteObject } from 'firebase/storage'
 import { defineStore } from 'pinia'
 import { db, getDownloadURL, ref, storage, uploadBytes } from '@/firebase'
-import { deleteObject } from 'firebase/storage'
 import { noAvatar } from '@/models/no-data.js'
 import { useAuthStore } from '@/stores/auth.js'
 
@@ -10,6 +10,7 @@ const collection_db_scheduled = import.meta.env.VITE_POST_COLLECTION_SCEDULED
 
 export const useUpdatePostStore = defineStore('updatePost', {
   actions: {
+    // eslint-disable-next-line complexity
     async updatePost (docId, payload = {}) {
       const authStore = useAuthStore()
       if (!authStore.user) {
@@ -20,8 +21,12 @@ export const useUpdatePostStore = defineStore('updatePost', {
       }
 
       const toFirestoreDate = value => {
-        if (!value) return null
-        if (value instanceof Date) return Number.isNaN(value.getTime()) ? null : value
+        if (!value) {
+          return null
+        }
+        if (value instanceof Date) {
+          return Number.isNaN(value.getTime()) ? null : value
+        }
         if (typeof value === 'string' || typeof value === 'number') {
           const d = new Date(value)
           return Number.isNaN(d.getTime()) ? null : d
@@ -43,12 +48,16 @@ export const useUpdatePostStore = defineStore('updatePost', {
       const isBlobLike = value => value instanceof File || value instanceof Blob
 
       const getStorageRefFromPossibleImageValue = imageValue => {
-        if (typeof imageValue !== 'string' || imageValue.length === 0) return null
+        if (typeof imageValue !== 'string' || imageValue.length === 0) {
+          return null
+        }
 
         // Common case: Firebase Storage download URL.
         if (imageValue.startsWith('http')) {
           const match = imageValue.match(/\/o\/([^?]+)/)
-          if (!match) return null
+          if (!match) {
+            return null
+          }
           const encodedPath = match[1]
           const decodedPath = decodeURIComponent(encodedPath.replace(/\+/g, '%20'))
           return ref(storage, decodedPath)
@@ -90,7 +99,7 @@ export const useUpdatePostStore = defineStore('updatePost', {
 
         // Prefer `scheduleDate` because UI edits this field via DatePicker.
         // `scheduleDate` may be explicitly `null` to indicate "unschedule".
-        const scheduleDateRaw = payload.scheduleDate !== undefined ? payload.scheduleDate : (payload.scheduledAt ?? null)
+        const scheduleDateRaw = payload.scheduleDate === undefined ? (payload.scheduledAt ?? null) : payload.scheduleDate
         const isScheduled = !!scheduleDateRaw
 
         const scheduledAtRaw = isScheduled ? toFirestoreDate(scheduleDateRaw) : null
@@ -132,7 +141,9 @@ export const useUpdatePostStore = defineStore('updatePost', {
             uploads.push(
               uploadBytes(thumbStorageRef, thumbVal)
                 .then(snapshot => getDownloadURL(snapshot.ref))
-                .then(url => { thumbUrl = url }),
+                .then(url => {
+                  thumbUrl = url
+                }),
             )
           }
 
@@ -141,21 +152,25 @@ export const useUpdatePostStore = defineStore('updatePost', {
             uploads.push(
               uploadBytes(fullStorageRef, fullVal)
                 .then(snapshot => getDownloadURL(snapshot.ref))
-                .then(url => { fullUrl = url }),
+                .then(url => {
+                  fullUrl = url
+                }),
             )
           }
 
           await Promise.all(uploads)
 
           // Require both URLs.
-          if (!thumbUrl || !fullUrl) return null
+          if (!thumbUrl || !fullUrl) {
+            return null
+          }
           return { thumb: thumbUrl, full: fullUrl, name, isNew: true }
         }))
 
         const normalizedImages = imagesPayload
           .filter(Boolean)
           .map((img, idx) => ({ ...img, __idx: idx }))
-          .sort((a, b) => (b.isNew === a.isNew ? a.__idx - b.__idx : (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0)))
+          .toSorted((a, b) => (b.isNew === a.isNew ? a.__idx - b.__idx : (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0)))
           .map(({ isNew, __idx, ...rest }) => rest)
 
         const selectedCategories = Array.isArray(payload.selectedCategories)
@@ -205,17 +220,21 @@ export const useUpdatePostStore = defineStore('updatePost', {
           // Delete old thumb/full independently if they are not present anymore.
           if (oldThumb && !keepThumbs.has(oldThumb)) {
             const r = getStorageRefFromPossibleImageValue(oldThumb)
-            if (r) deleteRefs.push(r)
+            if (r) {
+              deleteRefs.push(r)
+            }
           }
 
           if (oldFull && !keepFulls.has(oldFull)) {
             const r = getStorageRefFromPossibleImageValue(oldFull)
-            if (r) deleteRefs.push(r)
+            if (r) {
+              deleteRefs.push(r)
+            }
           }
         }
 
-        const deleteOps = deleteRefs.map(r => deleteObject(r).catch(err => {
-          console.error('Failed deleting storage object:', err)
+        const deleteOps = deleteRefs.map(r => deleteObject(r).catch(error => {
+          console.error('Failed deleting storage object:', error)
         }))
         await Promise.allSettled(deleteOps)
 
@@ -227,4 +246,3 @@ export const useUpdatePostStore = defineStore('updatePost', {
     },
   },
 })
-

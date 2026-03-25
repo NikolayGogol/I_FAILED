@@ -11,6 +11,7 @@
   import { QuillEditor } from '@vueup/vue-quill'
   import { computed, ref } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
+  import { useToast } from 'vue-toastification'
   import AdditionalInfoPost from '@/components/AdditionalInfoPost.vue'
   import FormInput from '@/components/FormInput.vue'
   import PrivacyPosting from '@/components/PrivacyPosting.vue'
@@ -18,7 +19,6 @@
   import { useCreatePostStore } from '@/stores/create-post.js'
   import { useUpdatePostStore } from '@/stores/update-post.js'
   import { stripHtml } from '@/utils/html.js'
-  import { useToast } from 'vue-toastification'
   import '@vueup/vue-quill/dist/vue-quill.snow.css'
   import '@/styles/pages/create-post.scss'
 
