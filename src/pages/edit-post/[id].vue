@@ -8,20 +8,27 @@
 </route>
 <script setup>
   import { onMounted } from 'vue'
-  import { useRoute } from 'vue-router'
+  import { useRoute, useRouter } from 'vue-router'
   import CreatePost from '@/pages/create-post.vue'
+  import { useAuthStore } from '@/stores/auth.js'
   import { useCreatePostStore } from '@/stores/create-post.js'
   import { useSinglePostStore } from '@/stores/single-post/single-post.js'
   //
   const route = useRoute()
+  const router = useRouter()
   const singlePostStore = useSinglePostStore()
   const createPostStore = useCreatePostStore()
+  const auth = useAuthStore()
   //
   onMounted(() => {
     const id = route.params.id
     if (id) {
       singlePostStore.getPostById(id)
         .then(res => {
+          if (auth.user.uid !== res.uid) {
+            router.go(-1)
+            return
+          }
           createPostStore.title = res.title
           createPostStore.whatHappened = res.whatHappened
           createPostStore.selectedCategories = res.selectedCategories
