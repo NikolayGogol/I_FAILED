@@ -14,6 +14,7 @@
   import { usePostCardStore } from '@/stores/post-card.js'
   import { floatNumber, formatNumber } from '@/utils/format-number.js'
   import '@/styles/components/feed/post-card.scss'
+  import {noAvatar} from "@/models/no-data.js";
 
   dayjs.extend(relativeTime)
 
@@ -222,7 +223,8 @@
     <!-- Post header -->
     <header class="post-header">
       <div class="post-avatar cursor-pointer" @click="openUserProfile">
-        <img v-if="post.user.photoURL" alt="User avatar" :src="post.user.photoURL">
+        <img v-if="post.user && post.user.photoURL" alt="User avatar" :src="post.user.photoURL">
+        <img v-else-if="post.isAnonymous" alt="User avatar" :src="noAvatar">
         <span v-else>{{ userInitial }}</span>
       </div>
       <div class="post-author cursor-pointer" @click="openUserProfile">
