@@ -171,7 +171,7 @@
 
     if (result.success) {
       if (newIsBookmarked) {
-        toast.success('Post bookmarked!')
+        toast.info('Post bookmarked!')
       } else {
         toast.info('Post removed from bookmarks.')
       }
