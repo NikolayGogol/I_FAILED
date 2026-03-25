@@ -45,11 +45,16 @@ export const useMainStore = defineStore('main', {
   }),
   getters: {
     filteredPosts (state) {
+      const authStore = useAuthStore()
+      const notInterestedTags = authStore.user?.notInterestedTags || []
       const normalize = v => (v === undefined || v === null) ? '' : String(v).trim().toLowerCase()
       if (!state.currentFilters || Object.values(state.currentFilters).every(f => !f || f.length === 0)) {
-        return state.allPosts
+        return state.allPosts.filter(post => !post.tags || !post.tags.some(tag => notInterestedTags.includes(tag)))
       }
       const matched = state.allPosts.filter(post => {
+        if (post.tags && post.tags.some(tag => notInterestedTags.includes(tag))) {
+          return false
+        }
         const {
           categories,
           emojiTags,

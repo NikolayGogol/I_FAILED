@@ -1,8 +1,10 @@
-import { collection, getDocs } from 'firebase/firestore'
+import { arrayRemove, arrayUnion, collection, doc, getDocs, updateDoc } from 'firebase/firestore'
 import { defineStore } from 'pinia'
 import { db } from '@/firebase'
+import { useAuthStore } from './auth'
 
 const VITE_POST_COLLECTION = import.meta.env.VITE_POST_COLLECTION
+const VITE_USERS_COLLECTION = import.meta.env.VITE_USERS_COLLECTION
 
 export const usePopularTagsStore = defineStore('popularTags', {
   state: () => ({
@@ -45,5 +47,66 @@ export const usePopularTagsStore = defineStore('popularTags', {
         console.error('Error getting popular tags:', error)
       }
     },
+
+    async followTag (tag) {
+      const authStore = useAuthStore()
+      if (!authStore.user) {
+        return { success: false, message: 'User not authenticated' }
+      }
+
+      const userRef = doc(db, VITE_USERS_COLLECTION, authStore.user.uid)
+      const isFollowing = authStore.user.followedTags?.includes(tag)
+
+      try {
+        if (isFollowing) {
+          await updateDoc(userRef, {
+            followedTags: arrayRemove(tag),
+          })
+          authStore.user.followedTags = authStore.user.followedTags.filter(t => t !== tag)
+          return { success: true, following: false, message: `Unfollowed ${tag}` }
+        } else {
+          await updateDoc(userRef, {
+            followedTags: arrayUnion(tag),
+          })
+          if (!authStore.user.followedTags) {
+            authStore.user.followedTags = []
+          }
+          authStore.user.followedTags.push(tag)
+          return { success: true, following: true, message: `Following ${tag}` }
+        }
+      } catch (error) {
+        console.error('Error following tag:', error)
+        return { success: false, message: 'Failed to update tag follow status' }
+      }
+    },
+    async toggleInterestInTag(tag) {
+      const authStore = useAuthStore()
+      if (!authStore.user) return { success: false, message: 'User not authenticated' }
+
+      const userRef = doc(db, VITE_USERS_COLLECTION, authStore.user.uid)
+      const isNotInterested = authStore.user.notInterestedTags?.includes(tag)
+
+      try {
+        if (isNotInterested) {
+          await updateDoc(userRef, {
+            notInterestedTags: arrayRemove(tag)
+          });
+          authStore.user.notInterestedTags = authStore.user.notInterestedTags.filter(t => t !== tag)
+          return { success: true, interested: true, message: `You will now see posts with ${tag}` }
+        } else {
+          await updateDoc(userRef, {
+            notInterestedTags: arrayUnion(tag)
+          });
+          if (!authStore.user.notInterestedTags) {
+            authStore.user.notInterestedTags = []
+          }
+          authStore.user.notInterestedTags.push(tag)
+          return { success: true, interested: false, message: `Not interested in ${tag}` }
+        }
+      } catch (error) {
+        console.error('Error updating interest in tag:', error)
+        return { success: false, message: 'Failed to update tag interest status' }
+      }
+    }
   },
 })

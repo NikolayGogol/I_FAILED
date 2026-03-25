@@ -54,9 +54,15 @@ export const useProfileStore = defineStore('profile', {
         const posts = []
         const authStore = useAuthStore()
         const user = authStore.user
+        const notInterestedTags = user?.notInterestedTags || []
 
         for (const doc of querySnapshot.docs) {
           const post = { id: doc.id, ...doc.data() }
+
+          // Skip posts with not interested tags
+          if (post.tags && post.tags.some(tag => notInterestedTags.includes(tag))) {
+            continue
+          }
 
           // Handle anonymous posts
           if (post.isAnonymous) {

@@ -1,9 +1,13 @@
 <script setup>
   import { computed, onMounted, ref } from 'vue'
+  import { useToast } from 'vue-toastification'
+  import { useAuthStore } from '@/stores/auth'
   import { usePopularTagsStore } from '@/stores/popular-tags'
   import '@/styles/components/sidebars/popular-tags.scss'
 
   const popularTagsStore = usePopularTagsStore()
+  const authStore = useAuthStore()
+  const toast = useToast()
 
   const footerLink = [
     {
@@ -46,6 +50,36 @@
     displayLimit.value += 5
   }
 
+  async function handleInterestToggle(tag) {
+    const result = await popularTagsStore.toggleInterestInTag(tag)
+    if (result.success) {
+      toast.info(result.message)
+    } else {
+      toast.error(result.message)
+    }
+  }
+
+  async function handleFollowTag (tag) {
+    const result = await popularTagsStore.followTag(tag)
+    if (result.success) {
+      if (result.following) {
+        toast.success(result.message)
+      } else {
+        toast.info(result.message)
+      }
+    } else {
+      toast.error(result.message)
+    }
+  }
+
+  function isFollowing (tag) {
+    return authStore.user?.followedTags?.includes(tag)
+  }
+
+  function isNotInterested(tag) {
+    return authStore.user?.notInterestedTags?.includes(tag)
+  }
+
   onMounted(() => {
     popularTagsStore.getPopularTags()
   })
@@ -63,9 +97,31 @@
     >
       <span class="popular-tag">#{{ tag }}</span>
       <v-spacer />
-      <v-btn icon size="small" variant="text">
-        <v-icon>mdi-dots-horizontal</v-icon>
-      </v-btn>
+      <v-menu open-on-hover>
+        <template #activator="{ props }">
+          <v-btn icon size="small" variant="text" v-bind="props">
+            <v-icon>mdi-dots-horizontal</v-icon>
+          </v-btn>
+        </template>
+        <v-list class="rounded-xl elevation-1">
+          <v-list-item class="cursor-pointer" @click="handleInterestToggle(tag)">
+            <v-list-item-title>
+              <v-icon :icon="isNotInterested(tag) ? 'mdi-emoticon-happy-outline' : 'mdi-emoticon-sad-outline'" />
+              {{ isNotInterested(tag) ? 'Interested in this topic' : 'Not interested in this topic' }}
+            </v-list-item-title>
+          </v-list-item>
+          <v-list-item class="cursor-pointer" @click="handleFollowTag(tag)">
+            <v-list-item-title v-if="isFollowing(tag)">
+              <v-icon icon="mdi-minus" />
+              Unfollow tag
+            </v-list-item-title>
+            <v-list-item-title v-else>
+              <v-icon icon="mdi-plus" />
+              Follow tag
+            </v-list-item-title>
+          </v-list-item>
+        </v-list>
+      </v-menu>
     </div>
 
     <!-- Show More Button -->
