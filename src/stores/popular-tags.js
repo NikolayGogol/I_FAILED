@@ -92,9 +92,11 @@ export const usePopularTagsStore = defineStore('popularTags', {
      * @param {string} tag - The tag to mark as interested or not interested.
      * @returns {Promise<object>} An object with success status and a message.
      */
-    async toggleInterestInTag(tag) {
+    async toggleInterestInTag (tag) {
       const authStore = useAuthStore()
-      if (!authStore.user) return { success: false, message: 'User not authenticated' }
+      if (!authStore.user) {
+        return { success: false, message: 'User not authenticated' }
+      }
 
       const userRef = doc(db, VITE_USERS_COLLECTION, authStore.user.uid)
       const isNotInterested = authStore.user.notInterestedTags?.includes(tag)
@@ -103,15 +105,15 @@ export const usePopularTagsStore = defineStore('popularTags', {
         if (isNotInterested) {
           // Mark as interested
           await updateDoc(userRef, {
-            notInterestedTags: arrayRemove(tag)
-          });
+            notInterestedTags: arrayRemove(tag),
+          })
           authStore.user.notInterestedTags = authStore.user.notInterestedTags.filter(t => t !== tag)
           return { success: true, interested: true, message: `You will now see posts with ${tag}` }
         } else {
           // Mark as not interested
           await updateDoc(userRef, {
-            notInterestedTags: arrayUnion(tag)
-          });
+            notInterestedTags: arrayUnion(tag),
+          })
           if (!authStore.user.notInterestedTags) {
             authStore.user.notInterestedTags = []
           }
@@ -122,6 +124,6 @@ export const usePopularTagsStore = defineStore('popularTags', {
         console.error('Error updating interest in tag:', error)
         return { success: false, message: 'Failed to update tag interest status' }
       }
-    }
+    },
   },
 })

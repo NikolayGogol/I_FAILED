@@ -56,8 +56,8 @@ export const useMainStore = defineStore('main', {
       // We only apply client-side filters that the backend is not aware of, like "not interested".
       if (state.activeTab === 'for-you') {
         return state.allPosts.filter(post => {
-          return !notInterestedTags.some(tag => post.tags?.includes(tag));
-        });
+          return !notInterestedTags.some(tag => post.tags?.includes(tag))
+        })
       }
 
       // --- Default filtering logic for other tabs ('latest', 'popular') ---
@@ -69,7 +69,7 @@ export const useMainStore = defineStore('main', {
 
         // If no other filters are set, the post is a match
         if (!state.currentFilters || Object.values(state.currentFilters).every(f => !f || f.length === 0)) {
-            return true;
+          return true
         }
 
         const {
@@ -320,10 +320,10 @@ export const useMainStore = defineStore('main', {
           if (isTabChanging) {
             if (tab === 'for-you') {
               // For "For You", we don't need to save/restore filters as it has its own logic
-              this.currentFilters = null;
+              this.currentFilters = null
             } else if (prevTab === 'for-you') {
               // Clear filters when moving away from "For You" to a normal tab
-              this.currentFilters = null;
+              this.currentFilters = null
             }
           }
 
@@ -342,7 +342,7 @@ export const useMainStore = defineStore('main', {
       this.loading = true
 
       try {
-        const effectivePageSize = pageSize;
+        const effectivePageSize = pageSize
 
         // Construct the payload for the API
         const payload = {
@@ -354,8 +354,8 @@ export const useMainStore = defineStore('main', {
 
         // For "For You" tab, send user's follow data for personalization
         if (this.activeTab === 'for-you') {
-            payload.followedUsers = authStore.user?.following || [];
-            payload.followedTags = authStore.user?.followedTags || [];
+          payload.followedUsers = authStore.user?.following || []
+          payload.followedTags = authStore.user?.followedTags || []
         }
 
         const response = await api.post('posts/feed', payload)

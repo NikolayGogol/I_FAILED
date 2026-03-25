@@ -7,101 +7,87 @@
 </route>
 
 <script setup>
-  import { storeToRefs } from 'pinia'
-  import { computed, onMounted, onUnmounted, reactive, ref } from 'vue'
-  import { useToast } from 'vue-toastification'
-  import { useDisplay } from 'vuetify'
-  import Filter from '@/components/feed/Filter.vue'
-  import PostCard from '@/components/feed/PostCard.vue'
-  import { useAuthStore } from '@/stores/auth.js'
-  import { useFilterStore } from '@/stores/main/filter.js'
-  import { useMainStore } from '@/stores/main/main.js'
-  import { generateRandomPost } from '@/utils/post-generator.js'
-  import '@/styles/pages/index.scss'
-  const { smAndUp } = useDisplay()
-  //
-  const mainStore = useMainStore()
-  const authStore = useAuthStore()
-  const filterStore = useFilterStore()
-  const { filteredPosts: posts, loading, hasMore, activeTab } = storeToRefs(mainStore)
-  const { selectedFilter } = storeToRefs(filterStore)
-  const toast = useToast()
-  const isFilterPanel = ref(false)
-  const postPerPage = 5
-  const loadPerPage = 3
-  const tabs = reactive([
-    { label: 'Latest', value: 'latest' },
-    { label: 'Popular', value: 'popular' },
-  ])
-  if (authStore.user) {
-    tabs.push({ label: 'For You', value: 'for-you' })
-  }
+import { ref, reactive, computed } from 'vue';
+import { useDisplay } from 'vuetify';
+import { useAuthStore } from '@/stores/auth';
+import { useFilterStore } from '@/stores/main/filter.js';
+import { useLatestStore } from '@/stores/feed/latest';
+import { usePopularStore } from '@/stores/feed/popular';
+import Filter from '@/components/feed/Filter.vue';
+import ForYouTab from '@/components/feed/tabs/ForYouTab.vue';
+import LatestTab from '@/components/feed/tabs/LatestTab.vue';
+import PopularTab from '@/components/feed/tabs/PopularTab.vue';
+import MobileSlide from '@/components/MobileSlide.vue';
+import '@/styles/pages/index.scss';
 
-  function selectTab (tab) {
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-    mainStore.fetchPosts({ tab: tab.value, pageSize: postPerPage, refresh: true })
-  }
+const { smAndUp } = useDisplay();
+const authStore = useAuthStore();
+const filterStore = useFilterStore();
+const latestStore = useLatestStore();
+const popularStore = usePopularStore();
 
-  function handleScroll () {
-    if (loading.value) return;
-    const { scrollTop, scrollHeight, clientHeight } = document.documentElement
-    if (scrollHeight - scrollTop - clientHeight < 100) {
-      mainStore.fetchPosts({ pageSize: loadPerPage })
-    }
-  }
+const activeTab = ref('latest');
+const isFilterPanel = ref(false);
 
-  onMounted(() => {
-    // Clear any persistent filters from previous sessions on mount
-    mainStore.currentFilters = null
-    mainStore.fetchPosts({ tab: 'latest', pageSize: postPerPage, refresh: true })
-    window.addEventListener('scroll', handleScroll)
-  })
+// Define the tabs for the feed
+const tabs = reactive([
+  { label: 'Latest', value: 'latest', component: LatestTab },
+  { label: 'Popular', value: 'popular', component: PopularTab },
+]);
 
-  onUnmounted(() => {
-    window.removeEventListener('scroll', handleScroll)
-  })
+// Add "For You" tab if the user is authenticated
+if (authStore.user) {
+  tabs.push({ label: 'For You', value: 'for-you', component: ForYouTab });
+}
 
-  function toggleFilter () {
-    isFilterPanel.value = !isFilterPanel.value
-  }
+/**
+ * Computed property to count the number of active filters.
+ */
+const activeFilterCount = computed(() => {
+  const filters = filterStore.selectedFilter;
+  if (!filters) return 0;
+  let count = 0;
+  if (filters.categories?.length) count += filters.categories.length;
+  if (filters.emojiTags?.length) count += filters.emojiTags.length;
+  if (filters.recoveryTime?.length) count += filters.recoveryTime.length;
+  if (filters.costRange?.length) count += filters.costRange.length;
+  if (filters.postedBy) count += 1;
+  return count;
+});
 
-  async function handleGeneratePost () {
-    try {
-      await generateRandomPost()
-      toast.success('Random post generated successfully!')
-      await mainStore.fetchPosts({ tab: activeTab.value, pageSize: postPerPage, refresh: true })
-    } catch {
-      toast.error('Failed to generate random post.')
-    }
-  }
+/**
+ * Computed property to check if the app is in development mode.
+ */
+const isDevMode = computed(() => location.hostname === 'localhost');
 
-  const activeFilterCount = computed(() => {
-    const filters = selectedFilter.value
-    if (!filters) {
-      return 0
-    }
-    let count = 0
-    if (filters.categories?.length) {
-      count += filters.categories.length
-    }
-    if (filters.emojiTags?.length) {
-      count += filters.emojiTags.length
-    }
-    if (filters.recoveryTime?.length) {
-      count += filters.recoveryTime.length
-    }
-    if (filters.costRange?.length) {
-      count += filters.costRange.length
-    }
-    if (filters.postedBy) {
-      count += 1
-    }
-    return count
-  })
+/**
+ * Selects a tab and scrolls to the top of the page.
+ * @param {object} tab - The selected tab.
+ */
+function selectTab(tab) {
+  activeTab.value = tab.value;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 
-  const isDevMode = computed(() => {
-    return location.hostname === 'localhost'
-  })
+/**
+ * Toggles the filter panel visibility.
+ */
+function toggleFilter() {
+  isFilterPanel.value = !isFilterPanel.value;
+}
+
+/**
+ * Applies the selected filters to the appropriate store.
+ * @param {object} filters - The filters to apply.
+ */
+function applyFilters(filters) {
+    if (activeTab.value === 'latest') {
+        latestStore.applyPostFilters(filters);
+    } else if (activeTab.value === 'popular') {
+        popularStore.applyPostFilters(filters);
+    }
+    isFilterPanel.value = false;
+}
 </script>
 
 <template>
@@ -120,61 +106,33 @@
         </button>
       </div>
 
-      <!-- Composer -->
-      <div
-        class="composer-card"
-        :class="[
-          {'mb-2 sm-mb-6': !isFilterPanel},
-          {'card-open': smAndUp && isFilterPanel},
-        ]"
-      >
+      <!-- Composer and Filter -->
+      <div class="composer-card" :class="[{'mb-2 sm-mb-6': !isFilterPanel}, {'card-open': smAndUp && isFilterPanel}]">
         <div class="d-flex">
           <div class="font-weight-semibold cancel-btn" @click="$router.push('/create-post')">
             New failure
           </div>
-          <div v-if="isDevMode" class="cancel-btn font-weight-semibold ml-2 d-none d-md-block" @click="handleGeneratePost">
-            Generate Post
-          </div>
         </div>
         <div class="composer-filter">
-          <v-badge
-            v-if="activeFilterCount > 0"
-            color="primary"
-            :content="activeFilterCount"
-            floating
-          >
+          <v-badge v-if="activeFilterCount > 0" color="primary" :content="activeFilterCount" floating>
             <v-icon icon="mdi-filter-variant" @click="toggleFilter" />
           </v-badge>
           <v-icon v-else icon="mdi-filter-variant" @click="toggleFilter" />
         </div>
       </div>
+
+      <!-- Filter Panels -->
       <v-slide-y-transition>
-        <Filter v-if="isFilterPanel && smAndUp" @close="isFilterPanel = false" />
+        <Filter v-if="isFilterPanel && smAndUp" @apply="applyFilters" @close="isFilterPanel = false" />
       </v-slide-y-transition>
       <template v-if="!smAndUp">
         <MobileSlide v-model="isFilterPanel">
-          <Filter title="Filter" @close="isFilterPanel = false" />
+          <Filter title="Filter" @apply="applyFilters" @close="isFilterPanel = false" />
         </MobileSlide>
       </template>
-      <!-- Posts -->
-      <div v-if="loading && posts.length === 0" class="text-center py-10">
-        Loading...
-      </div>
-      <div v-else-if="posts.length === 0" class="text-center py-10 text-gray-500">
-        No posts found.
-      </div>
-      <PostCard
-        v-for="post in posts"
-        :key="post.id"
-        :class="{'mt-2 sm-mt-6': isFilterPanel}"
-        :post="post"
-      />
-      <div v-if="loading && posts.length > 0" class="text-center py-4">
-        Loading more posts...
-      </div>
-      <div v-if="!hasMore && posts.length > 0" class="text-center py-4 text-gray-500">
-        You've reached the end.
-      </div>
+
+      <!-- Dynamic Tab Component -->
+      <component :is="tabs.find(t => t.value === activeTab).component" />
     </section>
   </div>
 </template>

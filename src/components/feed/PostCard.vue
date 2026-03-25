@@ -10,11 +10,11 @@
   import PostMenu from '@/components/feed/PostMenu.vue'
   import { auth } from '@/firebase'
   import { getIcon } from '@/models/icons.js'
+  import { noAvatar } from '@/models/no-data.js'
   import { useAuthStore } from '@/stores/auth.js'
   import { usePostCardStore } from '@/stores/post-card.js'
   import { floatNumber, formatNumber } from '@/utils/format-number.js'
   import '@/styles/components/feed/post-card.scss'
-  import {noAvatar} from "@/models/no-data.js";
 
   dayjs.extend(relativeTime)
 

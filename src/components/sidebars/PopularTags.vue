@@ -57,7 +57,7 @@
    * Toggles the user's interest in a tag.
    * @param {string} tag - The tag to toggle interest in.
    */
-  async function handleInterestToggle(tag) {
+  async function handleInterestToggle (tag) {
     const result = await popularTagsStore.toggleInterestInTag(tag)
     if (result.success) {
       toast.info(result.message)
@@ -97,7 +97,7 @@
    * @param {string} tag - The tag to check.
    * @returns {boolean} True if the user is not interested in the tag, false otherwise.
    */
-  function isNotInterested(tag) {
+  function isNotInterested (tag) {
     return authStore.user?.notInterestedTags?.includes(tag)
   }
 
