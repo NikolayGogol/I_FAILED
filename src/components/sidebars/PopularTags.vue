@@ -117,7 +117,13 @@
       :key="tag"
       class="popular-row"
     >
-      <span class="popular-tag" :class="{'text-primary': isFollowing(tag)}">#{{ tag }}</span>
+      <span
+        class="popular-tag"
+        :class="[
+          {'text-primary': isFollowing(tag)},
+          {'text-warning': isNotInterested(tag)},
+        ]"
+      >#{{ tag }}</span>
       <v-spacer />
       <v-menu open-on-hover>
         <template #activator="{ props }">

@@ -16,6 +16,7 @@ const myCustomTheme = {
     'primary': '#D65A1F',
     'secondary': '#F9EAD5',
     'danger': '#C8372B',
+    'warning': '#6E240F',
     'orange-accent-1': '#F9EAD5',
     'grey-darken-4': '#454541',
     'grey-darken-3': '#1C1C1B',
