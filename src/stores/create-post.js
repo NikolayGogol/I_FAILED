@@ -2,6 +2,7 @@ import {
   addDoc,
   collection,
   doc,
+  getDoc,
   getDocs,
   increment, limit,
   orderBy,
@@ -11,6 +12,7 @@ import {
 } from 'firebase/firestore'
 import { defineStore } from 'pinia'
 import { db, getDownloadURL, ref, storage, uploadBytes } from '@/firebase'
+import { deleteObject } from 'firebase/storage'
 import { visibilityList } from '@/models/categories.js'
 import { noAvatar } from '@/models/no-data.js'
 import { useAuthStore } from '@/stores/auth.js'

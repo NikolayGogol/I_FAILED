@@ -9,7 +9,7 @@
   import FormTextarea from '@/components/FormTextarea.vue'
   import { getIcon } from '@/models/icons.js'
   import { useAuthStore } from '@/stores/auth.js'
-  import { useProfileStore } from '@/stores/profile.js'
+  import { useProfileStore } from '@/stores/profile/profile.js'
   import { floatNumber } from '@/utils/format-number.js'
   import '@/styles/components/profile/user-card.scss'
 

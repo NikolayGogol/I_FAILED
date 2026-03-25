@@ -15,7 +15,7 @@
   import Activity from '@/components/profile/Activity.vue'
   import UserCard from '@/components/profile/UserCard.vue'
   import { useAuthStore } from '@/stores/auth'
-  import { useProfileStore } from '@/stores/profile'
+  import { useProfileStore } from '@/stores/profile/profile.js'
   import '@/styles/pages/profile.scss'
 
   const authStore = useAuthStore()

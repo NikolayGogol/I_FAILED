@@ -16,13 +16,17 @@
   import PrivacyPosting from '@/components/PrivacyPosting.vue'
   import { categories } from '@/models/categories.js'
   import { useCreatePostStore } from '@/stores/create-post.js'
+  import { useUpdatePostStore } from '@/stores/update-post.js'
   import { stripHtml } from '@/utils/html.js'
+  import { useToast } from 'vue-toastification'
   import '@vueup/vue-quill/dist/vue-quill.snow.css'
   import '@/styles/pages/create-post.scss'
 
   const router = useRouter()
   const route = useRoute()
   const store = useCreatePostStore()
+  const updatePostStore = useUpdatePostStore()
+  const toast = useToast()
   const inputLength = 100
   const quillLength = 5000
   const isLoading = ref(false)
@@ -55,8 +59,18 @@
     }
   }
 
-  function updatePost () {
-    console.log('updatePost')
+  async function updatePost () {
+    if (!isFormValid.value) return
+    isLoading.value = true
+    const { success } = await updatePostStore.updatePost(route.params.id, store.$state)
+    isLoading.value = false
+    if (success) {
+      toast.info('Post successfully updated')
+      store.resetState()
+      router.push('/')
+    } else {
+      toast.error('Something went wrong')
+    }
   }
 
 </script>

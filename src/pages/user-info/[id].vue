@@ -19,7 +19,7 @@
   import Activity from '@/components/profile/Activity.vue'
   import UserCard from '@/components/profile/UserCard.vue'
   import { useAuthStore } from '@/stores/auth.js'
-  import { useProfileStore } from '@/stores/profile.js'
+  import { useProfileStore } from '@/stores/profile/profile.js'
   import { useUserInfoStore } from '@/stores/user-info.js'
   import '@/styles/pages/profile.scss'
 

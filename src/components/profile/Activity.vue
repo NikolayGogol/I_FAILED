@@ -2,7 +2,7 @@
   import { onMounted, ref } from 'vue'
   import PostCard from '@/components/feed/PostCard.vue'
   import { useAuthStore } from '@/stores/auth'
-  import { useProfileStore } from '@/stores/profile'
+  import { useProfileStore } from '@/stores/profile/profile.js'
 
   const props = defineProps({
     userId: {

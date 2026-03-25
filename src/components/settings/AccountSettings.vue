@@ -3,7 +3,7 @@
   import { computed, ref } from 'vue'
   import { useToast } from 'vue-toastification'
   import { useAuthStore } from '@/stores/auth.js'
-  import { useProfileStore } from '@/stores/profile.js'
+  import { useProfileStore } from '@/stores/profile/profile.js'
 
   const authStore = useAuthStore()
   const profileStore = useProfileStore()

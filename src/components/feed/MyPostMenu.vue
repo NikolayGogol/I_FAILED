@@ -2,7 +2,7 @@
   import { ref } from 'vue'
   import { useRouter } from 'vue-router'
   import { useToast } from 'vue-toastification'
-  import { usePostStore } from '@/stores/post'
+  import { usePostStore } from '@/stores/profile/post.js'
 
   const props = defineProps({
     post: {

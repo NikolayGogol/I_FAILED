@@ -15,8 +15,8 @@ import {
 } from 'firebase/firestore'
 import { getDownloadURL, ref as storageRef, uploadBytes } from 'firebase/storage'
 import { defineStore } from 'pinia'
-import { auth, db, storage, updateProfile } from '@/firebase'
-import { useAuthStore } from '@/stores/auth'
+import { auth, db, storage, updateProfile } from '@/firebase.js'
+import { useAuthStore } from '@/stores/auth.js'
 const VITE_POST_COLLECTION = import.meta.env.VITE_POST_COLLECTION
 const VITE_USERS_COLLECTION = import.meta.env.VITE_USERS_COLLECTION
 const VITE_COMMENTS = import.meta.env.VITE_COMMENTS

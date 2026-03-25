@@ -5,7 +5,7 @@
   import { useDisplay } from 'vuetify/framework'
   import { getIcon } from '@/models/icons.js'
   import { useAuthStore } from '@/stores/auth.js'
-  import { usePostMenuStore } from '@/stores/post-menu.js'
+  import { usePostMenuStore } from '@/stores/profile/post-menu.js'
   import '@/styles/components/feed/post-menu.scss'
   const { smAndDown } = useDisplay()
 
