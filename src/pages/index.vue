@@ -43,6 +43,7 @@
   }
 
   function handleScroll () {
+    if (loading.value) return;
     const { scrollTop, scrollHeight, clientHeight } = document.documentElement
     if (scrollHeight - scrollTop - clientHeight < 100) {
       mainStore.fetchPosts({ pageSize: loadPerPage })

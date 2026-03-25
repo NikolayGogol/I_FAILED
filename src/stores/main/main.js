@@ -52,17 +52,26 @@ export const useMainStore = defineStore('main', {
       const notInterestedTags = authStore.user?.notInterestedTags || []
       const normalize = v => (v === undefined || v === null) ? '' : String(v).trim().toLowerCase()
 
-      // If no filters are applied, just filter out not interested tags
-      if (!state.currentFilters || Object.values(state.currentFilters).every(f => !f || f.length === 0)) {
-        return state.allPosts.filter(post => !post.tags || !post.tags.some(tag => notInterestedTags.includes(tag)))
+      // For "For You" tab, we trust the backend to send pre-sorted and relevant posts.
+      // We only apply client-side filters that the backend is not aware of, like "not interested".
+      if (state.activeTab === 'for-you') {
+        return state.allPosts.filter(post => {
+          return !notInterestedTags.some(tag => post.tags?.includes(tag));
+        });
       }
 
-      // Filter posts based on current filters
+      // --- Default filtering logic for other tabs ('latest', 'popular') ---
       const matched = state.allPosts.filter(post => {
         // Exclude posts with not interested tags
         if (post.tags && post.tags.some(tag => notInterestedTags.includes(tag))) {
           return false
         }
+
+        // If no other filters are set, the post is a match
+        if (!state.currentFilters || Object.values(state.currentFilters).every(f => !f || f.length === 0)) {
+            return true;
+        }
+
         const {
           categories,
           emojiTags,
@@ -172,79 +181,6 @@ export const useMainStore = defineStore('main', {
 
         return categoryMatch && emotionMatch && recoveryMatch && costMatch && postedByMatch
       })
-
-      // Special sorting for "For You" tab
-      if (state.activeTab === 'for-you') {
-        const followedUsers = authStore.user?.following || []
-        const followedTags = authStore.user?.followedTags || []
-
-        const createdAtValue = post => {
-          const ts = post?.createdAt
-          if (ts?.seconds !== undefined) return Number(ts.seconds)
-          const asDate = ts?.toDate ? ts.toDate() : (ts ? new Date(ts) : null)
-          return asDate ? asDate.getTime() / 1000 : 0
-        }
-        const sortByDate = (a, b) => createdAtValue(b) - createdAtValue(a)
-
-        // Create buckets for different types of posts
-        const buckets = {
-          user: [],
-          tag: [],
-          other: [],
-        }
-
-        // Distribute posts into buckets
-        for (const post of matched) {
-          if (post.isAnonymous) continue // Exclude anonymous posts from "For You" feed
-
-          if (followedUsers.includes(post.uid)) {
-            buckets.user.push(post)
-          } else if (post.tags && post.tags.some(tag => followedTags.includes(tag))) {
-            buckets.tag.push(post)
-          } else {
-            buckets.other.push(post)
-          }
-        }
-
-        // Sort each bucket by date
-        buckets.user.sort(sortByDate)
-        buckets.tag.sort(sortByDate)
-        buckets.other.sort(sortByDate)
-
-        // Mix posts from buckets to create a diverse feed
-        const result = []
-        const pattern = ['user', 'user', 'tag', 'other'] // 2 posts from followed users, 1 from followed tags, 1 other
-        let patternIndex = 0
-        const pointers = { user: 0, tag: 0, other: 0 }
-
-        while (result.length < matched.length) {
-          const bucketOrder = ['user', 'tag', 'other']
-          let postAdded = false
-
-          const preferredBucket = pattern[patternIndex % pattern.length]
-          if (pointers[preferredBucket] < buckets[preferredBucket].length) {
-            result.push(buckets[preferredBucket][pointers[preferredBucket]++])
-            postAdded = true
-          } else {
-            // If preferred bucket is empty, take from the next available one
-            for (const bucketName of bucketOrder) {
-              if (pointers[bucketName] < buckets[bucketName].length) {
-                result.push(buckets[bucketName][pointers[bucketName]++])
-                postAdded = true
-                break
-              }
-            }
-          }
-
-          if (!postAdded) {
-            break // No more posts in any bucket
-          }
-
-          patternIndex++
-        }
-
-        return result
-      }
 
       return matched
     },
@@ -383,18 +319,11 @@ export const useMainStore = defineStore('main', {
         if (tab) {
           if (isTabChanging) {
             if (tab === 'for-you') {
-              // Keep user's manual filters, but swap them for the "For You" categories.
-              this.savedFiltersBeforeForYou = this.currentFilters
-                ? structuredClone(this.currentFilters)
-                : null
-              // Preserve other filter fields, but force categories to be recalculated.
-              this.currentFilters = this.currentFilters
-                ? { ...this.currentFilters, categories: [] }
-                : null
+              // For "For You", we don't need to save/restore filters as it has its own logic
+              this.currentFilters = null;
             } else if (prevTab === 'for-you') {
-              // Restore manual filters when leaving the "For You" tab.
-              this.currentFilters = this.savedFiltersBeforeForYou
-              this.savedFiltersBeforeForYou = null
+              // Clear filters when moving away from "For You" to a normal tab
+              this.currentFilters = null;
             }
           }
 
@@ -413,40 +342,20 @@ export const useMainStore = defineStore('main', {
       this.loading = true
 
       try {
-        // For the first "For You" load, fetch more posts so we hit enough matches
-        // before the client-side bucketing logic in `filteredPosts`.
-        const effectivePageSize = (this.activeTab === 'for-you' && this.allPosts.length === 0)
-          ? Math.max(pageSize * 3, 20)
-          : pageSize
+        const effectivePageSize = pageSize;
 
-        if (this.activeTab === 'for-you' // Set category filters based on what the user reads most.
-          && (!this.currentFilters || !this.currentFilters.categories || this.currentFilters.categories.length === 0)) {
-          const topCategories = await this.fetchTopCategoriesForUserForYou({
-            userId: authStore.user?.uid,
-            limit: 5,
-          })
-
-          const filterCategories = topCategories
-            .filter(c => c && c.id && c.label)
-            .map(c => ({ id: c.id, label: c.label, count: c.count }))
-
-          if (filterCategories.length > 0) {
-            const prev = this.currentFilters || {}
-            this.currentFilters = { ...prev, categories: filterCategories }
-          } else {
-            this.currentFilters = this.currentFilters
-              ? { ...this.currentFilters, categories: [] }
-              : null
-          }
-        }
-
-        // Fetch already-filtered posts from backend to avoid Firestore "requires an index".
-        // Backend sorts by `createdAt`/`views`, then applies filters in memory.
+        // Construct the payload for the API
         const payload = {
           tab: this.activeTab,
           pageSize: effectivePageSize,
           cursor: this.lastVisible,
-          filters: this.currentFilters,
+          filters: this.activeTab === 'for-you' ? null : this.currentFilters, // Do not send filters for "For You"
+        }
+
+        // For "For You" tab, send user's follow data for personalization
+        if (this.activeTab === 'for-you') {
+            payload.followedUsers = authStore.user?.following || [];
+            payload.followedTags = authStore.user?.followedTags || [];
         }
 
         const response = await api.post('posts/feed', payload)
