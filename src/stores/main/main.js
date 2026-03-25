@@ -184,107 +184,66 @@ export const useMainStore = defineStore('main', {
         return categoryMatch && emotionMatch && recoveryMatch && costMatch && postedByMatch
       })
 
-      // For "For You" we want a feed ordered by user interest counts (not by createdAt only).
-      // This makes the "right" categories visible immediately.
-      if (state.activeTab === 'for-you' && state.currentFilters?.categories?.some(c => c?.count !== undefined)) {
-        const topCats = (state.currentFilters.categories || [])
-          .map(c => ({
-            id: normalize(c?.id),
-            label: normalize(c?.label),
-            count: c?.count || 0,
-          }))
-          .filter(c => c.id || c.label)
+      if (state.activeTab === 'for-you') {
+        const followedUsers = authStore.user?.following || []
+        const followedTags = authStore.user?.followedTags || []
 
         const createdAtValue = post => {
           const ts = post?.createdAt
-          if (ts?.seconds !== undefined) {
-            return Number(ts.seconds)
-          }
+          if (ts?.seconds !== undefined) return Number(ts.seconds)
           const asDate = ts?.toDate ? ts.toDate() : (ts ? new Date(ts) : null)
           return asDate ? asDate.getTime() / 1000 : 0
         }
+        const sortByDate = (a, b) => createdAtValue(b) - createdAtValue(a)
 
-        const postHasFilter = (post, filterCat) => {
-          const postCategories = post.selectedCategories || []
-
-          return postCategories.some(postCat => {
-            if (typeof postCat === 'string') {
-              const pc = normalize(postCat)
-              return pc === filterCat.id || pc === filterCat.label
-            }
-
-            const postId = normalize(postCat?.id || postCat?.categoryId || postCat?.value)
-            const postLabel = normalize(postCat?.label || postCat?.categoryLabel)
-
-            return postId === filterCat.id || postLabel === filterCat.label
-          })
+        const buckets = {
+          user: [],
+          tag: [],
+          other: [],
         }
-
-        const catKey = c => c.id || c.label
-
-        // Bucket posts by "best matching" top category, then do round-robin.
-        const buckets = new Map()
-        const otherKey = '__other__'
 
         for (const post of matched) {
-          let best = null
-          let bestCount = -1
-
-          for (const c of topCats) {
-            if (!postHasFilter(post, c)) {
-              continue
-            }
-            if (c.count > bestCount) {
-              best = c
-              bestCount = c.count
-            }
+          if (followedUsers.includes(post.uid)) {
+            buckets.user.push(post)
+          } else if (post.tags && post.tags.some(tag => followedTags.includes(tag))) {
+            buckets.tag.push(post)
+          } else {
+            buckets.other.push(post)
           }
-
-          const key = best ? catKey(best) : otherKey
-          if (!buckets.has(key)) {
-            buckets.set(key, [])
-          }
-          buckets.get(key).push(post)
         }
 
-        // Keep time-order inside each category bucket.
-        for (const [key, arr] of buckets.entries()) {
-          arr.sort((a, b) => createdAtValue(b) - createdAtValue(a))
-          buckets.set(key, arr)
-        }
-
-        const orderedCatsKeys = topCats.map(element => catKey(element))
-        const hasOther = buckets.has(otherKey)
+        buckets.user.sort(sortByDate)
+        buckets.tag.sort(sortByDate)
+        buckets.other.sort(sortByDate)
 
         const result = []
-        let guard = 0
-        const max = matched.length + 5
+        const pattern = ['user', 'user', 'tag', 'other']
+        let patternIndex = 0
+        const pointers = { user: 0, tag: 0, other: 0 }
 
-        while (result.length < matched.length && guard < max) {
-          guard++
-          let addedThisRound = false
+        while (result.length < matched.length) {
+          const bucketOrder = ['user', 'tag', 'other']
+          let postAdded = false
 
-          for (const key of orderedCatsKeys) {
-            const arr = buckets.get(key)
-            if (arr && arr.length > 0) {
-              result.push(arr.shift())
-              addedThisRound = true
-              if (result.length >= matched.length) {
+          const preferredBucket = pattern[patternIndex % pattern.length]
+          if (pointers[preferredBucket] < buckets[preferredBucket].length) {
+            result.push(buckets[preferredBucket][pointers[preferredBucket]++])
+            postAdded = true
+          } else {
+            for (const bucketName of bucketOrder) {
+              if (pointers[bucketName] < buckets[bucketName].length) {
+                result.push(buckets[bucketName][pointers[bucketName]++])
+                postAdded = true
                 break
               }
             }
           }
 
-          if (!addedThisRound && hasOther) {
-            const otherArr = buckets.get(otherKey)
-            if (otherArr && otherArr.length > 0) {
-              result.push(otherArr.shift())
-            }
-          }
-
-          if (!addedThisRound) {
+          if (!postAdded) {
             break
           }
+
+          patternIndex++
         }
 
         return result
