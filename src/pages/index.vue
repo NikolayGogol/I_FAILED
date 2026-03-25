@@ -18,8 +18,8 @@
   import { useLatestStore } from '@/stores/feed/latest'
   import { usePopularStore } from '@/stores/feed/popular'
   import { useFilterStore } from '@/stores/main/filter.js'
+  import { generateRandomPost } from '@/utils/post-generator.js'
   import '@/styles/pages/index.scss'
-  import {generateRandomPost} from "@/utils/post-generator.js";
 
   const { smAndUp } = useDisplay()
   const authStore = useAuthStore()
