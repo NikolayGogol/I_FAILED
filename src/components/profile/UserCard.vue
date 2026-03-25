@@ -104,7 +104,9 @@
   // =================================================================================================
   // Functions
   // =================================================================================================
-  // Open the edit profile dialog
+  /**
+   * Opens the edit profile dialog.
+   */
   function openEditDialog () {
     newDisplayName.value = displayName.value
     newBio.value = displayUser.value?.bio || ''
@@ -113,7 +115,10 @@
     editDialog.value = true
   }
 
-  // Handle the file change event for the photo upload
+  /**
+   * Handles the file change event for the photo upload.
+   * @param {Event} event - The file change event.
+   */
   function onFileChange (event) {
     const file = event.target.files[0]
     if (file) {
@@ -126,7 +131,9 @@
     }
   }
 
-  // Handle the profile update
+  /**
+   * Handles the profile update.
+   */
   async function handleUpdateProfile () {
     isUpdating.value = true
     try {

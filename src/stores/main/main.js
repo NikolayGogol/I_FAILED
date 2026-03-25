@@ -44,14 +44,22 @@ export const useMainStore = defineStore('main', {
     userCache: {},
   }),
   getters: {
+    /**
+     * Filters and sorts posts based on the current tab and filters.
+     */
     filteredPosts (state) {
       const authStore = useAuthStore()
       const notInterestedTags = authStore.user?.notInterestedTags || []
       const normalize = v => (v === undefined || v === null) ? '' : String(v).trim().toLowerCase()
+
+      // If no filters are applied, just filter out not interested tags
       if (!state.currentFilters || Object.values(state.currentFilters).every(f => !f || f.length === 0)) {
         return state.allPosts.filter(post => !post.tags || !post.tags.some(tag => notInterestedTags.includes(tag)))
       }
+
+      // Filter posts based on current filters
       const matched = state.allPosts.filter(post => {
+        // Exclude posts with not interested tags
         if (post.tags && post.tags.some(tag => notInterestedTags.includes(tag))) {
           return false
         }
@@ -63,20 +71,13 @@ export const useMainStore = defineStore('main', {
           postedBy,
         } = state.currentFilters || {}
 
-        // =========================
-        // 1) Category Match
-        // =========================
+        // Match categories
         const postCategories = post.selectedCategories || []
         const categoryMatch = !categories || categories.length === 0 || categories.some(filterCat => {
           const filterId = normalize(filterCat?.id ?? filterCat)
           const filterLabel = normalize(filterCat?.label ?? '')
 
           return postCategories.some(postCat => {
-            // Be tolerant to different Firestore shapes:
-            // - { id, label }
-            // - { categoryId, categoryLabel }
-            // - string ('business')
-            // - { value: 'business' }
             if (typeof postCat === 'string') {
               const pc = normalize(postCat)
               return pc === filterId || pc === filterLabel
@@ -89,9 +90,7 @@ export const useMainStore = defineStore('main', {
           })
         })
 
-        // =========================
-        // 2) Emotion Tags Match
-        // =========================
+        // Match emotion tags
         const postEmotionValues = (post.emotionTags || []).map(t => {
           if (typeof t === 'string') {
             return t
@@ -103,18 +102,14 @@ export const useMainStore = defineStore('main', {
           return postEmotionValues.some(pv => normalize(pv) === tv)
         })
 
-        // =========================
-        // 3) Recovery Time Match
-        // =========================
+        // Match recovery time
         const postRecovery = post?.lessonLearned?.recoveryTime
         const postRecoveryVal = typeof postRecovery === 'string'
           ? postRecovery
           : postRecovery?.value ?? postRecovery?.title ?? ''
         const recoveryMatch = !recoveryTime || recoveryTime.length === 0 || recoveryTime.some(rv => normalize(postRecoveryVal) === normalize(rv))
 
-        // =========================
-        // 4) Cost Range Match
-        // =========================
+        // Match cost range
         const parseCost = v => {
           if (v === undefined || v === null || v === '') {
             return null
@@ -159,17 +154,12 @@ export const useMainStore = defineStore('main', {
           return false
         })
 
-        // =========================
-        // 5) Posted By Match
-        // =========================
+        // Match posted by
         const postedByMatch = (() => {
           if (!postedBy) {
             return true
           }
 
-          // In the UI, `postedBy` values are:
-          // - 'anonymous' => only anonymous posts
-          // - 'public' => only non-anonymous posts
           if (postedBy === 'anonymous') {
             return !!post.isAnonymous
           }
@@ -177,13 +167,13 @@ export const useMainStore = defineStore('main', {
             return !post.isAnonymous
           }
 
-          // Fallback: if someone passes a uid, match by uid.
           return normalize(post.uid) === normalize(postedBy)
         })()
 
         return categoryMatch && emotionMatch && recoveryMatch && costMatch && postedByMatch
       })
 
+      // Special sorting for "For You" tab
       if (state.activeTab === 'for-you') {
         const followedUsers = authStore.user?.following || []
         const followedTags = authStore.user?.followedTags || []
@@ -196,12 +186,14 @@ export const useMainStore = defineStore('main', {
         }
         const sortByDate = (a, b) => createdAtValue(b) - createdAtValue(a)
 
+        // Create buckets for different types of posts
         const buckets = {
           user: [],
           tag: [],
           other: [],
         }
 
+        // Distribute posts into buckets
         for (const post of matched) {
           if (followedUsers.includes(post.uid)) {
             buckets.user.push(post)
@@ -212,12 +204,14 @@ export const useMainStore = defineStore('main', {
           }
         }
 
+        // Sort each bucket by date
         buckets.user.sort(sortByDate)
         buckets.tag.sort(sortByDate)
         buckets.other.sort(sortByDate)
 
+        // Mix posts from buckets to create a diverse feed
         const result = []
-        const pattern = ['user', 'user', 'tag', 'other']
+        const pattern = ['user', 'user', 'tag', 'other'] // 2 posts from followed users, 1 from followed tags, 1 other
         let patternIndex = 0
         const pointers = { user: 0, tag: 0, other: 0 }
 
@@ -230,6 +224,7 @@ export const useMainStore = defineStore('main', {
             result.push(buckets[preferredBucket][pointers[preferredBucket]++])
             postAdded = true
           } else {
+            // If preferred bucket is empty, take from the next available one
             for (const bucketName of bucketOrder) {
               if (pointers[bucketName] < buckets[bucketName].length) {
                 result.push(buckets[bucketName][pointers[bucketName]++])
@@ -240,7 +235,7 @@ export const useMainStore = defineStore('main', {
           }
 
           if (!postAdded) {
-            break
+            break // No more posts in any bucket
           }
 
           patternIndex++

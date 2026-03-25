@@ -24,16 +24,21 @@
   const showBlockDialog = ref(false)
   const isBlocking = ref(false)
 
+  // Computed property to check if the current user is following the post author
   const isFollowing = computed(() => {
     if (!authStore.user || !authStore.user.following) return false
     return authStore.user.following.includes(props.post.uid)
   })
 
+  // Computed property to check if the current user has blocked the post author
   const isBlocked = computed(() => {
     if (!authStore.user || !authStore.user.blockedUsers) return false
     return authStore.user.blockedUsers.includes(props.post.uid)
   })
 
+  /**
+   * Mutes the current post.
+   */
   async function handleMutePost () {
     if (!authStore.user) {
       await router.push('/login')
@@ -47,6 +52,9 @@
     }
   }
 
+  /**
+   * Toggles following the post author.
+   */
   async function handleFollow () {
     if (!authStore.user) {
       await router.push('/login')
@@ -72,10 +80,16 @@
     }
   }
 
+  /**
+   * Opens the block user confirmation dialog.
+   */
   function handleBlock () {
     showBlockDialog.value = true
   }
 
+  /**
+   * Confirms and blocks the post author.
+   */
   async function confirmBlock () {
     if (!authStore.user) {
       await router.push('/login')
@@ -95,6 +109,9 @@
     isBlocking.value = false
   }
 
+  /**
+   * Unblocks the post author.
+   */
   async function handleUnblock () {
     if (!authStore.user) {
       await router.push('/login')

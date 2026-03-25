@@ -17,10 +17,16 @@
   const showDeleteDialog = ref(false)
   const isDeleting = ref(false)
 
+  /**
+   * Navigates to the edit post page.
+   */
   function editPost () {
     router.push(`/edit-post/${props.post.id}`)
   }
 
+  /**
+   * Confirms and deletes the post.
+   */
   async function confirmDelete () {
     isDeleting.value = true
     const success = await postStore.deletePost(props.post.id)

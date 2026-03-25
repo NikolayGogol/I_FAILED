@@ -1,7 +1,7 @@
 <script setup>
   import dayjs from 'dayjs'
   import { storeToRefs } from 'pinia'
-  import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+  import { computed, onBeforeUnmount, onMounted, ref, watch, nextTick } from 'vue'
   import { useRouter } from 'vue-router'
   import FormInput from '@/components/FormInput.vue'
   import { useSearchStore } from '@/stores/search'
@@ -14,9 +14,14 @@
   const debounceMs = 350
   const timerId = ref(null)
   const searchContainer = ref(null)
+  let isJustFocused = false
 
+  // Computed property to determine if the dropdown should be visible
   const dropdownVisible = computed(() => opened.value && hasSearchParams.value)
 
+  /**
+   * Triggers a search after a debounce period.
+   */
   function triggerSearch () {
     if (timerId.value) {
       clearTimeout(timerId.value)
@@ -29,14 +34,28 @@
     }, debounceMs)
   }
 
+  /**
+   * Opens the search dropdown.
+   */
   function openDropdown () {
+    isJustFocused = true
     searchStore.setOpened(true)
+    nextTick(() => {
+      isJustFocused = false
+    })
   }
 
+  /**
+   * Closes the search dropdown.
+   */
   function closeDropdown () {
     searchStore.setOpened(false)
   }
 
+  /**
+   * Navigates to a post and closes the dropdown.
+   * @param {string} postId - The ID of the post to open.
+   */
   function openPost (postId) {
     if (!postId) {
       return
@@ -45,6 +64,11 @@
     closeDropdown()
   }
 
+  /**
+   * Formats a timestamp into a relative time string.
+   * @param {object} time - The timestamp to format.
+   * @returns {string} The formatted time string.
+   */
   function formatDate (time) {
     if (time?._seconds) {
       return dayjs.unix(time._seconds).fromNow()
@@ -55,12 +79,20 @@
     return ''
   }
 
+  /**
+   * Handles clicks outside the search container to close the dropdown.
+   * @param {Event} event - The click event.
+   */
   function handleClickOutside (event) {
+    if (isJustFocused) {
+      return
+    }
     if (searchContainer.value && !searchContainer.value.contains(event.target)) {
       closeDropdown()
     }
   }
 
+  // Watch for changes in the search query and trigger a search
   watch(
     () => search.value,
     () => {
@@ -72,6 +104,7 @@
     },
   )
 
+  // Add and remove the click outside listener
   onMounted(() => {
     document.addEventListener('click', handleClickOutside)
   })
@@ -94,7 +127,7 @@
       placeholder="Search posts (title, content, category, tags, user...)"
       prepend-inner-icon="mdi-magnify"
       variant="outlined"
-      @click="openDropdown"
+      @focus="openDropdown"
     />
 
     <div v-if="dropdownVisible" class="search-dropdown">

@@ -48,6 +48,11 @@ export const usePopularTagsStore = defineStore('popularTags', {
       }
     },
 
+    /**
+     * Toggles following a tag for the current user.
+     * @param {string} tag - The tag to follow or unfollow.
+     * @returns {Promise<object>} An object with success status and a message.
+     */
     async followTag (tag) {
       const authStore = useAuthStore()
       if (!authStore.user) {
@@ -59,12 +64,14 @@ export const usePopularTagsStore = defineStore('popularTags', {
 
       try {
         if (isFollowing) {
+          // Unfollow the tag
           await updateDoc(userRef, {
             followedTags: arrayRemove(tag),
           })
           authStore.user.followedTags = authStore.user.followedTags.filter(t => t !== tag)
           return { success: true, following: false, message: `Unfollowed ${tag}` }
         } else {
+          // Follow the tag
           await updateDoc(userRef, {
             followedTags: arrayUnion(tag),
           })
@@ -79,6 +86,12 @@ export const usePopularTagsStore = defineStore('popularTags', {
         return { success: false, message: 'Failed to update tag follow status' }
       }
     },
+
+    /**
+     * Toggles interest in a tag for the current user.
+     * @param {string} tag - The tag to mark as interested or not interested.
+     * @returns {Promise<object>} An object with success status and a message.
+     */
     async toggleInterestInTag(tag) {
       const authStore = useAuthStore()
       if (!authStore.user) return { success: false, message: 'User not authenticated' }
@@ -88,12 +101,14 @@ export const usePopularTagsStore = defineStore('popularTags', {
 
       try {
         if (isNotInterested) {
+          // Mark as interested
           await updateDoc(userRef, {
             notInterestedTags: arrayRemove(tag)
           });
           authStore.user.notInterestedTags = authStore.user.notInterestedTags.filter(t => t !== tag)
           return { success: true, interested: true, message: `You will now see posts with ${tag}` }
         } else {
+          // Mark as not interested
           await updateDoc(userRef, {
             notInterestedTags: arrayUnion(tag)
           });

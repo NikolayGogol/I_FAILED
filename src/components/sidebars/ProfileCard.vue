@@ -48,9 +48,12 @@
   ]
 
   const router = useRouter()
-  //
+
+  // Computed property for the current user's name
   const currentUserName = computed(() => authStore.user?.displayName)
+  // Computed property for the current user's photo URL
   const currentUserPhoto = computed(() => authStore.user?.photoURL)
+  // Computed property for the current user's initials
   const currentUserInitials = computed(() => {
     const name = currentUserName.value
     if (!name) {
@@ -63,10 +66,16 @@
     return (parts[0].charAt(0) + parts[1].charAt(0)).toUpperCase()
   })
 
+  /**
+   * Opens the logout confirmation dialog.
+   */
   function handleLogout () {
     logoutDialog.value = true
   }
 
+  /**
+   * Confirms and performs the logout.
+   */
   async function confirmLogout () {
     isLoggingOut.value = true
     await authStore.logout()
@@ -74,6 +83,10 @@
     logoutDialog.value = false
   }
 
+  /**
+   * Navigates to a given path.
+   * @param {string} path - The path to navigate to.
+   */
   function goTo (path) {
     router.push(path)
   }
