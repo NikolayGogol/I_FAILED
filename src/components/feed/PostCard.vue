@@ -183,6 +183,10 @@
   }
 
   function addTo () {
+    if (!authStore.user) {
+      router.push('/login')
+      return
+    }
     isCollectionDialog.value = true
   }
   function onPostSaved () {
