@@ -198,7 +198,7 @@
 
 <template>
   <!-- Post card is only rendered if the post exists, is not muted, and the author is not blocked -->
-  <div v-if="post && !isMuted && !isBlocked" class="post-card">
+  <div v-if="post && !isMuted && !isBlocked" class="post-card" :class="{'has-image': post.images[0]}">
     <!-- Post header -->
     <header class="post-header">
       <div class="post-avatar cursor-pointer" @click="openUserProfile">

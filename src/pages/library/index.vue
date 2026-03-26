@@ -123,10 +123,16 @@
           scale: 2,
           useCORS: true,
           logging: false,
-          width: 730,
+          width: 725,
         },
-        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
-        pagebreak: { mode: 'css' },
+        jsPDF: {
+          unit: 'in',
+          format: 'letter',
+          orientation: 'portrait',
+        },
+        pagebreak: {
+          mode: ['avoid-all', 'css', 'legacy'],
+        },
       }
       html2pdf().from(exportWrapper).set(opt).save().then(() => {
         toast.success('PDF generated')
@@ -183,12 +189,15 @@
     selectedCollection.value = item
     isDeleteDialogOpen.value = true
   }
+
   function openRenameDialog (item) {
     editedCollection.value = { ...item }
     isRenameDialog.value = true
   }
+
   const openCollection = item => router.push(`/library/${item.id}`)
   const timeAgo = time => time?.seconds ? dayjs.unix(time.seconds).fromNow() : 'no time'
+
   function shareLink (item) {
     navigator.clipboard.writeText(`${window.location.origin}/library/${item.id}`)
     toast.info('Link copied')
@@ -209,7 +218,12 @@
 
     <v-dialog v-model="isCreateDialog" class="collection-dialog" max-width="520">
       <v-card class="pa-7 rounded-xl">
-        <v-btn class="position-absolute right-0 top-0 m-2" icon="mdi-close" variant="text" @click="isCreateDialog = false" />
+        <v-btn
+          class="position-absolute right-0 top-0 m-2"
+          icon="mdi-close"
+          variant="text"
+          @click="isCreateDialog = false"
+        />
         <v-card-title class="text-center">Create collection</v-card-title>
         <v-text-field v-model="newCollection" class="mt-4" label="Collection Name" variant="outlined" />
         <v-btn block color="primary" :loading="isSaving" @click="createCollection">Create</v-btn>
@@ -218,7 +232,12 @@
 
     <v-dialog v-model="isRenameDialog" class="collection-dialog" max-width="520">
       <v-card v-if="editedCollection" class="pa-7 rounded-xl">
-        <v-btn class="position-absolute right-0 top-0 m-2" icon="mdi-close" variant="text" @click="isRenameDialog = false" />
+        <v-btn
+          class="position-absolute right-0 top-0 m-2"
+          icon="mdi-close"
+          variant="text"
+          @click="isRenameDialog = false"
+        />
         <v-card-title class="text-center">Rename collection</v-card-title>
         <v-text-field v-model="editedCollection.name" class="mt-4" label="Name" variant="outlined" />
         <v-btn block color="primary" :loading="isSaving" @click="renameCollection">Save</v-btn>
@@ -243,11 +262,19 @@
       <v-menu location="bottom end" open-on-hover>
         <template #activator="{ props }">
           <div class="d-flex align-center cursor-pointer" v-bind="props">
-            <div class="bg-secondary d-flex align-center justify-center pa-2 rounded-circle" v-html="getIcon('filter', 20, 20)" />
+            <div
+              class="bg-secondary d-flex align-center justify-center pa-2 rounded-circle"
+              v-html="getIcon('filter', 20, 20)"
+            />
           </div>
         </template>
         <v-list class="rounded-xl elevation-1" color="primary">
-          <v-list-item v-for="opt in sortOptions" :key="opt.value" :active="selectedSort === opt.value" @click="sortCollections(opt.value)">
+          <v-list-item
+            v-for="opt in sortOptions"
+            :key="opt.value"
+            :active="selectedSort === opt.value"
+            @click="sortCollections(opt.value)"
+          >
             {{ opt.label }}
           </v-list-item>
         </v-list>
@@ -272,20 +299,28 @@
               </template>
               <v-list class="rounded-xl" color="primary" width="200">
                 <v-list-item @click="openRenameDialog(item)">
-                  <template #prepend><div class="mr-2" v-html="getIcon('pencil', 18, 18)" /></template>
+                  <template #prepend>
+                    <div class="mr-2" v-html="getIcon('pencil', 18, 18)" />
+                  </template>
                   Rename
                 </v-list-item>
                 <v-list-item @click="shareLink(item)">
-                  <template #prepend><div class="mr-2" v-html="getIcon('share', 18, 18)" /></template>
+                  <template #prepend>
+                    <div class="mr-2" v-html="getIcon('share', 18, 18)" />
+                  </template>
                   Share
                 </v-list-item>
                 <v-list-item @click="exportToPDF(item)">
-                  <template #prepend><div class="mr-2" v-html="getIcon('export', 18, 18)" /></template>
+                  <template #prepend>
+                    <div class="mr-2" v-html="getIcon('export', 18, 18)" />
+                  </template>
                   Export PDF
                 </v-list-item>
                 <v-divider />
                 <v-list-item base-color="error" @click="openDeleteDialog(item)">
-                  <template #prepend><div class="mr-2" v-html="getIcon('trash', 18, 18)" /></template>
+                  <template #prepend>
+                    <div class="mr-2" v-html="getIcon('trash', 18, 18)" />
+                  </template>
                   Delete
                 </v-list-item>
               </v-list>
@@ -304,17 +339,3 @@
     </template>
   </div>
 </template>
-
-<style scoped lang="scss">
-#exporting-wrapper {
-  pointer-events: none;
-  background: white;
-
-  .post-card-export {
-    display: block;
-    width: 100%;
-    margin-bottom: 40px;
-    break-inside: avoid;
-  }
-}
-</style>
