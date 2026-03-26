@@ -9,7 +9,7 @@
 <script setup>
   import dayjs from 'dayjs'
   import relativeTime from 'dayjs/plugin/relativeTime'
-  import { onMounted, ref } from 'vue'
+  import { computed, onMounted, ref } from 'vue'
   import { useRouter } from 'vue-router'
   import { useToast } from 'vue-toastification'
   import ConfirmationModal from '@/components/ConfirmationModal.vue'
@@ -30,15 +30,57 @@
   const isDeleteDialogOpen = ref(false)
   const selectedCollection = ref(null)
   const router = useRouter()
+
+  const selectedSort = ref('updatedAtDesc') // Default sort to match backend
+  const sortOptions = [
+    { label: 'Last created', value: 'createdAtDesc' },
+    { label: 'Last updated', value: 'updatedAtDesc' },
+    { label: 'A-Z', value: 'nameAsc' },
+    { label: 'Z-A', value: 'nameDesc' },
+  ]
+
+  const selectedSortLabel = computed(() => {
+    const option = sortOptions.find(opt => opt.value === selectedSort.value)
+    return option ? option.label : ''
+  })
+
   //
   onMounted(() => {
     getCollectionList()
   })
+
+  function sortCollections (sortType) {
+    selectedSort.value = sortType
+    const list = [...collectionList.value]
+
+    switch (sortType) {
+      case 'createdAtDesc': {
+        list.sort((a, b) => (a.createdAt?.seconds || 0) - (b.createdAt?.seconds || 0))
+        break
+      }
+      case 'updatedAtDesc': {
+        list.sort((a, b) => (b.updatedAt?.seconds || 0) - (a.updatedAt?.seconds || 0))
+        break
+      }
+      case 'nameAsc': {
+        list.sort((a, b) => a.name.localeCompare(b.name))
+        break
+      }
+      case 'nameDesc': {
+        list.sort((a, b) => b.name.localeCompare(a.name))
+        break
+      }
+    }
+    collectionList.value = list
+  }
+
   function getCollectionList () {
     postIsLoading.value = true
     libraryStore.getCollections()
       .then(res => {
         collectionList.value = res
+        // Apply the current sort after fetching, as initial fetch is by updatedAtDesc
+        sortCollections(selectedSort.value)
       })
       .finally(() => {
         postIsLoading.value = false
@@ -103,6 +145,13 @@
 
   function openCollection (item) {
     router.push(`/library/${item.id}`)
+  }
+  function shareLink (item) {
+    const url = `${window.location.origin}/library/${item.id}`
+    navigator.clipboard.writeText(url)
+      .then(() => {
+        toast.info('Link copied to clipboard')
+      })
   }
 </script>
 
@@ -185,7 +234,23 @@
     </div>
     <div class="header-panel d-flex align-center justify-space-between">
       <p class="text-description">{{ collectionList.length }} Collections</p>
-      <div class="cursor-pointer" v-html="getIcon('filter')" />
+      <v-menu color="primary" location="bottom right" open-on-hover>
+        <template #activator="{ props }">
+          <div class="d-flex align-center cursor-pointer" v-bind="props">
+            <div class="bg-secondary d-flex align-center justify-center pa-2 rounded-circle" v-html="getIcon('filter', 20, 20)" />
+          </div>
+        </template>
+        <v-list class="rounded-xl elevation-1">
+          <v-list-item
+            v-for="option in sortOptions"
+            :key="option.value"
+            :class="{ 'v-list-item--active': selectedSort === option.value }"
+            @click="sortCollections(option.value)"
+          >
+            <v-list-item-title>{{ option.label }}</v-list-item-title>
+          </v-list-item>
+        </v-list>
+      </v-menu>
     </div>
     <p v-if="postIsLoading" class="mt-10 text-center">Loading...</p>
     <template v-else>
@@ -201,11 +266,15 @@
               </template>
               <v-list class="rounded-xl elevation-1">
                 <v-list-item class="cursor-pointer drop-item" @click="openRenameDialog(item)">
-                  <div class="mr-2" v-html="getIcon('pencil')" />
+                  <div class="mr-2 d-flex" v-html="getIcon('pencil')" />
                   <p>Rename collection</p>
                 </v-list-item>
+                <v-list-item class="cursor-pointer drop-item" @click="shareLink(item)">
+                  <div class="mr-2 d-flex" v-html="getIcon('share')" />
+                  <p>Share link</p>
+                </v-list-item>
                 <v-list-item class="cursor-pointer drop-item text-danger" @click="openDeleteDialog(item)">
-                  <div class="mr-2" v-html="getIcon('trash')" />
+                  <div class="mr-2 d-flex" v-html="getIcon('trash')" />
                   <p>Delete</p>
                 </v-list-item>
               </v-list>

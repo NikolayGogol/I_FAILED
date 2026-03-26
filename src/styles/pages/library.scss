@@ -57,6 +57,11 @@
       background-color: $color-surface;
       padding: 25px;
       margin-bottom: 12px;
+      transition: all 0.2s ease-in-out;
+
+      &:hover {
+        box-shadow: $shadow-sm;
+      }
 
       .name {
         font-weight: 600;
@@ -68,9 +73,6 @@
 }
 
 .drop-item {
-  p {
-    margin-top: -5px;
-  }
 
   &:not(:last-of-type) {
     svg {
