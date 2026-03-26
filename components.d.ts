@@ -14,6 +14,7 @@ declare module 'vue' {
     AboutAccountModal: typeof import('./src/components/profile/AboutAccountModal.vue')['default']
     AccountSettings: typeof import('./src/components/settings/AccountSettings.vue')['default']
     Activity: typeof import('./src/components/profile/Activity.vue')['default']
+    AddCollectionDialog: typeof import('./src/components/feed/AddCollectionDialog.vue')['default']
     AdditionalInfoPost: typeof import('./src/components/AdditionalInfoPost.vue')['default']
     CommentMenu: typeof import('./src/components/CommentMenu.vue')['default']
     ConfirmationModal: typeof import('./src/components/ConfirmationModal.vue')['default']

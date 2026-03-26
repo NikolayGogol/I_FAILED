@@ -2,12 +2,12 @@ import { deleteDoc, doc, getDoc } from 'firebase/firestore'
 import { deleteObject } from 'firebase/storage'
 import { defineStore } from 'pinia'
 import { db, ref, storage } from '@/firebase.js'
-
+const VITE_POST_COLLECTION = import.meta.env.VITE_POST_COLLECTION
 export const usePostStore = defineStore('post', {
   actions: {
     async deletePost (postId) {
       try {
-        const postRef = doc(db, 'posts', postId)
+        const postRef = doc(db, VITE_POST_COLLECTION, postId)
         const postSnap = await getDoc(postRef)
         const data = postSnap.exists() ? postSnap.data() : null
 

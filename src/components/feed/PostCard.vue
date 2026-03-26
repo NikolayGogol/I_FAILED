@@ -7,6 +7,7 @@
   import { computed, onMounted, ref } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { useToast } from 'vue-toastification'
+  import AddCollectionDialog from '@/components/feed/AddCollectionDialog.vue'
   import PostMenu from '@/components/feed/PostMenu.vue'
   import { auth } from '@/firebase'
   import { getIcon } from '@/models/icons.js'
@@ -50,7 +51,7 @@
   const isBookmarked = ref(false)
   const bookmarkCount = ref(p.post.bookmarks || 0)
   const isBookmarking = ref(false)
-
+  const isCollectionDialog = ref(false)
   // =================================================================================================
   // Computed Properties
   // =================================================================================================
@@ -215,6 +216,15 @@
       toast.error('Failed to copy link')
     })
   }
+
+  function addTo () {
+    isCollectionDialog.value = true
+  }
+  function onPostSaved () {
+    isBookmarked.value = true
+    bookmarkCount.value += 1
+    isCollectionDialog.value = false
+  }
 </script>
 
 <template>
@@ -324,7 +334,7 @@
         class="icon-btn mr-4 hover"
         :class="{ 'bookmarked': isBookmarked }"
         :disabled="isBookmarking"
-        @click.stop.prevent="handleBookmark"
+        @click.stop.prevent="addTo"
       >
         <span class="mr-2 text-uppercase">{{ floatNumber(bookmarkCount) }}</span>
         <div class="d-flex" v-html="getIcon('bookmark')" />
@@ -333,6 +343,17 @@
         <div class="d-flex" v-html="getIcon('share')" />
       </button>
     </footer>
+    <v-dialog
+      v-model="isCollectionDialog"
+      class="collection-dialog"
+      max-width="520"
+    >
+      <AddCollectionDialog
+        :post="post"
+        @cancel="isCollectionDialog = false"
+        @post-saved="onPostSaved"
+      />
+    </v-dialog>
   </div>
 </template>
 <style scoped lang="scss">

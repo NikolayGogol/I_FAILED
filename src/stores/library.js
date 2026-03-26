@@ -1,97 +1,69 @@
-import { collection, getDocs, query, where } from 'firebase/firestore'
+import {
+  addDoc,
+  arrayUnion,
+  collection,
+  doc,
+  getDocs,
+  query,
+  runTransaction,
+  where,
+} from 'firebase/firestore'
 import { defineStore } from 'pinia'
 import { db } from '@/firebase'
 import { useAuthStore } from '@/stores/auth.js'
-import { useSinglePostStore } from '@/stores/single-post/single-post.js'
 
 const VITE_BOOKMARKS_COLLECTION = import.meta.env.VITE_BOOKMARKS
+const VITE_LIBRARY = import.meta.env.VITE_LIBRARY
 
 export const useLibraryStore = defineStore('library', {
-  state: () => ({
-    bookmarkedPosts: [], // Holds the fully loaded post objects
-    bookmarkedPostIds: [], // Holds only the IDs of all bookmarked posts
-    loading: false, // For initial ID fetch
-    loadingMore: false, // For loading subsequent pages
-    error: null,
-    hasMore: true, // Becomes false when all posts are loaded
-  }),
+  state: () => ({}),
   actions: {
-    async fetchBookmarkedPostIds () {
-      this.loading = true
-      this.error = null
-      this.bookmarkedPosts = []
-      this.bookmarkedPostIds = []
-      this.hasMore = true
-
-      try {
-        const authStore = useAuthStore()
-        const uid = authStore.user?.uid
-        if (!uid) {
-          console.log('User not authenticated.')
-          this.hasMore = false
-          return
-        }
-
-        const bookmarksQuery = query(
-          collection(db, VITE_BOOKMARKS_COLLECTION),
-          where('userId', '==', uid),
-        )
-
-        const snapshot = await getDocs(bookmarksQuery)
-
-        if (snapshot.empty) {
-          console.log('No bookmarked posts found.')
-          this.bookmarkedPostIds = []
-          this.hasMore = false
-        } else {
-          // Assuming the bookmark document contains a 'postId' field.
-          const ids = snapshot.docs.map(doc => doc.data().postId).filter(Boolean)
-          this.bookmarkedPostIds = ids
-          this.hasMore = ids.length > 0
-        }
-      } catch (error) {
-        console.error('Error fetching bookmarked post IDs:', error)
-        this.error = error.message
-      } finally {
-        this.loading = false
+    async createNewCollection (name) {
+      const authStore = useAuthStore()
+      const params = {
+        name,
+        items: [],
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        counter: 0,
+        uid: authStore.user.uid,
       }
+      return await addDoc(collection(db, VITE_LIBRARY), params)
     },
-
-    async loadMoreBookmarks (pageSize = 5) {
-      if (this.loadingMore || !this.hasMore) {
-        return
+    async getCollections () {
+      const authStore = useAuthStore()
+      const postsRef = collection(db, VITE_LIBRARY)
+      const q = query(postsRef, where('uid', '==', authStore.user.uid))
+      const querySnapshot = await getDocs(q)
+      const posts = []
+      for (const doc of querySnapshot.docs) {
+        const post = { id: doc.id, ...doc.data() }
+        posts.push(post)
       }
+      return posts
+    },
+    async saveToCollection (payload) {
+      const { post, selectedCollection } = payload
+      const docRef = doc(db, VITE_LIBRARY, selectedCollection.id)
 
-      this.loadingMore = true
-      this.error = null
-
-      try {
-        const singlePostStore = useSinglePostStore()
-        const currentlyLoadedCount = this.bookmarkedPosts.length
-        const idsToLoad = this.bookmarkedPostIds.slice(
-          currentlyLoadedCount,
-          currentlyLoadedCount + pageSize,
-        )
-
-        if (idsToLoad.length === 0) {
-          this.hasMore = false
-          return
+      return await runTransaction(db, async transaction => {
+        const collectionDoc = await transaction.get(docRef)
+        if (!collectionDoc.exists()) {
+          throw 'Document does not exist!'
         }
 
-        const promises = idsToLoad.map(id => singlePostStore.getPostById(id))
-        const newPosts = await Promise.all(promises)
+        const newItems = arrayUnion(post.id)
+        // Since arrayUnion is a transform, we can't easily get the new length on the client.
+        // Instead, we'll get the length from the server and add 1 if the item is not already in the array.
+        const currentItems = collectionDoc.data().items || []
+        const newCounter = currentItems.includes(post.id) ? currentItems.length : currentItems.length + 1
 
-        this.bookmarkedPosts.push(...newPosts.filter(Boolean)) // Add new posts, filtering out any nulls
-
-        if (this.bookmarkedPosts.length >= this.bookmarkedPostIds.length) {
-          this.hasMore = false
-        }
-      } catch (error) {
-        console.error('Error loading more bookmarks:', error)
-        this.error = error.message // Show loading error
-      } finally {
-        this.loadingMore = false
-      }
+        transaction.update(docRef, {
+          items: newItems,
+          counter: newCounter,
+          updatedAt: new Date(),
+        })
+      })
     },
   },
 })
