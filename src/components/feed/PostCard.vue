@@ -244,6 +244,7 @@
         v-if="post.images[0]"
         :alt="post.title"
         :aspect-ratio="16/9"
+        :attr="{ crossorigin: 'anonymous' }"
         class="mb-4 rounded-xl mt-4"
         cover
         :lazy-src="post.images[0].thumb"

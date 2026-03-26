@@ -1,26 +1,32 @@
 <route lang="json">
 {
-  "meta": {
-    "layout": "MainLayout",
-    "auth": true
-  }
+"meta": {
+"layout": "MainLayout",
+"auth": true
+}
 }
 </route>
+
 <script setup>
   import dayjs from 'dayjs'
   import relativeTime from 'dayjs/plugin/relativeTime'
-  import { computed, onMounted, ref } from 'vue'
+  import { nextTick, onMounted, ref } from 'vue'
   import { useRouter } from 'vue-router'
   import { useToast } from 'vue-toastification'
   import ConfirmationModal from '@/components/ConfirmationModal.vue'
+  import PostCard from '@/components/feed/PostCard.vue' // Переконайтеся, що імпорт правильний
   import { getIcon } from '@/models/icons.js'
   import { useLibraryStore } from '@/stores/library.js'
   import '@/styles/pages/library.scss'
-  const toast = useToast()
-  //
-  const libraryStore = useLibraryStore()
-  const collectionList = ref([])
+
   dayjs.extend(relativeTime)
+
+  const toast = useToast()
+  const libraryStore = useLibraryStore()
+  const router = useRouter()
+
+  // State
+  const collectionList = ref([])
   const isCreateDialog = ref(false)
   const isRenameDialog = ref(false)
   const isSaving = ref(false)
@@ -28,10 +34,11 @@
   const editedCollection = ref(null)
   const postIsLoading = ref(false)
   const isDeleteDialogOpen = ref(false)
+  const isExporting = ref(false)
   const selectedCollection = ref(null)
-  const router = useRouter()
+  const exportingPosts = ref([])
+  const selectedSort = ref('updatedAtDesc')
 
-  const selectedSort = ref('updatedAtDesc') // Default sort to match backend
   const sortOptions = [
     { label: 'Last created', value: 'createdAtDesc' },
     { label: 'Last updated', value: 'updatedAtDesc' },
@@ -39,20 +46,34 @@
     { label: 'Z-A', value: 'nameDesc' },
   ]
 
-  const selectedSortLabel = computed(() => {
-    const option = sortOptions.find(opt => opt.value === selectedSort.value)
-    return option ? option.label : ''
-  })
-
-  //
   onMounted(() => {
     getCollectionList()
+    addScript('https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js')
   })
+
+  // Logic
+  function addScript (url) {
+    if (document.querySelector(`script[src="${url}"]`)) return
+    const script = document.createElement('script')
+    script.src = url
+    document.head.append(script)
+  }
+
+  function getCollectionList () {
+    postIsLoading.value = true
+    libraryStore.getCollections()
+      .then(res => {
+        collectionList.value = res
+        sortCollections(selectedSort.value)
+      })
+      .finally(() => {
+        postIsLoading.value = false
+      })
+  }
 
   function sortCollections (sortType) {
     selectedSort.value = sortType
     const list = [...collectionList.value]
-
     switch (sortType) {
       case 'createdAtDesc': {
         list.sort((a, b) => (a.createdAt?.seconds || 0) - (b.createdAt?.seconds || 0))
@@ -74,27 +95,55 @@
     collectionList.value = list
   }
 
-  function getCollectionList () {
-    postIsLoading.value = true
-    libraryStore.getCollections()
-      .then(res => {
-        collectionList.value = res
-        // Apply the current sort after fetching, as initial fetch is by updatedAtDesc
-        sortCollections(selectedSort.value)
-      })
-      .finally(() => {
-        postIsLoading.value = false
-      })
-  }
+  async function exportToPDF (item) {
+    if (isExporting.value) return
+    isExporting.value = true
 
-  function timeAgo (time) {
-    if (time?.seconds) {
-      return dayjs.unix(time.seconds).fromNow()
+    try {
+      const res = await libraryStore.getPostFromCollection(item.id)
+      if (!res || res.length === 0) {
+        toast.error('Collection is empty')
+        return
+      }
+      exportingPosts.value = res
+
+      await nextTick()
+
+      const exportWrapper = document.querySelector('#exporting-wrapper')
+
+      const opt = {
+        margin: 0.5,
+        filename: `${item.name}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: {
+          scale: 2,
+          useCORS: true,
+          logging: false,
+          scrollY: -window.scrollY,
+          windowWidth: 800,
+        },
+        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
+        pagebreak: { mode: 'css' },
+      }
+
+      html2pdf().from(exportWrapper).set(opt).save().then(() => {
+        toast.success('PDF generated')
+      }).catch(error => {
+        console.error('PDF Export Error:', error)
+        toast.error('Failed to generate PDF')
+      })
+    } catch (error) {
+      console.error('PDF Export Error:', error)
+      toast.error('Failed to generate PDF')
+    } finally {
+      isExporting.value = false
+      exportingPosts.value = []
     }
-    return 'no time'
   }
 
+  // Handlers (Rename, Delete, Create...)
   function createCollection () {
+    if (!newCollection.value) return
     isSaving.value = true
     libraryStore.createNewCollection(newCollection.value)
       .then(() => {
@@ -103,13 +152,7 @@
         getCollectionList()
         toast.info('New collection created')
       })
-      .finally(() => {
-        isSaving.value = false
-      })
-  }
-  function openDeleteDialog (item) {
-    selectedCollection.value = item
-    isDeleteDialogOpen.value = true
+      .finally(() => isSaving.value = false)
   }
 
   function deleteCollection () {
@@ -120,14 +163,7 @@
         toast.info('Collection deleted')
         isDeleteDialogOpen.value = false
       })
-      .finally(() => {
-        isSaving.value = false
-      })
-  }
-
-  function openRenameDialog (item) {
-    editedCollection.value = { ...item }
-    isRenameDialog.value = true
+      .finally(() => isSaving.value = false)
   }
 
   function renameCollection () {
@@ -138,165 +174,171 @@
         toast.info('Collection renamed')
         isRenameDialog.value = false
       })
-      .finally(() => {
-        isSaving.value = false
-      })
+      .finally(() => isSaving.value = false)
   }
 
-  function openCollection (item) {
-    router.push(`/library/${item.id}`)
+  function openDeleteDialog (item) {
+    selectedCollection.value = item
+    isDeleteDialogOpen.value = true
   }
+  function openRenameDialog (item) {
+    editedCollection.value = { ...item }
+    isRenameDialog.value = true
+  }
+  const openCollection = item => router.push(`/library/${item.id}`)
+  const timeAgo = time => time?.seconds ? dayjs.unix(time.seconds).fromNow() : 'no time'
   function shareLink (item) {
-    const url = `${window.location.origin}/library/${item.id}`
-    navigator.clipboard.writeText(url)
-      .then(() => {
-        toast.info('Link copied to clipboard')
-      })
+    navigator.clipboard.writeText(`${window.location.origin}/library/${item.id}`)
+    toast.info('Link copied')
   }
 </script>
 
 <template>
   <div class="library-page">
+    <div v-if="exportingPosts.length > 0" id="exporting-wrapper">
+      <div v-for="post in exportingPosts" :key="post.id" class="post-card-export">
+        <PostCard :post="post" />
+      </div>
+    </div>
+
     <v-dialog v-model="isCreateDialog" class="collection-dialog" max-width="520">
-      <v-card class="pa-7 rounded-xl position-relative">
-        <v-icon
-          class="close-icon"
-          icon="mdi-close"
-          @click="isCreateDialog = false"
-        />
-        <v-card-title class="text-center py-0">Create collection</v-card-title>
-        <form-input
-          v-model="newCollection"
-          class="mt-6"
-          placeholder="Big Failures"
-        />
-        <div class="d-flex justify-center">
-          <div
-            class="submit-btn"
-            :class="{'opacity-60 pointer-events-none': !newCollection}"
-            @click="createCollection"
-          >
-            <v-progress-circular
-              v-if="isSaving"
-              class="mr-2"
-              indeterminate
-              size="20"
-              width="2"
-            />
-            <span v-else>Create</span>
-          </div>
-        </div>
+      <v-card class="pa-7 rounded-xl">
+        <v-btn class="position-absolute right-0 top-0 m-2" icon="mdi-close" variant="text" @click="isCreateDialog = false" />
+        <v-card-title class="text-center">Create collection</v-card-title>
+        <v-text-field v-model="newCollection" class="mt-4" label="Collection Name" variant="outlined" />
+        <v-btn block color="primary" :loading="isSaving" @click="createCollection">Create</v-btn>
       </v-card>
     </v-dialog>
+
     <v-dialog v-model="isRenameDialog" class="collection-dialog" max-width="520">
-      <v-card class="pa-7 rounded-xl position-relative">
-        <v-icon
-          class="close-icon"
-          icon="mdi-close"
-          @click="isRenameDialog = false"
-        />
-        <v-card-title class="text-center py-0">Rename collection</v-card-title>
-        <form-input
-          v-if="editedCollection"
-          v-model="editedCollection.name"
-          class="mt-6"
-          placeholder="Big Failures"
-        />
-        <div class="d-flex justify-center">
-          <div
-            class="submit-btn"
-            :class="{'opacity-60 pointer-events-none': !editedCollection.name}"
-            @click="renameCollection"
-          >
-            <v-progress-circular
-              v-if="isSaving"
-              class="mr-2"
-              indeterminate
-              size="20"
-              width="2"
-            />
-            <span v-else>Save</span>
-          </div>
-        </div>
+      <v-card v-if="editedCollection" class="pa-7 rounded-xl">
+        <v-btn class="position-absolute right-0 top-0 m-2" icon="mdi-close" variant="text" @click="isRenameDialog = false" />
+        <v-card-title class="text-center">Rename collection</v-card-title>
+        <v-text-field v-model="editedCollection.name" class="mt-4" label="Name" variant="outlined" />
+        <v-btn block color="primary" :loading="isSaving" @click="renameCollection">Save</v-btn>
       </v-card>
     </v-dialog>
+
     <confirmation-modal
       :loading="isSaving"
-      message="Are you sure you want to delete this collection?"
+      message="Delete this collection?"
       :show="isDeleteDialogOpen"
-      title="Delete Collection"
       @cancel="isDeleteDialogOpen = false"
       @confirm="deleteCollection"
     />
-    <div class="page-header d-flex align-center justify-space-between">
+
+    <div class="page-header d-flex align-center justify-space-between mb-6">
       <h2>Saved Library</h2>
       <button @click="isCreateDialog = true">Create collection</button>
     </div>
-    <div class="header-panel d-flex align-center justify-space-between">
-      <p class="text-description">{{ collectionList.length }} Collections</p>
-      <v-menu color="primary" location="bottom right" open-on-hover>
+
+    <div class="header-panel d-flex align-center justify-space-between mb-4">
+      <p class="text-grey">{{ collectionList.length }} Collections</p>
+      <v-menu location="bottom end" open-on-hover>
         <template #activator="{ props }">
           <div class="d-flex align-center cursor-pointer" v-bind="props">
             <div class="bg-secondary d-flex align-center justify-center pa-2 rounded-circle" v-html="getIcon('filter', 20, 20)" />
           </div>
         </template>
-        <v-list class="rounded-xl elevation-1">
-          <v-list-item
-            v-for="option in sortOptions"
-            :key="option.value"
-            :class="{ 'v-list-item--active': selectedSort === option.value }"
-            @click="sortCollections(option.value)"
-          >
-            <v-list-item-title>{{ option.label }}</v-list-item-title>
+        <v-list class="rounded-xl elevation-1" color="primary">
+          <v-list-item v-for="opt in sortOptions" :key="opt.value" :active="selectedSort === opt.value" @click="sortCollections(opt.value)">
+            {{ opt.label }}
           </v-list-item>
         </v-list>
       </v-menu>
     </div>
-    <p v-if="postIsLoading" class="mt-10 text-center">Loading...</p>
+
+    <v-progress-linear v-if="postIsLoading" color="primary" indeterminate />
+
     <template v-else>
       <ul v-if="collectionList.length > 0" class="collection-list">
-        <li v-for="item in collectionList" :key="item.id">
+        <li v-for="item in collectionList" :key="item.id" class="collection-item">
           <div class="d-flex align-center justify-space-between">
-            <p class="name hover-underline" @click="openCollection(item)">{{ item.name }}</p>
-            <v-menu color="primary" open-on-hover>
-              <template #activator="{ props: menuProps }">
-                <v-btn icon size="small" v-bind="menuProps" variant="text">
-                  <v-icon>mdi-dots-horizontal</v-icon>
-                </v-btn>
+            <p class="name" @click="openCollection(item)">{{ item.name }}</p>
+            <v-menu location="bottom end" open-on-hover>
+              <template #activator="{ props }">
+                <v-btn
+                  v-bind="props"
+                  density="compact"
+                  icon="mdi-dots-horizontal"
+                  variant="text"
+                />
               </template>
-              <v-list class="rounded-xl elevation-1">
-                <v-list-item class="cursor-pointer drop-item" @click="openRenameDialog(item)">
-                  <div class="mr-2 d-flex" v-html="getIcon('pencil', 20, 20)" />
-                  <p>Rename collection</p>
+              <v-list class="rounded-xl" color="primary" width="200">
+                <v-list-item @click="openRenameDialog(item)">
+                  <template #prepend><div class="mr-2" v-html="getIcon('pencil', 18, 18)" /></template>
+                  Rename
                 </v-list-item>
-                <v-list-item class="cursor-pointer drop-item" @click="shareLink(item)">
-                  <div class="mr-2 d-flex" v-html="getIcon('share', 20, 20)" />
-                  <p>Share link</p>
+                <v-list-item @click="shareLink(item)">
+                  <template #prepend><div class="mr-2" v-html="getIcon('share', 18, 18)" /></template>
+                  Share
                 </v-list-item>
-                <v-list-item class="cursor-pointer drop-item">
-                  <div class="mr-2 d-flex" v-html="getIcon('export', 20, 20)" />
-                  <p>Export as PDF</p>
+                <v-list-item @click="exportToPDF(item)">
+                  <template #prepend><div class="mr-2" v-html="getIcon('export', 18, 18)" /></template>
+                  Export PDF
                 </v-list-item>
-                <v-list-item class="cursor-pointer drop-item text-danger" @click="openDeleteDialog(item)">
-                  <div class="mr-2 d-flex" v-html="getIcon('trash', 20, 20)" />
-                  <p>Delete</p>
+                <v-divider />
+                <v-list-item base-color="error" @click="openDeleteDialog(item)">
+                  <template #prepend><div class="mr-2" v-html="getIcon('trash', 18, 18)" /></template>
+                  Delete
                 </v-list-item>
               </v-list>
-
             </v-menu>
           </div>
-          <div class="d-flex align-center justify-space-between">
-            <p class="text-description">{{ item.counter }} posts</p>
-            <p class="text-description"> {{ timeAgo(item.updatedAt) }}</p>
+          <div class="d-flex justify-space-between text-caption text-grey">
+            <span>{{ item.counter }} posts</span>
+            <span>{{ timeAgo(item.updatedAt) }}</span>
           </div>
-
         </li>
       </ul>
-      <div v-else class="no-content">
-        <img alt="You don’t have any library yet" src="../../assets/library/Frame192.png">
-        <h4 class="text-description">You don’t have any library yet</h4>
-        <p>Create your first collection</p>
+      <div v-else class="text-center py-10">
+        <v-img class="mx-auto mb-4" src="@/assets/library/Frame192.png" width="200" />
+        <p class="text-grey">You don’t have any library yet</p>
       </div>
     </template>
   </div>
 </template>
+
+<style scoped lang="scss">
+.collection-list {
+  list-style: none;
+  padding: 0;
+  .collection-item {
+    padding: 16px;
+    border-bottom: 1px solid #f0f0f0;
+    .name {
+      font-weight: 600;
+      cursor: pointer;
+      &:hover { text-decoration: underline; }
+    }
+  }
+}
+
+// Стилі для експорту
+#exporting-wrapper {
+  position: absolute;
+  left: -9999px;
+  top: -9999px;
+  width: 750px; // Стандартна ширина для PDF
+  opacity: 0; // Робимо прозорим, а не прихованим через display: none
+  pointer-events: none;
+  background: white;
+  padding: 40px;
+
+  // Стилі для карток всередині PDF
+  .post-card-export {
+    display: block;
+    width: 100%;
+    margin-bottom: 40px;
+    break-inside: avoid;
+    page-break-inside: avoid;
+
+    // Переконуємось, що контент всередині PostCard видимий
+    :deep(.post-card) {
+      box-shadow: none !important;
+      border: 1px solid #eee !important;
+      background: white !important;
+    }
+  }
+}
+</style>
