@@ -128,7 +128,6 @@
     color: $color-text-secondary;
     font-size: $font-size-sm;
     line-height: $line-height-relaxed;
-    margin-bottom: $spacing-md;
     word-wrap: break-word;
   }
 
@@ -139,7 +138,6 @@
     padding: 0;
     font-weight: 600;
     cursor: pointer;
-    margin-bottom: $spacing-md;
 
     &:hover {
       text-decoration: underline;

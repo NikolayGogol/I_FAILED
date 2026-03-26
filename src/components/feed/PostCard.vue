@@ -259,13 +259,13 @@
       <h2 class="post-title cursor-pointer hover-text-underline" @click="openPost">
         {{ post.title }}
       </h2>
-      <p class="post-body cursor-pointer hover-text-underline" @click="openPost" v-html="truncatedBody" />
+      <div class="post-body cursor-pointer hover-text-underline" @click="openPost" v-html="truncatedBody" />
       <button v-if="showReadMore" class="read-more" @click="readMore">Read more</button>
       <v-img
         v-if="post.images[0]"
         :alt="post.title"
         :aspect-ratio="16/9"
-        class="mb-4 rounded-xl"
+        class="mb-4 rounded-xl mt-4"
         cover
         :lazy-src="post.images[0].thumb"
         :src="post.images[0].thumb"

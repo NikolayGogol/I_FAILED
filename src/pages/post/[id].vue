@@ -25,6 +25,7 @@
   import { useCommentMenuStore } from '@/stores/single-post/comment-menu.js'
   import { useSinglePostStore } from '@/stores/single-post/single-post.js'
   import { floatNumber, formatNumber } from '@/utils/format-number.js'
+  import { stripHtml } from '@/utils/html.js'
   import 'vue3-emoji-picker/css'
   import '@/styles/pages/single-post.scss'
 
@@ -165,6 +166,7 @@
       }
     })
   }
+
   watch(() => route.params, val => {
     init(val.id)
   })
@@ -172,17 +174,35 @@
     if (!post.value?.createdAt) return ''
     return dayjs.unix(post.value.createdAt.seconds).fromNow()
   })
-
-  const readingTime = computed(() => {
-    if (!post.value?.whatHappened) return '1 min read'
-
-    const content = post.value.whatHappened
-    const text = content.replace(/<[^>]*>/g, '')
-    const wordCount = text.trim().split(/\s+/).length
-    const time = Math.ceil(wordCount / 300)
-
+  const keys = [
+    'howDidItFeel',
+    'whatHappened',
+    'whatWentWrong',
+  ]
+  const keys1 = [
+    'advice',
+    'keyTakeaways',
+    'whatILearned',
+    'whatIdDoDifferently',
+  ]
+  function readingTime (obj) {
+    const arr = [
+      obj?.title || '',
+      obj?.howDidItFeel || '',
+      obj?.whatHappened || '',
+      obj?.whatWentWrong || '',
+      obj?.lessonLearned?.advice || '',
+      obj?.lessonLearned?.keyTakeaways || '',
+      obj?.lessonLearned?.whatILearned || '',
+      obj?.lessonLearned?.whatIdDoDifferently || '',
+    ]
+    const word = arr.map(item => stripHtml(item))
+      .map(el => stripHtml(el))
+      .join('')
+    const wordCount = word.trim().length
+    const time = Math.ceil(wordCount / 200)
     return `${time} min read`
-  })
+  }
 
   async function handlePostLike () {
     if (!authStore.user) {
@@ -474,7 +494,7 @@
         </div>
         <div class="read-widget">
           <v-icon icon="mdi-clock-outline" />
-          {{ readingTime }}
+          {{ readingTime(post) }}
         </div>
       </div>
 
