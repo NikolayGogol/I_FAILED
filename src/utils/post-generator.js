@@ -59,6 +59,7 @@ export async function generateRandomPost () {
       user: {
         displayName: isAnonymous ? 'Anonymous' : authStore.user.displayName,
         photoURL: isAnonymous ? noAvatar : authStore.user.photoURL || noAvatar,
+        email: authStore.user.email,
       },
       likes: 0,
       comments: 0,

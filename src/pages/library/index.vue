@@ -225,8 +225,17 @@
           @click="isCreateDialog = false"
         />
         <v-card-title class="text-center">Create collection</v-card-title>
-        <v-text-field v-model="newCollection" class="mt-4" label="Collection Name" variant="outlined" />
-        <v-btn block color="primary" :loading="isSaving" @click="createCollection">Create</v-btn>
+        <form-input v-model="newCollection" class="mt-4" placeholder="Collection Name" variant="outlined" />
+        <div class="d-flex justify-center">
+          <div class="submit-btn" @click="createCollection">
+            <v-progress-circular
+              v-if="isSaving"
+              color="primary"
+              indeterminate
+            />
+            <span v-else>Create</span>
+          </div>
+        </div>
       </v-card>
     </v-dialog>
 
@@ -239,8 +248,23 @@
           @click="isRenameDialog = false"
         />
         <v-card-title class="text-center">Rename collection</v-card-title>
-        <v-text-field v-model="editedCollection.name" class="mt-4" label="Name" variant="outlined" />
-        <v-btn block color="primary" :loading="isSaving" @click="renameCollection">Save</v-btn>
+        <form-input
+          v-model="editedCollection.name"
+          class="mt-4"
+          placeholder="Name"
+          variant="outlined"
+        />
+        <div class="d-flex justify-center">
+          <div class="submit-btn" @click="renameCollection()">
+            <v-progress-circular
+              v-if="isSaving"
+              color="primary"
+              indeterminate
+            />
+            <span v-else>Save</span>
+          </div>
+        </div>
+
       </v-card>
     </v-dialog>
 
@@ -298,28 +322,32 @@
                 />
               </template>
               <v-list class="rounded-xl" color="primary" width="200">
-                <v-list-item @click="openRenameDialog(item)">
+                <v-list-item class="drop-item" @click="openRenameDialog(item)">
                   <template #prepend>
-                    <div class="mr-2" v-html="getIcon('pencil', 18, 18)" />
+                    <div class="mr-2 d-flex" v-html="getIcon('pencil', 18, 18)" />
                   </template>
                   Rename
                 </v-list-item>
-                <v-list-item @click="shareLink(item)">
+                <v-list-item class="drop-item" @click="shareLink(item)">
                   <template #prepend>
-                    <div class="mr-2" v-html="getIcon('share', 18, 18)" />
+                    <div class="mr-2 d-flex" v-html="getIcon('share', 18, 18)" />
                   </template>
                   Share
                 </v-list-item>
-                <v-list-item @click="exportToPDF(item)">
+                <v-list-item
+                  v-if="item.counter"
+                  class="drop-item"
+                  @click="exportToPDF(item)"
+                >
                   <template #prepend>
-                    <div class="mr-2" v-html="getIcon('export', 18, 18)" />
+                    <div class="mr-2 d-flex" v-html="getIcon('export', 18, 18)" />
                   </template>
                   Export PDF
                 </v-list-item>
                 <v-divider />
                 <v-list-item base-color="error" @click="openDeleteDialog(item)">
                   <template #prepend>
-                    <div class="mr-2" v-html="getIcon('trash', 18, 18)" />
+                    <div class="mr-2 d-flex" v-html="getIcon('trash', 18, 18)" />
                   </template>
                   Delete
                 </v-list-item>
@@ -333,7 +361,7 @@
         </li>
       </ul>
       <div v-else class="text-center py-10">
-        <v-img class="mx-auto mb-4" src="@/assets/library/Frame192.png" width="200" />
+        <v-img class="mx-auto mb-4" src="@/assets/library/Frame192.png" width="100" />
         <p class="text-grey">You don’t have any library yet</p>
       </div>
     </template>

@@ -144,6 +144,7 @@
     })
 
     if (result.success && newIsLiked) {
+      console.log(p.post)
       await postCardStore.sendLikeNotification(p.post)
     }
 

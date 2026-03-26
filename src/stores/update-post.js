@@ -203,6 +203,7 @@ export const useUpdatePostStore = defineStore('updatePost', {
           user: {
             displayName: payload.isAnonymous ? 'Anonymous' : authStore.user.displayName,
             photoURL: payload.isAnonymous ? noAvatar : authStore.user.photoURL,
+            email: authStore.user.email,
           },
         }
 

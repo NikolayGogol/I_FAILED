@@ -90,19 +90,17 @@
 
 .drop-item {
 
-  &:not(:last-of-type) {
-    svg {
-      * {
-        stroke: $color-text-primary;
-      }
+  svg {
+    * {
+      stroke: $color-text-primary;
     }
   }
-
   .v-list-item__content {
     display: flex;
     align-items: center;
   }
 }
+
 
 .collection-dialog {
   .close-icon {

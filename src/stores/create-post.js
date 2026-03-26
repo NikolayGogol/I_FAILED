@@ -103,6 +103,7 @@ export const useCreatePostStore = defineStore('createPost', {
         user: {
           displayName: this.isAnonymous ? 'Anonymous' : authStore.user.displayName,
           photoURL: this.isAnonymous ? noAvatar : authStore.user.photoURL,
+          email: authStore.user.email,
         },
         likes: 0,
         comments: 0,
