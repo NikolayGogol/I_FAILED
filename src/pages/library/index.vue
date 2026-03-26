@@ -266,15 +266,19 @@
               </template>
               <v-list class="rounded-xl elevation-1">
                 <v-list-item class="cursor-pointer drop-item" @click="openRenameDialog(item)">
-                  <div class="mr-2 d-flex" v-html="getIcon('pencil')" />
+                  <div class="mr-2 d-flex" v-html="getIcon('pencil', 20, 20)" />
                   <p>Rename collection</p>
                 </v-list-item>
                 <v-list-item class="cursor-pointer drop-item" @click="shareLink(item)">
-                  <div class="mr-2 d-flex" v-html="getIcon('share')" />
+                  <div class="mr-2 d-flex" v-html="getIcon('share', 20, 20)" />
                   <p>Share link</p>
                 </v-list-item>
+                <v-list-item class="cursor-pointer drop-item">
+                  <div class="mr-2 d-flex" v-html="getIcon('export', 20, 20)" />
+                  <p>Export as PDF</p>
+                </v-list-item>
                 <v-list-item class="cursor-pointer drop-item text-danger" @click="openDeleteDialog(item)">
-                  <div class="mr-2 d-flex" v-html="getIcon('trash')" />
+                  <div class="mr-2 d-flex" v-html="getIcon('trash', 20, 20)" />
                   <p>Delete</p>
                 </v-list-item>
               </v-list>
