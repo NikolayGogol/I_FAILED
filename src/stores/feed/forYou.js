@@ -16,6 +16,7 @@ export const useForYouStore = defineStore('forYou', {
     hasMore: true,
     loading: false,
     userCache: {},
+    fallbackTried: false, // When personalized feed ends, load the remaining posts.
   }),
   getters: {
     /**
@@ -31,12 +32,19 @@ export const useForYouStore = defineStore('forYou', {
 
       const notInterestedTags = authStore.user.notInterestedTags || []
       const currentUserId = authStore.user.uid
+      const followedUsers = new Set(authStore.user.following || [])
 
       return state.posts.filter(post => {
         // Exclude user's own posts
         if (post.uid === currentUserId) {
           return false
         }
+
+        // If a followed user created an anonymous post, don't show it.
+        if (post.isAnonymous && post.uid && followedUsers.has(post.uid)) {
+          return false
+        }
+
         // Exclude posts with tags the user is not interested in
         if (post.tags && post.tags.some(tag => notInterestedTags.includes(tag))) {
           return false
@@ -52,17 +60,34 @@ export const useForYouStore = defineStore('forYou', {
      * @param {number} options.pageSize - The number of posts to fetch.
      * @param {boolean} options.refresh - Whether to refresh the posts list.
      */
-    async fetchPosts ({ pageSize = 10, refresh = false } = {}) {
+    async fetchPosts ({ pageSize = 10, refresh = false, fallback = false } = {}) {
       const authStore = useAuthStore()
+      const followedUsers = authStore.user?.following || []
+      const followedTags = authStore.user?.followedTags || []
+      const currentUserId = authStore.user?.uid
+
+      const isForYouFallback = fallback
 
       if (refresh) {
         this.posts = []
         this.lastVisible = null
         this.hasMore = true
         this.loading = false
+        this.fallbackTried = false
       }
 
-      if (this.loading || !this.hasMore) {
+      if (this.loading) {
+        return
+      }
+
+      // If personalized mode is exhausted, try fallback once.
+      if (!isForYouFallback && !this.hasMore) {
+        const hasAnyPrefs = (Array.isArray(followedUsers) && followedUsers.length > 0)
+          || (Array.isArray(followedTags) && followedTags.length > 0)
+        if (hasAnyPrefs && !this.fallbackTried) {
+          this.fallbackTried = true
+          return await this.fetchPosts({ pageSize, refresh: false, fallback: true })
+        }
         return
       }
 
@@ -74,8 +99,10 @@ export const useForYouStore = defineStore('forYou', {
           tab: 'for-you',
           pageSize,
           cursor: this.lastVisible,
-          followedUsers: authStore.user?.following || [],
-          followedTags: authStore.user?.followedTags || [],
+          followedUsers,
+          followedTags,
+          fallback: isForYouFallback,
+          currentUserId,
         }
 
         const response = await api.post('posts/feed', payload)

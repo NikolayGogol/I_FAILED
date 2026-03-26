@@ -164,6 +164,58 @@ function matchesFilters (postData, filters) {
   return true
 }
 
+function matchesForYou (postData, followedUsersSet, followedTagsSet) {
+  const hasUserPref = followedUsersSet && followedUsersSet.size > 0
+  const hasTagPref = followedTagsSet && followedTagsSet.size > 0
+
+  if (!hasUserPref && !hasTagPref) {
+    return false
+  }
+
+  const postUidNorm = normalizeString(postData?.uid)
+
+  // If the author is a followed user, do not show anonymous posts from them.
+  if (postData?.isAnonymous && postUidNorm && hasUserPref && followedUsersSet.has(postUidNorm)) {
+    return false
+  }
+
+  // 1) Author match (followed users)
+  if (hasUserPref && postUidNorm && followedUsersSet.has(postUidNorm)) {
+    return true
+  }
+
+  // 2) Tag match (followed tags)
+  const postTags = Array.isArray(postData?.tags) ? postData.tags : []
+  if (hasTagPref && postTags.length > 0) {
+    for (const t of postTags) {
+      const raw = typeof t === 'string' ? t : (t?.value ?? t?.label ?? t?.id ?? '')
+      const tagNorm = normalizeString(raw)
+      if (tagNorm && followedTagsSet.has(tagNorm)) {
+        return true
+      }
+    }
+  }
+
+  return false
+}
+
+function matchesForYouFallback (postData, followedUsersSet, currentUserIdNorm) {
+  const postUidNorm = normalizeString(postData?.uid)
+
+  // Exclude user's own posts.
+  if (currentUserIdNorm && postUidNorm && postUidNorm === currentUserIdNorm) {
+    return false
+  }
+
+  // Never show anonymous posts when the author is a followed user.
+  if (postData?.isAnonymous && postUidNorm && followedUsersSet.has(postUidNorm)) {
+    return false
+  }
+
+  // Otherwise include everything.
+  return true
+}
+
 exports.queryPostsFeed = async (req, res) => {
   try {
     const {
@@ -171,6 +223,10 @@ exports.queryPostsFeed = async (req, res) => {
       pageSize,
       cursor,
       filters,
+      followedUsers,
+      followedTags,
+      fallback,
+      currentUserId,
     } = req.body || {}
 
     const effectivePageSize = Math.max(1, Number(pageSize) || 10)
@@ -183,6 +239,31 @@ exports.queryPostsFeed = async (req, res) => {
     // All other filter types are evaluated in memory.
     const orderField = activeTab === 'popular' ? 'views' : 'createdAt'
     const orderDirection = 'desc'
+
+    // Pre-compute personalization sets for the "For You" feed.
+    // We only apply these filters to `activeTab === 'for-you'`.
+    const followedUsersSet = new Set()
+    const followedTagsSet = new Set()
+    if (activeTab === 'for-you') {
+      const fus = Array.isArray(followedUsers) ? followedUsers : []
+      for (const uid of fus) {
+        const uidNorm = normalizeString(uid)
+        if (uidNorm) {
+          followedUsersSet.add(uidNorm)
+        }
+      }
+
+      const fts = Array.isArray(followedTags) ? followedTags : []
+      for (const t of fts) {
+        const tagNorm = normalizeString(t)
+        if (tagNorm) {
+          followedTagsSet.add(tagNorm)
+        }
+      }
+    }
+
+    const currentUserIdNorm = normalizeString(currentUserId)
+    const isForYouFallback = activeTab === 'for-you' && !!fallback
 
     // How many documents we pull per Firestore request.
     // We fetch more than `effectivePageSize` because many candidates may not match filters.
@@ -224,7 +305,14 @@ exports.queryPostsFeed = async (req, res) => {
       for (let i = 0; i < snapshot.docs.length; i++) {
         const docSnap = snapshot.docs[i]
         const data = docSnap.data() || {}
-        if (matchesFilters(data, filters)) {
+
+        let includeForYou = true
+        if (activeTab === 'for-you') {
+          includeForYou = isForYouFallback
+            ? matchesForYouFallback(data, followedUsersSet, currentUserIdNorm)
+            : matchesForYou(data, followedUsersSet, followedTagsSet)
+        }
+        if (matchesFilters(data, filters) && includeForYou) {
           results.push({ id: docSnap.id, ...data })
           lastDocId = docSnap.id
           // We only stop scanning once we have enough matches.

@@ -35,6 +35,7 @@ jobs:
           echo "VITE_POST_COLLECTION_SCEDULED=${{ vars.VITE_POST_COLLECTION_SCEDULED }}" >> .env
           echo "VITE_USER_CATEGORY_READS_COLLECTION=${{ vars.VITE_USER_CATEGORY_READS_COLLECTION }}" >> .env
           echo "VITE_BOOKMARKS=${{ vars.VITE_BOOKMARKS }}" >> .env
+          echo "VITE_LIBRARY=${{ vars.VITE_LIBRARY }}" >> .env
 
       - name: Install and Build Frontend
         run: npm ci && npm run build

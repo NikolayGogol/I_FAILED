@@ -152,45 +152,6 @@
 
     isLiking.value = false
   }
-
-  async function handleBookmark () {
-    if (!authStore.user) {
-      await router.push('/login')
-      return
-    }
-    if (isBookmarking.value) return
-
-    isBookmarking.value = true
-
-    const originalIsBookmarked = isBookmarked.value
-    const originalBookmarkCount = bookmarkCount.value
-    const newIsBookmarked = !isBookmarked.value
-
-    // Optimistic UI update
-    isBookmarked.value = newIsBookmarked
-    bookmarkCount.value += newIsBookmarked ? 1 : -1
-
-    const result = await postCardStore.toggleBookmark({
-      postId: p.post.id,
-      bookmarked: newIsBookmarked,
-    })
-
-    if (result.success) {
-      if (newIsBookmarked) {
-        toast.info('Post bookmarked!')
-      } else {
-        toast.info('Post removed from bookmarks.')
-      }
-    } else {
-      isBookmarked.value = originalIsBookmarked
-      bookmarkCount.value = originalBookmarkCount
-      toast.error('Failed to update bookmark')
-      console.error('Failed to update bookmark status:', result.error)
-    }
-
-    isBookmarking.value = false
-  }
-
   // Navigate to the single post page
   function openPost () {
     router.push(`/post/${p.post.id}`)

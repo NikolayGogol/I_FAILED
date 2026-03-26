@@ -1,17 +1,19 @@
 <script setup>
   import { storeToRefs } from 'pinia'
-  import { onMounted, onUnmounted } from 'vue'
+  import { onMounted, onUnmounted, watch } from 'vue'
   import PostCard from '@/components/feed/PostCard.vue'
+  import { useAuthStore } from '@/stores/auth'
   import { useForYouStore } from '@/stores/feed/forYou'
 
   const store = useForYouStore()
+  const authStore = useAuthStore()
   const { filteredPosts: posts, loading, hasMore } = storeToRefs(store)
 
   /**
    * Handles the scroll event to trigger infinite loading.
    */
   function handleScroll () {
-    if (loading.value || !hasMore.value) return
+    if (loading.value) return
     const { scrollTop, scrollHeight, clientHeight } = document.documentElement
     if (scrollHeight - scrollTop - clientHeight < 500) {
       store.fetchPosts({ pageSize: 5 })
@@ -22,6 +24,21 @@
     store.fetchPosts({ pageSize: 5, refresh: true })
     window.addEventListener('scroll', handleScroll)
   })
+
+  // Refresh "For You" whenever personalization data changes.
+  // This covers cases when user follows/unfollows without reloading the page.
+  watch(
+    () => [
+      authStore.user?.following,
+      authStore.user?.followedTags,
+      authStore.user?.notInterestedTags,
+    ],
+    () => {
+      if (!authStore.user) return
+      store.fetchPosts({ pageSize: 5, refresh: true })
+    },
+    { deep: true },
+  )
 
   onUnmounted(() => {
     window.removeEventListener('scroll', handleScroll)
