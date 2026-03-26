@@ -1,0 +1,18 @@
+@use '../../../settings' as *;
+
+.notify-tab {
+  .tab-header {
+    color: $color-text-secondary;
+    cursor: pointer;
+  }
+
+  .title {
+    color: $color-text-primary;
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  .text-description {
+    font-size: 12px;
+  }
+}

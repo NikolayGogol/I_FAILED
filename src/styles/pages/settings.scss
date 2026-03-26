@@ -3,113 +3,52 @@
 @use '../global/mixins' as *;
 
 .settings-page {
-  min-height: 100vh;
-  padding-top: $spacing-md;
-
-  .settings-title {
-    font-size: $font-size-2xl;
-    font-weight: bold;
-    color: $color-text-primary;
-    margin-bottom: $spacing-lg;
-    padding-left: $spacing-md;
-  }
-
   .settings-wrapper {
-    display: flex;
-    gap: $spacing-lg;
-    max-width: $container-width-xl;
-    margin: 0 auto;
+    background-color: $color-surface;
+    padding: $spacing-lg;
+    border-radius: $radius-xl;
+    border: 1px solid $color-border;
+    margin-top: 24px;
 
     .settings-sidebar {
-      width: $sidebar-width;
-      flex-shrink: 0;
-
       .settings-menu {
-        list-style: none;
+        margin: 0;
         padding: 0;
-        background-color: $color-surface;
-        border: 1px solid $color-border;
-        border-radius: $radius-lg;
-        overflow: hidden;
 
-        .menu-item {
-          padding: $spacing-md;
+        li {
+          list-style: none;
+          padding: 10px;
           cursor: pointer;
-          display: flex;
-          align-items: center;
-          color: $color-text-secondary;
-          transition: background-color 0.2s, color 0.2s;
-          border-bottom: 1px solid $color-border;
+          font-size: 16px;
+          border-radius: $radius-sm;
+          transition: all .3s ease-in;
 
-          &:last-child {
-            border-bottom: none;
-          }
-
-          &:hover {
-            background-color: $color-background;
-            color: $color-text-primary;
+          svg {
+            * {
+              stroke: $color-text-primary;
+            }
           }
 
           &.active {
-            background-color: $color-accent-bg;
-            color: $color-accent-text;
-            font-weight: bold;
-            border-left: $border-width-lg solid $color-accent-text;
-          }
+            background-color: $color-tag-bg;
+            color: $color-tag;
 
-          .icon {
-            margin-right: $spacing-md;
-            font-size: $font-size-lg;
-          }
-        }
-      }
-    }
-
-    .settings-content {
-      flex-grow: 1;
-
-      .settings-options-list {
-        background-color: $color-surface;
-        border: 1px solid $color-border;
-        border-radius: $radius-lg;
-        overflow: hidden;
-
-        .option-item {
-          padding: $spacing-lg;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          cursor: pointer;
-          border-bottom: 1px solid $color-border;
-          transition: background-color 0.2s;
-
-          &:last-child {
-            border-bottom: none;
+            svg {
+              * {
+                stroke: $color-tag;
+              }
+            }
           }
 
           &:hover {
-            background-color: $color-background;
-          }
+            background-color: $color-tag-bg;
+            color: $color-tag;
 
-          .option-info {
-            display: flex;
-            align-items: center;
-
-            .option-icon {
-              margin-right: $spacing-md;
-              font-size: $font-size-lg-xl;
+            svg {
+              * {
+                stroke: $color-tag;
+              }
             }
-
-            .option-text {
-              font-weight: bold;
-              color: $color-text-primary;
-            }
-          }
-
-          .arrow {
-            color: $color-text-tertiary;
-            font-size: $font-size-lg-xl;
-            font-weight: bold;
           }
         }
       }
@@ -117,13 +56,3 @@
   }
 }
 
-// Responsive adjustments
-@include media-down($breakpoint-sm) {
-  .settings-wrapper {
-    flex-direction: column;
-
-    .settings-sidebar {
-      width: 100%;
-    }
-  }
-}
