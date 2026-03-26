@@ -4,13 +4,11 @@ const admin = require('firebase-admin')
 const { onRequest } = require('firebase-functions/v2/https')
 require('dotenv').config() // Load environment variables from .env
 
-// Set the runtime service account for all functions in this project
-// setGlobalOptions({ serviceAccount: 'ifailed-25dab@appspot.gserviceaccount.com' })
-
 // Initialize Firebase Admin FIRST
 admin.initializeApp()
 
 const authRoutes = require('./routes/auth')
+const notificationRoutes = require('./routes/notifications') // Import the new router
 const postsRoutes = require('./routes/posts')
 const { publishScheduledPosts } = require('./scheduled/publish-posts')
 
@@ -26,7 +24,6 @@ app.options('*', corsMiddleware)
 app.use(express.json())
 
 // --- DEBUGGING STEP ---
-// Add a simple status endpoint to check if the function is alive at all
 app.get('/status', (req, res) => {
   res.status(200).send('API is running!')
 })
@@ -35,6 +32,7 @@ app.get('/status', (req, res) => {
 // Mount the routers
 app.use(authRoutes)
 app.use(postsRoutes)
+app.use(notificationRoutes) // Use the new router
 
 // Export the API as a single Cloud Function
 exports.api = onRequest(app)

@@ -1,7 +1,9 @@
 import { addDoc, arrayRemove, arrayUnion, collection, deleteDoc, doc, getCountFromServer, getDocs, increment, query, serverTimestamp, updateDoc, where } from 'firebase/firestore'
 import { defineStore } from 'pinia'
+import api from '@/axios'
 import { auth, db } from '@/firebase'
-
+import { useAuthStore } from '@/stores/auth.js'
+const authStore = useAuthStore()
 const VITE_POST_COLLECTION = import.meta.env.VITE_POST_COLLECTION
 const VITE_COMMENTS_COLLECTION = import.meta.env.VITE_COMMENTS
 const VITE_BOOKMARKS_COLLECTION = import.meta.env.VITE_BOOKMARKS
@@ -40,6 +42,20 @@ export const usePostCardStore = defineStore('postCard', {
         return { success: true }
       } catch (error) {
         console.error('Error updating likes:', error)
+        return { success: false, error: error.message }
+      }
+    },
+
+    async sendLikeNotification ({ postId, postTitle }) {
+      try {
+        await api.post('/send-like-email', {
+          postId,
+          postTitle,
+          user: authStore.user,
+        })
+        return { success: true }
+      } catch (error) {
+        console.error('Error sending like notification:', error)
         return { success: false, error: error.message }
       }
     },

@@ -143,6 +143,13 @@
       liked: newIsLiked,
     })
 
+    if (result.success && newIsLiked) {
+      await postCardStore.sendLikeNotification({
+        postId: p.post.id,
+        postTitle: p.post.title,
+      })
+    }
+
     // Revert UI on failure
     if (!result.success) {
       isLiked.value = originalIsLiked

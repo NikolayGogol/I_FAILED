@@ -48,7 +48,7 @@ export const useEmailSettingsStore = defineStore('emailSettings', () => {
       settings: {
         notify: {
           email: {
-            switches: JSON.parse(JSON.stringify(switches)),
+            switches: structuredClone(switches),
             selectedRadio: selectedRadio.value,
           },
         },
