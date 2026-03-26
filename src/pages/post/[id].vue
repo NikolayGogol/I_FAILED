@@ -174,17 +174,6 @@
     if (!post.value?.createdAt) return ''
     return dayjs.unix(post.value.createdAt.seconds).fromNow()
   })
-  const keys = [
-    'howDidItFeel',
-    'whatHappened',
-    'whatWentWrong',
-  ]
-  const keys1 = [
-    'advice',
-    'keyTakeaways',
-    'whatILearned',
-    'whatIdDoDifferently',
-  ]
   function readingTime (obj) {
     const arr = [
       obj?.title || '',
