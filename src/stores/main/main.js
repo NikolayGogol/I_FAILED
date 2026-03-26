@@ -16,6 +16,7 @@ import { defineStore } from 'pinia'
 import api from '@/axios.js'
 import { db } from '@/firebase.js'
 import { useAuthStore } from '@/stores/auth.js'
+import { useLatestStore } from '@/stores/feed/latest.js'
 
 // =================================================================================================
 // Constants
@@ -269,6 +270,11 @@ export const useMainStore = defineStore('main', {
      * @param {object} filters - The filters object.
      */
     applyPostFilters (filters) {
+      if (this.activeTab === 'latest') {
+        const latestStore = useLatestStore()
+        latestStore.applyPostFilters(filters)
+        return
+      }
       // Avoid `structuredClone` because Vue/Pinia data can contain proxies
       // that are not cloneable. We manually build a safe, plain object.
       // eslint-disable-next-line @stylistic/multiline-ternary

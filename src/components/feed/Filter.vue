@@ -41,7 +41,7 @@
     <v-chip-group v-model="filterStore.selectedFilter.emojiTags" multiple>
       <v-chip
         v-for="item in emotionTags"
-        :key="item.id"
+        :key="item.value"
         color="primary"
         :text="`${item.emoji} ${item.label}`"
         :value="item"
