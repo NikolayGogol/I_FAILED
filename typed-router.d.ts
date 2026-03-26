@@ -28,7 +28,8 @@ declare module 'vue-router/auto-routes' {
     '/failure-age': RouteRecordInfo<'/failure-age', '/failure-age', Record<never, never>, Record<never, never>>,
     '/failure-resume': RouteRecordInfo<'/failure-resume', '/failure-resume', Record<never, never>, Record<never, never>>,
     '/forgot-password': RouteRecordInfo<'/forgot-password', '/forgot-password', Record<never, never>, Record<never, never>>,
-    '/library': RouteRecordInfo<'/library', '/library', Record<never, never>, Record<never, never>>,
+    '/library/': RouteRecordInfo<'/library/', '/library', Record<never, never>, Record<never, never>>,
+    '/library/[id]': RouteRecordInfo<'/library/[id]', '/library/:id', { id: ParamValue<true> }, { id: ParamValue<false> }>,
     '/login': RouteRecordInfo<'/login', '/login', Record<never, never>, Record<never, never>>,
     '/notifications': RouteRecordInfo<'/notifications', '/notifications', Record<never, never>, Record<never, never>>,
     '/otp': RouteRecordInfo<'/otp', '/otp', Record<never, never>, Record<never, never>>,
@@ -95,8 +96,12 @@ declare module 'vue-router/auto-routes' {
       routes: '/forgot-password'
       views: never
     }
-    'src/pages/library.vue': {
-      routes: '/library'
+    'src/pages/library/index.vue': {
+      routes: '/library/'
+      views: never
+    }
+    'src/pages/library/[id].vue': {
+      routes: '/library/[id]'
       views: never
     }
     'src/pages/login.vue': {

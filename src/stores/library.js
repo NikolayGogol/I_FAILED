@@ -3,7 +3,10 @@ import {
   arrayUnion,
   collection,
   deleteDoc,
-  doc, getDocs,
+  doc,
+  documentId,
+  getDoc,
+  getDocs,
   orderBy,
   query,
   runTransaction,
@@ -15,6 +18,7 @@ import { db } from '@/firebase'
 import { useAuthStore } from '@/stores/auth.js'
 
 const VITE_LIBRARY = import.meta.env.VITE_LIBRARY
+const VITE_POSTS = import.meta.env.VITE_POST_COLLECTION
 
 export const useLibraryStore = defineStore('library', {
   state: () => ({}),
@@ -76,6 +80,39 @@ export const useLibraryStore = defineStore('library', {
     async updateCollection (id, payload) {
       const docRef = doc(db, VITE_LIBRARY, id)
       return await updateDoc(docRef, payload)
+    },
+    async getPostFromCollection (id) {
+      const collectionRef = doc(db, VITE_LIBRARY, id)
+      const collectionSnap = await getDoc(collectionRef)
+
+      if (!collectionSnap.exists()) {
+        console.log('No such collection document!')
+        return []
+      }
+
+      const postIds = collectionSnap.data().items
+      if (!postIds || postIds.length === 0) {
+        return []
+      }
+
+      const postsRef = collection(db, VITE_POSTS)
+      const allPosts = []
+      // Firestore 'in' query is limited to 30 items. We need to chunk the requests.
+      const CHUNK_SIZE = 30
+      for (let i = 0; i < postIds.length; i += CHUNK_SIZE) {
+        const chunk = postIds.slice(i, i + CHUNK_SIZE)
+        const q = query(postsRef, where(documentId(), 'in', chunk))
+        const querySnapshot = await getDocs(q)
+        for (const doc of querySnapshot.docs) {
+          allPosts.push({ id: doc.id, ...doc.data() })
+        }
+      }
+
+      // The posts from getDocs are not ordered. We should order them based on postIds array.
+      const postsById = new Map(allPosts.map(p => [p.id, p]))
+      const orderedPosts = postIds.map(id => postsById.get(id)).filter(Boolean)
+
+      return orderedPosts
     },
   },
 })

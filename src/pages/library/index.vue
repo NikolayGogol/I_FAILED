@@ -2,6 +2,7 @@
 {
   "meta": {
     "layout": "MainLayout"
+    "auth": true
   }
 }
 </route>
@@ -9,10 +10,11 @@
   import dayjs from 'dayjs'
   import relativeTime from 'dayjs/plugin/relativeTime'
   import { onMounted, ref } from 'vue'
+  import { useRouter } from 'vue-router'
   import { useToast } from 'vue-toastification'
   import ConfirmationModal from '@/components/ConfirmationModal.vue'
   import { getIcon } from '@/models/icons.js'
-  import { useLibraryStore } from '@/stores/library'
+  import { useLibraryStore } from '@/stores/library.js'
   import '@/styles/pages/library.scss'
   const toast = useToast()
   //
@@ -27,6 +29,7 @@
   const postIsLoading = ref(false)
   const isDeleteDialogOpen = ref(false)
   const selectedCollection = ref(null)
+  const router = useRouter()
   //
   onMounted(() => {
     getCollectionList()
@@ -96,6 +99,10 @@
       .finally(() => {
         isSaving.value = false
       })
+  }
+
+  function openCollection (item) {
+    router.push(`/library/${item.id}`)
   }
 </script>
 
@@ -185,7 +192,7 @@
       <ul v-if="collectionList.length > 0" class="collection-list">
         <li v-for="item in collectionList" :key="item.id">
           <div class="d-flex align-center justify-space-between">
-            <p class="name">{{ item.name }}</p>
+            <p class="name hover-underline" @click="openCollection(item)">{{ item.name }}</p>
             <v-menu color="primary" open-on-hover>
               <template #activator="{ props: menuProps }">
                 <v-btn icon size="small" v-bind="menuProps" variant="text">
@@ -213,7 +220,7 @@
         </li>
       </ul>
       <div v-else class="no-content">
-        <img alt="You don’t have any library yet" src="../assets/library/Frame192.png">
+        <img alt="You don’t have any library yet" src="../../assets/library/Frame192.png">
         <h4 class="text-description">You don’t have any library yet</h4>
         <p>Create your first collection</p>
       </div>
