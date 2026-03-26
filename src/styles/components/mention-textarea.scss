@@ -1,4 +1,4 @@
-@import '../settings';
+@use '../settings.scss' as *;
 
 .mention-textarea-wrapper {
   position: relative;
