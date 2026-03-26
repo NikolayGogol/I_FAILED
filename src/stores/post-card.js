@@ -1,13 +1,29 @@
-import { addDoc, arrayRemove, arrayUnion, collection, deleteDoc, doc, getCountFromServer, getDocs, increment, query, serverTimestamp, updateDoc, where } from 'firebase/firestore'
+import {
+  addDoc,
+  arrayRemove,
+  arrayUnion,
+  collection,
+  deleteDoc,
+  doc,
+  getCountFromServer,
+  getDocs,
+  increment,
+  query,
+  serverTimestamp,
+  updateDoc,
+  where,
+} from 'firebase/firestore'
 import { defineStore } from 'pinia'
 import api from '@/axios'
 import { auth, db } from '@/firebase'
 import { useUserStore } from '@/stores/user.js'
 import { findSwitch } from '@/utils/find-switch.js'
+
 const userStore = useUserStore()
 const VITE_POST_COLLECTION = import.meta.env.VITE_POST_COLLECTION
 const VITE_COMMENTS_COLLECTION = import.meta.env.VITE_COMMENTS
 const VITE_BOOKMARKS_COLLECTION = import.meta.env.VITE_BOOKMARKS
+const VITE_NOTIFICATION_COLLECTION = import.meta.env.VITE_NOTIFICATION_COLLECTION
 
 export const usePostCardStore = defineStore('postCard', {
   actions: {
@@ -154,6 +170,34 @@ export const usePostCardStore = defineStore('postCard', {
         console.error('Error getting comment count:', error)
         return 0
       }
+    },
+    async saveLikeAction (payload) {
+      if (!auth.currentUser) {
+        console.error('No user logged in to save like action.')
+        return
+      }
+      const likerUid = auth.currentUser.uid
+      const postOwnerUid = payload.uid
+
+      // Do not save a notification if a user likes their own post.
+      if (likerUid === postOwnerUid) {
+        return
+      }
+
+      const likesCollectionRef = collection(db, VITE_NOTIFICATION_COLLECTION, postOwnerUid, 'likes')
+      const q = query(likesCollectionRef, where('postId', '==', payload.id), where('uid', '==', likerUid))
+      const querySnapshot = await getDocs(q)
+
+      if (querySnapshot.empty) {
+        const notificationPayload = {
+          postId: payload.id,
+          uid: likerUid, // UID of the user who liked the post
+          createdAt: serverTimestamp(),
+        }
+        return await addDoc(likesCollectionRef, notificationPayload)
+      }
+      // If a like action from this user for this post already exists, do nothing.
+      console.log('Like action already exists.')
     },
   },
 })

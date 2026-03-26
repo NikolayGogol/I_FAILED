@@ -219,7 +219,6 @@
       liked: newIsLiked,
     })
     if (result.success && newIsLiked) {
-      console.log(post.value)
       await postCardStore.sendLikeNotification(post.value)
     }
     if (!result.success) {

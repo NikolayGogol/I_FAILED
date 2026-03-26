@@ -142,9 +142,8 @@
       postId: p.post.id,
       liked: newIsLiked,
     })
-
+    if (newIsLiked) await postCardStore.saveLikeAction(p.post)
     if (result.success && newIsLiked) {
-      console.log(p.post)
       await postCardStore.sendLikeNotification(p.post)
     }
 
@@ -157,6 +156,7 @@
 
     isLiking.value = false
   }
+
   // Navigate to the single post page
   function openPost () {
     router.push(`/post/${p.post.id}`)
@@ -194,6 +194,7 @@
     }
     isCollectionDialog.value = true
   }
+
   function onPostSaved () {
     isBookmarked.value = true
     bookmarkCount.value += 1
