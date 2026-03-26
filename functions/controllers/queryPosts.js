@@ -164,11 +164,24 @@ function matchesFilters (postData, filters) {
   return true
 }
 
-function matchesForYou (postData, followedUsersSet, followedTagsSet) {
+// eslint-disable-next-line complexity
+function matchesForYou (postData, followedUsersSet, followedTagsSet, preferredCategoriesSet) {
+  /**
+   * Personalized "For You" matching.
+   *
+   * A post is included if it matches at least one user signal:
+   *  - followed author       => post.uid in `followedUsersSet`
+   *  - followed tag          => any postData.tags entry in `followedTagsSet`
+   *  - preferred category    => any postData.selectedCategories entry in `preferredCategoriesSet`
+   *
+   * Special rule:
+   *  - Anonymous posts are never shown when the author is a followed user.
+   */
   const hasUserPref = followedUsersSet && followedUsersSet.size > 0
   const hasTagPref = followedTagsSet && followedTagsSet.size > 0
+  const hasCategoryPref = preferredCategoriesSet && preferredCategoriesSet.size > 0
 
-  if (!hasUserPref && !hasTagPref) {
+  if (!hasUserPref && !hasTagPref && !hasCategoryPref) {
     return false
   }
 
@@ -185,6 +198,7 @@ function matchesForYou (postData, followedUsersSet, followedTagsSet) {
   }
 
   // 2) Tag match (followed tags)
+  // Note: tags are usually stored as strings, but we defensively handle objects too.
   const postTags = Array.isArray(postData?.tags) ? postData.tags : []
   if (hasTagPref && postTags.length > 0) {
     for (const t of postTags) {
@@ -196,10 +210,31 @@ function matchesForYou (postData, followedUsersSet, followedTagsSet) {
     }
   }
 
+  // 3) Category match (based on user's read stats)
+  // Note: selectedCategories can contain objects or strings depending on the origin.
+  if (hasCategoryPref) {
+    const postCats = Array.isArray(postData?.selectedCategories) ? postData.selectedCategories : []
+    for (const pc of postCats) {
+      const raw = typeof pc === 'string' ? pc : (pc?.id ?? pc?.label ?? pc?.categoryId ?? pc?.categoryLabel ?? pc?.value ?? '')
+      const catNorm = normalizeString(raw)
+      if (catNorm && preferredCategoriesSet.has(catNorm)) {
+        return true
+      }
+    }
+  }
+
   return false
 }
 
 function matchesForYouFallback (postData, followedUsersSet, currentUserIdNorm) {
+  /**
+   * Fallback "remaining posts" matching.
+   *
+   * This is used to keep the feed infinite when personalized recommendations
+   * are exhausted. We intentionally relax the matching constraints, but keep:
+   *  - no current user's own posts
+   *  - no anonymous posts from followed authors
+   */
   const postUidNorm = normalizeString(postData?.uid)
 
   // Exclude user's own posts.
@@ -216,6 +251,7 @@ function matchesForYouFallback (postData, followedUsersSet, currentUserIdNorm) {
   return true
 }
 
+// eslint-disable-next-line complexity
 exports.queryPostsFeed = async (req, res) => {
   try {
     const {
@@ -225,6 +261,7 @@ exports.queryPostsFeed = async (req, res) => {
       filters,
       followedUsers,
       followedTags,
+      preferredCategories,
       fallback,
       currentUserId,
     } = req.body || {}
@@ -240,10 +277,19 @@ exports.queryPostsFeed = async (req, res) => {
     const orderField = activeTab === 'popular' ? 'views' : 'createdAt'
     const orderDirection = 'desc'
 
-    // Pre-compute personalization sets for the "For You" feed.
-    // We only apply these filters to `activeTab === 'for-you'`.
+    /**
+     * Pre-compute personalization sets for the "For You" feed.
+     *
+     * We convert arrays into Sets for O(1) membership checks.
+     * We also normalize strings to make matching case-insensitive and whitespace-tolerant.
+     *
+     * Important:
+     * - These sets are only used when `activeTab === 'for-you'`.
+     * - When `activeTab !== 'for-you'` we just use the generic `matchesFilters()` logic.
+     */
     const followedUsersSet = new Set()
     const followedTagsSet = new Set()
+    const preferredCategoriesSet = new Set()
     if (activeTab === 'for-you') {
       const fus = Array.isArray(followedUsers) ? followedUsers : []
       for (const uid of fus) {
@@ -260,9 +306,29 @@ exports.queryPostsFeed = async (req, res) => {
           followedTagsSet.add(tagNorm)
         }
       }
+
+      const pcs = Array.isArray(preferredCategories) ? preferredCategories : []
+      for (const c of pcs) {
+        if (typeof c === 'string') {
+          const catNorm = normalizeString(c)
+          if (catNorm) {
+            preferredCategoriesSet.add(catNorm)
+          }
+          continue
+        }
+        const idNorm = normalizeString(c?.id)
+        const labelNorm = normalizeString(c?.label)
+        if (idNorm) {
+          preferredCategoriesSet.add(idNorm)
+        }
+        if (labelNorm) {
+          preferredCategoriesSet.add(labelNorm)
+        }
+      }
     }
 
     const currentUserIdNorm = normalizeString(currentUserId)
+    // When `fallback` is true we relax matching to keep the feed infinite.
     const isForYouFallback = activeTab === 'for-you' && !!fallback
 
     // How many documents we pull per Firestore request.
@@ -306,11 +372,15 @@ exports.queryPostsFeed = async (req, res) => {
         const docSnap = snapshot.docs[i]
         const data = docSnap.data() || {}
 
+        // For each candidate post we decide whether it should be included in the final feed.
+        // This decision is:
+        //  - `matchesFilters(data, filters)` for generic filters (categories/emoji/cost/etc).
+        //  - plus an additional `For You` layer when `activeTab === 'for-you'`.
         let includeForYou = true
         if (activeTab === 'for-you') {
           includeForYou = isForYouFallback
             ? matchesForYouFallback(data, followedUsersSet, currentUserIdNorm)
-            : matchesForYou(data, followedUsersSet, followedTagsSet)
+            : matchesForYou(data, followedUsersSet, followedTagsSet, preferredCategoriesSet)
         }
         if (matchesFilters(data, filters) && includeForYou) {
           results.push({ id: docSnap.id, ...data })
