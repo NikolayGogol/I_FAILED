@@ -171,7 +171,7 @@ export const useUpdatePostStore = defineStore('updatePost', {
           .filter(Boolean)
           .map((img, idx) => ({ ...img, __idx: idx }))
           .toSorted((a, b) => (b.isNew === a.isNew ? a.__idx - b.__idx : (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0)))
-          .map(({ isNew, __idx, ...rest }) => rest)
+          .map(({ ...rest }) => rest)
 
         const selectedCategories = Array.isArray(payload.selectedCategories)
           ? payload.selectedCategories

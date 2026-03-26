@@ -2,10 +2,12 @@ import {
   addDoc,
   arrayUnion,
   collection,
-  doc,
-  getDocs,
+  deleteDoc,
+  doc, getDocs,
+  orderBy,
   query,
   runTransaction,
+  updateDoc,
   where,
 } from 'firebase/firestore'
 import { defineStore } from 'pinia'
@@ -32,7 +34,10 @@ export const useLibraryStore = defineStore('library', {
     async getCollections () {
       const authStore = useAuthStore()
       const postsRef = collection(db, VITE_LIBRARY)
-      const q = query(postsRef, where('uid', '==', authStore.user.uid))
+      const q = query(postsRef,
+        where('uid', '==', authStore.user.uid),
+        orderBy('updatedAt', 'desc'),
+      )
       const querySnapshot = await getDocs(q)
       const posts = []
       for (const doc of querySnapshot.docs) {
@@ -63,6 +68,14 @@ export const useLibraryStore = defineStore('library', {
           updatedAt: new Date(),
         })
       })
+    },
+    async deleteCollection (id) {
+      const docRef = doc(db, VITE_LIBRARY, id)
+      return await deleteDoc(docRef)
+    },
+    async updateCollection (id, payload) {
+      const docRef = doc(db, VITE_LIBRARY, id)
+      return await updateDoc(docRef, payload)
     },
   },
 })

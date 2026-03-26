@@ -2,5 +2,96 @@
 @use '../global/fonts' as *;
 
 .library-page {
+  .page-header {
+    h2 {
+      font-weight: 600;
+      font-size: 32px;
+      color: $color-text-primary;
+    }
 
+    button {
+      border: 1px solid $color-border;
+      color: $color-primary;
+      border-radius: $radius-xs;
+      padding: 8px 12px;
+      font-size: 14px;
+      font-weight: 600;
+      background-color: $color-surface;
+    }
+  }
+
+  .header-panel {
+    margin-top: 32px;
+  }
+
+  .no-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    flex-direction: column;
+    margin-top: 120px;
+
+    h4 {
+      font-weight: 600;
+      font-size: 18px;
+      color: $color-text-primary;
+      margin-top: 12px;
+    }
+
+    p {
+      font-weight: 400;
+      font-size: 14px;
+      color: $color-text-quaternary;
+      margin-top: 12px;
+    }
+  }
+
+  .collection-list {
+    margin-top: 20px;
+
+    li {
+      list-style: none;
+      border: 1px solid $color-border;
+      border-radius: $radius-md;
+      background-color: $color-surface;
+      padding: 25px;
+      margin-bottom: 12px;
+
+      .name {
+        font-weight: 600;
+        font-size: 16px;
+        color: $color-text-primary;
+      }
+    }
+  }
+}
+
+.drop-item {
+  p {
+    margin-top: -5px;
+  }
+
+  &:not(:last-of-type) {
+    svg {
+      * {
+        stroke: $color-text-primary;
+      }
+    }
+  }
+
+  .v-list-item__content {
+    display: flex;
+    align-items: center;
+  }
+}
+
+.collection-dialog {
+  .close-icon {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    cursor: pointer;
+    color: $color-text-quaternary;
+  }
 }

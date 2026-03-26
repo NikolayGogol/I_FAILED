@@ -153,6 +153,7 @@ export const useForYouStore = defineStore('forYou', {
      * @param {number} options.pageSize - The number of posts to fetch.
      * @param {boolean} options.refresh - Whether to refresh the posts list.
      */
+    // eslint-disable-next-line complexity
     async fetchPosts ({ pageSize = 10, refresh = false, fallback = false } = {}) {
       const authStore = useAuthStore()
       const followedUsers = authStore.user?.following || []
@@ -175,8 +176,8 @@ export const useForYouStore = defineStore('forYou', {
       //  - we don't have categories yet
       //  - it's been more than 60s since we last loaded them
       const shouldReloadCategories = refresh
-        || !this.preferredCategories.length
-        || (Date.now() - this.preferredCategoriesFetchedAt > 60000)
+        || this.preferredCategories.length === 0
+        || (Date.now() - this.preferredCategoriesFetchedAt > 60_000)
       if (shouldReloadCategories && currentUserId) {
         this.preferredCategories = await this.fetchTopCategoriesForUserForYou({ userId: currentUserId, limit: 5 })
         this.preferredCategoriesFetchedAt = Date.now()

@@ -11,13 +11,29 @@
       </v-card-text>
       <v-row class="px-6">
         <v-col>
-          <div class="cancel-btn" @click="$emit('cancel')">Cancel</div>
+          <div
+            class="cancel-btn"
+            :class="{'opacity-60 pointer-events-none': loading}"
+            @click="$emit('cancel')"
+          >
+            Cancel
+          </div>
         </v-col>
         <v-col>
           <div
             class="submit-btn"
+            :class="{'opacity-60 pointer-events-none': loading}"
             @click="$emit('confirm')"
-          >Confirm</div>
+          >
+            <v-progress-circular
+              v-if="loading"
+              class="mr-2"
+              indeterminate
+              size="20"
+              width="2"
+            />
+            <span v-else>Confirm</span>
+          </div>
         </v-col>
       </v-row>
     </v-card>
@@ -29,6 +45,10 @@
     show: {
       type: Boolean,
       required: true,
+    },
+    loading: {
+      type: Boolean,
+      default: false,
     },
     title: {
       type: String,
