@@ -109,6 +109,9 @@
 
       await nextTick()
 
+      // Add a small delay to ensure all content (especially images) is rendered
+      await new Promise(resolve => setTimeout(resolve, 500))
+
       const exportWrapper = document.querySelector('#exporting-wrapper')
 
       const opt = {
@@ -119,8 +122,7 @@
           scale: 2,
           useCORS: true,
           logging: false,
-          scrollY: -window.scrollY,
-          windowWidth: 800,
+          width: 730,
         },
         jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
         pagebreak: { mode: 'css' },
@@ -300,45 +302,19 @@
 </template>
 
 <style scoped lang="scss">
-.collection-list {
-  list-style: none;
-  padding: 0;
-  .collection-item {
-    padding: 16px;
-    border-bottom: 1px solid #f0f0f0;
-    .name {
-      font-weight: 600;
-      cursor: pointer;
-      &:hover { text-decoration: underline; }
-    }
-  }
-}
-
-// Стилі для експорту
 #exporting-wrapper {
-  position: absolute;
-  left: -9999px;
-  top: -9999px;
-  width: 750px; // Стандартна ширина для PDF
-  opacity: 0; // Робимо прозорим, а не прихованим через display: none
+  //position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
   pointer-events: none;
   background: white;
-  padding: 40px;
 
-  // Стилі для карток всередині PDF
   .post-card-export {
     display: block;
     width: 100%;
     margin-bottom: 40px;
     break-inside: avoid;
-    page-break-inside: avoid;
-
-    // Переконуємось, що контент всередині PostCard видимий
-    :deep(.post-card) {
-      box-shadow: none !important;
-      border: 1px solid #eee !important;
-      background: white !important;
-    }
   }
 }
 </style>
