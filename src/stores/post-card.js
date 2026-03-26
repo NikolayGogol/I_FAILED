@@ -2,8 +2,9 @@ import { addDoc, arrayRemove, arrayUnion, collection, deleteDoc, doc, getCountFr
 import { defineStore } from 'pinia'
 import api from '@/axios'
 import { auth, db } from '@/firebase'
-import { useAuthStore } from '@/stores/auth.js'
-const authStore = useAuthStore()
+import { useUserStore } from '@/stores/user.js'
+import { findSwitch } from '@/utils/find-switch.js'
+const userStore = useUserStore()
 const VITE_POST_COLLECTION = import.meta.env.VITE_POST_COLLECTION
 const VITE_COMMENTS_COLLECTION = import.meta.env.VITE_COMMENTS
 const VITE_BOOKMARKS_COLLECTION = import.meta.env.VITE_BOOKMARKS
@@ -45,18 +46,18 @@ export const usePostCardStore = defineStore('postCard', {
         return { success: false, error: error.message }
       }
     },
-
-    async sendLikeNotification ({ postId, postTitle }) {
-      try {
-        await api.post('/send-like-email', {
-          postId,
-          postTitle,
-          user: authStore.user,
-        })
-        return { success: true }
-      } catch (error) {
-        console.error('Error sending like notification:', error)
-        return { success: false, error: error.message }
+    async sendLikeNotification (payload) {
+      const res = await userStore.getUserById(payload.uid)
+      const obj = res?.settings?.notify?.email
+      const emailSwitch = findSwitch(obj?.switches, 0)
+      if (!obj || emailSwitch) {
+        try {
+          await api.post('/send-like-email', payload)
+          return { success: true }
+        } catch (error) {
+          console.error('Error sending like notification:', error)
+          return { success: false, error: error.message }
+        }
       }
     },
 

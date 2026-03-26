@@ -9,11 +9,31 @@ export const useEmailSettingsStore = defineStore('emailSettings', () => {
   const authStore = useAuthStore()
 
   const switches = reactive([
-    { label: 'Likes', state: true },
-    { label: 'Comments', state: true },
-    { label: 'Mentions', state: true },
-    { label: 'New followers', state: true },
-    { label: 'Community updates', state: true },
+    {
+      label: 'Likes',
+      state: true,
+      value: 0,
+    },
+    {
+      label: 'Comments',
+      state: true,
+      value: 1,
+    },
+    {
+      label: 'Mentions',
+      state: true,
+      value: 2,
+    },
+    {
+      label: 'New followers',
+      state: true,
+      value: 3,
+    },
+    {
+      label: 'Community updates',
+      state: true,
+      value: 4,
+    },
   ])
   const selectedRadio = ref(null)
 
@@ -29,7 +49,12 @@ export const useEmailSettingsStore = defineStore('emailSettings', () => {
       const settings = userDoc.data().settings?.notify?.email
       if (settings) {
         if (settings.switches) {
-          Object.assign(switches, settings.switches)
+          for (const loadedSwitch of settings.switches) {
+            const localSwitch = switches.find(s => s.label === loadedSwitch.label)
+            if (localSwitch) {
+              Object.assign(localSwitch, loadedSwitch)
+            }
+          }
         }
         if (settings.selectedRadio) {
           selectedRadio.value = settings.selectedRadio
@@ -42,13 +67,12 @@ export const useEmailSettingsStore = defineStore('emailSettings', () => {
     if (!authStore.user) {
       return
     }
-
     const userRef = doc(db, USER_COLLECTION, authStore.user.uid)
     const settings = {
       settings: {
         notify: {
           email: {
-            switches: structuredClone(switches),
+            switches: JSON.parse(JSON.stringify(switches)),
             selectedRadio: selectedRadio.value,
           },
         },

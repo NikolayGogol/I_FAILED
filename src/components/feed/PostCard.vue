@@ -144,10 +144,7 @@
     })
 
     if (result.success && newIsLiked) {
-      await postCardStore.sendLikeNotification({
-        postId: p.post.id,
-        postTitle: p.post.title,
-      })
+      await postCardStore.sendLikeNotification(p.post)
     }
 
     // Revert UI on failure
