@@ -98,7 +98,8 @@
   async function exportToPDF (item) {
     if (isExporting.value) return
     isExporting.value = true
-
+    const body = document.querySelector('html')
+    body.style.overflow = 'hidden'
     try {
       const res = await libraryStore.getPostFromCollection(item.id)
       if (!res || res.length === 0) {
@@ -110,7 +111,7 @@
       await nextTick()
 
       // Add a small delay to ensure all content (especially images) is rendered
-      await new Promise(resolve => setTimeout(resolve, 500))
+      await new Promise(resolve => setTimeout(resolve, 1500))
 
       const exportWrapper = document.querySelector('#exporting-wrapper')
 
@@ -127,9 +128,11 @@
         jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
         pagebreak: { mode: 'css' },
       }
-
       html2pdf().from(exportWrapper).set(opt).save().then(() => {
         toast.success('PDF generated')
+        isExporting.value = false
+        exportingPosts.value = []
+        body.style.overflow = 'visible'
       }).catch(error => {
         console.error('PDF Export Error:', error)
         toast.error('Failed to generate PDF')
@@ -137,9 +140,6 @@
     } catch (error) {
       console.error('PDF Export Error:', error)
       toast.error('Failed to generate PDF')
-    } finally {
-      isExporting.value = false
-      exportingPosts.value = []
     }
   }
 
@@ -197,7 +197,11 @@
 
 <template>
   <div class="library-page">
-    <div v-if="exportingPosts.length > 0" id="exporting-wrapper">
+    <div v-if="isExporting" class="overlay">
+      <h3 class="mb-5">Generating PDF</h3>
+      <v-progress-linear color="primary" indeterminate />
+    </div>
+    <div v-if="isExporting" id="exporting-wrapper">
       <div v-for="post in exportingPosts" :key="post.id" class="post-card-export">
         <PostCard :post="post" />
       </div>
@@ -303,10 +307,6 @@
 
 <style scoped lang="scss">
 #exporting-wrapper {
-  //position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
   pointer-events: none;
   background: white;
 
