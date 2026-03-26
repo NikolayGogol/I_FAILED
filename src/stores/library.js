@@ -12,7 +12,6 @@ import { defineStore } from 'pinia'
 import { db } from '@/firebase'
 import { useAuthStore } from '@/stores/auth.js'
 
-const VITE_BOOKMARKS_COLLECTION = import.meta.env.VITE_BOOKMARKS
 const VITE_LIBRARY = import.meta.env.VITE_LIBRARY
 
 export const useLibraryStore = defineStore('library', {

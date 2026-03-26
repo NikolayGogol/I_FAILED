@@ -123,7 +123,9 @@
       })
     }
   })
-
+  function canInteract (commentID) {
+    return commentID !== authStore.user.uid
+  }
   function init (postId) {
     getPostById(postId).then(res => {
       post.value = res
@@ -194,6 +196,10 @@
   }
 
   async function handlePostLike () {
+    if (isOwnPost.value) {
+      toast.info('You can not like own post')
+      return
+    }
     if (!authStore.user) {
       await router.push('/login')
       return
@@ -223,6 +229,10 @@
   }
 
   async function handleReaction (reactionId) {
+    if (isOwnPost.value) {
+      toast.info('You can not react with own post')
+      return
+    }
     if (!authStore.user) {
       await router.push('/login')
       return
@@ -350,6 +360,10 @@
   }
 
   async function toggleLike (comment) {
+    if (!canInteract(comment.user.uid)) {
+      toast.info('You can not interact with own comment')
+      return
+    }
     if (!isAuth.value) {
       await router.push('/login')
       return
@@ -507,20 +521,20 @@
       >
         <section v-if="post.lessonLearned?.whatILearned">
           <h2 class="section-title">What I Learned</h2>
-          <div class="word-break" v-html="post.lessonLearned.whatILearned" />
+          <div class="word-break quill-break" v-html="post.lessonLearned.whatILearned" />
         </section>
         <section v-if="post.lessonLearned?.keyTakeaways">
           <h2 class="section-title">Key Takeaways</h2>
-          <div class="word-break" v-html="post.lessonLearned.keyTakeaways " />
+          <div class="word-break quill-break" v-html="post.lessonLearned.keyTakeaways " />
         </section>
       </div>
       <section v-if="post?.lessonLearned?.whatIdDoDifferently" class="bg-orange-accent-1 pa-6 rounded-lg mb-6">
         <h2 class="section-title">What I'd Do Differently</h2>
-        <div class="word-break" v-html="post.lessonLearned.whatIdDoDifferently" />
+        <div class="word-break quill-break" v-html="post.lessonLearned.whatIdDoDifferently" />
       </section>
       <section v-if="post?.lessonLearned?.advice" class="bg-orange-accent-1 pa-6 rounded-lg mb-6">
         <h2 class="section-title">Advice for Others</h2>
-        <div class="word-break" v-html="post?.lessonLearned.advice" />
+        <div class="word-break quill-break" v-html="post?.lessonLearned.advice" />
       </section>
 
       <h3>Additional Details</h3>
@@ -731,9 +745,8 @@
                   <div class="d-flex mr-3 w-15" v-html="getIcon('message')" />
                   {{ comment.replies?.length || 0 }}
                 </div>
-
                 <div
-                  v-if="isAuth"
+                  v-if="isAuth && canInteract(comment.user.uid)"
                   class="px-0 text-primary ml-5 hover-underline"
                   style="font-size: 12px;"
                   @click="showReplyInput[comment.id] = !showReplyInput[comment.id]"
@@ -871,6 +884,7 @@
                             <span class="text-caption">{{ reply.replies?.length || 0 }}</span>
                           </div>
                           <div
+                            v-if="canInteract(reply.user.uid)"
                             class="px-0 text-primary ml-3 hover-underline"
                             style="font-size: 12px;"
                             @click="showReplyInput[reply.id] = !showReplyInput[reply.id]"

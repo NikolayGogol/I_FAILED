@@ -119,6 +119,10 @@
 
   // Handle the like button click
   async function handleLike () {
+    if (isOwnPost.value) {
+      toast.info('You can not like own post')
+      return
+    }
     if (!authStore.user) {
       await router.push('/login')
       return
