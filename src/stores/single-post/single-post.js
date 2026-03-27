@@ -45,7 +45,7 @@ function extractMentions (text) {
 
     // Очищення uid на всякий випадок
     if (uid) {
-      uid = uid.replace(/[\(\)]/g, '').trim()
+      uid = uid.replace(/[()]/g, '').trim()
     }
 
     mentions.push({
@@ -131,28 +131,77 @@ export const useSinglePostStore = defineStore('singlePost', {
 
         // Handle mentions
         const mentions = extractMentions(text)
-        const userStore = useUserStore()
-        for (const mention of mentions) {
-          if (mention.uid && mention.uid !== user.uid) { // Перевірка на наявність uid
-            try {
-              // Ensure we pass only the string ID to getUserById
-              const mentionedUidStr = String(mention.uid).trim()
-              const mentionedUser = await userStore.getUserById(mentionedUidStr)
-              if (mentionedUser) {
-                await this.saveMentionAction(post, { id: commentId, text }, mentionedUser, user)
-                await this.sendMentionEmail(post, { id: commentId, text }, mentionedUser, user)
+        if (mentions.length > 0) {
+          const userStore = useUserStore()
+          for (const mention of mentions) {
+            if (mention.uid && mention.uid !== user.uid) { // Перевірка на наявність uid
+              try {
+                // Ensure we pass only the string ID to getUserById
+                const mentionedUidStr = String(mention.uid).trim()
+                const mentionedUser = await userStore.getUserById(mentionedUidStr)
+                if (mentionedUser) {
+                  await this.saveMentionAction(post, { id: commentId, text }, mentionedUser, user)
+                  await this.sendMentionEmail(post, { id: commentId, text }, mentionedUser, user)
+                }
+              } catch (error) {
+                console.error(`Error processing mention for uid ${mention.uid}:`, error)
               }
-            } catch (error) {
-              console.error(`Error processing mention for uid ${mention.uid}:`, error)
+            } else if (!mention.uid) {
+              console.warn('Mention extracted without a valid UID:', mention)
             }
-          } else if (!mention.uid) {
-            console.warn('Mention extracted without a valid UID:', mention)
           }
         }
 
         return commentId
       } catch (error) {
         console.error('Error adding comment:', error)
+        throw error
+      }
+    },
+    async updateComment (commentId, newText, user) {
+      try {
+        const commentRef = doc(db, comments_collection, commentId)
+        await updateDoc(commentRef, {
+          text: newText,
+          updatedAt: serverTimestamp(),
+        })
+
+        const commentSnap = await getDoc(commentRef)
+        if (!commentSnap.exists()) {
+          console.error('Comment not found after update.')
+          return
+        }
+        const comment = { id: commentSnap.id, ...commentSnap.data() }
+
+        const post = await this.getPostById(comment.postId)
+        if (!post || post === 'Post not found.') {
+          console.error('Post not found for comment notification.')
+          return
+        }
+
+        // Handle mentions
+        const mentions = extractMentions(newText)
+        if (mentions.length > 0) {
+          const userStore = useUserStore()
+          for (const mention of mentions) {
+            if (mention.uid && mention.uid !== user.uid) {
+              try {
+                const mentionedUidStr = String(mention.uid).trim()
+                const mentionedUser = await userStore.getUserById(mentionedUidStr)
+                if (mentionedUser) {
+                  await this.saveMentionAction(post, comment, mentionedUser, user)
+                  await this.sendMentionEmail(post, comment, mentionedUser, user)
+                }
+              } catch (error) {
+                console.error(`Error processing mention for uid ${mention.uid}:`, error)
+              }
+            } else if (!mention.uid) {
+              console.warn('Mention extracted without a valid UID:', mention)
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error updating comment:', error)
         throw error
       }
     },
@@ -183,22 +232,24 @@ export const useSinglePostStore = defineStore('singlePost', {
 
         // Handle mentions
         const mentions = extractMentions(text)
-        const userStore = useUserStore()
-        for (const mention of mentions) {
-          if (mention.uid && mention.uid !== user.uid) { // Перевірка на наявність uid
-            try {
-              // Ensure we pass only the string ID to getUserById
-              const mentionedUidStr = String(mention.uid).trim()
-              const mentionedUser = await userStore.getUserById(mentionedUidStr)
-              if (mentionedUser) {
-                await this.saveMentionAction(post, { id: commentId, text }, mentionedUser, user)
-                await this.sendMentionEmail(post, { id: commentId, text }, mentionedUser, user)
+        if (mentions.length > 0) {
+          const userStore = useUserStore()
+          for (const mention of mentions) {
+            if (mention.uid && mention.uid !== user.uid) { // Перевірка на наявність uid
+              try {
+                // Ensure we pass only the string ID to getUserById
+                const mentionedUidStr = String(mention.uid).trim()
+                const mentionedUser = await userStore.getUserById(mentionedUidStr)
+                if (mentionedUser) {
+                  await this.saveMentionAction(post, { id: commentId, text }, mentionedUser, user)
+                  await this.sendMentionEmail(post, { id: commentId, text }, mentionedUser, user)
+                }
+              } catch (error) {
+                console.error(`Error processing mention for uid ${mention.uid}:`, error)
               }
-            } catch (error) {
-              console.error(`Error processing mention for uid ${mention.uid}:`, error)
+            } else if (!mention.uid) {
+              console.warn('Mention extracted without a valid UID:', mention)
             }
-          } else if (!mention.uid) {
-            console.warn('Mention extracted without a valid UID:', mention)
           }
         }
         return commentId

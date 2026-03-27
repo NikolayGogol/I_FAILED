@@ -43,8 +43,8 @@
     if (!text || !text.includes('@')) return text || ''
     let res = text
     for (const user of sortedUsers.value) {
-      const escaped = user.label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-      const regex = new RegExp(`(^|[^\\p{L}\\p{N}_])@${escaped}(?![\\p{L}\\p{N}_])`, 'gu')
+      const escaped = user.label.replace(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`)
+      const regex = new RegExp(String.raw`(^|[^\p{L}\p{N}_])@${escaped}(?![\p{L}\p{N}_])`, 'gu')
       res = res.replace(regex, `$1@[${user.label}](${user.value})`)
     }
     return res
