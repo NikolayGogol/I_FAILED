@@ -19,7 +19,6 @@ import api from '@/axios.js'
 import { auth, db } from '@/firebase.js'
 import { useUserStore } from '@/stores/user.js'
 import { findSwitch } from '@/utils/find-switch.js'
-const userStore = useUserStore()
 
 const collection_db = import.meta.env.VITE_POST_COLLECTION
 const comments_collection = import.meta.env.VITE_COMMENTS
@@ -30,6 +29,31 @@ const VITE_NOTIFICATION_COLLECTION = import.meta.env.VITE_NOTIFICATION_COLLECTIO
 function getDocId ({ userId, categoryId }) {
   // Firestore doc IDs cannot contain `/`, so we encode anything potentially unsafe.
   return `${userId}__${encodeURIComponent(String(categoryId))}`
+}
+
+// Helper function to extract mentions from text
+function extractMentions (text) {
+  // Змінено регулярний вираз, щоб він точно шукав закриваючу дужку в кінці
+  // Очікуваний формат: @[DisplayName](uid)
+  const mentionRegex = /@\[([^\]]+)\]\(([^)]+)\)/g
+  const mentions = []
+  let match
+
+  while ((match = mentionRegex.exec(text)) !== null) {
+    const displayName = match[1]
+    let uid = match[2]
+
+    // Очищення uid на всякий випадок
+    if (uid) {
+      uid = uid.replace(/[\(\)]/g, '').trim()
+    }
+
+    mentions.push({
+      displayName,
+      uid,
+    })
+  }
+  return mentions
 }
 
 export const useSinglePostStore = defineStore('singlePost', {
@@ -80,7 +104,6 @@ export const useSinglePostStore = defineStore('singlePost', {
 
     async addComment (postId, user, text) {
       try {
-        // Fetch the post details to get the post owner's UID
         const post = await this.getPostById(postId)
 
         if (!post || post === 'Post not found.') {
@@ -104,8 +127,28 @@ export const useSinglePostStore = defineStore('singlePost', {
         const docRef = await addDoc(collection(db, comments_collection), newCommentData)
         const commentId = docRef.id
 
-        // Now call saveCommentAction
         await this.saveCommentAction(post, { id: commentId, text })
+
+        // Handle mentions
+        const mentions = extractMentions(text)
+        const userStore = useUserStore()
+        for (const mention of mentions) {
+          if (mention.uid && mention.uid !== user.uid) { // Перевірка на наявність uid
+            try {
+              // Ensure we pass only the string ID to getUserById
+              const mentionedUidStr = String(mention.uid).trim()
+              const mentionedUser = await userStore.getUserById(mentionedUidStr)
+              if (mentionedUser) {
+                await this.saveMentionAction(post, { id: commentId, text }, mentionedUser, user)
+                await this.sendMentionEmail(post, { id: commentId, text }, mentionedUser, user)
+              }
+            } catch (error) {
+              console.error(`Error processing mention for uid ${mention.uid}:`, error)
+            }
+          } else if (!mention.uid) {
+            console.warn('Mention extracted without a valid UID:', mention)
+          }
+        }
 
         return commentId
       } catch (error) {
@@ -115,7 +158,14 @@ export const useSinglePostStore = defineStore('singlePost', {
     },
     async addReply (postId, parentId, user, text) {
       try {
-        await addDoc(collection(db, comments_collection), {
+        const post = await this.getPostById(postId)
+
+        if (!post || post === 'Post not found.') {
+          console.error('Post not found for reply notification.')
+          return
+        }
+
+        const newReplyData = {
           postId,
           parentId,
           user: {
@@ -126,7 +176,32 @@ export const useSinglePostStore = defineStore('singlePost', {
           text,
           likes: [],
           createdAt: serverTimestamp(),
-        })
+        }
+
+        const docRef = await addDoc(collection(db, comments_collection), newReplyData)
+        const commentId = docRef.id // Reply is also a comment in the collection
+
+        // Handle mentions
+        const mentions = extractMentions(text)
+        const userStore = useUserStore()
+        for (const mention of mentions) {
+          if (mention.uid && mention.uid !== user.uid) { // Перевірка на наявність uid
+            try {
+              // Ensure we pass only the string ID to getUserById
+              const mentionedUidStr = String(mention.uid).trim()
+              const mentionedUser = await userStore.getUserById(mentionedUidStr)
+              if (mentionedUser) {
+                await this.saveMentionAction(post, { id: commentId, text }, mentionedUser, user)
+                await this.sendMentionEmail(post, { id: commentId, text }, mentionedUser, user)
+              }
+            } catch (error) {
+              console.error(`Error processing mention for uid ${mention.uid}:`, error)
+            }
+          } else if (!mention.uid) {
+            console.warn('Mention extracted without a valid UID:', mention)
+          }
+        }
+        return commentId
       } catch (error) {
         console.error('Error adding reply:', error)
         throw error
@@ -170,6 +245,7 @@ export const useSinglePostStore = defineStore('singlePost', {
       }
     },
     async sendCommentEmail ({ post, authStore, comment }) {
+      const userStore = useUserStore()
       const res = await userStore.getUserById(post.uid)
       const obj = res?.settings?.notify?.email
       const commentSwitch = findSwitch(obj?.switches, 1)
@@ -220,6 +296,64 @@ export const useSinglePostStore = defineStore('singlePost', {
         return await addDoc(commentsNotificationCollectionRef, notificationPayload)
       }
       console.log('Comment notification for this comment already exists.')
+    },
+    async saveMentionAction (post, comment, mentionedUser, mentionerUser) {
+      if (!auth.currentUser) {
+        console.error('No user logged in to save mention action.')
+        return
+      }
+
+      const mentionerUid = mentionerUser.uid
+      const mentionedUid = mentionedUser.id // ВИПРАВЛЕНО: використовуємо .id замість .uid
+      const postId = post.id
+      const commentId = comment.id
+      const commentText = comment.text
+
+      // Do not save a notification if a user mentions themselves.
+      if (mentionerUid === mentionedUid) {
+        return
+      }
+
+      const mentionsNotificationCollectionRef = collection(db, VITE_NOTIFICATION_COLLECTION, mentionedUid, 'mentions')
+      const q = query(
+        mentionsNotificationCollectionRef,
+        where('postId', '==', postId),
+        where('commentId', '==', commentId),
+        where('mentionerUid', '==', mentionerUid),
+      )
+      const querySnapshot = await getDocs(q)
+
+      if (querySnapshot.empty) {
+        const notificationPayload = {
+          postId,
+          commentId,
+          mentionerUid,
+          commentText,
+          createdAt: serverTimestamp(),
+        }
+        return await addDoc(mentionsNotificationCollectionRef, notificationPayload)
+      }
+      console.log('Mention notification for this comment already exists.')
+    },
+    async sendMentionEmail (post, comment, mentionedUser, mentionerUser) {
+      const obj = mentionedUser?.settings?.notify?.email
+      const mentionSwitch = findSwitch(obj?.switches, 2) // Assuming switch 2 is for mentions
+
+      if (obj && mentionSwitch) {
+        try {
+          await api.post('/send-mention-email', {
+            recipientEmail: mentionedUser.email,
+            mentionerName: mentionerUser.displayName,
+            postTitle: post.title,
+            commentText: comment.text,
+            postLink: `${window.location.origin}/post/${post.id}`, // Adjust as needed for your frontend route
+          })
+          return { success: true }
+        } catch (error) {
+          console.error('Error sending mention notification email:', error)
+          return { success: false, error: error.message }
+        }
+      }
     },
   },
 })

@@ -2,6 +2,7 @@ const logger = require('firebase-functions/logger')
 const {
   sendLikeNotificationEmail,
   sendCommentNotificationEmail,
+  sendMentionNotificationEmail,
 } = require('../../utils/email')
 
 async function sendLikeEmail (req, res) {
@@ -25,12 +26,11 @@ async function sendCommentEmail (req, res) {
   try {
     const params = req.body
     const email = params.post.user.email
-    const displayName = params.post.user.displayName
+    const displayName = params.authStore.displayName
     const postTitle = params.post.title
     const postId = params.post.id
     const commentText = params.comment.text
     const commentId = params.comment.id
-
     const postLink = `${process.env.VERIFY_LINK}/post/${postId}#${commentId}`
     await sendCommentNotificationEmail(email, displayName, postTitle, commentText, postLink)
     return res.status(200).json({
@@ -41,4 +41,22 @@ async function sendCommentEmail (req, res) {
     res.status(500).json({ error: 'Failed send email', message: error.message })
   }
 }
-module.exports = { sendLikeEmail, sendCommentEmail }
+async function sendMentionEmail (req, res) {
+  try {
+    const { recipientEmail, mentionerName, postTitle, commentText, postLink } = req.body
+    await sendMentionNotificationEmail(
+      recipientEmail,
+      mentionerName,
+      postTitle,
+      commentText,
+      postLink)
+    return res.status(200).json({
+      status: 'success',
+    })
+  } catch (error) {
+    logger.error('Error in registration process:', error)
+    res.status(500).json({ error: 'Failed send email', message: error.message })
+  }
+}
+//
+module.exports = { sendLikeEmail, sendCommentEmail, sendMentionEmail }
