@@ -23,8 +23,34 @@ if (firebaseConfig.apiKey) {
     const notificationOptions = {
       body: payload.notification?.body || payload.data?.body || '',
       icon: '/Logo.png',
+      data: {
+        url: payload.data?.url, // Pass the URL to the notification
+      },
     }
 
     self.registration.showNotification(notificationTitle, notificationOptions)
+  })
+
+  self.addEventListener('notificationclick', event => {
+    event.notification.close() // Close the notification
+
+    const urlToOpen = event.notification.data?.url
+    if (urlToOpen) {
+      event.waitUntil(
+        clients.matchAll({ type: 'window', includeUncontrolled: true }).then(windowClients => {
+          // Check if a window is already open and focus it.
+          for (let i = 0; i < windowClients.length; i++) {
+            const client = windowClients[i]
+            if (client.url === urlToOpen && 'focus' in client) {
+              return client.focus()
+            }
+          }
+          // If no window is open, open a new one.
+          if (clients.openWindow) {
+            return clients.openWindow(urlToOpen)
+          }
+        }),
+      )
+    }
   })
 }

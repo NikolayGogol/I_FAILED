@@ -24,12 +24,12 @@ async function sendPushNotification (fcmToken, title, body, data = {}) {
 }
 
 async function sendLikePush (req, res) {
-  const { fcmToken, postTitle, likedBy, type } = req.body
+  const { fcmToken, postTitle, likedBy, type, postId } = req.body
   const title = 'New Like!'
   const body = `${likedBy} liked your post: "${postTitle}"`
 
   try {
-    await sendPushNotification(fcmToken, title, body, { type })
+    await sendPushNotification(fcmToken, title, body, { type, url: `/post/${postId}` })
     res.status(200).send('Push notification sent successfully')
   } catch {
     res.status(500).send('Error sending push notification')

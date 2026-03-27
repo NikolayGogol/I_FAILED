@@ -78,6 +78,7 @@ export const usePostCardStore = defineStore('postCard', {
             postTitle: payload.title,
             likedBy: authStore.user?.displayName || 'Someone',
             type: 'like',
+            postId: payload.id, // Pass post ID
           })
         } catch (error) {
           console.error('Error sending like push notification:', error)
