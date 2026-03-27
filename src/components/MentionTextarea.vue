@@ -18,6 +18,10 @@
   const selectedIndex = ref(0)
   const displayValue = ref(props.modelValue)
 
+  const sortedUsers = computed(() => {
+    return [...(props.users || [])].sort((a, b) => b.label.length - a.label.length)
+  })
+
   const filteredUsers = computed(() => {
     if (!searchQuery.value) {
       return props.users
@@ -34,6 +38,17 @@
   watch(() => props.modelValue, newValue => {
     displayValue.value = renderMentions(newValue)
   })
+
+  function buildModelValue (text) {
+    if (!text || !text.includes('@')) return text || ''
+    let res = text
+    for (const user of sortedUsers.value) {
+      const escaped = user.label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+      const regex = new RegExp(`(^|[^\\p{L}\\p{N}_])@${escaped}(?![\\p{L}\\p{N}_])`, 'gu')
+      res = res.replace(regex, `$1@[${user.label}](${user.value})`)
+    }
+    return res
+  }
 
   function onInput (value) {
     const textarea = formTextarea.value.$el.querySelector('textarea')
@@ -53,7 +68,7 @@
         showPopover.value = true
       }
     }
-    emit('update:modelValue', value)
+    emit('update:modelValue', buildModelValue(value))
   }
 
   function onKeydown (e) {
@@ -108,13 +123,8 @@
         + `@${user.label} `
         + text.slice(caretPos)
 
-    const newModelValue
-      = props.modelValue.slice(0, atIndex)
-        + `@[${user.label}](${user.value}) `
-        + props.modelValue.slice(caretPos)
-
     displayValue.value = newDisplayValue
-    emit('update:modelValue', newModelValue)
+    emit('update:modelValue', buildModelValue(newDisplayValue))
     showPopover.value = false
 
     nextTick(() => {
