@@ -1,6 +1,7 @@
 <script setup>
   import { ref } from 'vue'
   import Email from '@/components/settings/notify-tabs/email.vue'
+  import Push from '@/components/settings/notify-tabs/push.vue'
   import { getIcon } from '@/models/icons.js'
   import '@/styles/components/settings/notifications.scss'
 
@@ -43,5 +44,6 @@
       </li>
     </ul>
     <Email v-if="activeTab?.id === 0" @back="activeTab = null" />
+    <Push v-if="activeTab?.id === 1" @back="activeTab = null" />
   </div>
 </template>
