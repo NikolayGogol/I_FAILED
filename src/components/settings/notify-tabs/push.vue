@@ -1,10 +1,11 @@
 <script setup>
+  import { storeToRefs } from 'pinia'
   import { computed } from 'vue'
   import { usePushSettingsStore } from '@/stores/settings/push.js'
   import '@/styles/components/settings/notify-tabs/tab.scss'
-  import {storeToRefs} from "pinia";
-  //
-  const { switches } = storeToRefs(usePushSettingsStore())
+
+  const pushSettingsStore = usePushSettingsStore()
+  const { switches } = storeToRefs(pushSettingsStore)
   const emit = defineEmits(['back'])
 
   const allSwitch = computed({

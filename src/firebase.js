@@ -19,6 +19,7 @@ import {
 import { getFirestore } from 'firebase/firestore'
 import { getFunctions } from 'firebase/functions'
 import { getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage'
+import { getMessaging } from 'firebase/messaging'
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -35,6 +36,7 @@ const auth = getAuth(app)
 const functions = getFunctions(app)
 const db = getFirestore(app)
 const storage = getStorage(app)
+const messaging = typeof window !== 'undefined' ? getMessaging(app) : null;
 const googleProvider = new GoogleAuthProvider()
 const facebookProvider = new FacebookAuthProvider()
 
@@ -46,7 +48,7 @@ onAuthStateChanged(auth, () => {
   // Error handling is done in auth store
 })
 
-export { auth, db, facebookProvider, functions, googleProvider, storage }
+export { auth, db, facebookProvider, functions, googleProvider, storage, messaging }
 
 export {
   browserLocalPersistence,
@@ -64,4 +66,5 @@ export {
 /* eslint-enable */
 export { doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore'
 export { httpsCallable } from 'firebase/functions'
+export { getToken, onMessage } from 'firebase/messaging'
 export { getDownloadURL, ref, uploadBytes } from 'firebase/storage'

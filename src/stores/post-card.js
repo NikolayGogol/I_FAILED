@@ -16,6 +16,7 @@ import {
 import { defineStore } from 'pinia'
 import api from '@/axios'
 import { auth, db } from '@/firebase'
+import { useAuthStore } from '@/stores/auth.js'
 import { useUserStore } from '@/stores/user.js'
 import { findSwitch } from '@/utils/find-switch.js'
 
@@ -64,6 +65,25 @@ export const usePostCardStore = defineStore('postCard', {
     },
     async sendLikeNotification (payload) {
       const res = await userStore.getUserById(payload.uid)
+
+      const authStore = useAuthStore()
+
+      const pushObj = res?.settings?.notify?.push
+      const pushSwitch = findSwitch(pushObj?.switches, 0)
+
+      if (pushObj && pushSwitch && res.fcmToken) {
+        try {
+          await api.post('/send-like-push', {
+            fcmToken: res.fcmToken,
+            postTitle: payload.title,
+            likedBy: authStore.user?.displayName || 'Someone',
+            type: 'like',
+          })
+        } catch (error) {
+          console.error('Error sending like push notification:', error)
+        }
+      }
+
       const obj = res?.settings?.notify?.email
       const emailSwitch = findSwitch(obj?.switches, 0)
       if (obj && emailSwitch) {
