@@ -311,7 +311,7 @@ export const useSinglePostStore = defineStore('singlePost', {
         }
       }
     },
-    async sendCommentPush (payload) {
+    async sendCommentPush (payload, id) {
       const userStore = useUserStore()
       const res = await userStore.getUserById(payload.uid)
       const authStore = useAuthStore()
@@ -326,6 +326,7 @@ export const useSinglePostStore = defineStore('singlePost', {
             likedBy: authStore.user?.displayName,
             type: 'comment',
             postId: payload.id,
+            commentID: id,
           })
           return { success: true }
         } catch (error) {

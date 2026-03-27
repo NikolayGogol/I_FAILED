@@ -346,7 +346,7 @@
             id,
           },
         })
-        await sendCommentPush(post.value)
+        await sendCommentPush(post.value, id)
       }
       newComment.value = ''
       await loadComments(post.value.id)
