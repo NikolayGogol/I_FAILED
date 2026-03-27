@@ -43,6 +43,7 @@
     toggleCommentLike,
     getComments,
     getUsersForMentions,
+    sendCommentEmail,
   } = useSinglePostStore()
   const { deleteComment, updateComment } = useCommentMenuStore()
   const postCardStore = usePostCardStore()
@@ -218,6 +219,7 @@
       postId: post.value.id,
       liked: newIsLiked,
     })
+    if (newIsLiked) await postCardStore.saveLikeAction(post.value)
     if (result.success && newIsLiked) {
       await postCardStore.sendLikeNotification(post.value)
     }
@@ -332,7 +334,18 @@
 
     isSubmitting.value = true
     try {
-      await addComment(post.value.id, authStore.user, newComment.value)
+      const id = await addComment(post.value.id, authStore.user, newComment.value)
+
+      if (!isOwnPost.value) {
+        await sendCommentEmail({
+          post: post.value,
+          authStore: authStore.user,
+          comment: {
+            text: newComment.value,
+            id,
+          },
+        })
+      }
       newComment.value = ''
       await loadComments(post.value.id)
     } catch (error) {

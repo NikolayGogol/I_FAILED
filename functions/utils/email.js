@@ -211,6 +211,53 @@ async function sendLikeNotificationEmail (email, likerName, postTitle, postLink)
   return sendEmail({ to: email, subject, html, text })
 }
 
+async function sendCommentNotificationEmail (email, commenterName, postTitle, commentText, postLink) {
+  validateEnv()
+
+  const subject = `${commenterName} commented on your post!`
+  const html = `
+    <body style="margin:0;padding:0;background-color:${colors.background};">
+      <div style="font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width:640px; margin:24px auto; padding:0 16px;">
+        <div style="background:${colors.surface};border-radius:16px;box-shadow:0 10px 30px rgba(15,23,42,0.1);overflow:hidden;border:1px solid ${colors.border};">
+          <div style="padding:20px 24px;border-bottom:1px solid ${colors.border};">
+            <img src="${LOGO_URL}" alt="${APP_NAME} Logo" style="height:32px;">
+          </div>
+          <div style="padding:24px 24px 16px;">
+            <h2 style="margin:0 0 12px;font-size:22px;font-weight:700;color:${colors.textPrimary};">New Comment on Your Post</h2>
+            <p style="margin:0 0 16px;font-size:14px;line-height:1.6;color:${colors.textSecondary};">
+              <strong>${commenterName}</strong> commented on your post: <em>"${postTitle}"</em>.
+            </p>
+            <div style="background-color:${colors.background};padding:18px 24px;margin:20px 0;border-radius:12px;">
+              <p style="margin:0;font-size:14px;line-height:1.6;color:${colors.textPrimary};">
+                "${commentText}"
+              </p>
+            </div>
+            <div style="text-align:center;margin:24px 0 16px;">
+              <a href="${postLink}"
+                 target="_blank"
+                 style="display:inline-block;background-color:${colors.primary};color:${colors.surface};text-decoration:none;padding:12px 28px;border-radius:999px;font-size:14px;font-weight:600;">
+                View Comment
+              </a>
+            </div>
+            <p style="margin:0 0 8px;font-size:12px;line-height:1.6;color:${colors.textSecondary};">
+              You can manage your email notification preferences in your settings.
+            </p>
+          </div>
+          <div style="padding:12px 24px 16px;border-top:1px solid ${colors.border};text-align:center;">
+            <p style="margin:4px 0;font-size:11px;color:${colors.textSecondary};">
+              © ${new Date().getFullYear()} ${APP_NAME}. All rights reserved.
+            </p>
+          </div>
+        </div>
+      </div>
+    </body>
+  `
+  const text = `
+    ${commenterName} commented on your post: "${postTitle}".\n\nComment: "${commentText}"\n\nView the comment here: ${postLink}\n\nYou can manage your email notification preferences in your settings.
+  `
+  return sendEmail({ to: email, subject, html, text })
+}
+
 async function sendEmail ({ to, subject, html, text }) {
   const msg = {
     to,
@@ -238,4 +285,11 @@ async function sendEmail ({ to, subject, html, text }) {
   }
 }
 
-module.exports = { sendWelcomeEmail, sendVerificationEmail, sendOTPEmail, sendEmail, sendLikeNotificationEmail }
+module.exports = {
+  sendWelcomeEmail,
+  sendVerificationEmail,
+  sendOTPEmail,
+  sendEmail,
+  sendLikeNotificationEmail,
+  sendCommentNotificationEmail,
+}

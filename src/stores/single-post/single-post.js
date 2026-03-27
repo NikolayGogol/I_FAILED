@@ -15,12 +15,17 @@ import {
   where,
 } from 'firebase/firestore'
 import { defineStore } from 'pinia'
-import { db } from '@/firebase.js'
+import api from '@/axios.js'
+import { auth, db } from '@/firebase.js'
+import { useUserStore } from '@/stores/user.js'
+import { findSwitch } from '@/utils/find-switch.js'
+const userStore = useUserStore()
 
 const collection_db = import.meta.env.VITE_POST_COLLECTION
 const comments_collection = import.meta.env.VITE_COMMENTS
 const user_category_reads_collection = import.meta.env.VITE_USER_CATEGORY_READS_COLLECTION
 const VITE_USERS_COLLECTION = import.meta.env.VITE_USERS_COLLECTION
+const VITE_NOTIFICATION_COLLECTION = import.meta.env.VITE_NOTIFICATION_COLLECTION
 
 function getDocId ({ userId, categoryId }) {
   // Firestore doc IDs cannot contain `/`, so we encode anything potentially unsafe.
@@ -73,38 +78,17 @@ export const useSinglePostStore = defineStore('singlePost', {
       }, { merge: true })
     },
 
-    async fetchTopCategoriesForUser ({ userId, limit = 5 }) {
-      if (!userId) {
-        return []
-      }
-
-      try {
-        const q = query(
-          collection(db, user_category_reads_collection),
-          where('uid', '==', userId),
-        )
-        const snapshot = await getDocs(q)
-
-        const counts = snapshot.docs.map(d => d.data())
-          .map(d => ({
-            categoryId: d.categoryId,
-            categoryLabel: d.categoryLabel,
-            count: d.count || 0,
-          }))
-
-        counts.sort((a, b) => b.count - a.count)
-        this.topCategories = counts.slice(0, limit)
-        return this.topCategories
-      } catch (error) {
-        console.error('Error fetching top categories:', error)
-        this.topCategories = []
-        return []
-      }
-    },
-
     async addComment (postId, user, text) {
       try {
-        await addDoc(collection(db, comments_collection), {
+        // Fetch the post details to get the post owner's UID
+        const post = await this.getPostById(postId)
+
+        if (!post || post === 'Post not found.') {
+          console.error('Post not found for comment notification.')
+          return
+        }
+
+        const newCommentData = {
           postId,
           parentId: null,
           user: {
@@ -115,7 +99,15 @@ export const useSinglePostStore = defineStore('singlePost', {
           text,
           likes: [],
           createdAt: serverTimestamp(),
-        })
+        }
+
+        const docRef = await addDoc(collection(db, comments_collection), newCommentData)
+        const commentId = docRef.id
+
+        // Now call saveCommentAction
+        await this.saveCommentAction(post, { id: commentId, text })
+
+        return commentId
       } catch (error) {
         console.error('Error adding comment:', error)
         throw error
@@ -176,6 +168,58 @@ export const useSinglePostStore = defineStore('singlePost', {
         console.error('Error getting users for mentions:', error)
         return []
       }
+    },
+    async sendCommentEmail ({ post, authStore, comment }) {
+      const res = await userStore.getUserById(post.uid)
+      const obj = res?.settings?.notify?.email
+      const commentSwitch = findSwitch(obj?.switches, 1)
+      if (!obj || commentSwitch) {
+        try {
+          await api.post('/send-comment-email', { post, authStore, comment })
+          return { success: true }
+        } catch (error) {
+          console.error('Error sending comment notification email:', error)
+          return { success: false, error: error.message }
+        }
+      }
+    },
+    async saveCommentAction (post, comment) {
+      if (!auth.currentUser) {
+        console.error('No user logged in to save comment action.')
+        return
+      }
+
+      const commenterUid = auth.currentUser.uid
+      const postOwnerUid = post.uid
+      const postId = post.id
+      const commentId = comment.id
+      const commentText = comment.text
+
+      // Do not save a notification if a user comments on their own post.
+      if (commenterUid === postOwnerUid) {
+        return
+      }
+
+      const commentsNotificationCollectionRef = collection(db, VITE_NOTIFICATION_COLLECTION, postOwnerUid, 'comments')
+      const q = query(
+        commentsNotificationCollectionRef,
+        where('postId', '==', postId),
+        where('commentId', '==', commentId),
+        where('commenterUid', '==', commenterUid),
+      )
+      const querySnapshot = await getDocs(q)
+
+      if (querySnapshot.empty) {
+        const notificationPayload = {
+          postId,
+          commentId,
+          commenterUid,
+          commentText,
+          createdAt: serverTimestamp(),
+        }
+        return await addDoc(commentsNotificationCollectionRef, notificationPayload)
+      }
+      console.log('Comment notification for this comment already exists.')
     },
   },
 })
