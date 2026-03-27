@@ -15,4 +15,9 @@
   .text-description {
     font-size: 12px;
   }
+
+  .all-item {
+    border: 1px solid $color-border;
+    border-radius: $spacing-md-sm;
+  }
 }
