@@ -173,7 +173,7 @@ export const useSinglePostStore = defineStore('singlePost', {
       const res = await userStore.getUserById(post.uid)
       const obj = res?.settings?.notify?.email
       const commentSwitch = findSwitch(obj?.switches, 1)
-      if (!obj || commentSwitch) {
+      if (obj && commentSwitch) {
         try {
           await api.post('/send-comment-email', { post, authStore, comment })
           return { success: true }

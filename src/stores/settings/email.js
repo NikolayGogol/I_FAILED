@@ -11,27 +11,27 @@ export const useEmailSettingsStore = defineStore('emailSettings', () => {
   const switches = reactive([
     {
       label: 'Likes',
-      state: true,
+      state: false,
       value: 0,
     },
     {
       label: 'Comments',
-      state: true,
+      state: false,
       value: 1,
     },
     {
       label: 'Mentions',
-      state: true,
+      state: false,
       value: 2,
     },
     {
       label: 'New followers',
-      state: true,
+      state: false,
       value: 3,
     },
     {
       label: 'Community updates',
-      state: true,
+      state: false,
       value: 4,
     },
   ])

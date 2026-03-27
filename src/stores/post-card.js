@@ -66,7 +66,7 @@ export const usePostCardStore = defineStore('postCard', {
       const res = await userStore.getUserById(payload.uid)
       const obj = res?.settings?.notify?.email
       const emailSwitch = findSwitch(obj?.switches, 0)
-      if (!obj || emailSwitch) {
+      if (obj && emailSwitch) {
         try {
           await api.post('/send-like-email', payload)
           return { success: true }
