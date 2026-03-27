@@ -684,11 +684,23 @@
             <div class="d-flex justify-start mt-2">
               <div
                 v-if="isAuth"
-                class="submit-btn"
-                :class="{ 'disabled': !newComment.trim() }"
+                class="submit-btn position-relative"
+                :class="[
+                  { 'disabled': !newComment.trim() || isSubmitting },
+                  { 'py-5 px-10': isSubmitting }
+                ]"
                 @click="submitComment(null)"
               >
-                Post
+                <v-progress-circular
+                  v-if="isSubmitting"
+                  class="position-absolute"
+                  color="white"
+                  indeterminate
+                  size="20"
+                  style="left: 50%; top: 50%; transform: translate(-50%, -50%);"
+                  width="2"
+                />
+                <span v-else>Post</span>
               </div>
             </div>
           </div>
@@ -811,11 +823,20 @@
                     <div class="d-flex mt-2">
                       <div
                         v-if="isAuth"
-                        class="submit-btn"
-                        :class="{ 'disabled': !replyText[comment.id]?.trim() }"
+                        class="submit-btn position-relative"
+                        :class="{ 'disabled': !replyText[comment.id]?.trim() || isSubmitting }"
                         @click="submitReply(comment.id, null)"
                       >
-                        Reply
+                        <span :class="{ 'opacity-0': isSubmitting }">Reply</span>
+                        <v-progress-circular
+                          v-if="isSubmitting"
+                          class="position-absolute"
+                          color="white"
+                          indeterminate
+                          size="20"
+                          style="left: 50%; top: 50%; transform: translate(-50%, -50%);"
+                          width="2"
+                        />
                       </div>
                       <div class="cancel-btn ml-4" @click="showReplyInput[comment.id] = false">
                         Cancel
@@ -951,11 +972,20 @@
                         </div>
                         <div class="d-flex mt-2">
                           <div
-                            class="submit-btn"
-                            :class="{ 'disabled': !replyText[reply.id]?.trim() }"
+                            class="submit-btn position-relative"
+                            :class="{ 'disabled': !replyText[reply.id]?.trim() || isSubmitting }"
                             @click="submitReply(reply.id, null)"
                           >
-                            Reply
+                            <span :class="{ 'opacity-0': isSubmitting }">Reply</span>
+                            <v-progress-circular
+                              v-if="isSubmitting"
+                              class="position-absolute"
+                              color="white"
+                              indeterminate
+                              size="20"
+                              style="left: 50%; top: 50%; transform: translate(-50%, -50%);"
+                              width="2"
+                            />
                           </div>
                           <div class="cancel-btn ml-4" @click="showReplyInput[reply.id] = false">
                             Cancel
