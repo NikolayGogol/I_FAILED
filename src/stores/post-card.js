@@ -76,9 +76,9 @@ export const usePostCardStore = defineStore('postCard', {
           await api.post('/send-like-push', {
             fcmToken: res.fcmToken,
             postTitle: payload.title,
-            likedBy: authStore.user?.displayName || 'Someone',
+            likedBy: authStore.user?.displayName,
             type: 'like',
-            postId: payload.id, // Pass post ID
+            postId: payload.id,
           })
         } catch (error) {
           console.error('Error sending like push notification:', error)

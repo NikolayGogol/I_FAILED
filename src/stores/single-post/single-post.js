@@ -17,6 +17,7 @@ import {
 import { defineStore } from 'pinia'
 import api from '@/axios.js'
 import { auth, db } from '@/firebase.js'
+import { useAuthStore } from '@/stores/auth.js'
 import { useUserStore } from '@/stores/user.js'
 import { findSwitch } from '@/utils/find-switch.js'
 
@@ -303,6 +304,29 @@ export const useSinglePostStore = defineStore('singlePost', {
       if (obj && commentSwitch) {
         try {
           await api.post('/send-comment-email', { post, authStore, comment })
+          return { success: true }
+        } catch (error) {
+          console.error('Error sending comment notification email:', error)
+          return { success: false, error: error.message }
+        }
+      }
+    },
+    async sendCommentPush (payload) {
+      const userStore = useUserStore()
+      const res = await userStore.getUserById(payload.uid)
+      const authStore = useAuthStore()
+
+      const obj = res?.settings?.notify?.push
+      const commentSwitch = findSwitch(obj?.switches, 1)
+      if (obj && commentSwitch) {
+        try {
+          await api.post('/send-comment-push', {
+            fcmToken: res.fcmToken,
+            postTitle: payload.title,
+            likedBy: authStore.user?.displayName,
+            type: 'comment',
+            postId: payload.id,
+          })
           return { success: true }
         } catch (error) {
           console.error('Error sending comment notification email:', error)

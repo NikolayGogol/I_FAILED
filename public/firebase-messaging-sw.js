@@ -39,8 +39,7 @@ if (firebaseConfig.apiKey) {
       event.waitUntil(
         clients.matchAll({ type: 'window', includeUncontrolled: true }).then(windowClients => {
           // Check if a window is already open and focus it.
-          for (let i = 0; i < windowClients.length; i++) {
-            const client = windowClients[i]
+          for (const client of windowClients) {
             if (client.url === urlToOpen && 'focus' in client) {
               return client.focus()
             }

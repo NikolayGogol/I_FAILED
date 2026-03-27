@@ -44,6 +44,7 @@
     getComments,
     getUsersForMentions,
     sendCommentEmail,
+    sendCommentPush,
   } = useSinglePostStore()
   const { deleteComment, updateComment } = useCommentMenuStore()
   const postCardStore = usePostCardStore()
@@ -345,6 +346,7 @@
             id,
           },
         })
+        await sendCommentPush(post.value)
       }
       newComment.value = ''
       await loadComments(post.value.id)
