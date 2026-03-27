@@ -26,6 +26,7 @@ const comments_collection = import.meta.env.VITE_COMMENTS
 const user_category_reads_collection = import.meta.env.VITE_USER_CATEGORY_READS_COLLECTION
 const VITE_USERS_COLLECTION = import.meta.env.VITE_USERS_COLLECTION
 const VITE_NOTIFICATION_COLLECTION = import.meta.env.VITE_NOTIFICATION_COLLECTION
+const VITE_STATISTIC_COLLECTION = import.meta.env.VITE_STATISTIC_COLLECTION
 
 function getDocId ({ userId, categoryId }) {
   // Firestore doc IDs cannot contain `/`, so we encode anything potentially unsafe.
@@ -34,8 +35,6 @@ function getDocId ({ userId, categoryId }) {
 
 // Helper function to extract mentions from text
 function extractMentions (text) {
-  // Змінено регулярний вираз, щоб він точно шукав закриваючу дужку в кінці
-  // Очікуваний формат: @[DisplayName](uid)
   const mentionRegex = /@\[([^\]]+)\]\(([^)]+)\)/g
   const mentions = []
   let match
@@ -43,8 +42,6 @@ function extractMentions (text) {
   while ((match = mentionRegex.exec(text)) !== null) {
     const displayName = match[1]
     let uid = match[2]
-
-    // Очищення uid на всякий випадок
     if (uid) {
       uid = uid.replace(/[()]/g, '').trim()
     }
@@ -429,6 +426,29 @@ export const useSinglePostStore = defineStore('singlePost', {
           console.error('Error sending mention notification email:', error)
           return { success: false, error: error.message }
         }
+      }
+    },
+    async addToRead (payload) {
+      try {
+        const uid = auth.currentUser.uid
+        const readCollectionRef = collection(db, VITE_STATISTIC_COLLECTION, uid, 'what_I_read')
+        const q = query(readCollectionRef,
+          where('postId', '==', payload.id),
+          where('uid', '==', uid),
+        )
+        const querySnapshot = await getDocs(q)
+        const res = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+        if (res.length === 0) {
+          const params = {
+            postId: payload.id,
+            uid,
+            createdAt: serverTimestamp(),
+          }
+          return await addDoc(readCollectionRef, params)
+        }
+      } catch (error) {
+        console.error('Error adding to read:', error)
+        return 'Failed to add to read list.'
       }
     },
   },

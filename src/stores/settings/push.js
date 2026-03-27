@@ -118,7 +118,6 @@ export const usePushSettingsStore = defineStore('pushSettings', () => {
       })
 
       if (token) {
-        console.log('FCM Token retrieved successfully:', token)
         setupMessageListener()
         return token
       } else {

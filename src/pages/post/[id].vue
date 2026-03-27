@@ -10,7 +10,7 @@
 <script setup>
   import dayjs from 'dayjs'
   import relativeTime from 'dayjs/plugin/relativeTime'
-  import { computed, nextTick, onMounted, ref, watch } from 'vue'
+  import { computed, nextTick, onBeforeMount, onMounted, ref, watch } from 'vue'
   import EmojiPicker from 'vue3-emoji-picker'
   import { useRoute, useRouter } from 'vue-router'
   import { useToast } from 'vue-toastification'
@@ -45,6 +45,7 @@
     getUsersForMentions,
     sendCommentEmail,
     sendCommentPush,
+    addToRead,
   } = useSinglePostStore()
   const { deleteComment, updateComment } = useCommentMenuStore()
   const postCardStore = usePostCardStore()
@@ -105,13 +106,17 @@
       active: false,
     },
   ])
+  let timeToRead = 1
 
   // Check if the post is owned by the current user
   const isOwnPost = computed(() => {
     if (!authStore.user || !post.value) return false
     return authStore.user.uid === post.value.uid
   })
-
+  let timeOut = null
+  onBeforeMount(() => {
+    clearTimeout(timeOut)
+  })
   onMounted(() => {
     const postId = route.params.id
     if (postId) {
@@ -123,6 +128,9 @@
           photoURL: user.photoURL,
         }))
       })
+      timeOut = setTimeout(() => {
+        addToRead(post.value)
+      }, (timeToRead * 60 * 1000) / 2)
     }
   })
   function canInteract (commentID) {
@@ -193,8 +201,8 @@
       .map(el => stripHtml(el))
       .join('')
     const wordCount = word.trim().length
-    const time = Math.ceil(wordCount / 200)
-    return `${time} min read`
+    timeToRead = Math.ceil(wordCount / 200)
+    return `${timeToRead} min read`
   }
 
   async function handlePostLike () {

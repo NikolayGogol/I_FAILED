@@ -15,7 +15,9 @@ function validateEnv () {
 }
 
 function renderMentionsInEmail (text) {
-  if (!text) return ''
+  if (!text) {
+    return ''
+  }
   const baseUrl = process.env.VERIFY_LINK
   const mentionRegex = /@\[([^\]]+)\]\(([^)]+)\)/g
   return text.replace(
