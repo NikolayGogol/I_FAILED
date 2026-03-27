@@ -14,6 +14,15 @@ function validateEnv () {
   sgMail.setApiKey(process.env.SENDGRID_API_KEY)
 }
 
+function renderMentionsInEmail (text) {
+  if (!text) return ''
+  const baseUrl = process.env.VERIFY_LINK
+  const mentionRegex = /@\[([^\]]+)\]\(([^)]+)\)/g
+  return text.replace(
+    mentionRegex,
+    `<a href="${baseUrl}/user-info/$2" style="font-weight:bold;color:${colors.primary};text-decoration:none;">@$1</a>`,
+  )
+}
 async function sendWelcomeEmail (email, displayName) {
   validateEnv()
 
@@ -174,6 +183,7 @@ async function sendLikeNotificationEmail (email, displayName, postTitle, postLin
 
 async function sendCommentNotificationEmail (email, displayName, postTitle, commentText, postLink) {
   validateEnv()
+  const renderedCommentText = renderMentionsInEmail(commentText)
 
   const subject = `You have a new comment on your post!`
   const html = `
@@ -190,7 +200,7 @@ async function sendCommentNotificationEmail (email, displayName, postTitle, comm
             </p>
             <div style="background-color:${colors.background};padding:18px 24px;margin:20px 0;border-radius:12px;">
               <p style="margin:0;font-size:14px;line-height:1.6;color:${colors.textPrimary};">
-                "${commentText}"
+                "${renderedCommentText}"
               </p>
             </div>
             <div style="text-align:center;margin:24px 0 16px;">
@@ -219,6 +229,7 @@ async function sendCommentNotificationEmail (email, displayName, postTitle, comm
 
 async function sendMentionNotificationEmail (email, mentionerName, postTitle, commentText, postLink) {
   validateEnv()
+  const renderedCommentText = renderMentionsInEmail(commentText)
 
   const subject = `You were mentioned in a comment!`
   const html = `
@@ -235,7 +246,7 @@ async function sendMentionNotificationEmail (email, mentionerName, postTitle, co
             </p>
             <div style="background-color:${colors.background};padding:18px 24px;margin:20px 0;border-radius:12px;">
               <p style="margin:0;font-size:14px;line-height:1.6;color:${colors.textPrimary};">
-                "${commentText}"
+                "${renderedCommentText}"
               </p>
             </div>
             <div style="text-align:center;margin:24px 0 16px;">
