@@ -1,4 +1,5 @@
 import {
+  addDoc,
   arrayRemove,
   arrayUnion,
   collection,
@@ -7,12 +8,18 @@ import {
   getDocs,
   limit,
   query,
+  serverTimestamp,
   updateDoc,
+  where,
 } from 'firebase/firestore'
 import { defineStore } from 'pinia'
+import api from '@/axios.js'
 import { db } from '@/firebase'
 import { useAuthStore } from '@/stores/auth'
+import { useUserStore } from '@/stores/user.js'
+import { findSwitch } from '@/utils/find-switch.js'
 const VITE_USERS_COLLECTION = import.meta.env.VITE_USERS_COLLECTION
+const VITE_NOTIFICATION_COLLECTION = import.meta.env.VITE_NOTIFICATION_COLLECTION
 
 export const useWhoToFollowStore = defineStore('whoToFollow', {
   state: () => ({
@@ -52,6 +59,7 @@ export const useWhoToFollowStore = defineStore('whoToFollow', {
         return false
       }
       const currentUserId = authStore.user.uid
+      const currentUser = authStore.user
 
       // Check if current user has blocked the target user
       if (authStore.user.blockedUsers && authStore.user.blockedUsers.includes(userIdToFollow)) {
@@ -85,6 +93,12 @@ export const useWhoToFollowStore = defineStore('whoToFollow', {
         await updateDoc(userToFollowRef, {
           followers: arrayUnion(currentUserId),
         })
+
+        // Save follower notification
+        await this.saveFollowerAction(userIdToFollow, currentUserId)
+
+        // Send follower notification email
+        await this.sendFollowerNotification(userIdToFollow, currentUser)
 
         return true
       } catch (error) {
@@ -172,6 +186,59 @@ export const useWhoToFollowStore = defineStore('whoToFollow', {
       } catch (error) {
         console.error('Error unblocking user:', error)
         return false
+      }
+    },
+
+    async saveFollowerAction (targetUserId, followerId) {
+      if (!followerId) {
+        console.error('No user logged in to save follower action.')
+        return
+      }
+
+      // Do not save a notification if a user follows themselves.
+      if (followerId === targetUserId) {
+        return
+      }
+
+      const followersNotificationCollectionRef = collection(db, VITE_NOTIFICATION_COLLECTION, targetUserId, 'followers')
+      const q = query(
+        followersNotificationCollectionRef,
+        where('followerId', '==', followerId),
+      )
+      const querySnapshot = await getDocs(q)
+
+      if (querySnapshot.empty) {
+        const notificationPayload = {
+          followerId,
+          createdAt: serverTimestamp(),
+        }
+        return await addDoc(followersNotificationCollectionRef, notificationPayload)
+      }
+      console.log('Follower notification for this user already exists.')
+    },
+
+    async sendFollowerNotification (targetUserId, follower) {
+      const userStore = useUserStore()
+      const targetUser = await userStore.getUserById(targetUserId)
+
+      if (!targetUser) {
+        console.error('Target user not found for follower notification.')
+        return
+      }
+
+      const notifySettings = targetUser.settings?.notify?.email
+      const followerSwitch = findSwitch(notifySettings?.switches, 3) // 3 is for 'New followers'
+
+      if (notifySettings && followerSwitch) {
+        try {
+          await api.post('/send-follower-email', {
+            recipientEmail: targetUser.email,
+            followerName: follower.displayName,
+            followerId: follower.uid,
+          })
+        } catch (error) {
+          console.error('Error sending follower notification email:', error)
+        }
       }
     },
   },

@@ -2,6 +2,7 @@
 // Imports
 // =================================================================================================
 import {
+  addDoc,
   arrayRemove,
   arrayUnion,
   collection,
@@ -10,16 +11,21 @@ import {
   getDocs,
   orderBy,
   query,
+  serverTimestamp,
   updateDoc,
   where,
 } from 'firebase/firestore'
 import { getDownloadURL, ref as storageRef, uploadBytes } from 'firebase/storage'
 import { defineStore } from 'pinia'
+import api from '@/axios.js'
 import { auth, db, storage, updateProfile } from '@/firebase.js'
 import { useAuthStore } from '@/stores/auth.js'
+import { useUserStore } from '@/stores/user.js'
+import { findSwitch } from '@/utils/find-switch.js'
 const VITE_POST_COLLECTION = import.meta.env.VITE_POST_COLLECTION
 const VITE_USERS_COLLECTION = import.meta.env.VITE_USERS_COLLECTION
 const VITE_COMMENTS = import.meta.env.VITE_COMMENTS
+const VITE_NOTIFICATION_COLLECTION = import.meta.env.VITE_NOTIFICATION_COLLECTION
 
 // =================================================================================================
 // Profile Store
@@ -329,6 +335,7 @@ export const useProfileStore = defineStore('profile', {
       this.error = null
       const authStore = useAuthStore()
       const currentUserId = authStore.user?.uid
+      const currentUser = authStore.user
 
       if (!currentUserId) {
         return
@@ -378,6 +385,12 @@ export const useProfileStore = defineStore('profile', {
             following: updatedFollowing,
           },
         })
+
+        // Save follower notification
+        await this.saveFollowerAction(targetUserId, currentUserId)
+
+        // Send follower notification email
+        await this.sendFollowerNotification(targetUserId, currentUser)
       } catch (error) {
         console.error('Error following user:', error)
         this.error = 'Failed to follow user.'
@@ -428,6 +441,59 @@ export const useProfileStore = defineStore('profile', {
         throw error
       } finally {
         this.loading = false
+      }
+    },
+
+    async saveFollowerAction (targetUserId, followerId) {
+      if (!followerId) {
+        console.error('No user logged in to save follower action.')
+        return
+      }
+
+      // Do not save a notification if a user follows themselves.
+      if (followerId === targetUserId) {
+        return
+      }
+
+      const followersNotificationCollectionRef = collection(db, VITE_NOTIFICATION_COLLECTION, targetUserId, 'followers')
+      const q = query(
+        followersNotificationCollectionRef,
+        where('followerId', '==', followerId),
+      )
+      const querySnapshot = await getDocs(q)
+
+      if (querySnapshot.empty) {
+        const notificationPayload = {
+          followerId,
+          createdAt: serverTimestamp(),
+        }
+        return await addDoc(followersNotificationCollectionRef, notificationPayload)
+      }
+      console.log('Follower notification for this user already exists.')
+    },
+
+    async sendFollowerNotification (targetUserId, follower) {
+      const userStore = useUserStore()
+      const targetUser = await userStore.getUserById(targetUserId)
+
+      if (!targetUser) {
+        console.error('Target user not found for follower notification.')
+        return
+      }
+
+      const notifySettings = targetUser.settings?.notify?.email
+      const followerSwitch = findSwitch(notifySettings?.switches, 3) // 3 is for 'New followers'
+
+      if (notifySettings && followerSwitch) {
+        try {
+          await api.post('/send-follower-email', {
+            recipientEmail: targetUser.email,
+            followerName: follower.displayName,
+            followerId: follower.uid,
+          })
+        } catch (error) {
+          console.error('Error sending follower notification email:', error)
+        }
       }
     },
   },

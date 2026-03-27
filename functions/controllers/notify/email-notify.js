@@ -3,6 +3,7 @@ const {
   sendLikeNotificationEmail,
   sendCommentNotificationEmail,
   sendMentionNotificationEmail,
+  sendFollowerNotificationEmail,
 } = require('../../utils/email')
 
 async function sendLikeEmail (req, res) {
@@ -58,5 +59,20 @@ async function sendMentionEmail (req, res) {
     res.status(500).json({ error: 'Failed send email', message: error.message })
   }
 }
+
+async function sendFollowerEmail (req, res) {
+  try {
+    const { recipientEmail, followerName, followerId } = req.body
+    const followerProfileLink = `${process.env.VERIFY_LINK}/user-info/${followerId}`
+    await sendFollowerNotificationEmail(recipientEmail, followerName, followerProfileLink)
+    return res.status(200).json({
+      status: 'success',
+    })
+  } catch (error) {
+    logger.error('Error in follower email process:', error)
+    res.status(500).json({ error: 'Failed send email', message: error.message })
+  }
+}
+
 //
-module.exports = { sendLikeEmail, sendCommentEmail, sendMentionEmail }
+module.exports = { sendLikeEmail, sendCommentEmail, sendMentionEmail, sendFollowerEmail }

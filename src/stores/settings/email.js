@@ -29,11 +29,6 @@ export const useEmailSettingsStore = defineStore('emailSettings', () => {
       state: false,
       value: 3,
     },
-    {
-      label: 'Community updates',
-      state: false,
-      value: 4,
-    },
   ])
   const selectedRadio = ref(null)
 

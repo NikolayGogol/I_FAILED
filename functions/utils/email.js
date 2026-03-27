@@ -1,86 +1,17 @@
 const sgMail = require('@sendgrid/mail')
-const logger = require('firebase-functions/logger')
+const { logger } = require('firebase-functions')
+const {
+  colors,
+  APP_NAME,
+  LOGO_URL,
+  VERIFY_LINK,
+} = require('./constants')
 
-const APP_NAME = 'IFELL'
-const LOGO_URL = 'https://firebasestorage.googleapis.com/v0/b/ifailed-25dab.firebasestorage.app/o/Logo.png?alt=media&token=5597847f-b4fa-4d32-b193-5f8a6bcdf771'
-
-// Define your brand colors here
-const colors = {
-  primary: '#D65A1F',
-  textPrimary: '#1C1C1B',
-  textSecondary: '#454541',
-  background: '#f8fafc',
-  surface: '#ffffff',
-  border: '#DCDCD8',
-}
-
-// Function to validate environment variables
 function validateEnv () {
-  if (!process.env.SENDGRID_API_KEY) {
-    logger.error('SENDGRID_API_KEY is not set in environment variables.')
-    throw new Error('Email service configuration error: Missing API Key.')
+  if (!process.env.EMAIL_USER || !process.env.SENDGRID_API_KEY) {
+    throw new Error('Missing environment variables for email sending.')
   }
-  if (!process.env.EMAIL_USER) {
-    logger.error('EMAIL_USER is not set in environment variables.')
-    throw new Error('Email service configuration error: Missing Sender Email.')
-  }
-}
-
-// Initialize SendGrid with API Key
-try {
-  if (process.env.SENDGRID_API_KEY) {
-    sgMail.setApiKey(process.env.SENDGRID_API_KEY)
-  }
-} catch (error) {
-  logger.error('Error initializing SendGrid:', error)
-}
-
-async function sendVerificationEmail (email, verificationLink) {
-  validateEnv()
-
-  const subject = `Verify your email for ${APP_NAME}`
-  const html = `
-    <body style="margin:0;padding:0;background-color:${colors.background};">
-      <div style="font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width:640px; margin:24px auto; padding:0 16px;">
-        <div style="background:${colors.surface};border-radius:16px;box-shadow:0 10px 30px rgba(15,23,42,0.1);overflow:hidden;border:1px solid ${colors.border};">
-          <div style="padding:20px 24px;border-bottom:1px solid ${colors.border};">
-            <img src="${LOGO_URL}" alt="${APP_NAME} Logo" style="height:32px;">
-          </div>
-          <div style="padding:24px 24px 8px;">
-            <h2 style="margin:0 0 12px;font-size:22px;font-weight:700;color:${colors.textPrimary};">Welcome to ${APP_NAME} 👋</h2>
-            <p style="margin:0 0 16px;font-size:14px;line-height:1.6;color:${colors.textSecondary};">
-              Please verify your email address to finish setting up your account.
-            </p>
-            <div style="text-align:center;margin:24px 0 16px;">
-              <a href="${verificationLink}"
-              target="_blank"
-                 style="display:inline-block;background-color:${colors.primary};color:${colors.surface};text-decoration:none;padding:12px 28px;border-radius:999px;font-size:14px;font-weight:600;">
-                Verify email
-              </a>
-            </div>
-            <p style="margin:0 0 8px;font-size:12px;line-height:1.6;color:${colors.textSecondary};">
-              Or copy and paste this link into your browser:
-            </p>
-            <p style="margin:0 0 16px;font-size:12px;word-break:break-all;color:${colors.textPrimary};">
-              ${verificationLink}
-            </p>
-            <p style="margin:0 0 4px;font-size:12px;color:${colors.textSecondary};">
-              If you didn’t create an account, you can safely ignore this email.
-            </p>
-          </div>
-          <div style="padding:12px 24px 16px;border-top:1px solid ${colors.border};text-align:center;">
-            <p style="margin:4px 0;font-size:11px;color:${colors.textSecondary};">
-              © ${new Date().getFullYear()} ${APP_NAME}. All rights reserved.
-            </p>
-          </div>
-        </div>
-      </div>
-    </body>
-  `
-  const text = `
-    Welcome to ${APP_NAME}!\n\nPlease copy and paste the following link in your browser to verify your email address:\n\n${verificationLink}\n\nIf you did not request this, please ignore this email.
-  `
-  return sendEmail({ to: email, subject, html, text })
+  sgMail.setApiKey(process.env.SENDGRID_API_KEY)
 }
 
 async function sendWelcomeEmail (email, displayName) {
@@ -95,105 +26,19 @@ async function sendWelcomeEmail (email, displayName) {
             <img src="${LOGO_URL}" alt="${APP_NAME} Logo" style="height:32px;">
           </div>
           <div style="padding:24px 24px 16px;">
-            <h2 style="margin:0 0 12px;font-size:22px;font-weight:700;color:${colors.textPrimary};">Welcome, ${displayName || 'there'} 👋</h2>
-            <p style="margin:0 0 12px;font-size:14px;line-height:1.6;color:${colors.textSecondary};">
-              Thanks for joining <strong>${APP_NAME}</strong>. This is your space to share failures, lessons learned, and help others avoid the same mistakes.
-            </p>
-            <p style="margin:0 0 12px;font-size:14px;line-height:1.6;color:${colors.textSecondary};">
-              You can start by creating your first post or exploring what others have shared in the feed.
-            </p>
-            <div style="text-align:center;margin:24px 0 8px;">
-              <a href="${process.env.VERIFY_LINK || '#'}"
-              target="_blank"
-                 style="display:inline-block;background-color:${colors.primary};color:${colors.surface};text-decoration:none;padding:12px 28px;border-radius:999px;font-size:14px;font-weight:600;">
-                Go to feed
-              </a>
-            </div>
-          </div>
-          <div style="padding:12px 24px 16px;border-top:1px solid ${colors.border};text-align:center;">
-            <p style="margin:4px 0;font-size:11px;color:${colors.textSecondary};">
-              You’re receiving this email because you signed up for ${APP_NAME}.
-            </p>
-          </div>
-        </div>
-      </div>
-    </body>
-  `
-  const text = `
-Welcome, ${displayName}!
-
-Thank you for joining our application. We are excited to have you on board.
-
-You are receiving this email because you signed up on ${APP_NAME}.
-  `
-  return sendEmail({ to: email, subject, html, text })
-}
-
-async function sendOTPEmail (email, otp) {
-  validateEnv()
-
-  const subject = `Your verification code for ${APP_NAME}`
-  const html = `
-    <body style="margin:0;padding:0;background-color:${colors.background};">
-      <div style="font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width:640px; margin:24px auto; padding:0 16px;">
-        <div style="background:${colors.surface};border-radius:16px;box-shadow:0 10px 30px rgba(15,23,42,0.1);overflow:hidden;border:1px solid ${colors.border};">
-          <div style="padding:20px 24px;border-bottom:1px solid ${colors.border};">
-            <img src="${LOGO_URL}" alt="${APP_NAME} Logo" style="height:32px;">
-          </div>
-          <div style="padding:24px 24px 16px;">
-            <h2 style="margin:0 0 12px;font-size:22px;font-weight:700;color:${colors.textPrimary};">Reset your password</h2>
-            <p style="margin:0 0 12px;font-size:14px;line-height:1.6;color:${colors.textSecondary};">
-              You requested to reset your password. Use the verification code below to continue.
-            </p>
-            <div style="background-color:${colors.background};padding:18px 24px;text-align:center;margin:20px 0;border-radius:12px;">
-              <span style="display:inline-block;font-size:28px;font-weight:700;letter-spacing:10px;color:${colors.primary};">
-                ${otp}
-              </span>
-            </div>
-            <p style="margin:0 0 8px;font-size:13px;color:${colors.textSecondary};">
-              This code will expire in <strong>15 minutes</strong>. If you didn’t request a password reset, you can safely ignore this email.
-            </p>
-          </div>
-          <div style="padding:12px 24px 16px;border-top:1px solid ${colors.border};text-align:center;">
-            <p style="margin:4px 0;font-size:11px;color:${colors.textSecondary};">
-              Need help? Reply to this email and our team will get back to you.
-            </p>
-          </div>
-        </div>
-      </div>
-    </body>
-  `
-  const text = `
-    Your verification code for ${APP_NAME} is: ${otp}\n\nThis code will expire in 15 minutes.\n\nIf you did not request this, please ignore this email.
-  `
-  return sendEmail({ to: email, subject, html, text })
-}
-
-async function sendLikeNotificationEmail (email, likerName, postTitle, postLink) {
-  validateEnv()
-
-  const subject = `${likerName} liked your post!`
-  const html = `
-    <body style="margin:0;padding:0;background-color:${colors.background};">
-      <div style="font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width:640px; margin:24px auto; padding:0 16px;">
-        <div style="background:${colors.surface};border-radius:16px;box-shadow:0 10px 30px rgba(15,23,42,0.1);overflow:hidden;border:1px solid ${colors.border};">
-          <div style="padding:20px 24px;border-bottom:1px solid ${colors.border};">
-            <img src="${LOGO_URL}" alt="${APP_NAME} Logo" style="height:32px;">
-          </div>
-          <div style="padding:24px 24px 16px;">
-            <h2 style="margin:0 0 12px;font-size:22px;font-weight:700;color:${colors.textPrimary};">New Like on Your Post</h2>
+            <h2 style="margin:0 0 12px;font-size:22px;font-weight:700;color:${colors.textPrimary};">Welcome, ${displayName}!</h2>
             <p style="margin:0 0 16px;font-size:14px;line-height:1.6;color:${colors.textSecondary};">
-              <strong>${likerName}</strong> liked your post: <em>"${postTitle}"</em>.
+              We're excited to have you on board. Get ready to explore a world of ideas and connect with others.
             </p>
             <div style="text-align:center;margin:24px 0 16px;">
-              <a href="${postLink}"
+              <a href="${VERIFY_LINK}"
                  target="_blank"
                  style="display:inline-block;background-color:${colors.primary};color:${colors.surface};text-decoration:none;padding:12px 28px;border-radius:999px;font-size:14px;font-weight:600;">
-                View Post
+                Get Started
               </a>
             </div>
             <p style="margin:0 0 8px;font-size:12px;line-height:1.6;color:${colors.textSecondary};">
-              You can manage your email notification preferences in your settings.
+              If you have any questions, feel free to reach out to our support team.
             </p>
           </div>
           <div style="padding:12px 24px 16px;border-top:1px solid ${colors.border};text-align:center;">
@@ -205,16 +50,132 @@ async function sendLikeNotificationEmail (email, likerName, postTitle, postLink)
       </div>
     </body>
   `
-  const text = `
-    ${likerName} liked your post: "${postTitle}".\n\nView the post here: ${postLink}\n\nYou can manage your email notification preferences in your settings.
-  `
+  const text = `Welcome, ${displayName}!\n\nWe're excited to have you on board. Get started by visiting: ${VERIFY_LINK}`
   return sendEmail({ to: email, subject, html, text })
 }
 
-async function sendCommentNotificationEmail (email, commenterName, postTitle, commentText, postLink) {
+async function sendVerificationEmail (email, verificationLink) {
   validateEnv()
 
-  const subject = `${commenterName} commented on your post!`
+  const subject = `Verify your email for ${APP_NAME}`
+  const html = `
+    <body style="margin:0;padding:0;background-color:${colors.background};">
+      <div style="font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width:640px; margin:24px auto; padding:0 16px;">
+        <div style="background:${colors.surface};border-radius:16px;box-shadow:0 10px 30px rgba(15,23,42,0.1);overflow:hidden;border:1px solid ${colors.border};">
+          <div style="padding:20px 24px;border-bottom:1px solid ${colors.border};">
+            <img src="${LOGO_URL}" alt="${APP_NAME} Logo" style="height:32px;">
+          </div>
+          <div style="padding:24px 24px 16px;">
+            <h2 style="margin:0 0 12px;font-size:22px;font-weight:700;color:${colors.textPrimary};">Verify Your Email</h2>
+            <p style="margin:0 0 16px;font-size:14px;line-height:1.6;color:${colors.textSecondary};">
+              Please click the button below to verify your email address and complete your registration.
+            </p>
+            <div style="text-align:center;margin:24px 0 16px;">
+              <a href="${verificationLink}"
+                 target="_blank"
+                 style="display:inline-block;background-color:${colors.primary};color:${colors.surface};text-decoration:none;padding:12px 28px;border-radius:999px;font-size:14px;font-weight:600;">
+                Verify Email
+              </a>
+            </div>
+            <p style="margin:0 0 8px;font-size:12px;line-height:1.6;color:${colors.textSecondary};">
+              If you did not request this, please ignore this email.
+            </p>
+          </div>
+          <div style="padding:12px 24px 16px;border-top:1px solid ${colors.border};text-align:center;">
+            <p style="margin:4px 0;font-size:11px;color:${colors.textSecondary};">
+              © ${new Date().getFullYear()} ${APP_NAME}. All rights reserved.
+            </p>
+          </div>
+        </div>
+      </div>
+    </body>
+  `
+  const text = `Please verify your email by clicking this link: ${verificationLink}`
+  return sendEmail({ to: email, subject, html, text })
+}
+
+async function sendOTPEmail (email, otp) {
+  validateEnv()
+
+  const subject = `Your One-Time Password for ${APP_NAME}`
+  const html = `
+    <body style="margin:0;padding:0;background-color:${colors.background};">
+      <div style="font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width:640px; margin:24px auto; padding:0 16px;">
+        <div style="background:${colors.surface};border-radius:16px;box-shadow:0 10px 30px rgba(15,23,42,0.1);overflow:hidden;border:1px solid ${colors.border};">
+          <div style="padding:20px 24px;border-bottom:1px solid ${colors.border};">
+            <img src="${LOGO_URL}" alt="${APP_NAME} Logo" style="height:32px;">
+          </div>
+          <div style="padding:24px 24px 16px;">
+            <h2 style="margin:0 0 12px;font-size:22px;font-weight:700;color:${colors.textPrimary};">Your One-Time Password</h2>
+            <p style="margin:0 0 16px;font-size:14px;line-height:1.6;color:${colors.textSecondary};">
+              Use the following One-Time Password (OTP) to complete your action. This OTP is valid for 10 minutes.
+            </p>
+            <div style="background-color:${colors.background};padding:18px 24px;margin:20px 0;border-radius:12px;text-align:center;">
+              <p style="margin:0;font-size:28px;font-weight:700;letter-spacing:4px;color:${colors.textPrimary};">
+                ${otp}
+              </p>
+            </div>
+            <p style="margin:0 0 8px;font-size:12px;line-height:1.6;color:${colors.textSecondary};">
+              If you did not request this, please ignore this email.
+            </p>
+          </div>
+          <div style="padding:12px 24px 16px;border-top:1px solid ${colors.border};text-align:center;">
+            <p style="margin:4px 0;font-size:11px;color:${colors.textSecondary};">
+              © ${new Date().getFullYear()} ${APP_NAME}. All rights reserved.
+            </p>
+          </div>
+        </div>
+      </div>
+    </body>
+  `
+  const text = `Your One-Time Password is: ${otp}`
+  return sendEmail({ to: email, subject, html, text })
+}
+
+async function sendLikeNotificationEmail (email, displayName, postTitle, postLink) {
+  validateEnv()
+
+  const subject = `Someone liked your post!`
+  const html = `
+    <body style="margin:0;padding:0;background-color:${colors.background};">
+      <div style="font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width:640px; margin:24px auto; padding:0 16px;">
+        <div style="background:${colors.surface};border-radius:16px;box-shadow:0 10px 30px rgba(15,23,42,0.1);overflow:hidden;border:1px solid ${colors.border};">
+          <div style="padding:20px 24px;border-bottom:1px solid ${colors.border};">
+            <img src="${LOGO_URL}" alt="${APP_NAME} Logo" style="height:32px;">
+          </div>
+          <div style="padding:24px 24px 16px;">
+            <h2 style="margin:0 0 12px;font-size:22px;font-weight:700;color:${colors.textPrimary};">Your Post Got a Like!</h2>
+            <p style="margin:0 0 16px;font-size:14px;line-height:1.6;color:${colors.textSecondary};">
+              Great news! <strong>${displayName}</strong> liked your post: <em>"${postTitle}"</em>.
+            </p>
+            <div style="text-align:center;margin:24px 0 16px;">
+              <a href="${postLink}"
+                 target="_blank"
+                 style="display:inline-block;background-color:${colors.primary};color:${colors.surface};text-decoration:none;padding:12px 28px;border-radius:999px;font-size:14px;font-weight:600;">
+                View Post
+              </a>
+            </div>
+            <p style="margin:0 0 8px;font-size:12px;line-height:1.6;color:${colors.textSecondary};">
+              Keep creating great content! You can manage your email notification preferences in your settings.
+            </p>
+          </div>
+          <div style="padding:12px 24px 16px;border-top:1px solid ${colors.border};text-align:center;">
+            <p style="margin:4px 0;font-size:11px;color:${colors.textSecondary};">
+              © ${new Date().getFullYear()} ${APP_NAME}. All rights reserved.
+            </p>
+          </div>
+        </div>
+      </div>
+    </body>
+  `
+  const text = `${displayName} liked your post: "${postTitle}". View it here: ${postLink}`
+  return sendEmail({ to: email, subject, html, text })
+}
+
+async function sendCommentNotificationEmail (email, displayName, postTitle, commentText, postLink) {
+  validateEnv()
+
+  const subject = `You have a new comment on your post!`
   const html = `
     <body style="margin:0;padding:0;background-color:${colors.background};">
       <div style="font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width:640px; margin:24px auto; padding:0 16px;">
@@ -225,7 +186,7 @@ async function sendCommentNotificationEmail (email, commenterName, postTitle, co
           <div style="padding:24px 24px 16px;">
             <h2 style="margin:0 0 12px;font-size:22px;font-weight:700;color:${colors.textPrimary};">New Comment on Your Post</h2>
             <p style="margin:0 0 16px;font-size:14px;line-height:1.6;color:${colors.textSecondary};">
-              <strong>${commenterName}</strong> commented on your post: <em>"${postTitle}"</em>.
+              <strong>${displayName}</strong> commented on your post: <em>"${postTitle}"</em>.
             </p>
             <div style="background-color:${colors.background};padding:18px 24px;margin:20px 0;border-radius:12px;">
               <p style="margin:0;font-size:14px;line-height:1.6;color:${colors.textPrimary};">
@@ -252,9 +213,7 @@ async function sendCommentNotificationEmail (email, commenterName, postTitle, co
       </div>
     </body>
   `
-  const text = `
-    ${commenterName} commented on your post: "${postTitle}".\n\nComment: "${commentText}"\n\nView the comment here: ${postLink}\n\nYou can manage your email notification preferences in your settings.
-  `
+  const text = `${displayName} commented on your post: "${postTitle}".\n\nComment: "${commentText}"\n\nView the comment here: ${postLink}`
   return sendEmail({ to: email, subject, html, text })
 }
 
@@ -305,6 +264,46 @@ async function sendMentionNotificationEmail (email, mentionerName, postTitle, co
   return sendEmail({ to: email, subject, html, text })
 }
 
+async function sendFollowerNotificationEmail (email, followerName, followerProfileLink) {
+  validateEnv()
+
+  const subject = `You have a new follower!`
+  const html = `
+    <body style="margin:0;padding:0;background-color:${colors.background};">
+      <div style="font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width:640px; margin:24px auto; padding:0 16px;">
+        <div style="background:${colors.surface};border-radius:16px;box-shadow:0 10px 30px rgba(15,23,42,0.1);overflow:hidden;border:1px solid ${colors.border};">
+          <div style="padding:20px 24px;border-bottom:1px solid ${colors.border};">
+            <img src="${LOGO_URL}" alt="${APP_NAME} Logo" style="height:32px;">
+          </div>
+          <div style="padding:24px 24px 16px;">
+            <h2 style="margin:0 0 12px;font-size:22px;font-weight:700;color:${colors.textPrimary};">You Have a New Follower!</h2>
+            <p style="margin:0 0 16px;font-size:14px;line-height:1.6;color:${colors.textSecondary};">
+              <strong>${followerName}</strong> is now following you.
+            </p>
+            <div style="text-align:center;margin:24px 0 16px;">
+              <a href="${followerProfileLink}"
+                 target="_blank"
+                 style="display:inline-block;background-color:${colors.primary};color:${colors.surface};text-decoration:none;padding:12px 28px;border-radius:999px;font-size:14px;font-weight:600;">
+                View Their Profile
+              </a>
+            </div>
+            <p style="margin:0 0 8px;font-size:12px;line-height:1.6;color:${colors.textSecondary};">
+              You can manage your email notification preferences in your settings.
+            </p>
+          </div>
+          <div style="padding:12px 24px 16px;border-top:1px solid ${colors.border};text-align:center;">
+            <p style="margin:4px 0;font-size:11px;color:${colors.textSecondary};">
+              © ${new Date().getFullYear()} ${APP_NAME}. All rights reserved.
+            </p>
+          </div>
+        </div>
+      </div>
+    </body>
+  `
+  const text = `${followerName} is now following you. View their profile here: ${followerProfileLink}`
+  return sendEmail({ to: email, subject, html, text })
+}
+
 async function sendEmail ({ to, subject, html, text }) {
   const msg = {
     to,
@@ -340,4 +339,5 @@ module.exports = {
   sendLikeNotificationEmail,
   sendCommentNotificationEmail,
   sendMentionNotificationEmail,
+  sendFollowerNotificationEmail,
 }
