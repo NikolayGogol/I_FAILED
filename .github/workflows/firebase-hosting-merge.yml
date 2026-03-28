@@ -37,6 +37,7 @@ jobs:
           echo "VITE_BOOKMARKS=${{ vars.VITE_BOOKMARKS }}" >> .env
           echo "VITE_LIBRARY=${{ vars.VITE_LIBRARY }}" >> .env
           echo "VITE_NOTIFICATION_COLLECTION=${{ vars.VITE_NOTIFICATION_COLLECTION }}" >> .env
+          echo "VITE_STATISTIC_COLLECTION=${{ vars.VITE_STATISTIC_COLLECTION }}" >> .env
 
       - name: Install and Build Frontend
         run: npm ci && npm run build
@@ -78,6 +79,7 @@ jobs:
           echo "POST_COLLECTION_SCEDULED=${{ vars.POST_COLLECTION_SCEDULED }}" >> functions/.env
           echo "POST_PASSWORD_RESET=${{ vars.POST_PASSWORD_RESET }}" >> functions/.env
           echo "NOTIFICATION_COLLECTION=${{ vars.NOTIFICATION_COLLECTION }}" >> functions/.env
+          echo "STATISTIC_COLLECTION=${{ vars.STATISTIC_COLLECTION }}" >> functions/.env
 
       - name: Install Function Dependencies
         run: cd functions && npm ci
