@@ -120,6 +120,7 @@
   onMounted(() => {
     const postId = route.params.id
     if (postId) {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
       init(postId)
       getUsersForMentions().then(res => {
         users.value = res.map(user => ({
@@ -493,7 +494,7 @@
         <div class="d-flex align-start">
           <v-avatar class="mr-4" color="grey-lighten-2" size="48">
             <v-img
-              v-if="!post.isAnonymous && post.user?.photoURL"
+              v-if="post.user?.photoURL"
               alt="User avatar"
               class="w-100 img-cover"
               :src="post.user.photoURL"

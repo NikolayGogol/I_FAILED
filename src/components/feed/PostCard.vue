@@ -241,10 +241,10 @@
       <div v-if="post.selectedCategories?.length > 0" class="post-tags cursor-pointer " @click="openPost">
         <span>{{ post.selectedCategories.map(el => el.label).join(' / ') }}</span>
       </div>
-      <h2 class="post-title cursor-pointer hover-text-underline" @click="openPost">
+      <h2 class="post-title cursor-pointer" @click="openPost">
         {{ post.title }}
       </h2>
-      <div class="post-body cursor-pointer hover-text-underline" @click="openPost" v-html="truncatedBody" />
+      <div class="post-body" v-html="truncatedBody" />
       <button v-if="showReadMore" class="read-more" @click="readMore">Read more</button>
       <v-img
         v-if="post.images[0]"
@@ -332,10 +332,3 @@
     </v-dialog>
   </div>
 </template>
-<style scoped lang="scss">
-.hover-text-underline {
-  &:hover {
-    text-decoration: underline;
-  }
-}
-</style>
