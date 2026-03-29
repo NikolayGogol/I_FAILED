@@ -391,6 +391,7 @@ export const useProfileStore = defineStore('profile', {
 
         // Send follower notification email
         await this.sendFollowerNotification(targetUserId, currentUser)
+        await this.sendFollowPush(targetUserId, currentUser)
       } catch (error) {
         console.error('Error following user:', error)
         this.error = 'Failed to follow user.'
@@ -493,6 +494,30 @@ export const useProfileStore = defineStore('profile', {
           })
         } catch (error) {
           console.error('Error sending follower notification email:', error)
+        }
+      }
+    },
+    async sendFollowPush (targetUserId, follower) {
+      const userStore = useUserStore()
+      const targetUser = await userStore.getUserById(targetUserId)
+
+      if (!targetUser) {
+        console.error('Target user not found for follower notification.')
+        return
+      }
+
+      const notifySettings = targetUser.settings?.notify?.push
+      const followerSwitch = findSwitch(notifySettings?.switches, 3)
+
+      if (notifySettings && followerSwitch && targetUser.fcmToken) {
+        try {
+          await api.post('/send-follower-push', {
+            fcmToken: targetUser.fcmToken,
+            followerName: follower.displayName,
+            type: 'follow',
+          })
+        } catch (error) {
+          console.error('Error sending follower notification push:', error)
         }
       }
     },

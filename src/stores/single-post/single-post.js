@@ -130,14 +130,15 @@ export const useSinglePostStore = defineStore('singlePost', {
         if (mentions.length > 0) {
           const userStore = useUserStore()
           for (const mention of mentions) {
-            if (mention.uid && mention.uid !== user.uid) { // Перевірка на наявність uid
+            if (mention.uid && mention.uid !== user.uid) {
               try {
-                // Ensure we pass only the string ID to getUserById
                 const mentionedUidStr = String(mention.uid).trim()
                 const mentionedUser = await userStore.getUserById(mentionedUidStr)
                 if (mentionedUser) {
-                  await this.saveMentionAction(post, { id: commentId, text }, mentionedUser, user)
-                  await this.sendMentionEmail(post, { id: commentId, text }, mentionedUser, user)
+                  const fullMentionedUser = { ...mentionedUser, uid: mentionedUidStr }
+                  await this.saveMentionAction(post, { id: commentId, text }, fullMentionedUser, user)
+                  await this.sendMentionEmail(post, { id: commentId, text }, fullMentionedUser, user)
+                  await this.sendMentionPush(post, fullMentionedUser)
                 }
               } catch (error) {
                 console.error(`Error processing mention for uid ${mention.uid}:`, error)
@@ -185,8 +186,10 @@ export const useSinglePostStore = defineStore('singlePost', {
                 const mentionedUidStr = String(mention.uid).trim()
                 const mentionedUser = await userStore.getUserById(mentionedUidStr)
                 if (mentionedUser) {
-                  await this.saveMentionAction(post, comment, mentionedUser, user)
-                  await this.sendMentionEmail(post, comment, mentionedUser, user)
+                  const fullMentionedUser = { ...mentionedUser, uid: mentionedUidStr }
+                  await this.saveMentionAction(post, comment, fullMentionedUser, user)
+                  await this.sendMentionEmail(post, comment, fullMentionedUser, user)
+                  await this.sendMentionPush(post, fullMentionedUser)
                 }
               } catch (error) {
                 console.error(`Error processing mention for uid ${mention.uid}:`, error)
@@ -231,14 +234,15 @@ export const useSinglePostStore = defineStore('singlePost', {
         if (mentions.length > 0) {
           const userStore = useUserStore()
           for (const mention of mentions) {
-            if (mention.uid && mention.uid !== user.uid) { // Перевірка на наявність uid
+            if (mention.uid && mention.uid !== user.uid) {
               try {
-                // Ensure we pass only the string ID to getUserById
                 const mentionedUidStr = String(mention.uid).trim()
                 const mentionedUser = await userStore.getUserById(mentionedUidStr)
                 if (mentionedUser) {
-                  await this.saveMentionAction(post, { id: commentId, text }, mentionedUser, user)
-                  await this.sendMentionEmail(post, { id: commentId, text }, mentionedUser, user)
+                  const fullMentionedUser = { ...mentionedUser, uid: mentionedUidStr }
+                  await this.saveMentionAction(post, { id: commentId, text }, fullMentionedUser, user)
+                  await this.sendMentionEmail(post, { id: commentId, text }, fullMentionedUser, user)
+                  await this.sendMentionPush(post, fullMentionedUser)
                 }
               } catch (error) {
                 console.error(`Error processing mention for uid ${mention.uid}:`, error)
@@ -375,7 +379,7 @@ export const useSinglePostStore = defineStore('singlePost', {
       }
 
       const mentionerUid = mentionerUser.uid
-      const mentionedUid = mentionedUser.id // ВИПРАВЛЕНО: використовуємо .id замість .uid
+      const mentionedUid = mentionedUser.uid
       const postId = post.id
       const commentId = comment.id
       const commentText = comment.text
@@ -426,6 +430,25 @@ export const useSinglePostStore = defineStore('singlePost', {
         }
       }
     },
+    async sendMentionPush (post, mentionedUser) {
+      const authStore = useAuthStore()
+      const pushObj = mentionedUser?.settings?.notify?.push
+      const pushSwitch = findSwitch(pushObj?.switches, 2)
+      if (pushObj && pushSwitch && mentionedUser.fcmToken) {
+        try {
+          await api.post('/send-mention-push', {
+            fcmToken: mentionedUser.fcmToken,
+            postTitle: post.title,
+            likedBy: authStore.user?.displayName,
+            type: 'mention',
+            postId: post.id,
+          })
+        } catch (error) {
+          console.error('Error sending mention push notification:', error)
+        }
+      }
+    },
+
     async addToRead (payload) {
       try {
         const uid = auth.currentUser.uid

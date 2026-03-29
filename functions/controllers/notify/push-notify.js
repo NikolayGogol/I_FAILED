@@ -47,9 +47,33 @@ async function sendCommentPush (req, res) {
     res.status(500).send('Error sending push notification')
   }
 }
+async function sendMentionPush (req, res) {
+  const { fcmToken, postTitle, likedBy, type, postId, commentID } = req.body
+  const title = 'New Mention!'
+  const body = `${likedBy} mention your: "${postTitle}"`
+
+  try {
+    await sendPushNotification(fcmToken, title, body, { type, url: `/post/${postId}#${commentID}` })
+    res.status(200).send('Push notification sent successfully')
+  } catch {
+    res.status(500).send('Error sending push notification')
+  }
+}
+async function sendFollowPush (req, res) {
+  const { fcmToken, followerName, type } = req.body
+  const title = 'New Following!'
+  const body = `${followerName} follow your`
+  try {
+    await sendPushNotification(fcmToken, title, body, { type, url: '' })
+    res.status(200).send('Push notification sent successfully')
+  } catch {
+    res.status(500).send('Error sending push notification')
+  }
+}
 
 module.exports = {
-  sendPushNotification,
   sendLikePush,
   sendCommentPush,
+  sendMentionPush,
+  sendFollowPush,
 }
