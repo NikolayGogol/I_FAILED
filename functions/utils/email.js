@@ -317,6 +317,67 @@ async function sendFollowerNotificationEmail (email, followerName, followerProfi
   return sendEmail({ to: email, subject, html, text })
 }
 
+async function sendDigestEmail (email, totalPosts, categoryPostCounts) {
+  validateEnv()
+
+  const subject = 'Your Daily Digest'
+  const text = `You have read ${totalPosts} posts in ${categoryPostCounts.size} categories.`
+
+  const categoryDetails = []
+  for (const [category, count] of categoryPostCounts.entries()) {
+    categoryDetails.push(
+      `<tr style="border-bottom:1px solid ${colors.border};">
+        <td style="padding:12px 16px;font-size:14px;color:${colors.textPrimary};">${category}</td>
+        <td style="padding:12px 16px;font-size:14px;color:${colors.textPrimary};text-align:right;">${count}</td>
+      </tr>`,
+    )
+  }
+
+  const html = `
+    <body style="margin:0;padding:0;background-color:${colors.background};">
+      <div style="font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width:640px; margin:24px auto; padding:0 16px;">
+        <div style="background:${colors.surface};border-radius:16px;box-shadow:0 10px 30px rgba(15,23,42,0.1);overflow:hidden;border:1px solid ${colors.border};">
+          <div style="padding:20px 24px;border-bottom:1px solid ${colors.border};">
+            <img src="${LOGO_URL}" alt="${APP_NAME} Logo" style="height:32px;">
+          </div>
+          <div style="padding:24px 24px 16px;">
+            <h2 style="margin:0 0 12px;font-size:22px;font-weight:700;color:${colors.textPrimary};">Your Daily Digest</h2>
+            <p style="margin:0 0 16px;font-size:14px;line-height:1.6;color:${colors.textSecondary};">
+              Here's a summary of your reading activity from yesterday.
+            </p>
+            <div style="border:1px solid ${colors.border};border-radius:12px;overflow:hidden;">
+              <table style="width:100%;border-collapse:collapse;">
+                <thead style="background-color:${colors.background};">
+                  <tr style="border-bottom:1px solid ${colors.border};">
+                    <th style="padding:12px 16px;font-size:12px;font-weight:600;color:${colors.textSecondary};text-align:left;text-transform:uppercase;">Category</th>
+                    <th style="padding:12px 16px;font-size:12px;font-weight:600;color:${colors.textSecondary};text-align:right;text-transform:uppercase;">Posts Read</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${categoryDetails.join('')}
+                </tbody>
+              </table>
+            </div>
+            <div style="text-align:center;margin:24px 0 16px;">
+              <a href="${VERIFY_LINK}"
+                 target="_blank"
+                 style="display:inline-block;background-color:${colors.primary};color:${colors.surface};text-decoration:none;padding:12px 28px;border-radius:999px;font-size:14px;font-weight:600;">
+                Continue Reading
+              </a>
+            </div>
+          </div>
+          <div style="padding:12px 24px 16px;border-top:1px solid ${colors.border};text-align:center;">
+            <p style="margin:4px 0;font-size:11px;color:${colors.textSecondary};">
+              © ${new Date().getFullYear()} ${APP_NAME}. All rights reserved.
+            </p>
+          </div>
+        </div>
+      </div>
+    </body>
+  `
+  return sendEmail({ to: email, subject, html, text })
+}
+
 async function sendEmail ({ to, subject, html, text }) {
   const msg = {
     to,
@@ -353,4 +414,5 @@ module.exports = {
   sendCommentNotificationEmail,
   sendMentionNotificationEmail,
   sendFollowerNotificationEmail,
+  sendDigestEmail,
 }

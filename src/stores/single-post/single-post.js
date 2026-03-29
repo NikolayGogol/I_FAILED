@@ -78,7 +78,6 @@ export const useSinglePostStore = defineStore('singlePost', {
         console.error('Error incrementing view count:', error)
       }
     },
-
     async incrementCategoryRead ({ userId, category }) {
       if (!userId || !category) {
         return
@@ -99,7 +98,6 @@ export const useSinglePostStore = defineStore('singlePost', {
         lastReadAt: serverTimestamp(),
       }, { merge: true })
     },
-
     async addComment (postId, user, text) {
       try {
         const post = await this.getPostById(postId)
