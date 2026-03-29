@@ -23,21 +23,25 @@ async function generateReport (type = 'daily', currentDate = new Date()) {
       const today = new Date(currentDate)
       today.setUTCHours(0, 0, 0, 0)
 
-      const yesterday = new Date(today)
-      yesterday.setDate(yesterday.getDate() - 1)
+      const startDate = new Date(today)
+      if (type === 'daily') {
+        startDate.setDate(startDate.getDate() - 1)
+      } else if (type === 'weekly') {
+        startDate.setDate(startDate.getDate() - 7)
+      }
 
       const postsCollection = db
         .collection(STATISTIC_COLLECTION)
         .doc(user.id)
         .collection('what_I_read')
       const postsQuery = postsCollection
-        .where('createdAt', '>=', yesterday)
+        .where('createdAt', '>=', startDate)
         .where('createdAt', '<', today)
 
       const postsSnapshot = await postsQuery.get()
 
       if (postsSnapshot.empty) {
-        logger.info('Result: No posts found for yesterday.')
+        logger.info(`Result: No posts found for the ${type} period.`)
         continue
       }
 
@@ -83,15 +87,30 @@ async function generateReport (type = 'daily', currentDate = new Date()) {
   }
 }
 
-module.exports = generateReport
-
-exports.dijest = onSchedule({
+exports.dailyDigest = onSchedule({
   schedule: 'every day 09:00',
   timeZone: 'Europe/Kiev',
 }, async () => {
   generateReport('daily')
     .then(users =>
-      logger.info(`Test run finished, found users: ${users.length}`),
+      logger.info(`Daily digest run finished, found users: ${users.length}`),
     )
-    .catch(error => logger.error('Error during testing:', error))
+    .catch(error => logger.error('Error during daily digest:', error))
 })
+
+exports.weeklyDigest = onSchedule({
+  schedule: 'every monday 09:00',
+  timeZone: 'Europe/Kiev',
+}, async () => {
+  generateReport('weekly')
+    .then(users =>
+      logger.info(`Weekly digest run finished, found users: ${users.length}`),
+    )
+    .catch(error => logger.error('Error during weekly digest:', error))
+})
+
+module.exports = {
+  generateReport,
+  dailyDigest: exports.dailyDigest,
+  weeklyDigest: exports.weeklyDigest,
+}
