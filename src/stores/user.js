@@ -10,7 +10,13 @@ export const useUserStore = defineStore('userStore', {
       const docSnap = await getDoc(docRef)
 
       if (docSnap.exists()) {
-        return { id: docSnap.id, ...docSnap.data() }
+        const userData = docSnap.data()
+        return {
+          id: docSnap.id,
+          displayName: userData.displayName,
+          photoURL: userData.photoURL,
+          ...userData,
+        }
       } else {
         // doc.data() will be undefined in this case
         console.log('No such document!')

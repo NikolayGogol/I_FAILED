@@ -1,20 +1,89 @@
 @use '../settings.scss' as *;
 
 .notifications-page {
-  .notifications-main {
-    padding: 20px;
-  }
-
   .notification-item {
-    border-bottom: 1px solid #eee;
-    padding: 15px 0;
+    background-color: $color-surface;
+    border: 1px solid $color-border;
+    padding: 15px 25px;
+    border-bottom: 0;
 
-    &:last-child {
-      border-bottom: none;
+    &.need2Read {
+      background-color: $color-tag-bg;
+      position: relative;
+
+      &:before {
+        content: '';
+        position: absolute;
+        top: 33px;
+        left: 10px;
+        width: 8px;
+        height: 8px;
+        background-color: $color-primary;
+        border-radius: 50%;
+        display: block;
+      }
     }
 
-    p {
-      margin: 0;
+    &:first-of-type {
+      border-radius: $radius-md $radius-md 0 0;
+    }
+
+    &:last-of-type {
+      border-radius: 0 0 $radius-md $radius-md;
+      border-bottom: 1px solid $color-border;
+    }
+  }
+
+  .card-notify {
+
+    .user-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+    }
+
+    .user-name {
+      font-size: 16px;
+      color: $color-text-primary;
+      font-weight: 600;
+    }
+
+    .time {
+      display: flex;
+      align-items: center;
+      color: $color-text-quaternary;
+      font-size: 14px;
+      margin-left: 10px;
+    }
+
+    .text-description {
+      font-size: 14px;
+      color: $color-text-quaternary;
+    }
+
+    .text-main {
+      font-size: 14px;
+      color: $color-text-primary;
+      font-weight: 400;
+      line-height: 20px;
+    }
+
+    .bg-icon {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+
+      i {
+        border-radius: 50%;
+        color: $color-surface;
+        font-size: 16px;
+      }
+    }
+
+    .like-icon {
+      i {
+        background-color: #C8372B;
+      }
     }
   }
 }

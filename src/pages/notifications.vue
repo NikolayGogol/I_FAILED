@@ -7,6 +7,8 @@
 }
 </route>
 <script setup>
+  import dayjs from 'dayjs'
+  import relativeTime from 'dayjs/plugin/relativeTime'
   import { computed, onMounted } from 'vue'
   import LikeCard from '@/components/notifications/LikeCard.vue'
   import { useNotificationStore } from '@/stores/notification'
@@ -16,6 +18,7 @@
 
   const paginatedNotifications = computed(() => notificationStore.paginatedNotifications)
   const totalPages = computed(() => notificationStore.totalPages)
+  dayjs.extend(relativeTime)
 
   onMounted(() => {
     notificationStore.fetchNotifications()
@@ -35,7 +38,12 @@
         You have no new notifications.
       </div>
       <div v-else>
-        <div v-for="notification in paginatedNotifications" :key="notification.id" class="notification-item">
+        <div
+          v-for="notification in paginatedNotifications"
+          :key="notification.id"
+          class="notification-item"
+          :class="{'need2Read': !notification.isRead}"
+        >
           <div v-if="notification.type === 'follower'">
             <p><strong>{{ notification.followerName }}</strong> started following you.</p>
           </div>
