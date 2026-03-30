@@ -27,6 +27,42 @@ const VITE_COMMENTS_COLLECTION = import.meta.env.VITE_COMMENTS
 const VITE_BOOKMARKS_COLLECTION = import.meta.env.VITE_BOOKMARKS
 const VITE_NOTIFICATION_COLLECTION = import.meta.env.VITE_NOTIFICATION_COLLECTION
 
+async function saveLike (payload, likeType = 'postLike') {
+  if (!auth.currentUser) {
+    console.error('No user logged in to save like action.')
+    return
+  }
+  const likerUid = auth.currentUser.uid
+  const postOwnerUid = likeType === 'postLike' ? payload.uid : payload.post.uid
+
+  // Do not save a notification if a user likes their own content.
+  if (likerUid === postOwnerUid) {
+    return
+  }
+
+  const likesCollectionRef = collection(db, VITE_NOTIFICATION_COLLECTION, postOwnerUid, 'likes')
+  let q
+  q = likeType === 'postLike' ? query(likesCollectionRef, where('postId', '==', payload.id), where('uid', '==', likerUid)) : query(likesCollectionRef, where('commentId', '==', payload.commentId), where('uid', '==', likerUid))
+
+  const querySnapshot = await getDocs(q)
+  if (querySnapshot.empty) {
+    const notificationPayload = {
+      uid: likerUid, // UID of the user who liked the content
+      createdAt: serverTimestamp(),
+      likeType,
+    }
+    if (likeType === 'postLike') {
+      notificationPayload.postId = payload.id
+    } else {
+      notificationPayload.postId = payload.postId
+      notificationPayload.commentId = payload.commentId
+    }
+    return await addDoc(likesCollectionRef, notificationPayload)
+  }
+  // If a like action from this user for this content already exists, do nothing.
+  console.log('Like action already exists.')
+}
+
 export const usePostCardStore = defineStore('postCard', {
   actions: {
     async toggleLike ({ postId, liked }) {
@@ -199,37 +235,21 @@ export const usePostCardStore = defineStore('postCard', {
         return 0
       }
     },
-    async saveLikeAction (payload, likeType = 'postCard') {
-      if (!auth.currentUser) {
-        console.error('No user logged in to save like action.')
-        return
-      }
-      const likerUid = auth.currentUser.uid
-      const postOwnerUid = payload.uid
-
-      // Do not save a notification if a user likes their own post.
-      if (likerUid === postOwnerUid) {
-        return
-      }
-
-      const likesCollectionRef = collection(db, VITE_NOTIFICATION_COLLECTION, postOwnerUid, 'likes')
-      const q = query(likesCollectionRef,
-        where('postId', '==', payload.postId),
-        where('commentId', '==', payload.id),
-        where('uid', '==', likerUid))
-      const querySnapshot = await getDocs(q)
-      if (querySnapshot.empty) {
-        const notificationPayload = {
-          postId: payload.postId,
-          uid: likerUid, // UID of the user who liked the post
-          createdAt: serverTimestamp(),
-          commentId: payload.id,
-          likeType,
+    async saveLikeAction (payload, likeType = 'postLike') {
+      switch (likeType) {
+        case 'postLike': {
+          return saveLike(payload, 'postLike')
         }
-        return await addDoc(likesCollectionRef, notificationPayload)
+        case 'commentLike': {
+          return saveLike(payload, 'commentLike')
+        }
+        case 'replyLike': {
+          return saveLike(payload, 'replyLike')
+        }
+        default: {
+          console.error('Invalid like type provided.')
+        }
       }
-      // If a like action from this user for this post already exists, do nothing.
-      console.log('Like action already exists.')
     },
   },
 })

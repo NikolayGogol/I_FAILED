@@ -395,14 +395,21 @@
       await router.push('/login')
       return
     }
-    const isLiked = comment.likes?.includes(authStore.user.uid)
+    const isLiked = comment.likes?.includes(authStore.user.uid) || false
     try {
       await toggleCommentLike(comment.id, authStore.user.uid, isLiked)
-      await postCardStore.saveLikeAction({
-        id: comment.id,
-        uid: post.value.uid,
-        postId: post.value.id,
-      }, 'commentLike')
+
+      if (!isLiked) {
+        const actionType = comment.parentId ? 'replyLike' : 'commentLike'
+        const actionData = {
+          commentId: comment.id,
+          postId: post.value.id,
+          post: post.value,
+          comment,
+        }
+        await postCardStore.saveLikeAction(actionData, actionType)
+      }
+
       await loadComments(post.value.id)
     } catch (error) {
       console.error('Failed to toggle like:', error)
