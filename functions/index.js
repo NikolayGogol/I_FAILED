@@ -10,9 +10,8 @@ admin.initializeApp()
 const authRoutes = require('./routes/auth')
 const notificationRoutes = require('./routes/notifications') // Import the new router
 const postsRoutes = require('./routes/posts')
-const { generateReport } = require('./scheduled/dijest')
-const { publishScheduledPosts } = require('./scheduled/publish-posts')
 const { dailyDigest, weeklyDigest } = require('./scheduled/dijest')
+const { publishScheduledPosts } = require('./scheduled/publish-posts')
 
 const app = express()
 
