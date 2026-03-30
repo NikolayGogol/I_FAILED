@@ -53,6 +53,11 @@
         }
       }
     }
+
+    .border-left {
+      border-left: 1px solid $color-border;
+      padding-left: 15px;
+    }
   }
 }
 

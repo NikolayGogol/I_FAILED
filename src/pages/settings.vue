@@ -96,7 +96,7 @@
             </ul>
           </aside>
         </v-col>
-        <v-col sm="8">
+        <v-col class="border-left" sm="8">
           <main class="settings-content">
             <component :is="currentComponent" />
           </main>

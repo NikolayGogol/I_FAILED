@@ -20,4 +20,19 @@
     border: 1px solid $color-border;
     border-radius: $spacing-md-sm;
   }
+
+  .separator {
+    color: $color-border;
+  }
+
+  .picker-wrapper {
+    .dp__input {
+      border: 1px solid $color-border;
+      border-radius: $radius-md;
+    }
+
+    .dp__action_select {
+      background-color: $color-primary;
+    }
+  }
 }
