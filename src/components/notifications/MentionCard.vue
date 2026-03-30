@@ -39,11 +39,11 @@
     const randomIndex = Math.floor(Math.random() * backgroundColors.length)
     return backgroundColors[randomIndex]
   }
-  function parseUserTags (text) {
+  function parseUserTags (text, commentID, postID) {
     const regex = /@\[([^\]]+)\]\(([^)]+)\)/g
 
     return text.replace(regex, (match, name, id) => {
-      return `<a href="/user-info/${id}" class="text-primary font-weight-semibold">@ ${name}</a>`
+      return `<a href="/post/${postID}#${commentID}" uid="${id}" class="text-primary font-weight-semibold">@ ${name}</a>`
     })
   }
   function getMentionCard (data) {
@@ -51,7 +51,8 @@
       cardData.user = user
     })
     cardData.createdAt = data.createdAt
-    cardData.description = parseUserTags(data.commentText)
+    console.log(data)
+    cardData.description = parseUserTags(data.commentText, data.commentId, data.postId)
   }
 </script>
 
