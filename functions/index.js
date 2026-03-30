@@ -12,6 +12,7 @@ const notificationRoutes = require('./routes/notifications') // Import the new r
 const postsRoutes = require('./routes/posts')
 const { generateReport } = require('./scheduled/dijest')
 const { publishScheduledPosts } = require('./scheduled/publish-posts')
+const { dailyDigest, weeklyDigest } = require('./scheduled/dijest')
 
 const app = express()
 
@@ -23,11 +24,6 @@ app.use(corsMiddleware)
 app.options('*', corsMiddleware)
 
 app.use(express.json())
-
-// --- DEBUGGING STEP ---
-app.get('/status', (req, res) => {
-  res.status(200).send('API is running!')
-})
 // --- END DEBUGGING STEP ---
 
 // Mount the routers
@@ -40,4 +36,5 @@ exports.api = onRequest(app)
 
 // Export the scheduled function
 exports.publishScheduledPosts = publishScheduledPosts
-exports.dijest = generateReport
+exports.dailyDigest = dailyDigest
+exports.weeklyDigest = weeklyDigest
