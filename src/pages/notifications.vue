@@ -13,9 +13,9 @@
   import FollowCard from '@/components/notifications/FollowCard.vue'
   import LikeCard from '@/components/notifications/LikeCard.vue'
   import MentionCard from '@/components/notifications/MentionCard.vue'
+  import { useMainStore } from '@/stores/main/main.js'
   import { useNotificationStore } from '@/stores/notification'
   import '@/styles/pages/notifications.scss'
-  import {useMainStore} from "@/stores/main/main.js";
 
   const notificationStore = useNotificationStore()
   const mainStore = useMainStore()
@@ -73,9 +73,11 @@
   <div class="notifications-page">
     <div class="d-flex align-center justify-space-between">
       <h2 class="font-weight-bold text-grey-darken-3 ml-3 ml-sm-0">Notifications</h2>
-      <p class="cursor-pointer text-primary"
-         v-if="notifications > 1"
-         @click="handleMarkAllAsRead">Mark all as read</p>
+      <p
+        v-if="notifications > 1"
+        class="cursor-pointer text-primary"
+        @click="handleMarkAllAsRead"
+      >Mark all as read</p>
     </div>
     <section class="notifications-main mt-7">
       <div v-if="notificationStore.loading" class="loading d-flex justify-center">
