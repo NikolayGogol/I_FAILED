@@ -1,6 +1,8 @@
 <script setup>
   import dayjs from 'dayjs'
   import { onMounted, reactive } from 'vue'
+  import { useRouter } from 'vue-router'
+  import NotifyMenu from '@/components/notifications/NotifyMenu.vue'
   import { backgroundColors } from '@/models/no-data.js'
   import { useSinglePostStore } from '@/stores/single-post/single-post.js'
   import { useUserStore } from '@/stores/user.js'
@@ -11,6 +13,7 @@
       required: true,
     },
   })
+  const router = useRouter()
   const cardData = reactive({
     user: null,
     createdAt: null,
@@ -102,42 +105,46 @@
     const randomIndex = Math.floor(Math.random() * backgroundColors.length)
     return backgroundColors[randomIndex]
   }
+  function goToProfile (user) {
+    router.push('/user-info/' + user.id)
+  }
 </script>
 
 <template>
   <div class="card-notify" :class="{'need2Read': !data.isRead}">
-    <div class="d-flex">
-      <div class="d-flex align-start user-avatar-wrapper">
-        <div class="position-relative">
-          <v-img
-            v-if="cardData.user?.photoURL"
-            :alt="cardData.user?.displayName"
-            class="user-avatar"
-            cover
-            :src="cardData.user?.photoURL"
-          />
-          <span
-            v-else
-            class="avatar-initials"
-            :style="{ backgroundColor: getRandomColor() }"
-          >{{ getInitials(cardData.user?.displayName) }}</span>
-          <div class="bg-icon like-icon">
-            <template v-if="data.likeType === 'replyLike' || data.likeType === 'likeReply'">
-              <v-icon icon="mdi-share-circle" />
-            </template>
-            <template v-else>
-              <v-icon icon="mdi-heart-circle-outline" />
-            </template>
-          </div>
+    <div class="d-flex align-start user-avatar-wrapper w-100">
+      <div class="position-relative">
+        <v-img
+          v-if="cardData.user?.photoURL"
+          :alt="cardData.user?.displayName"
+          class="user-avatar"
+          cover
+          :src="cardData.user?.photoURL"
+        />
+        <span
+          v-else
+          class="avatar-initials"
+          :style="{ backgroundColor: getRandomColor() }"
+        >{{ getInitials(cardData.user?.displayName) }}</span>
+        <div class="bg-icon like-icon">
+          <template v-if="data.likeType === 'replyLike' || data.likeType === 'likeReply'">
+            <v-icon icon="mdi-share-circle" />
+          </template>
+          <template v-else>
+            <v-icon icon="mdi-heart-circle-outline" />
+          </template>
         </div>
-        <div class="d-flex flex-column ml-3">
+      </div>
+      <div class="d-flex flex-column ml-3 w-100">
+        <div class="d-flex align-center justify-space-between">
           <div class="d-flex">
-            <span class="user-name">{{ cardData.user?.displayName }}</span>
+            <span class="user-name cursor-pointer" @click="goToProfile(cardData.user)">{{ cardData.user?.displayName }}</span>
             <span class="time"> • {{ timeAgo(cardData.createdAt) }}</span>
           </div>
-          <p class="text-description">{{ transformText(data.likeType) }}</p>
-          <p class="text-main" v-html="cardData.description" />
+          <NotifyMenu :data="data" />
         </div>
+        <p class="text-description">{{ transformText(data.likeType) }}</p>
+        <p class="text-main" v-html="cardData.description" />
       </div>
     </div>
   </div>

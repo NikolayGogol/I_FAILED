@@ -225,7 +225,8 @@ export const useMainStore = defineStore('main', {
         try {
           const collectionRef = collection(db, NOTIFICATIONS_COLLECTION, uid, subcollectionName)
           const unsubscribe = onSnapshot(collectionRef, snapshot => {
-            counts[subcollectionName] = snapshot.size
+            const unreadCount = snapshot.docs.filter(doc => doc.data().isRead !== true).length
+            counts[subcollectionName] = unreadCount
             updateTotal()
           })
           notificationListeners.push(unsubscribe)

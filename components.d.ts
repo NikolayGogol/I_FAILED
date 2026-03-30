@@ -40,6 +40,8 @@ declare module 'vue' {
     MoblileNavbar: typeof import('./src/components/MoblileNavbar.vue')['default']
     MyPostMenu: typeof import('./src/components/feed/MyPostMenu.vue')['default']
     NotificationSettings: typeof import('./src/components/settings/NotificationSettings.vue')['default']
+    NotifiMenu: typeof import('./src/components/notifications/notifi-menu.vue')['default']
+    NotifyMenu: typeof import('./src/components/notifications/NotifyMenu.vue')['default']
     PopularTab: typeof import('./src/components/feed/tabs/PopularTab.vue')['default']
     PopularTags: typeof import('./src/components/sidebars/PopularTags.vue')['default']
     PostCard: typeof import('./src/components/feed/PostCard.vue')['default']

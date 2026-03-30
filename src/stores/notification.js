@@ -1,4 +1,4 @@
-import { collection, getDocs, orderBy, query } from 'firebase/firestore'
+import { collection, deleteDoc, doc, getDocs, orderBy, query, updateDoc, where, writeBatch } from 'firebase/firestore'
 import { defineStore } from 'pinia'
 import { db } from '@/firebase'
 import { useAuthStore } from '@/stores/auth'
@@ -74,6 +74,82 @@ export const useNotificationStore = defineStore('notification', {
       const snapshot = await getDocs(q)
       this.notifications = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data(), type: tab.path.slice(0, -1) }))
       this.loading = false
+    },
+    async toggleMarkAsRead (notification) {
+      const authStore = useAuthStore()
+      if (!authStore.user?.uid) {
+        return
+      }
+
+      const uid = authStore.user.uid
+      const newIsRead = !notification.isRead
+      const subcollection = `${notification.type}s` // e.g., 'like' -> 'likes'
+
+      try {
+        const notifRef = doc(db, NOTIFICATIONS_COLLECTION, uid, subcollection, notification.id)
+        await updateDoc(notifRef, { isRead: newIsRead })
+
+        // Update local state
+        const index = this.notifications.findIndex(n => n.id === notification.id)
+        if (index !== -1) {
+          this.notifications[index].isRead = newIsRead
+        }
+      } catch (error) {
+        console.error('Error updating notification read status:', error)
+      }
+    },
+    async deleteNotification (notification) {
+      const authStore = useAuthStore()
+      if (!authStore.user?.uid) {
+        return
+      }
+
+      const uid = authStore.user.uid
+      const subcollection = `${notification.type}s`
+
+      try {
+        const notifRef = doc(db, NOTIFICATIONS_COLLECTION, uid, subcollection, notification.id)
+        await deleteDoc(notifRef)
+
+        // Update local state
+        this.notifications = this.notifications.filter(n => n.id !== notification.id)
+      } catch (error) {
+        console.error('Error deleting notification:', error)
+        throw error // Re-throw to handle it in the component
+      }
+    },
+    async markAllAsRead () {
+      const authStore = useAuthStore()
+      if (!authStore.user?.uid) {
+        return
+      }
+
+      const uid = authStore.user.uid
+      const subcollections = ['followers', 'likes', 'mentions']
+      const batch = writeBatch(db)
+
+      try {
+        for (const sub of subcollections) {
+          const subcollectionRef = collection(db, NOTIFICATIONS_COLLECTION, uid, sub)
+          const snapshot = await getDocs(subcollectionRef)
+          for (const document of snapshot.docs) {
+            // Only update documents that are not already read
+            if (document.data().isRead !== true) {
+              batch.update(document.ref, { isRead: true })
+            }
+          }
+        }
+        await batch.commit()
+
+        // Update local state
+        for (const n of this.notifications) {
+          if (n.isRead !== true) {
+            n.isRead = true
+          }
+        }
+      } catch (error) {
+        console.error('Error marking all notifications as read:', error)
+      }
     },
   },
 })

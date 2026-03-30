@@ -1,13 +1,14 @@
 <script setup>
   import dayjs from 'dayjs'
   import { onMounted, reactive } from 'vue'
+  import { useRouter } from 'vue-router'
   import { backgroundColors } from '@/models/no-data.js'
   import { useAuthStore } from '@/stores/auth.js'
   import { useUserStore } from '@/stores/user.js'
   import { useWhoToFollowStore } from '@/stores/who-to-follow.js'
   const authStore = useAuthStore()
   const whoToFollowStore = useWhoToFollowStore()
-
+  const router = useRouter()
   //
   const props = defineProps({
     data: {
@@ -61,43 +62,47 @@
       whoToFollowStore.followUser(userId)
     }
   }
+  function goToProfile (user) {
+    router.push('/user-info/' + user.id)
+  }
 </script>
 
 <template>
   <div class="card-notify" :class="{'need2Read': !data.isRead}">
-    <div class="d-flex">
-      <div class="d-flex align-start user-avatar-wrapper">
-        <div class="position-relative">
-          <v-img
-            v-if="cardData.user?.photoURL"
-            :alt="cardData.user?.displayName"
-            class="user-avatar"
-            cover
-            :src="cardData.user?.photoURL"
-          />
-          <span
-            v-else
-            class="avatar-initials"
-            :style="{ backgroundColor: getRandomColor() }"
-          >{{ getInitials(cardData.user?.displayName) }}</span>
-          <div class="bg-icon follow-icon">
-            <template v-if="isFollowing(data.followerId)">
-              <v-icon icon="mdi-plus-circle-outline" />
-            </template>
-            <template v-else>
-              <v-icon icon="mdi-minus-circle-outline" />
-            </template>
-          </div>
+    <div class="d-flex align-start user-avatar-wrapper">
+      <div class="position-relative">
+        <v-img
+          v-if="cardData.user?.photoURL"
+          :alt="cardData.user?.displayName"
+          class="user-avatar"
+          cover
+          :src="cardData.user?.photoURL"
+        />
+        <span
+          v-else
+          class="avatar-initials"
+          :style="{ backgroundColor: getRandomColor() }"
+        >{{ getInitials(cardData.user?.displayName) }}</span>
+        <div class="bg-icon follow-icon">
+          <template v-if="isFollowing(data.followerId)">
+            <v-icon icon="mdi-plus-circle-outline" />
+          </template>
+          <template v-else>
+            <v-icon icon="mdi-minus-circle-outline" />
+          </template>
         </div>
-        <div class="d-flex flex-column ml-3">
-          <div class="d-flex">
-            <span class="user-name">{{ cardData.user?.displayName }}</span>
+      </div>
+      <div class="d-flex flex-column ml-3 w-100">
+        <div class="d-flex align-center justify-space-between">
+          <div class="d-block">
+            <span class="user-name cursor-pointer" @click="goToProfile(cardData.user)">{{ cardData.user?.displayName }}</span>
             <span class="time"> • {{ timeAgo(cardData.createdAt) }}</span>
           </div>
-          <p class="text-description">Started following you</p>
-          <div class="d-flex justify-start mt-3">
-            <div class="submit-btn" @click="handleFollowClick">{{ isFollowing(props.data.followerId) ? 'Unfollow' : 'Follow back' }}</div>
-          </div>
+          <NotifyMenu :data="data" />
+        </div>
+        <p class="text-description">Started following you</p>
+        <div class="d-flex justify-start mt-3">
+          <div class="submit-btn" @click="handleFollowClick">{{ isFollowing(props.data.followerId) ? 'Unfollow' : 'Follow back' }}</div>
         </div>
       </div>
     </div>

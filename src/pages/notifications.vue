@@ -61,12 +61,16 @@
     }
     notificationStore.currentPage = 1
   }
+
+  function handleMarkAllAsRead () {
+    notificationStore.markAllAsRead()
+  }
 </script>
 <template>
   <div class="notifications-page">
     <div class="d-flex align-center justify-space-between">
       <h2 class="font-weight-bold text-grey-darken-3 ml-3 ml-sm-0">Notifications</h2>
-      <p class="cursor-pointer text-primary">Mark all as read</p>
+      <p class="cursor-pointer text-primary" @click="handleMarkAllAsRead">Mark all as read</p>
     </div>
     <section class="notifications-main mt-7">
       <div v-if="notificationStore.loading" class="loading d-flex justify-center">

@@ -9,6 +9,7 @@
 
 <script setup>
   import { computed, ref } from 'vue'
+  import { useRoute } from 'vue-router'
   import AccountSettings from '@/components/settings/AccountSettings.vue'
   import ContentSettings from '@/components/settings/ContentSettings.vue'
   import HelpSettings from '@/components/settings/HelpSettings.vue'
@@ -65,10 +66,16 @@
       component: HelpSettings,
     },
   ]
+  const route = useRoute()
 
   const currentComponent = computed(() => {
-    const tab = tabs.find(t => t.id === currentTabId.value)
-    return tab ? tab.component : AccountSettings
+    if (route.query.tab) {
+      const tab = tabs.find(t => t.id === route.query.tab)
+      return tab ? tab.component : AccountSettings
+    } else {
+      const tab = tabs.find(t => t.id === currentTabId.value)
+      return tab ? tab.component : AccountSettings
+    }
   })
 </script>
 
