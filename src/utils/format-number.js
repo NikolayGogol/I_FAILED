@@ -12,7 +12,7 @@ export function formatNumber (value, format = '0,0.00', currency = '$') {
 export function floatNumber (value, format = '0a.0') {
   value = Number(value)
   try {
-    return value > 1000 ? `${numeral(value).format(format)}` : value
+    return value >= 1000 ? `${numeral(value).format(format)}` : value
   } catch (error) {
     console.log(error)
     return value

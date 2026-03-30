@@ -1,11 +1,12 @@
 <script setup>
-  import { computed, onMounted } from 'vue'
+  import { computed, onMounted, watch } from 'vue'
   import { useRouter } from 'vue-router'
   import ProfileCard from '@/components/sidebars/ProfileCard.vue'
   import { feedNavItems } from '@/models/feed'
   import { getIcon } from '@/models/icons.js'
   import { useAuthStore } from '@/stores/auth.js'
   import { useMainStore } from '@/stores/main/main.js'
+  import { floatNumber } from '@/utils/format-number.js'
   import '@/styles/components/sidebars/sidebar.scss'
 
   const navItems = feedNavItems
@@ -13,13 +14,24 @@
   const mainStore = useMainStore()
   const authStore = useAuthStore()
   const currentUserName = computed(() => authStore.user?.displayName)
+  const currentUserUid = computed(() => authStore.user?.uid)
   // Use a computed property to reactively get the total posts count from the store
   const totalPosts = computed(() => mainStore.totalPosts)
   const lessonsShared = computed(() => mainStore.lessonsShared)
+  const notifications = computed(() => mainStore.notifications)
 
   // Fetch the total count when the component is mounted
   onMounted(() => {
     mainStore.fetchTotalPostCount()
+    if (currentUserUid.value) {
+      mainStore.listenForNotifications(currentUserUid.value)
+    }
+  })
+
+  watch(currentUserUid, newUid => {
+    if (newUid) {
+      mainStore.listenForNotifications(newUid)
+    }
   })
 </script>
 <template>
@@ -40,7 +52,12 @@
           class="nav-item py-2"
           :to="item.id === 'sidebars' ? '/' : '/' + item.id"
         >
-          <p class="mr-3" v-html="getIcon(item.icon)" />
+          <div
+            class="mr-3"
+            :class="{'fill': item.id === 'notifications'}"
+            v-html="getIcon(item.icon)"
+          />
+          <div v-if="item.id === 'notifications' && notifications > 0" class="badge">{{ floatNumber(notifications, '0a') }}</div>
           <span>{{ item.label }}</span>
         </router-link>
       </div>

@@ -15,5 +15,5 @@ module.exports = {
   APP_NAME,
   LOGO_URL,
   colors,
-  VERIFY_LINK: process.env.VERIFY_LINK
+  VERIFY_LINK: process.env.VERIFY_LINK,
 }

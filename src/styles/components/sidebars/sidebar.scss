@@ -28,39 +28,65 @@
         align-items: center;
         padding: $spacing-sm 0;
         transition: all .3s ease-in-out;
+        position: relative;
 
         &.router-link-active {
-          color: #6E240F;
+          color: $color-tag;
           font-weight: 600;
 
           svg {
             &.fill-current {
               * {
-                fill: #6E240F;
+                fill: $color-tag;
               }
             }
 
             * {
-              stroke: #6E240F;
+              stroke: $color-tag;
             }
           }
         }
 
         &:hover {
-          color: #6E240F;
+          color: $color-tag;
           font-weight: 600;
 
           svg {
             &.fill-current {
               * {
-                fill: #6E240F;
+                fill: $color-tag;
               }
             }
 
             * {
-              stroke: #6E240F;
+              stroke: $color-tag;
             }
           }
+        }
+
+        .fill {
+
+          svg {
+            * {
+              fill: $color-tag;
+            }
+          }
+        }
+
+        .badge {
+          background-color: #C8372B;
+          color: white;
+          border-radius: $radius-full;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 20px;
+          height: 20px;
+          font-size: 10px;
+          position: absolute;
+          top: 0;
+          left: 7px;
+          text-transform: uppercase;
         }
       }
     }

@@ -8,6 +8,7 @@ import {
   getDoc,
   getDocs,
   limit,
+  onSnapshot,
   orderBy,
   query,
   where,
@@ -24,7 +25,9 @@ import { useLatestStore } from '@/stores/feed/latest.js'
 const collection_db = import.meta.env.VITE_POST_COLLECTION
 const USER_COLLECTION = import.meta.env.VITE_USERS_COLLECTION
 const user_category_reads_collection = import.meta.env.VITE_USER_CATEGORY_READS_COLLECTION
+const NOTIFICATIONS_COLLECTION = import.meta.env.VITE_NOTIFICATION_COLLECTION
 
+let notificationListeners = []
 // =================================================================================================
 // Main Store
 // =================================================================================================
@@ -37,6 +40,7 @@ export const useMainStore = defineStore('main', {
     activeTab: 'latest',
     totalPosts: 0, // State to hold the total count
     lessonsShared: 0, // State to hold the total count
+    notifications: 0,
     currentFilters: null,
     allPosts: [], // To store all fetched posts before filtering
     savedFiltersBeforeForYou: null,
@@ -187,6 +191,49 @@ export const useMainStore = defineStore('main', {
     },
   },
   actions: {
+    listenForNotifications (uid) {
+      // Unsubscribe from any existing listeners
+      for (const unsub of notificationListeners) {
+        unsub()
+      }
+      notificationListeners = []
+
+      if (!uid) {
+        this.notifications = 0
+        return
+      }
+
+      if (!NOTIFICATIONS_COLLECTION) {
+        console.warn(
+          'VITE_NOTIFICATIONS_COLLECTION is not set in your environment variables. Skipping notification listener.',
+        )
+        return
+      }
+
+      const subcollections = ['likes', 'mentions', 'followers']
+      const counts = {
+        likes: 0,
+        mentions: 0,
+        followers: 0,
+      }
+
+      const updateTotal = () => {
+        this.notifications = counts.likes + counts.mentions + counts.followers
+      }
+
+      for (const subcollectionName of subcollections) {
+        try {
+          const collectionRef = collection(db, NOTIFICATIONS_COLLECTION, uid, subcollectionName)
+          const unsubscribe = onSnapshot(collectionRef, snapshot => {
+            counts[subcollectionName] = snapshot.size
+            updateTotal()
+          })
+          notificationListeners.push(unsubscribe)
+        } catch (error) {
+          console.error(`Failed to listen to ${subcollectionName} subcollection`, error)
+        }
+      }
+    },
     /**
      * Loads categories the user reads most (from `VITE_USER_CATEGORY_READS_COLLECTION`)
      * and returns normalized objects suitable for post filtering: { id, label, count }.
@@ -418,7 +465,12 @@ export const useMainStore = defineStore('main', {
 
           if (postData.uid && !postData.isAnonymous) {
             const cachedUser = this.userCache[postData.uid]
-            finalPost.user = cachedUser ? { ...finalPost.user, ...cachedUser, uid: postData.uid } : { ...finalPost.user, uid: postData.uid }
+            finalPost.user = cachedUser
+              ? { ...finalPost.user, ...cachedUser, uid: postData.uid }
+              : {
+                  ...finalPost.user,
+                  uid: postData.uid,
+                }
           }
 
           newPosts.push(finalPost)
