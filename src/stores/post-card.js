@@ -215,6 +215,7 @@ export const usePostCardStore = defineStore('postCard', {
       const likesCollectionRef = collection(db, VITE_NOTIFICATION_COLLECTION, postOwnerUid, 'likes')
       const q = query(likesCollectionRef,
         where('postId', '==', payload.postId),
+        where('commentId', '==', payload.id),
         where('uid', '==', likerUid))
       const querySnapshot = await getDocs(q)
       if (querySnapshot.empty) {
