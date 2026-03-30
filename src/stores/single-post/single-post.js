@@ -28,6 +28,45 @@ const VITE_USERS_COLLECTION = import.meta.env.VITE_USERS_COLLECTION
 const VITE_NOTIFICATION_COLLECTION = import.meta.env.VITE_NOTIFICATION_COLLECTION
 const VITE_STATISTIC_COLLECTION = import.meta.env.VITE_STATISTIC_COLLECTION
 
+// Helper function to check if Do Not Disturb is active
+export function isDoNotDisturbActive (dndSettings) {
+  if (!dndSettings || !dndSettings.from || !dndSettings.to) {
+    return false
+  }
+
+  const { from, to, timezone } = dndSettings
+
+  if (!timezone) {
+    // If no timezone, can't reliably determine DND, so assume not active
+    return false
+  }
+
+  try {
+    const now = new Date()
+    // Get current time in the target user's timezone
+    const userTime = new Date(now.toLocaleString('en-US', { timeZone: timezone }))
+
+    const startTime = new Date(userTime)
+    startTime.setHours(from.hours, from.minutes, 0, 0)
+
+    const endTime = new Date(userTime)
+    endTime.setHours(to.hours, to.minutes, 0, 0)
+
+    // Handle overnight DND period (e.g., 10 PM to 7 AM)
+    if (startTime > endTime) {
+      // If current time is after start OR before end, DND is active
+      return userTime >= startTime || userTime < endTime
+    }
+
+    // Handle same-day DND period (e.g., 9 AM to 5 PM)
+    return userTime >= startTime && userTime < endTime
+  } catch (error) {
+    console.error('Error checking Do Not Disturb status:', error)
+    // Fail safe: if timezone is invalid or something else goes wrong, don't block notifications
+    return false
+  }
+}
+
 function getDocId ({ userId, categoryId }) {
   // Firestore doc IDs cannot contain `/`, so we encode anything potentially unsafe.
   return `${userId}__${encodeURIComponent(String(categoryId))}`
@@ -298,6 +337,13 @@ export const useSinglePostStore = defineStore('singlePost', {
     async sendCommentEmail ({ post, authStore, comment }) {
       const userStore = useUserStore()
       const res = await userStore.getUserById(post.uid)
+
+      const dndSettings = res?.settings?.notify?.doNotDisturb
+      if (isDoNotDisturbActive(dndSettings)) {
+        console.log('Do Not Disturb is active for user. Email notification not sent.')
+        return
+      }
+
       const obj = res?.settings?.notify?.email
       const commentSwitch = findSwitch(obj?.switches, 1)
       if (obj && commentSwitch) {
@@ -313,6 +359,13 @@ export const useSinglePostStore = defineStore('singlePost', {
     async sendCommentPush (payload, id) {
       const userStore = useUserStore()
       const res = await userStore.getUserById(payload.uid)
+
+      const dndSettings = res?.settings?.notify?.doNotDisturb
+      if (isDoNotDisturbActive(dndSettings)) {
+        console.log('Do Not Disturb is active for user. Push notification not sent.')
+        return
+      }
+
       const authStore = useAuthStore()
 
       const obj = res?.settings?.notify?.push
@@ -411,6 +464,12 @@ export const useSinglePostStore = defineStore('singlePost', {
       console.log('Mention notification for this comment already exists.')
     },
     async sendMentionEmail (post, comment, mentionedUser, mentionerUser) {
+      const dndSettings = mentionedUser?.settings?.notify?.doNotDisturb
+      if (isDoNotDisturbActive(dndSettings)) {
+        console.log('Do Not Disturb is active for user. Mention email not sent.')
+        return
+      }
+
       const obj = mentionedUser?.settings?.notify?.email
       const mentionSwitch = findSwitch(obj?.switches, 2) // Assuming switch 2 is for mentions
 
@@ -431,6 +490,12 @@ export const useSinglePostStore = defineStore('singlePost', {
       }
     },
     async sendMentionPush (post, mentionedUser) {
+      const dndSettings = mentionedUser?.settings?.notify?.doNotDisturb
+      if (isDoNotDisturbActive(dndSettings)) {
+        console.log('Do Not Disturb is active for user. Mention push not sent.')
+        return
+      }
+
       const authStore = useAuthStore()
       const pushObj = mentionedUser?.settings?.notify?.push
       const pushSwitch = findSwitch(pushObj?.switches, 2)

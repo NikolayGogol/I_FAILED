@@ -20,6 +20,7 @@ import { defineStore } from 'pinia'
 import api from '@/axios.js'
 import { auth, db, storage, updateProfile } from '@/firebase.js'
 import { useAuthStore } from '@/stores/auth.js'
+import { isDoNotDisturbActive } from '@/stores/single-post/single-post.js'
 import { useUserStore } from '@/stores/user.js'
 import { findSwitch } from '@/utils/find-switch.js'
 const VITE_POST_COLLECTION = import.meta.env.VITE_POST_COLLECTION
@@ -482,6 +483,12 @@ export const useProfileStore = defineStore('profile', {
         return
       }
 
+      const dndSettings = targetUser?.settings?.notify?.doNotDisturb
+      if (isDoNotDisturbActive(dndSettings)) {
+        console.log('Do Not Disturb is active for user. Follower email not sent.')
+        return
+      }
+
       const notifySettings = targetUser.settings?.notify?.email
       const followerSwitch = findSwitch(notifySettings?.switches, 3) // 3 is for 'New followers'
 
@@ -503,6 +510,12 @@ export const useProfileStore = defineStore('profile', {
 
       if (!targetUser) {
         console.error('Target user not found for follower notification.')
+        return
+      }
+
+      const dndSettings = targetUser?.settings?.notify?.doNotDisturb
+      if (isDoNotDisturbActive(dndSettings)) {
+        console.log('Do Not Disturb is active for user. Follower push not sent.')
         return
       }
 

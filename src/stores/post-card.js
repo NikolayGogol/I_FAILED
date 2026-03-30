@@ -17,6 +17,7 @@ import { defineStore } from 'pinia'
 import api from '@/axios'
 import { auth, db } from '@/firebase'
 import { useAuthStore } from '@/stores/auth.js'
+import { isDoNotDisturbActive } from '@/stores/single-post/single-post.js'
 import { useUserStore } from '@/stores/user.js'
 import { findSwitch } from '@/utils/find-switch.js'
 
@@ -65,6 +66,12 @@ export const usePostCardStore = defineStore('postCard', {
     },
     async sendLikeNotification (payload) {
       const res = await userStore.getUserById(payload.uid)
+
+      const dndSettings = res?.settings?.notify?.doNotDisturb
+      if (isDoNotDisturbActive(dndSettings)) {
+        console.log('Do Not Disturb is active for user. Notification not sent.')
+        return
+      }
 
       const authStore = useAuthStore()
 
