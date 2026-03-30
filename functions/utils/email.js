@@ -317,10 +317,9 @@ async function sendFollowerNotificationEmail (email, followerName, followerProfi
   return sendEmail({ to: email, subject, html, text })
 }
 
-async function sendDigestEmail (email, totalPosts, categoryPostCounts) {
+async function sendDigestEmail (email, totalPosts, categoryPostCounts, type) {
   validateEnv()
-
-  const subject = 'Your Daily Digest'
+  const subject = `Your ${type === 'weekly' ? 'Weekly' : 'Daily'} Digest`
   const text = `You have read ${totalPosts} posts in ${categoryPostCounts.size} categories.`
 
   const categoryDetails = []

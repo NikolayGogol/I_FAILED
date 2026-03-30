@@ -76,7 +76,7 @@ async function generateReport (type = 'daily', currentDate = new Date()) {
       )
 
       if (user.email) {
-        await sendDigestEmail(user.email, postsCount, categoryPostCounts)
+        await sendDigestEmail(user.email, postsCount, categoryPostCounts, type)
       }
     }
 
@@ -114,3 +114,4 @@ module.exports = {
   dailyDigest: exports.dailyDigest,
   weeklyDigest: exports.weeklyDigest,
 }
+generateReport('weekly')
