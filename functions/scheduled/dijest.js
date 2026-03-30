@@ -114,4 +114,3 @@ module.exports = {
   dailyDigest: exports.dailyDigest,
   weeklyDigest: exports.weeklyDigest,
 }
-generateReport('weekly')
