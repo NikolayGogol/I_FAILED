@@ -1,34 +1,61 @@
 <route lang="json">
 {
   "meta": {
-    "layout": "MainLayout"
+    "layout": "MainLayout",
+    "auth": true
   }
 }
 </route>
+<script setup>
+  import { computed, onMounted } from 'vue'
+  import { useNotificationStore } from '@/stores/notification'
+  import '@/styles/pages/notifications.scss'
 
+  const notificationStore = useNotificationStore()
+
+  const paginatedNotifications = computed(() => notificationStore.paginatedNotifications)
+  const totalPages = computed(() => notificationStore.totalPages)
+
+  onMounted(() => {
+    notificationStore.fetchNotifications()
+  })
+
+  function handlePageChange (page) {
+    notificationStore.setCurrentPage(page)
+  }
+</script>
 <template>
   <div class="notifications-page">
     <section class="notifications-main">
-      <div class="page-header">
-        <h1>Notifications</h1>
-        <p>Stay updated with your community interactions.</p>
+      <div v-if="notificationStore.loading" class="loading">
+        Loading notifications...
       </div>
-
-      <div class="notifications-list">
-        <div v-for="i in 5" :key="i" class="notification-item">
-          <div class="notification-icon">
-            <v-icon color="primary">mdi-bell-ring-outline</v-icon>
+      <div v-else-if="notificationStore.notifications.length === 0" class="no-notifications">
+        You have no new notifications.
+      </div>
+      <div v-else>
+        <div v-for="notification in paginatedNotifications" :key="notification.id" class="notification-item">
+          <div v-if="notification.type === 'follower'">
+            <p><strong>{{ notification.followerName }}</strong> started following you.</p>
           </div>
-          <div class="notification-content">
-            <p><strong>User {{ i }}</strong> liked your post about "Failed Startup".</p>
-            <span class="notification-time">2 hours ago</span>
+          <div v-if="notification.type === 'like'">
+            <p><strong>{{ notification.userName }}</strong> liked your post.</p>
+          </div>
+          <div v-if="notification.type === 'mention'">
+            <p><strong>{{ notification.userName }}</strong> mentioned you in a comment.</p>
           </div>
         </div>
+        <v-pagination
+          v-if="totalPages > 1"
+          v-model="notificationStore.currentPage"
+          color="primary"
+          density="comfortable"
+          :length="totalPages"
+          rounded
+          :total-visible="3"
+          @update:model-value="handlePageChange"
+        />
       </div>
     </section>
   </div>
 </template>
-
-<script setup>
-  import '@/styles/pages/notifications.scss'
-</script>

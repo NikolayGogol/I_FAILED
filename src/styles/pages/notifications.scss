@@ -1,73 +1,20 @@
 @use '../settings.scss' as *;
 
 .notifications-page {
-  min-height: 100vh;
-  padding-top: $spacing-md;
+  .notifications-main {
+    padding: 20px;
+  }
 
-  .page-header {
-    margin-bottom: $spacing-lg;
-    text-align: center;
+  .notification-item {
+    border-bottom: 1px solid #eee;
+    padding: 15px 0;
 
-    h1 {
-      font-size: 24px;
-      font-weight: bold;
-      color: $color-text-primary;
-      margin-bottom: $spacing-sm;
+    &:last-child {
+      border-bottom: none;
     }
 
     p {
-      color: $color-text-secondary;
-      font-size: 16px;
-    }
-  }
-
-  .notifications-list {
-    display: flex;
-    flex-direction: column;
-    gap: $spacing-md;
-
-    .notification-item {
-      background-color: $color-surface;
-      border: 1px solid $color-border;
-      border-radius: $radius-lg;
-      padding: $spacing-md;
-      display: flex;
-      align-items: flex-start;
-      transition: background-color 0.2s;
-      cursor: pointer;
-
-      &:hover {
-        background-color: rgba($color-background, 0.5);
-      }
-
-      .notification-icon {
-        margin-right: $spacing-md;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 40px;
-        height: 40px;
-        background-color: $color-accent-bg;
-        border-radius: 50%;
-        color: $color-accent-text;
-        flex-shrink: 0;
-      }
-
-      .notification-content {
-        flex-grow: 1;
-
-        p {
-          color: $color-text-primary;
-          font-size: 14px;
-          margin-bottom: $spacing-xs;
-          line-height: 1.4;
-        }
-
-        .notification-time {
-          color: $color-text-secondary;
-          font-size: 12px;
-        }
-      }
+      margin: 0;
     }
   }
 }
