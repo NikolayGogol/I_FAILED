@@ -199,7 +199,7 @@ export const usePostCardStore = defineStore('postCard', {
         return 0
       }
     },
-    async saveLikeAction (payload) {
+    async saveLikeAction (payload, likeType = 'postCard') {
       if (!auth.currentUser) {
         console.error('No user logged in to save like action.')
         return
@@ -213,14 +213,17 @@ export const usePostCardStore = defineStore('postCard', {
       }
 
       const likesCollectionRef = collection(db, VITE_NOTIFICATION_COLLECTION, postOwnerUid, 'likes')
-      const q = query(likesCollectionRef, where('postId', '==', payload.id), where('uid', '==', likerUid))
+      const q = query(likesCollectionRef,
+        where('postId', '==', payload.postId),
+        where('uid', '==', likerUid))
       const querySnapshot = await getDocs(q)
-
       if (querySnapshot.empty) {
         const notificationPayload = {
-          postId: payload.id,
+          postId: payload.postId,
           uid: likerUid, // UID of the user who liked the post
           createdAt: serverTimestamp(),
+          commentId: payload.id,
+          likeType,
         }
         return await addDoc(likesCollectionRef, notificationPayload)
       }

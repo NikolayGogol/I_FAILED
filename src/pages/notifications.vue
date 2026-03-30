@@ -8,6 +8,7 @@
 </route>
 <script setup>
   import { computed, onMounted } from 'vue'
+  import LikeCard from '@/components/notifications/LikeCard.vue'
   import { useNotificationStore } from '@/stores/notification'
   import '@/styles/pages/notifications.scss'
 
@@ -39,7 +40,7 @@
             <p><strong>{{ notification.followerName }}</strong> started following you.</p>
           </div>
           <div v-if="notification.type === 'like'">
-            <p><strong>{{ notification.userName }}</strong> liked your post.</p>
+            <LikeCard :data="notification" />
           </div>
           <div v-if="notification.type === 'mention'">
             <p><strong>{{ notification.userName }}</strong> mentioned you in a comment.</p>

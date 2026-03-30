@@ -31,6 +31,7 @@ declare module 'vue' {
     GoogleLoginButton: typeof import('./src/components/GoogleLoginButton.vue')['default']
     HelpSettings: typeof import('./src/components/settings/HelpSettings.vue')['default']
     LatestTab: typeof import('./src/components/feed/tabs/LatestTab.vue')['default']
+    LikeCard: typeof import('./src/components/notifications/LikeCard.vue')['default']
     MentionPopover: typeof import('./src/components/MentionPopover.vue')['default']
     MentionTextarea: typeof import('./src/components/MentionTextarea.vue')['default']
     MobileSlide: typeof import('./src/components/MobileSlide.vue')['default']

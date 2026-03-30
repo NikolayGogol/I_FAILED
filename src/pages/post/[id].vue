@@ -375,6 +375,7 @@
     isSubmitting.value = true
     try {
       await addReply(post.value.id, commentId, authStore.user, text)
+
       replyText.value[commentId] = ''
       showReplyInput.value[commentId] = false
       await loadComments(post.value.id)
@@ -397,6 +398,11 @@
     const isLiked = comment.likes?.includes(authStore.user.uid)
     try {
       await toggleCommentLike(comment.id, authStore.user.uid, isLiked)
+      await postCardStore.saveLikeAction({
+        id: comment.id,
+        uid: post.value.uid,
+        postId: post.value.id,
+      }, 'commentLike')
       await loadComments(post.value.id)
     } catch (error) {
       console.error('Failed to toggle like:', error)
@@ -738,7 +744,7 @@
                     <span class="username font-weight-bold mr-2">{{ comment.user?.displayName }}</span>
                     <span class="date text-caption text-grey">{{ formatCommentDate(comment.createdAt) }}</span>
                   </div>
-                  <div class="text-caption text-grey">@{{ post.user?.displayName?.replaceAll(' ', '_') }}</div>
+                  <div class="text-caption text-grey">@{{ comment.user?.displayName?.replaceAll(' ', '_') }}</div>
                 </div>
 
                 <v-spacer />
