@@ -2,9 +2,13 @@
   import dayjs from 'dayjs'
   import { onMounted, reactive } from 'vue'
   import { backgroundColors } from '@/models/no-data.js'
-  import { useSinglePostStore } from '@/stores/single-post/single-post.js'
+  import { useAuthStore } from '@/stores/auth.js'
   import { useUserStore } from '@/stores/user.js'
+  import { useWhoToFollowStore } from '@/stores/who-to-follow.js'
+  const authStore = useAuthStore()
+  const whoToFollowStore = useWhoToFollowStore()
 
+  //
   const props = defineProps({
     data: {
       type: Object,
@@ -16,80 +20,23 @@
     createdAt: null,
     description: '',
   })
-  const singlePostStore = useSinglePostStore()
   const userStore = useUserStore()
-
+  //
   onMounted(() => {
-    switch (props.data.likeType) {
-      case 'postLike':
-      case 'likePost': {
-        getPostCard(props.data)
-        break
-      }
-      case 'likeComment':
-      case 'commentLike': {
-        getCommentCard(props.data)
-        break
-      }
-      case 'likeReply':
-      case 'replyLike': {
-        getCommentCard(props.data)
-        break
-      }
-    }
+    getFollowCard(props.data)
   })
-
-  function getPostCard (data) {
-    userStore.getUserById(data.uid).then(user => {
+  function getFollowCard (data) {
+    userStore.getUserById(data.followerId).then(user => {
       cardData.user = user
     })
     cardData.createdAt = data.createdAt
-    singlePostStore.getPostById(data.postId)
-      .then(res => {
-        cardData.description = res.whatHappened
-      })
   }
-
-  function getCommentCard (data) {
-    userStore.getUserById(data.uid).then(user => {
-      cardData.user = user
-    })
-    cardData.createdAt = data.createdAt
-    singlePostStore.getComments(data.postId)
-      .then(comments => {
-        const comment = comments.find(c => c.id === data.commentId)
-        if (comment) {
-          cardData.description = comment.text
-        }
-      })
-  }
-
   function timeAgo (time) {
     if (time?.seconds) {
       return dayjs.unix(time.seconds).fromNow()
     }
     return ''
   }
-
-  function transformText (text) {
-    switch (text) {
-      case 'postLike': {
-        return 'Liked your post'
-      }
-      case 'likeComment':
-      case 'commentLike': {
-        return 'Liked your comment'
-      }
-      case 'likeReply':
-      case 'replyLike': {
-        return 'Liked your reply'
-      }
-      default: {
-        return ''
-      }
-    }
-  }
-
   function getInitials (name) {
     if (!name) return ''
     const parts = name.split(' ')
@@ -101,6 +48,18 @@
   function getRandomColor () {
     const randomIndex = Math.floor(Math.random() * backgroundColors.length)
     return backgroundColors[randomIndex]
+  }
+  function isFollowing (userId) {
+    if (!authStore.user || !authStore.user.following) return false
+    return authStore.user.following.includes(userId)
+  }
+  function handleFollowClick () {
+    const userId = props.data.followerId
+    if (isFollowing(userId)) {
+      whoToFollowStore.unfollowUser(userId)
+    } else {
+      whoToFollowStore.followUser(userId)
+    }
   }
 </script>
 
@@ -121,12 +80,12 @@
             class="avatar-initials"
             :style="{ backgroundColor: getRandomColor() }"
           >{{ getInitials(cardData.user?.displayName) }}</span>
-          <div class="bg-icon like-icon">
-            <template v-if="data.likeType === 'replyLike' || data.likeType === 'likeReply'">
-              <v-icon icon="mdi-share-circle" />
+          <div class="bg-icon follow-icon">
+            <template v-if="isFollowing(data.followerId)">
+              <v-icon icon="mdi-plus-circle-outline" />
             </template>
             <template v-else>
-              <v-icon icon="mdi-heart-circle-outline" />
+              <v-icon icon="mdi-minus-circle-outline" />
             </template>
           </div>
         </div>
@@ -135,10 +94,16 @@
             <span class="user-name">{{ cardData.user?.displayName }}</span>
             <span class="time"> • {{ timeAgo(cardData.createdAt) }}</span>
           </div>
-          <p class="text-description">{{ transformText(data.likeType) }}</p>
-          <p class="text-main" v-html="cardData.description" />
+          <p class="text-description">Started following you</p>
+          <div class="d-flex justify-start mt-3">
+            <div class="submit-btn" @click="handleFollowClick">{{ isFollowing(props.data.followerId) ? 'Unfollow' : 'Follow back' }}</div>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </template>
+
+<style scoped lang="scss">
+
+</style>

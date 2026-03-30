@@ -1,0 +1,94 @@
+<script setup>
+  import dayjs from 'dayjs'
+  import { onMounted, reactive } from 'vue'
+  import { backgroundColors } from '@/models/no-data.js'
+  import { useUserStore } from '@/stores/user.js'
+  //
+  const userStore = useUserStore()
+  //
+  const props = defineProps({
+    data: {
+      type: Object,
+      required: true,
+    },
+  })
+  const cardData = reactive({
+    user: null,
+    createdAt: null,
+    description: '',
+  })
+  onMounted(() => {
+    getMentionCard(props.data)
+  })
+  //
+  function timeAgo (time) {
+    if (time?.seconds) {
+      return dayjs.unix(time.seconds).fromNow()
+    }
+    return ''
+  }
+  function getInitials (name) {
+    if (!name) return ''
+    const parts = name.split(' ')
+    if (parts.length === 1) {
+      return parts[0].charAt(0).toUpperCase()
+    }
+    return (parts[0].charAt(0) + (parts[1]?.charAt(0) || '')).toUpperCase()
+  }
+  function getRandomColor () {
+    const randomIndex = Math.floor(Math.random() * backgroundColors.length)
+    return backgroundColors[randomIndex]
+  }
+  function parseUserTags (text) {
+    const regex = /@\[([^\]]+)\]\(([^)]+)\)/g
+
+    return text.replace(regex, (match, name, id) => {
+      return `<a href="/user-info/${id}" class="text-primary font-weight-semibold">@ ${name}</a>`
+    })
+  }
+  function getMentionCard (data) {
+    userStore.getUserById(data.mentionerUid).then(user => {
+      cardData.user = user
+    })
+    cardData.createdAt = data.createdAt
+    cardData.description = parseUserTags(data.commentText)
+  }
+</script>
+
+<template>
+  <div class="card-notify" :class="{'need2Read': !data.isRead}">
+    <div class="d-flex">
+      <div class="d-flex align-start user-avatar-wrapper">
+        <div class="position-relative">
+          <v-img
+            v-if="cardData.user?.photoURL"
+            :alt="cardData.user?.displayName"
+            class="user-avatar"
+            cover
+            :src="cardData.user?.photoURL"
+          />
+          <span
+            v-else
+            class="avatar-initials"
+            :style="{ backgroundColor: getRandomColor() }"
+          >{{ getInitials(cardData.user?.displayName) }}</span>
+          <div class="bg-icon mention-icon">
+            <v-icon icon="mdi-at" />
+          </div>
+        </div>
+        <div class="d-flex flex-column ml-3">
+          <div class="d-flex">
+            <span class="user-name">{{ cardData.user?.displayName }}</span>
+            <span class="time"> • {{ timeAgo(cardData.createdAt) }}</span>
+          </div>
+          <p class="text-description">Mentioned you</p>
+          <div class="text-main" v-html="cardData.description" />
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<style scoped lang="scss">
+
+</style>

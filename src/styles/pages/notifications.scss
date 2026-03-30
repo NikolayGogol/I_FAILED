@@ -33,6 +33,17 @@
       border-bottom: 1px solid $color-border;
     }
   }
+  .avatar-initials {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: $radius-full;
+    color: $color-text-primary;
+    font-size: 16px;
+    font-weight: 600;
+  }
 
   .card-notify {
 
@@ -83,6 +94,16 @@
     .like-icon {
       i {
         background-color: #C8372B;
+      }
+    }
+    .follow-icon {
+      i {
+        background-color: #31953A;
+      }
+    }
+    .mention-icon {
+      i {
+        background-color: #7A4CC9;
       }
     }
   }
