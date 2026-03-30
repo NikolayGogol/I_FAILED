@@ -24,8 +24,6 @@ app.use(corsMiddleware)
 app.options('*', corsMiddleware)
 
 app.use(express.json())
-// --- END DEBUGGING STEP ---
-
 // Mount the routers
 app.use(authRoutes)
 app.use(postsRoutes)
