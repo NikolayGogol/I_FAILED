@@ -60,5 +60,20 @@ export const useNotificationStore = defineStore('notification', {
     setCurrentPage (page) {
       this.currentPage = page
     },
+    async getDataByTab (tab) {
+      this.loading = true
+      const authStore = useAuthStore()
+      if (!authStore.user?.uid) {
+        this.loading = false
+        return
+      }
+      const uid = authStore.user.uid
+
+      const subcollectionRef = collection(db, NOTIFICATIONS_COLLECTION, uid, tab.path)
+      const q = query(subcollectionRef, orderBy('createdAt', 'desc'))
+      const snapshot = await getDocs(q)
+      this.notifications = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data(), type: tab.path.slice(0, -1) }))
+      this.loading = false
+    },
   },
 })

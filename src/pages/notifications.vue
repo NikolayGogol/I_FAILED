@@ -9,7 +9,7 @@
 <script setup>
   import dayjs from 'dayjs'
   import relativeTime from 'dayjs/plugin/relativeTime'
-  import { computed, onMounted } from 'vue'
+  import { computed, onMounted, ref } from 'vue'
   import FollowCard from '@/components/notifications/FollowCard.vue'
   import LikeCard from '@/components/notifications/LikeCard.vue'
   import MentionCard from '@/components/notifications/MentionCard.vue'
@@ -21,13 +21,45 @@
   const paginatedNotifications = computed(() => notificationStore.paginatedNotifications)
   const totalPages = computed(() => notificationStore.totalPages)
   dayjs.extend(relativeTime)
-
+  const tabs = [
+    {
+      label: 'All',
+      value: 0,
+      path: null,
+    },
+    {
+      label: 'Mentions',
+      value: 2,
+      path: 'mentions',
+    },
+    {
+      label: 'Likes',
+      value: 1,
+      path: 'likes',
+    },
+    {
+      label: 'Follows',
+      value: 3,
+      path: 'followers',
+    },
+  ]
+  const selectedTab = ref(tabs[0])
+  //
   onMounted(() => {
     notificationStore.fetchNotifications()
   })
 
   function handlePageChange (page) {
     notificationStore.setCurrentPage(page)
+  }
+  function tabSelect (tab) {
+    selectedTab.value = tab
+    if (tab.path) {
+      notificationStore.getDataByTab(tab)
+    } else {
+      notificationStore.fetchNotifications()
+    }
+    notificationStore.currentPage = 1
   }
 </script>
 <template>
@@ -38,12 +70,21 @@
     </div>
     <section class="notifications-main mt-7">
       <div v-if="notificationStore.loading" class="loading d-flex justify-center">
-        <v-progress-circular color="primary" indeterminate />
+        <v-progress-linear color="primary" indeterminate />
       </div>
       <div v-else-if="notificationStore.notifications.length === 0" class="no-notifications">
         You have no new notifications.
       </div>
       <div v-else>
+        <ul class="tab-list">
+          <li
+            v-for="tab in tabs"
+            :key="tab.value"
+            :class="{ active: selectedTab.value === tab.value }"
+            @click="tabSelect(tab)"
+          >{{ tab.label }}</li>
+        </ul>
+
         <div
           v-for="notification in paginatedNotifications"
           :key="notification.id"

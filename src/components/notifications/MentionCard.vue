@@ -51,7 +51,6 @@
       cardData.user = user
     })
     cardData.createdAt = data.createdAt
-    console.log(data)
     cardData.description = parseUserTags(data.commentText, data.commentId, data.postId)
   }
 </script>
