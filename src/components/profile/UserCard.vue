@@ -184,7 +184,7 @@
         }}</p>
         <!-- User meta data -->
         <div class="user-meta d-flex align-center">
-          <v-icon class="mr-1" icon="mdi-calendar-blank-outline" />
+          <div class="d-flex mr-1" v-html="getIcon('calendar', 20, 20)" />
           <span class="join-date">Joined {{ joinDate }}</span>
         </div>
 
@@ -232,7 +232,7 @@
         displayUser?.bio || 'Entrepreneur learning from startup failures. Sharing my journey to help others.'
       }}</p>
       <div class="user-meta d-flex align-center my-3">
-        <v-icon class="mr-1" icon="mdi-calendar-blank-outline" />
+        <div class="d-flex mr-1" v-html="getIcon('calendar', 20, 20)" />
         <span class="join-date">Joined {{ joinDate }}</span>
       </div>
       <div class="user-stats">

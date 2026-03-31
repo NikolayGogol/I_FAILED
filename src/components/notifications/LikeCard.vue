@@ -1,7 +1,6 @@
 <script setup>
   import dayjs from 'dayjs'
   import { onMounted, reactive } from 'vue'
-  import { useRouter } from 'vue-router'
   import NotifyMenu from '@/components/notifications/NotifyMenu.vue'
   import ProfileInfo from '@/components/notifications/ProfileInfo.vue'
   import { backgroundColors } from '@/models/no-data.js'
@@ -14,7 +13,6 @@
       required: true,
     },
   })
-  const router = useRouter()
   const cardData = reactive({
     user: null,
     createdAt: null,
@@ -139,9 +137,6 @@
     const randomIndex = Math.floor(Math.random() * backgroundColors.length)
     return backgroundColors[randomIndex]
   }
-  function goToProfile (user) {
-    router.push('/user-info/' + user.id)
-  }
 </script>
 
 <template>
@@ -174,7 +169,7 @@
       <div class="d-flex flex-column ml-3 w-100">
         <div class="d-flex align-center justify-space-between">
           <div class="d-flex">
-            <span class="user-name cursor-pointer" @click="goToProfile(cardData.user)">{{ cardData.user?.displayName }}</span>
+            <span class="user-name cursor-pointer">{{ cardData.user?.displayName }}</span>
             <span class="time"> • {{ timeAgo(cardData.createdAt) }}</span>
           </div>
           <NotifyMenu :data="data" />

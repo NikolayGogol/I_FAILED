@@ -1,5 +1,7 @@
 <script setup>
   import dayjs from 'dayjs'
+  import { useRouter } from 'vue-router'
+  import { getIcon } from '@/models/icons.js'
   import { backgroundColors } from '@/models/no-data.js'
   import { useAuthStore } from '@/stores/auth.js'
   import { useWhoToFollowStore } from '@/stores/who-to-follow.js'
@@ -16,6 +18,7 @@
   })
   const authStore = useAuthStore()
   const whoToFollowStore = useWhoToFollowStore()
+  const router = useRouter()
   //
   function getInitials (name) {
     if (!name) return ''
@@ -41,14 +44,16 @@
       whoToFollowStore.followUser(userId)
     }
   }
-
+  function goToProfile (user) {
+    router.push('/user-info/' + user.id)
+  }
 </script>
 
 <template>
   <div class="drop-modal">
     <div class="d-flex flex-column">
       <div class="d-flex">
-        <div class="d-block mr-3">
+        <div class="d-block mr-3" @click="goToProfile(data.user)">
           <v-img
             v-if="data.user?.photoURL"
             :alt="data.user?.displayName"
@@ -63,7 +68,7 @@
           >{{ getInitials(data.user?.displayName) }}</span>
         </div>
         <div class="d-block">
-          <span class="user-name cursor-pointer">{{ data.user?.displayName }}</span>
+          <span class="user-name cursor-pointer" @click="goToProfile(data.user)">{{ data.user?.displayName }}</span>
           <p class="text-description">@{{ data.user?.displayName?.replaceAll(' ', '_') }}</p>
         </div>
         <div class="d-block ml-6">
@@ -73,7 +78,7 @@
 
       <p class="bio">{{ data?.user?.bio || 'Entrepreneur learning from startup failures. Sharing my journey to help others.' }}</p>
       <div class="d-flex align-center">
-        <v-icon class="mr-1" icon="mdi-calendar-blank-outline" />
+        <div class="d-flex mr-1 fill-grey" v-html="getIcon('calendar', 20, 20)" />
         <p class="join-date">Joined {{ dayjs.unix(data?.user?.createdAt?.seconds).format('MMMM YYYY') }}</p>
       </div>
       <div class="d-flex mt-3">

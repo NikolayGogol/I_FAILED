@@ -139,6 +139,13 @@
       color: $color-text-quaternary;
       font-size: 12px;
     }
+    .fill-grey{
+      svg {
+        * {
+          stroke: $color-text-quaternary;
+        }
+      }
+    }
   }
 
   .popup-hover {

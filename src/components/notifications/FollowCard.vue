@@ -1,7 +1,6 @@
 <script setup>
   import dayjs from 'dayjs'
   import { onMounted, reactive } from 'vue'
-  import { useRouter } from 'vue-router'
   import ProfileInfo from '@/components/notifications/ProfileInfo.vue'
   import { backgroundColors } from '@/models/no-data.js'
   import { useAuthStore } from '@/stores/auth.js'
@@ -9,7 +8,6 @@
   import { useWhoToFollowStore } from '@/stores/who-to-follow.js'
   const authStore = useAuthStore()
   const whoToFollowStore = useWhoToFollowStore()
-  const router = useRouter()
   //
   const props = defineProps({
     data: {
@@ -97,9 +95,6 @@
       whoToFollowStore.followUser(userId)
     }
   }
-  function goToProfile (user) {
-    router.push('/user-info/' + user.id)
-  }
 </script>
 
 <template>
@@ -131,7 +126,7 @@
       <div class="d-flex flex-column ml-3 w-100">
         <div class="d-flex align-center justify-space-between">
           <div class="d-flex">
-            <span class="user-name cursor-pointer" @click="goToProfile(cardData.user)">{{ cardData.user?.displayName }}</span>
+            <span class="user-name cursor-pointer">{{ cardData.user?.displayName }}</span>
             <span class="time"> • {{ timeAgo(cardData.createdAt) }}</span>
           </div>
           <NotifyMenu :data="data" />
