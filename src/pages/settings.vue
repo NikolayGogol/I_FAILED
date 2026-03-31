@@ -83,7 +83,7 @@
 
 <template>
   <div class="settings-page px-4">
-    <div v-if="currentTabId" class="mobile-bar">
+    <div v-if="currentTabId" class="mobile-bar d-sm-none">
       <div class="d-flex align-center">
         <v-icon icon="mdi-arrow-left" @click="currentTabId = ''" />
         <span class="text-capitalize ml-3">{{ currentTabId }}</span>
