@@ -25,7 +25,7 @@ exports.sendVerificationEmail = async (req, res) => {
       // This URL should point to a page on your frontend that can handle the email verification.
       // Firebase will append `?mode=verifyEmail&oobCode=...` to this URL.
       // It's crucial that your frontend route (e.g., /verify-email) is configured to handle this.
-      url: `${process.env.VERIFY_LINK}/verify-email`, // Assuming you have a /verify-email route on your frontend
+      url: `${process.env.VERIFY_LINK}/verify-email-change`, // Assuming you have a /verify-email route on your frontend
       handleCodeInApp: true,
     }
 

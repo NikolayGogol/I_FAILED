@@ -3,9 +3,10 @@ import { EmailAuthProvider, reauthenticateWithCredential } from 'firebase/auth'
 // Imports
 // =================================================================================================
 import { doc, updateDoc } from 'firebase/firestore'
+import { getDownloadURL, ref as storageRef, uploadBytes } from 'firebase/storage' // Import storage functions
 import { defineStore } from 'pinia'
 import api from '@/axios.js' // Import axios for backend calls
-import { auth, db } from '@/firebase.js'
+import { auth, db, storage, updateProfile } from '@/firebase.js' // Import storage and updateProfile
 import { useAuthStore } from '@/stores/auth.js'
 
 const VITE_USERS_COLLECTION = import.meta.env.VITE_USERS_COLLECTION
@@ -51,9 +52,10 @@ export const useSettingsStore = defineStore('settings', {
      * @param {string} accountData.bio - The new bio.
      * @param {string} accountData.userName - The new username.
      * @param {string} accountData.email - The new email.
+     * @param {File} [accountData.photoFile] - Optional new profile photo file.
      * @returns {Promise<boolean>} A promise that resolves with true if the update was successful.
      */
-    async updateAccountSettings ({ displayName, bio, userName, email }) {
+    async updateAccountSettings ({ displayName, bio, userName, email, photoFile }) {
       this.loading = true
       this.error = null
       const authStore = useAuthStore()
@@ -64,6 +66,21 @@ export const useSettingsStore = defineStore('settings', {
           throw new Error('No user logged in')
         }
 
+        let newPhotoURL = user.photoURL // Start with current photo URL
+
+        // If a new photo file is provided, upload it to Firebase Storage
+        if (photoFile) {
+          const fileRef = storageRef(storage, `profile_photos/${user.uid}/${photoFile.name}`);
+          const snapshot = await uploadBytes(fileRef, photoFile);
+          newPhotoURL = await getDownloadURL(snapshot.ref);
+        }
+
+        // Update Firebase Authentication profile (for displayName and photoURL)
+        await updateProfile(user, {
+          displayName: displayName,
+          photoURL: newPhotoURL,
+        });
+
         const userDocRef = doc(db, VITE_USERS_COLLECTION, user.uid)
 
         const dataToUpdate = {
@@ -71,6 +88,7 @@ export const useSettingsStore = defineStore('settings', {
           bio,
           userName,
           email, // Always update email in Firestore immediately
+          photoURL: newPhotoURL, // Include newPhotoURL in Firestore update
         }
 
         const emailChanged = email !== user.email

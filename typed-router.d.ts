@@ -42,6 +42,7 @@ declare module 'vue-router/auto-routes' {
     '/set-password': RouteRecordInfo<'/set-password', '/set-password', Record<never, never>, Record<never, never>>,
     '/settings': RouteRecordInfo<'/settings', '/settings', Record<never, never>, Record<never, never>>,
     '/user-info/[id]': RouteRecordInfo<'/user-info/[id]', '/user-info/:id', { id: ParamValue<true> }, { id: ParamValue<false> }>,
+    '/verify-email-change': RouteRecordInfo<'/verify-email-change', '/verify-email-change', Record<never, never>, Record<never, never>>,
     '/verify-new-user': RouteRecordInfo<'/verify-new-user', '/verify-new-user', Record<never, never>, Record<never, never>>,
   }
 
@@ -150,6 +151,10 @@ declare module 'vue-router/auto-routes' {
     }
     'src/pages/user-info/[id].vue': {
       routes: '/user-info/[id]'
+      views: never
+    }
+    'src/pages/verify-email-change.vue': {
+      routes: '/verify-email-change'
       views: never
     }
     'src/pages/verify-new-user.vue': {

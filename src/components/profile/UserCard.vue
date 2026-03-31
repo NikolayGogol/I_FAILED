@@ -10,6 +10,7 @@
   import { getIcon } from '@/models/icons.js'
   import { useAuthStore } from '@/stores/auth.js'
   import { useProfileStore } from '@/stores/profile/profile.js'
+  import { useSettingsStore } from '@/stores/settings.js' // Import the settings store
   import { floatNumber } from '@/utils/format-number.js'
   import { transformUsername } from '../../utils/transform-username.js'
   import '@/styles/components/profile/user-card.scss'
@@ -33,6 +34,7 @@
   // =================================================================================================
   const authStore = useAuthStore()
   const profileStore = useProfileStore()
+  const settingsStore = useSettingsStore() // Initialize the settings store
   const toast = useToast()
 
   // =================================================================================================
@@ -138,10 +140,13 @@
   async function handleUpdateProfile () {
     isUpdating.value = true
     try {
-      await profileStore.updateUserProfile({
+      // Use the centralized settingsStore to update the profile
+      await settingsStore.updateAccountSettings({
         displayName: newDisplayName.value,
-        photoFile: newPhotoFile.value,
         bio: newBio.value,
+        userName: authUser.value?.userName || '',
+        email: authUser.value?.email || '',
+        photoFile: newPhotoFile.value, // Pass the new photo file
       })
       toast.success('Profile updated successfully!')
       editDialog.value = false
