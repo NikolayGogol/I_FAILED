@@ -3,12 +3,49 @@
 @use '../global/mixins' as *;
 
 .settings-page {
+  @include media-down($breakpoint-sm) {
+    height: calc(100vh - 57px);
+  }
+
+  .title {
+    @include media-down($breakpoint-sm) {
+      font-size: 24px;
+      padding-top: 20px;
+    }
+  }
+
+  .mobile-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: $color-surface;
+    z-index: 99999;
+    height: 58px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 15px;
+    border-bottom: 1px solid $color-border;
+
+    span {
+      color: $color-text-primary;
+      font-weight: 600;
+      font-size: 16px;
+    }
+  }
+
   .settings-wrapper {
     background-color: $color-surface;
     padding: $spacing-lg;
     border-radius: $radius-xl;
     border: 1px solid $color-border;
     margin-top: 24px;
+    @include media-down($breakpoint-sm) {
+      margin-top: 10px;
+      padding: $spacing-md;
+      height: calc(100% - 90px);
+    }
 
     .settings-sidebar {
       .settings-menu {

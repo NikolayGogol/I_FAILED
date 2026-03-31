@@ -10,6 +10,7 @@
 <script setup>
   import { computed, ref } from 'vue'
   import { useRoute } from 'vue-router'
+  import { useDisplay } from 'vuetify/framework'
   import AccountSettings from '@/components/settings/AccountSettings.vue'
   import ContentSettings from '@/components/settings/ContentSettings.vue'
   import HelpSettings from '@/components/settings/HelpSettings.vue'
@@ -20,7 +21,8 @@
   import { getIcon } from '@/models/icons.js'
   import '@/styles/pages/settings.scss'
 
-  const currentTabId = ref('account')
+  const currentTabId = ref(window.innerWidth > 768 ? 'account' : '')
+  const { smAndDown } = useDisplay()
 
   const tabs = [
     {
@@ -80,30 +82,59 @@
 </script>
 
 <template>
-  <div class="settings-page">
+  <div class="settings-page px-4">
+    <div v-if="currentTabId" class="mobile-bar">
+      <div class="d-flex align-center">
+        <v-icon icon="mdi-arrow-left" @click="currentTabId = ''" />
+        <span class="text-capitalize ml-3">{{ currentTabId }}</span>
+      </div>
+    </div>
     <div class="settings-title">
-      <v-icon class="cursor-pointer" icon="mdi-arrow-left" @click="$router.go(-1)" />
-      <h1 class="font-weight-bold text-grey-darken-3 ml-3 ml-sm-0">Settings</h1>
+      <v-icon
+        class="cursor-pointer d-none d-sm-block"
+        icon="mdi-arrow-left"
+        @click="$router.go(-1)"
+      />
+      <h1 class="font-weight-bold text-grey-darken-3 ml-3 ml-sm-0 title">Settings</h1>
     </div>
     <div class="settings-wrapper">
       <v-row>
-        <v-col sm="4">
-          <aside class="settings-sidebar">
-            <ul class="settings-menu">
-              <li
-                v-for="tab in tabs"
-                :key="tab.id"
-                class="menu-item d-flex align-center"
-                :class="{ active: currentTabId === tab.id }"
-                @click="currentTabId = tab.id"
-              >
-                <div class="icon d-flex mr-2" v-html="tab.icon" />
-                {{ tab.label }}
-              </li>
-            </ul>
-          </aside>
+        <v-col cols="12" sm="4">
+          <template v-if="smAndDown">
+            <aside v-if="!currentTabId" class="settings-sidebar">
+              <ul class="settings-menu">
+                <li
+                  v-for="tab in tabs"
+                  :key="tab.id"
+                  class="menu-item d-flex align-center"
+                  :class="{ active: currentTabId === tab.id }"
+                  @click="currentTabId = tab.id"
+                >
+                  <div class="icon d-flex mr-2" v-html="tab.icon" />
+                  {{ tab.label }}
+                </li>
+              </ul>
+            </aside>
+            <component :is="currentComponent" v-else />
+          </template>
+          <template v-else>
+            <aside class="settings-sidebar">
+              <ul class="settings-menu">
+                <li
+                  v-for="tab in tabs"
+                  :key="tab.id"
+                  class="menu-item d-flex align-center"
+                  :class="{ active: currentTabId === tab.id }"
+                  @click="currentTabId = tab.id"
+                >
+                  <div class="icon d-flex mr-2" v-html="tab.icon" />
+                  {{ tab.label }}
+                </li>
+              </ul>
+            </aside>
+          </template>
         </v-col>
-        <v-col class="border-left" sm="8">
+        <v-col v-if="!smAndDown" class="border-left" cols="12" sm="8">
           <main class="settings-content">
             <component :is="currentComponent" />
           </main>
