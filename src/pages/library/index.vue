@@ -297,7 +297,8 @@
         <template #activator="{ props }">
           <div class="d-flex align-center cursor-pointer" v-bind="props">
             <div
-              class="sm:bg-secondary d-flex align-center justify-center pa-2 rounded-circle"
+              class="d-flex align-center justify-center pa-2 rounded-circle"
+              :class="{'bg-secondary': !smAndDown}"
               v-html="getIcon('filter', 20, 20)"
             />
           </div>
