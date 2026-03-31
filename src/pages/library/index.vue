@@ -322,7 +322,7 @@
       <ul v-if="collectionList.length > 0" class="collection-list">
         <li v-for="(item, index) in collectionList" :key="item.id" class="collection-item">
           <div class="d-flex align-center justify-space-between">
-            <p class="name" @click="openCollection(item)">{{ item.name }}</p>
+            <p class="name cursor-pointer" @click="openCollection(item)">{{ item.name }}</p>
             <v-menu v-if="!smAndDown" location="bottom end" open-on-hover>
               <template #activator="{ props }">
                 <v-btn
