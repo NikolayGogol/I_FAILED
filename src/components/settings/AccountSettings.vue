@@ -102,9 +102,16 @@
       <div class="form-group mt-3">
         <form-textarea v-model="bio" hide-details label="Bio" />
       </div>
-      <!--      <div class="form-group mt-3">-->
-      <!--        <form-input v-model="email" hide-details label="Email" type="email" />-->
-      <!--      </div>-->
+      <div class="form-group mt-3">
+        <form-input
+          v-model="email"
+          :disabled="user.providerId === 'google.com' || user.providerId === 'facebook.com'"
+          hide-details
+          label="Email"
+          :readonly="user.providerId === 'google.com' || user.providerId === 'facebook.com'"
+          type="email"
+        />
+      </div>
       <p class="mt-6">Account creation</p>
       <p class="text-description" style="font-size: 12px">{{ dayjs.unix(user?.createdAt?.seconds).format('DD MMM YYYY') }}</p>
       <div class="d-flex justify-center mt-6">
