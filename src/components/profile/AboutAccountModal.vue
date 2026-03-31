@@ -43,7 +43,7 @@
 </script>
 
 <template>
-  <v-dialog v-model="dialog" class="about-account-dialog d-none d-sm-block" max-width="600px">
+  <v-dialog v-model="dialog" class="about-account-dialog d-none d-sm-flex" max-width="600px">
     <v-card>
       <v-card-title>
         About account
@@ -73,7 +73,7 @@
       <div class="cancel-btn" @click="dialog = false">Close</div>
     </v-card>
   </v-dialog>
-  <MobileSlide v-model="dialog" class="about-account-dialog">
+  <MobileSlide v-model="dialog" class="about-account-dialog d-sm-none">
     <v-card class="elevation-0">
       <v-card-title>
         About account

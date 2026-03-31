@@ -11,6 +11,7 @@
   import { useAuthStore } from '@/stores/auth.js'
   import { useProfileStore } from '@/stores/profile/profile.js'
   import { floatNumber } from '@/utils/format-number.js'
+  import { transformUsername } from '../../utils/transform-username.js'
   import '@/styles/components/profile/user-card.scss'
 
   // =================================================================================================
@@ -177,7 +178,7 @@
           <slot name="profile-actions" />
         </div>
         <!-- User handle -->
-        <p class="user-email">@{{ displayName.replaceAll(' ', '_') }}</p>
+        <p class="user-email">{{ transformUsername(displayUser?.userName, displayName) }}</p>
         <!-- User bio -->
         <p class="user-bio">{{
           displayUser?.bio || 'Entrepreneur learning from startup failures. Sharing my journey to help others.'
@@ -268,7 +269,7 @@
     </div>
 
     <!-- Edit Profile Dialog -->
-    <v-dialog v-model="editDialog" class="d-none d-sm-block" max-width="500px">
+    <v-dialog v-model="editDialog" class="d-none d-sm-flex" max-width="500px">
       <v-card class="edit-profile-dialog">
         <div class="d-flex justify-end">
           <v-icon class="cursor-pointer" icon="mdi-close" @click="editDialog = false" />

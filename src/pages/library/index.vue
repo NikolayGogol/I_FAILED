@@ -268,8 +268,10 @@
           >
             <v-progress-circular
               v-if="isSaving"
-              color="primary"
+              color="white"
               indeterminate
+              size="20"
+              width="2"
             />
             <span v-else>Save</span>
           </div>

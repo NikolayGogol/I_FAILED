@@ -15,6 +15,7 @@
   import { useAuthStore } from '@/stores/auth.js'
   import { usePostCardStore } from '@/stores/post-card.js'
   import { floatNumber, formatNumber } from '@/utils/format-number.js'
+  import { transformUsername } from '@/utils/transform-username.js'
   import '@/styles/components/feed/post-card.scss'
 
   dayjs.extend(relativeTime)
@@ -217,7 +218,9 @@
           <div class="post-author-name">{{ post.user.displayName }}</div>
           <p class="ml-2"> • {{ timeAgo(post.createdAt) }}</p>
         </div>
-        <div class="post-author-handle">@{{ post.user.displayName.replaceAll(' ', '_') }}</div>
+        <div class="post-author-handle">
+          {{ transformUsername(post.user.userName, post.user.displayName) }}
+        </div>
       </div>
       <v-spacer />
       <slot name="recovered-content" />

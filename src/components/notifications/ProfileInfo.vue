@@ -5,6 +5,7 @@
   import { backgroundColors } from '@/models/no-data.js'
   import { useAuthStore } from '@/stores/auth.js'
   import { useWhoToFollowStore } from '@/stores/who-to-follow.js'
+  import { transformUsername } from '../../utils/transform-username.js'
   //
   const props = defineProps({
     data: {
@@ -69,7 +70,7 @@
         </div>
         <div class="d-block">
           <span class="user-name cursor-pointer" @click="goToProfile(data.user)">{{ data.user?.displayName }}</span>
-          <p class="text-description">@{{ data.user?.displayName?.replaceAll(' ', '_') }}</p>
+          <p class="text-description">{{ transformUsername(data.user?.userName, data.user?.displayName) }}</p>
         </div>
         <div class="d-block ml-6">
           <div class="submit-btn text-no-wrap" @click="handleFollowClick">{{ isFollowing(followerId) ? 'Unfollow' : 'Follow back' }}</div>

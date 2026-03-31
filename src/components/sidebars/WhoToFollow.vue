@@ -8,6 +8,7 @@
   import { backgroundColors } from '@/models/no-data.js'
   import { useAuthStore } from '@/stores/auth'
   import { useWhoToFollowStore } from '@/stores/who-to-follow'
+  import { transformUsername } from '../../utils/transform-username.js'
   import '@/styles/components/sidebars/who-to-follow.scss'
 
   // =================================================================================================
@@ -169,12 +170,12 @@
           </div>
           <!-- User handle -->
           <div class="follow-handle">
-            @{{ user.displayName?.replaceAll(' ', '_') || 'user' }}
+            {{ transformUsername(user.userName, user.displayName) }}
             <v-tooltip
               activator="parent"
               content-class="custom-tooltip"
               location="bottom"
-            >@{{ user.displayName?.replaceAll(' ', '_') || 'user' }}
+            >{{ transformUsername(user.userName, user.displayName) }}
             </v-tooltip>
           </div>
         </div>

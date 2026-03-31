@@ -1,40 +1,78 @@
 <script setup>
+  import dayjs from 'dayjs'
   import { storeToRefs } from 'pinia'
-  import { computed, ref } from 'vue'
+  import { onMounted, ref, watch } from 'vue'
   import { useToast } from 'vue-toastification'
   import { useAuthStore } from '@/stores/auth.js'
-  import { useProfileStore } from '@/stores/profile/profile.js'
-
+  import { useSettingsStore } from '@/stores/settings.js'
+  //
+  import '@/styles/components/settings/account.scss'
   const authStore = useAuthStore()
-  const profileStore = useProfileStore()
+  const settingsStore = useSettingsStore()
   const toast = useToast()
   const { user } = storeToRefs(authStore)
-
-  const dialog = ref(false)
-  const editName = ref('')
+  //
   const loading = ref(false)
+  const displayName = ref('')
+  const userName = ref('')
+  const bio = ref('')
+  const email = ref('')
 
-  const displayName = computed(() => user.value?.displayName || 'User')
-  const email = computed(() => user.value?.email || '')
+  onMounted(() => {
+    displayName.value = user.value?.displayName || ''
+    userName.value = user.value?.userName || ''
+    bio.value = user.value?.bio || ''
+    email.value = user.value?.email || ''
+  })
 
-  function openEditDialog () {
-    editName.value = user.value?.displayName || ''
-    dialog.value = true
-  }
+  watch(userName, (newValue, oldValue) => {
+    // Do nothing if the value hasn't changed
+    if (newValue === oldValue) return
+
+    let formatted = newValue || ''
+
+    // Rule 1: Ensure the username always starts with '@'
+    if (!formatted.startsWith('@')) {
+      formatted = '@' + formatted
+    }
+
+    // Rule 2: Sanitize the part of the string *after* the '@'
+    const prefix = '@'
+    let core = formatted.slice(1)
+
+    core = core.replaceAll(' ', '_')
+
+    core = core.replaceAll('-', '_')
+
+    // Reconstruct the final username
+    const finalUsername = prefix + core
+
+    // Update the model only if the formatted value is different
+    // This prevents an infinite loop and unnecessary cursor jumps
+    if (finalUsername !== newValue) {
+      userName.value = finalUsername
+    }
+  })
 
   async function saveProfile () {
-    if (!editName.value.trim()) {
-      toast.error('Name cannot be empty')
+    if (!displayName.value.trim()) {
+      toast.error('Display Name cannot be empty')
+      return
+    }
+    if (!userName.value.trim() || userName.value.trim() === '@') {
+      toast.error('Username cannot be empty')
       return
     }
 
     loading.value = true
     try {
-      await profileStore.updateUserProfile({
-        displayName: editName.value,
+      await settingsStore.updateAccountSettings({
+        displayName: displayName.value,
+        userName: userName.value,
+        bio: bio.value,
+        email: email.value,
       })
       toast.success('Profile updated successfully')
-      dialog.value = false
     } catch (error) {
       toast.error('Failed to update profile')
       console.error(error)
@@ -45,48 +83,41 @@
 </script>
 
 <template>
-  <div class="settings-section">
-    <h2>Account Information</h2>
-    <div class="setting-item">
-      <label>Email</label>
-      <div class="value">{{ email }}</div>
-      <!-- Email editing is usually more complex, disabled for now -->
-      <!-- <button class="edit-btn">Edit</button> -->
+  <div class="settings-account">
+    <div class="d-flex tab-header">
+      <v-icon icon="mdi-chevron-left" />
+      <span>Account Settings</span>
     </div>
-    <div class="setting-item">
-      <label>Display Name</label>
-      <div class="value">{{ displayName }}</div>
-      <button class="edit-btn" @click="openEditDialog">Edit</button>
-    </div>
-
-    <!-- Edit Profile Dialog -->
-    <v-dialog v-model="dialog" max-width="500">
-      <v-card class="edit-profile-card">
-        <v-card-title>Edit Display Name</v-card-title>
-        <v-card-text>
-          <v-text-field
-            v-model="editName"
-            label="Display Name"
-            variant="outlined"
+    <v-form class="mt-6" @submit.prevent="saveProfile">
+      <div class="form-group">
+        <form-input v-model="displayName" hide-details label="Display Name" />
+      </div>
+      <div class="form-group d-flex align-center mt-3 position-relative">
+        <form-input
+          v-model="userName"
+          hide-details
+          label="Username"
+        />
+      </div>
+      <div class="form-group mt-3">
+        <form-textarea v-model="bio" hide-details label="Bio" />
+      </div>
+      <!--      <div class="form-group mt-3">-->
+      <!--        <form-input v-model="email" hide-details label="Email" type="email" />-->
+      <!--      </div>-->
+      <p class="mt-6">Account creation</p>
+      <p class="text-description" style="font-size: 12px">{{ dayjs.unix(user?.createdAt?.seconds).format('DD MMM YYYY') }}</p>
+      <div class="d-flex justify-center mt-6">
+        <div class="submit-btn" @click="saveProfile">
+          <v-progress-circular
+            v-if="loading"
+            color="white"
+            size="20"
+            width="2"
           />
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer />
-          <v-btn color="grey" variant="text" @click="dialog = false">Cancel</v-btn>
-          <v-btn
-            color="primary"
-            :loading="loading"
-            variant="text"
-            @click="saveProfile"
-          >
-            Save
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+          <span v-else>Save</span>
+        </div>
+      </div>
+    </v-form>
   </div>
 </template>
-
-<style scoped lang="scss">
-@use '@/styles/components/settings/account.scss';
-</style>
