@@ -8,6 +8,7 @@ require('dotenv').config() // Load environment variables from .env
 admin.initializeApp()
 
 const authRoutes = require('./routes/auth')
+const emailVerificationRoutes = require('./routes/emailVerificationRoutes') // Import the new router
 const notificationRoutes = require('./routes/notifications') // Import the new router
 const postsRoutes = require('./routes/posts')
 const { dailyDigest, weeklyDigest } = require('./scheduled/dijest')
@@ -27,6 +28,7 @@ app.use(express.json())
 app.use(authRoutes)
 app.use(postsRoutes)
 app.use(notificationRoutes) // Use the new router
+app.use(emailVerificationRoutes) // Use the new router
 
 // Export the API as a single Cloud Function
 exports.api = onRequest(app)

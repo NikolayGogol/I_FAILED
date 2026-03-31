@@ -105,6 +105,46 @@ async function sendVerificationEmail (email, verificationLink) {
   return sendEmail({ to: email, subject, html, text })
 }
 
+async function sendUpdateEmailVerification (email, verificationLink) {
+  validateEnv()
+
+  const subject = `Confirm Your New Email Address for ${APP_NAME}`
+  const html = `
+    <body style="margin:0;padding:0;background-color:${colors.background};">
+      <div style="font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width:640px; margin:24px auto; padding:0 16px;">
+        <div style="background:${colors.surface};border-radius:16px;box-shadow:0 10px 30px rgba(15,23,42,0.1);overflow:hidden;border:1px solid ${colors.border};">
+          <div style="padding:20px 24px;border-bottom:1px solid ${colors.border};">
+            <img src="${LOGO_URL}" alt="${APP_NAME} Logo" style="height:32px;">
+          </div>
+          <div style="padding:24px 24px 16px;">
+            <h2 style="margin:0 0 12px;font-size:22px;font-weight:700;color:${colors.textPrimary};">Confirm Your New Email</h2>
+            <p style="margin:0 0 16px;font-size:14px;line-height:1.6;color:${colors.textSecondary};">
+              You recently requested to change the email address associated with your account. Please click the button below to confirm this change.
+            </p>
+            <div style="text-align:center;margin:24px 0 16px;">
+              <a href="${verificationLink}"
+                 target="_blank"
+                 style="display:inline-block;background-color:${colors.primary};color:${colors.surface};text-decoration:none;padding:12px 28px;border-radius:999px;font-size:14px;font-weight:600;">
+                Confirm New Email
+              </a>
+            </div>
+            <p style="margin:0 0 8px;font-size:12px;line-height:1.6;color:${colors.textSecondary};">
+              If you did not request this change, please secure your account and contact our support team immediately.
+            </p>
+          </div>
+          <div style="padding:12px 24px 16px;border-top:1px solid ${colors.border};text-align:center;">
+            <p style="margin:4px 0;font-size:11px;color:${colors.textSecondary};">
+              © ${new Date().getFullYear()} ${APP_NAME}. All rights reserved.
+            </p>
+          </div>
+        </div>
+      </div>
+    </body>
+  `
+  const text = `Please confirm your new email address by clicking this link: ${verificationLink}`
+  return sendEmail({ to: email, subject, html, text })
+}
+
 async function sendOTPEmail (email, otp) {
   validateEnv()
 
@@ -414,4 +454,5 @@ module.exports = {
   sendMentionNotificationEmail,
   sendFollowerNotificationEmail,
   sendDigestEmail,
+  sendUpdateEmailVerification,
 }

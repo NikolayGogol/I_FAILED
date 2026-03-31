@@ -18,6 +18,7 @@ declare module 'vue' {
     AdditionalInfoPost: typeof import('./src/components/AdditionalInfoPost.vue')['default']
     CommentMenu: typeof import('./src/components/CommentMenu.vue')['default']
     ConfirmationModal: typeof import('./src/components/ConfirmationModal.vue')['default']
+    ConfirmPasswordModal: typeof import('./src/components/modals/ConfirmPasswordModal.vue')['default']
     ContentSettings: typeof import('./src/components/settings/ContentSettings.vue')['default']
     DatePickerInput: typeof import('./src/components/DatePickerInput.vue')['default']
     DoNotDisturb: typeof import('./src/components/settings/notify-tabs/DoNotDisturb.vue')['default']

@@ -1,8 +1,10 @@
+import { EmailAuthProvider, reauthenticateWithCredential } from 'firebase/auth'
 // =================================================================================================
 // Imports
 // =================================================================================================
 import { doc, updateDoc } from 'firebase/firestore'
 import { defineStore } from 'pinia'
+import api from '@/axios.js' // Import axios for backend calls
 import { auth, db } from '@/firebase.js'
 import { useAuthStore } from '@/stores/auth.js'
 
@@ -17,6 +19,31 @@ export const useSettingsStore = defineStore('settings', {
     error: null,
   }),
   actions: {
+    /**
+     * Re-authenticates the user with their password.
+     * @param {string} password - The user's current password.
+     * @returns {Promise<boolean>} A promise that resolves with true if re-authentication is successful.
+     */
+    async reauthenticateUser (password) {
+      this.loading = true
+      this.error = null
+      try {
+        const user = auth.currentUser
+        if (!user) {
+          throw new Error('No user logged in')
+        }
+        const credential = EmailAuthProvider.credential(user.email, password)
+        await reauthenticateWithCredential(user, credential)
+        return true
+      } catch (error) {
+        console.error('Re-authentication failed:', error)
+        this.error = 'Re-authentication failed. Please check your password.'
+        return false
+      } finally {
+        this.loading = false
+      }
+    },
+
     /**
      * Updates the user's account information.
      * @param {object} accountData - The new account data.
@@ -43,10 +70,23 @@ export const useSettingsStore = defineStore('settings', {
           displayName,
           bio,
           userName,
-          email,
+          email, // Always update email in Firestore immediately
         }
 
+        const emailChanged = email !== user.email
+
         await updateDoc(userDocRef, dataToUpdate)
+
+        // If email changed, send a request to the backend to send a verification email
+        if (emailChanged) {
+          await api.post('/send-verification-email', {
+            newEmail: email,
+            uid: user.uid,
+          })
+          // Note: Firebase Auth email itself is NOT updated here. It will be updated
+          // only after the user clicks the verification link sent by your backend.
+          // The local authStore user object will reflect the new email for display purposes.
+        }
 
         // Update the local user state in the auth store
         authStore.$patch({
