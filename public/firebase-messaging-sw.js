@@ -1,4 +1,3 @@
-import { useToast } from 'vue-toastification'
 importScripts('https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js', 'https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging-compat.js')
 
 const params = new URL(location).searchParams
@@ -20,7 +19,6 @@ if (firebaseConfig.apiKey) {
 
   messaging.onBackgroundMessage(payload => {
     const notificationTitle = payload.notification?.title || payload.data?.title
-    const toast = useToast()
 
     const notificationOptions = {
       body: payload.notification?.body || payload.data?.body || '',
@@ -29,13 +27,6 @@ if (firebaseConfig.apiKey) {
         url: payload.data?.url, // Pass the URL to the notification
       },
     }
-    toast.info(payload.notification?.body, {
-      position: 'bottom-right',
-      closeOnClick: true,
-      pauseOnHover: true,
-      timeout: 9000,
-      draggable: true,
-    })
     self.registration.showNotification(notificationTitle, notificationOptions)
   })
 
