@@ -71,15 +71,23 @@
 </script>
 <template>
   <div class="notifications-page">
-    <div class="d-flex align-center justify-space-between">
-      <h2 class="font-weight-bold text-grey-darken-3 ml-3 ml-sm-0">Notifications</h2>
+    <div class="d-flex align-center justify-space-between mt-6 sm:mt-0">
+      <h2 class="font-weight-bold text-grey-darken-3 ml-3 ml-sm-0 title">Notifications</h2>
       <p
         v-if="notifications > 1"
         class="cursor-pointer text-primary"
         @click="handleMarkAllAsRead"
       >Mark all as read</p>
     </div>
-    <section class="notifications-main mt-7">
+    <section class="notifications-main px-4 mt-7">
+      <ul class="tab-list">
+        <li
+          v-for="tab in tabs"
+          :key="tab.value"
+          :class="{ active: selectedTab.value === tab.value }"
+          @click="tabSelect(tab)"
+        >{{ tab.label }}</li>
+      </ul>
       <div v-if="notificationStore.loading" class="loading d-flex justify-center">
         <v-progress-linear color="primary" indeterminate />
       </div>
@@ -87,15 +95,6 @@
         You have no new notifications.
       </div>
       <div v-else>
-        <ul class="tab-list">
-          <li
-            v-for="tab in tabs"
-            :key="tab.value"
-            :class="{ active: selectedTab.value === tab.value }"
-            @click="tabSelect(tab)"
-          >{{ tab.label }}</li>
-        </ul>
-
         <div
           v-for="notification in paginatedNotifications"
           :key="notification.id"
@@ -115,7 +114,7 @@
         <v-pagination
           v-if="totalPages > 1"
           v-model="notificationStore.currentPage"
-          class="mt-6"
+          class="mt-6 mb-6"
           color="primary"
           density="comfortable"
           :length="totalPages"

@@ -25,11 +25,45 @@
   })
   //
   function timeAgo (time) {
-    if (time?.seconds) {
-      return dayjs.unix(time.seconds).fromNow()
+    if (window.innerWidth > 768) {
+      if (time?.seconds) {
+        return dayjs.unix(time.seconds).fromNow()
+      }
+      return ''
+    } else {
+      if (!time?.seconds) {
+        return ''
+      }
+      const date = dayjs.unix(time.seconds)
+      const now = dayjs()
+      const diffYears = now.diff(date, 'year')
+      if (diffYears > 0) {
+        return `${diffYears}y ago`
+      }
+      const diffMonths = now.diff(date, 'month')
+      if (diffMonths > 0) {
+        return `${diffMonths}M ago`
+      }
+      const diffDays = now.diff(date, 'day')
+      if (diffDays > 0) {
+        return `${diffDays}d ago`
+      }
+      const diffHours = now.diff(date, 'hour')
+      if (diffHours > 0) {
+        return `${diffHours}h ago`
+      }
+      const diffMinutes = now.diff(date, 'minute')
+      if (diffMinutes > 0) {
+        return `${diffMinutes}m ago`
+      }
+      const diffSeconds = now.diff(date, 'second')
+      if (diffSeconds > 0) {
+        return `${diffSeconds}s ago`
+      }
+      return 'just now'
     }
-    return ''
   }
+
   function getInitials (name) {
     if (!name) return ''
     const parts = name.split(' ')

@@ -1,6 +1,12 @@
 @use '../settings.scss' as *;
 
 .notifications-page {
+  .title {
+    @include media-down($breakpoint-sm) {
+      font-size: 20px;
+    }
+  }
+
   .tab-list {
     display: flex;
     margin-bottom: 20px;
@@ -35,6 +41,9 @@
     border: 1px solid $color-border;
     padding: 15px 25px;
     border-bottom: 0;
+    @include media-down($breakpoint-sm) {
+      padding: 15px;
+    }
 
     &.need2Read {
       background-color: $color-tag-bg;
@@ -75,19 +84,25 @@
     font-weight: 600;
   }
 
-  .card-notify {
+  .user-name {
+    font-size: 16px;
+    color: $color-text-primary;
+    font-weight: 600;
+    @include media-down($breakpoint-sm) {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 150px;
+    }
+  }
 
+  .card-notify {
     .user-avatar {
       width: 44px;
       height: 44px;
       border-radius: 50%;
     }
 
-    .user-name {
-      font-size: 16px;
-      color: $color-text-primary;
-      font-weight: 600;
-    }
 
     .time {
       display: flex;
@@ -95,6 +110,10 @@
       color: $color-text-quaternary;
       font-size: 14px;
       margin-left: 10px;
+      @include media-down($breakpoint-sm) {
+        white-space: nowrap;
+        font-size: 12px;
+      }
     }
 
     .text-description {

@@ -13,12 +13,13 @@
   import { nextTick, onMounted, ref } from 'vue'
   import { useRouter } from 'vue-router'
   import { useToast } from 'vue-toastification'
+  import { useDisplay } from 'vuetify/framework'
   import ConfirmationModal from '@/components/ConfirmationModal.vue'
   import PostCard from '@/components/feed/PostCard.vue' // Переконайтеся, що імпорт правильний
   import { getIcon } from '@/models/icons.js'
   import { useLibraryStore } from '@/stores/library.js'
   import '@/styles/pages/library.scss'
-
+  const { smAndDown } = useDisplay()
   dayjs.extend(relativeTime)
 
   const toast = useToast()
@@ -27,6 +28,7 @@
 
   // State
   const collectionList = ref([])
+  const mobileDriver = ref([])
   const isCreateDialog = ref(false)
   const isRenameDialog = ref(false)
   const isSaving = ref(false)
@@ -217,7 +219,7 @@
     </div>
 
     <v-dialog v-model="isCreateDialog" class="collection-dialog" max-width="520">
-      <v-card class="pa-7 rounded-xl">
+      <v-card class="rounded-xl pa-3 sm:pa-7">
         <v-btn
           class="position-absolute right-0 top-0 m-2"
           icon="mdi-close"
@@ -226,7 +228,10 @@
         />
         <v-card-title class="text-center">Create collection</v-card-title>
         <form-input v-model="newCollection" class="mt-4" placeholder="Collection Name" variant="outlined" />
-        <div class="d-flex justify-center">
+        <div
+          class="d-flex justify-center"
+          :class="[smAndDown ? 'w-100' : 'w-auto']"
+        >
           <div class="submit-btn" @click="createCollection">
             <v-progress-circular
               v-if="isSaving"
@@ -240,8 +245,9 @@
     </v-dialog>
 
     <v-dialog v-model="isRenameDialog" class="collection-dialog" max-width="520">
-      <v-card v-if="editedCollection" class="pa-7 rounded-xl">
+      <v-card v-if="editedCollection" class="pa-3 sm:pa-7 rounded-xl">
         <v-btn
+          v-if="!smAndDown"
           class="position-absolute right-0 top-0 m-2"
           icon="mdi-close"
           variant="text"
@@ -255,7 +261,11 @@
           variant="outlined"
         />
         <div class="d-flex justify-center">
-          <div class="submit-btn" @click="renameCollection()">
+          <div
+            class="submit-btn"
+            :class="[smAndDown ? 'w-100' : 'w-auto']"
+            @click="renameCollection()"
+          >
             <v-progress-circular
               v-if="isSaving"
               color="primary"
@@ -287,7 +297,7 @@
         <template #activator="{ props }">
           <div class="d-flex align-center cursor-pointer" v-bind="props">
             <div
-              class="bg-secondary d-flex align-center justify-center pa-2 rounded-circle"
+              class="sm:bg-secondary d-flex align-center justify-center pa-2 rounded-circle"
               v-html="getIcon('filter', 20, 20)"
             />
           </div>
@@ -305,14 +315,14 @@
       </v-menu>
     </div>
 
-    <v-progress-linear v-if="postIsLoading" color="primary" indeterminate />
+    <v-progress-linear v-if="postIsLoading" class="mt-9" color="primary" indeterminate />
 
     <template v-else>
       <ul v-if="collectionList.length > 0" class="collection-list">
-        <li v-for="item in collectionList" :key="item.id" class="collection-item">
+        <li v-for="(item, index) in collectionList" :key="item.id" class="collection-item">
           <div class="d-flex align-center justify-space-between">
             <p class="name" @click="openCollection(item)">{{ item.name }}</p>
-            <v-menu location="bottom end" open-on-hover>
+            <v-menu v-if="!smAndDown" location="bottom end" open-on-hover>
               <template #activator="{ props }">
                 <v-btn
                   v-bind="props"
@@ -353,6 +363,47 @@
                 </v-list-item>
               </v-list>
             </v-menu>
+            <template v-else>
+              <v-btn
+                density="compact"
+                icon="mdi-dots-horizontal"
+                variant="text"
+                @click="mobileDriver[index] = true"
+              />
+              <MobileSlide v-model="mobileDriver[index]">
+                <v-list class="rounded-xl" color="primary">
+                  <v-list-item class="drop-item px-0" @click="openRenameDialog(item)">
+                    <template #prepend>
+                      <div class="mr-2 d-flex" v-html="getIcon('pencil', 18, 18)" />
+                    </template>
+                    Rename
+                  </v-list-item>
+                  <v-list-item class="drop-item px-0" @click="shareLink(item)">
+                    <template #prepend>
+                      <div class="mr-2 d-flex" v-html="getIcon('share', 18, 18)" />
+                    </template>
+                    Share
+                  </v-list-item>
+                  <v-list-item
+                    v-if="item.counter"
+                    class="drop-item px-0"
+                    @click="exportToPDF(item)"
+                  >
+                    <template #prepend>
+                      <div class="mr-2 d-flex" v-html="getIcon('export', 18, 18)" />
+                    </template>
+                    Export PDF
+                  </v-list-item>
+                  <v-divider v-if="!smAndDown" />
+                  <v-list-item base-color="error" class="px-0" @click="openDeleteDialog(item)">
+                    <template #prepend>
+                      <div class="mr-2 d-flex" v-html="getIcon('trash', 18, 18)" />
+                    </template>
+                    Delete
+                  </v-list-item>
+                </v-list>
+              </MobileSlide>
+            </template>
           </div>
           <div class="d-flex justify-space-between text-caption text-grey">
             <span>{{ item.counter }} posts</span>
