@@ -75,7 +75,7 @@
       <h2 class="font-weight-bold text-grey-darken-3 ml-3 ml-sm-0 title">Notifications</h2>
       <p
         v-if="notifications > 1"
-        class="cursor-pointer text-primary"
+        class="cursor-pointer text-primary mr-3 mr-sm-0"
         @click="handleMarkAllAsRead"
       >Mark all as read</p>
     </div>

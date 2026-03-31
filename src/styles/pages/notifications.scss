@@ -60,6 +60,9 @@
         background-color: $color-primary;
         border-radius: 50%;
         display: block;
+        @include media-down($breakpoint-sm) {
+          left: 2px;
+        }
       }
     }
 
