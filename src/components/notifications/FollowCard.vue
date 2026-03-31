@@ -118,7 +118,7 @@
           :style="{ backgroundColor: getRandomColor() }"
         >{{ getInitials(cardData.user?.displayName) }}</span>
         <div class="bg-icon follow-icon">
-          <template v-if="isFollowing(data.followerId)">
+          <template v-if="!isFollowing(data.followerId)">
             <v-icon icon="mdi-plus-circle-outline" />
           </template>
           <template v-else>
