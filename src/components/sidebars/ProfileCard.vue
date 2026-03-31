@@ -4,6 +4,7 @@
   import SearchInput from '@/components/SearchInput.vue'
   import { useAuthStore } from '@/stores/auth'
   import '@/styles/components/sidebars/profile-card.scss'
+  import {getIcon} from "@/models/icons.js";
 
   const authStore = useAuthStore()
   const logoutDialog = ref(false)
@@ -12,12 +13,12 @@
     {
       title: 'Profile',
       path: '/profile',
-      icon: 'mdi-account',
+      icon: getIcon('account'),
     },
     {
       title: 'Settings',
       path: '/settings',
-      icon: 'mdi-cog',
+      icon: getIcon('gear'),
     },
   ]
   const footerLink = [
@@ -130,7 +131,7 @@
               @click="goTo(item.path)"
             >
               <v-list-item-title>
-                <v-icon :icon="item.icon" />
+                <div class="d-flex" v-html="item.icon"></div>
                 {{ item.title }}
               </v-list-item-title>
             </v-list-item>
