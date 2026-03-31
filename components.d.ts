@@ -50,6 +50,7 @@ declare module 'vue' {
     PrivacyPosting: typeof import('./src/components/PrivacyPosting.vue')['default']
     PrivacySettings: typeof import('./src/components/settings/PrivacySettings.vue')['default']
     ProfileCard: typeof import('./src/components/sidebars/ProfileCard.vue')['default']
+    ProfileInfo: typeof import('./src/components/notifications/ProfileInfo.vue')['default']
     Push: typeof import('./src/components/settings/notify-tabs/Push.vue')['default']
     Rightbar: typeof import('./src/components/sidebars/Rightbar.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']

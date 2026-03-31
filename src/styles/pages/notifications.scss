@@ -41,6 +41,7 @@
     border: 1px solid $color-border;
     padding: 15px 25px;
     border-bottom: 0;
+    transition: all .5s ease-in-out;
     @include media-down($breakpoint-sm) {
       padding: 15px;
     }
@@ -59,6 +60,12 @@
         background-color: $color-primary;
         border-radius: 50%;
         display: block;
+      }
+    }
+
+    &.hover {
+      &:hover {
+        background-color: #F1F1EF;
       }
     }
 
@@ -93,6 +100,53 @@
       overflow: hidden;
       text-overflow: ellipsis;
       max-width: 150px;
+    }
+  }
+
+  .drop-modal {
+    position: absolute;
+    background-color: white;
+    left: -25px;
+    z-index: 1;
+    padding: 15px;
+    border-radius: $radius-md;
+    box-shadow: $shadow-sm;
+    display: none;
+
+    .bio {
+      color: $color-text-primary;
+      font-size: 12px;
+      margin-top: 12px;
+      margin-bottom: 12px;
+    }
+
+    .follow-block {
+      display: flex;
+      align-items: center;
+
+      span {
+        margin-left: 10px;
+        font-size: 12px;
+        color: $color-text-quaternary;
+      }
+    }
+
+    i {
+      color: $color-text-quaternary;
+    }
+
+    .join-date {
+      color: $color-text-quaternary;
+      font-size: 12px;
+    }
+  }
+
+  .popup-hover {
+    cursor: pointer;
+    &:hover {
+      .drop-modal {
+        display: block;
+      }
     }
   }
 

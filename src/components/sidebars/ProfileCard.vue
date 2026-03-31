@@ -2,9 +2,9 @@
   import { computed, ref } from 'vue'
   import { useRouter } from 'vue-router'
   import SearchInput from '@/components/SearchInput.vue'
+  import { getIcon } from '@/models/icons.js'
   import { useAuthStore } from '@/stores/auth'
   import '@/styles/components/sidebars/profile-card.scss'
-  import {getIcon} from "@/models/icons.js";
 
   const authStore = useAuthStore()
   const logoutDialog = ref(false)
@@ -131,7 +131,7 @@
               @click="goTo(item.path)"
             >
               <v-list-item-title>
-                <div class="d-flex" v-html="item.icon"></div>
+                <div class="d-flex" v-html="item.icon" />
                 {{ item.title }}
               </v-list-item-title>
             </v-list-item>

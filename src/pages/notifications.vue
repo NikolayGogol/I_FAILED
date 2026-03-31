@@ -99,7 +99,10 @@
           v-for="notification in paginatedNotifications"
           :key="notification.id"
           class="notification-item"
-          :class="{'need2Read': !notification.isRead}"
+          :class="[
+            {'need2Read': !notification.isRead},
+            {'hover': notification.isRead},
+          ]"
         >
           <div v-if="notification.type === 'follower'">
             <FollowCard :data="notification" />

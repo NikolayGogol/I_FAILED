@@ -2,6 +2,7 @@
   import dayjs from 'dayjs'
   import { onMounted, reactive } from 'vue'
   import { useRouter } from 'vue-router'
+  import ProfileInfo from '@/components/notifications/ProfileInfo.vue'
   import { backgroundColors } from '@/models/no-data.js'
   import { useAuthStore } from '@/stores/auth.js'
   import { useUserStore } from '@/stores/user.js'
@@ -104,7 +105,7 @@
 <template>
   <div class="card-notify" :class="{'need2Read': !data.isRead}">
     <div class="d-flex align-start user-avatar-wrapper">
-      <div class="position-relative">
+      <div class="position-relative popup-hover">
         <v-img
           v-if="cardData.user?.photoURL"
           :alt="cardData.user?.displayName"
@@ -125,6 +126,7 @@
             <v-icon icon="mdi-minus-circle-outline" />
           </template>
         </div>
+        <ProfileInfo :data="cardData" :follower-id="data.followerId" />
       </div>
       <div class="d-flex flex-column ml-3 w-100">
         <div class="d-flex align-center justify-space-between">
