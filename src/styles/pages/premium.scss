@@ -2,10 +2,15 @@
 @use '../global/fonts' as *;
 
 .premium-page {
+  padding-bottom: 20px;
+
   .premium-wrapper {
     border-radius: $radius-xl + 4;
     padding: 40px;
-    background-color: #1e293b;
+    background-image: url("../../assets/premium/background.png");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -122,8 +127,20 @@
     padding: 24px;
   }
 
+  button.button[type="button"] {
+    background: #D65A1F;
+    background: linear-gradient(90deg, rgba(214, 90, 31, 1) 0%, rgba(206, 41, 19, 1) 100%);
+    color: $color-surface;
+    padding: 15px 50px;
+    font-weight: 700;
+    font-size: 18px;
+    line-height: 28px;
+    border-radius: $radius-md;
+    margin-top: 24px;
+  }
+
   .everything-wrapper {
-    margin-top: 48px;
+    margin-top: 24px;
 
     ul {
       li {
@@ -217,7 +234,7 @@
   }
 
   .comment-feedback {
-    margin-top: 20px;
+    margin-top: 24px;
 
     ul {
       li {
@@ -270,6 +287,47 @@
           line-height: 20px;
         }
       }
+    }
+  }
+
+  .faq {
+    margin-top: 24px;
+
+    .title {
+      font-weight: 600;
+      color: $color-text-primary;
+      font-size: 16px;
+      line-height: 24px;
+      margin-bottom: 8px;
+      margin-top: 10px;
+    }
+  }
+
+  .trial {
+    border-radius: $radius-xl + 4;
+    padding: 30px;
+    background: #100500;
+    background: linear-gradient(0deg, rgba(16, 5, 0, 1) 0%, rgba(101, 28, 44, 1) 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 24px;
+
+    h1 {
+      font-size: 36px;
+      line-height: 44px;
+      margin-top: 8px;
+      color: $color-surface;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    p {
+      font-size: 16px;
+      line-height: 24px;
+      color: $color-surface;
+      text-align: center;
+      margin-top: 12px;
     }
   }
 }
