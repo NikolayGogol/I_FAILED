@@ -82,6 +82,7 @@
     await authStore.logout()
     isLoggingOut.value = false
     logoutDialog.value = false
+    router.push('/')
   }
 
   /**
