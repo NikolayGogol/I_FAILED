@@ -1,5 +1,6 @@
 <script setup>
   import { ref } from 'vue'
+  import Delete from '@/components/settings/account-tabs/delete.vue'
   import Info from '@/components/settings/account-tabs/Info.vue'
   import Password from '@/components/settings/account-tabs/password.vue'
   import { getIcon } from '@/models/icons.js'
@@ -14,6 +15,11 @@
       label: 'Change your password',
       icon: getIcon('lock', 20, 20),
       id: 1,
+    },
+    {
+      label: 'Delete account',
+      icon: getIcon('trash', 20, 20),
+      id: 2,
     },
   ]
   const activeTab = ref(null)
@@ -40,5 +46,6 @@
     </ul>
     <Info v-if="activeTab?.id === 0" @back="activeTab = null" />
     <Password v-if="activeTab?.id === 1" @back="activeTab = null" />
+    <Delete v-if="activeTab?.id === 2" @back="activeTab = null" />
   </div>
 </template>

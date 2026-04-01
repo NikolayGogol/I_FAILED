@@ -3,7 +3,7 @@ const functions = require('firebase-functions')
 const Stripe = require('stripe')
 
 // Safely get the secret key from Firebase Functions config
-const stripeSecretKey = functions.config().stripe?.secret_key
+const stripeSecretKey = 'ddsadasds'
 let stripe = null
 
 if (stripeSecretKey) {
@@ -43,8 +43,8 @@ exports.createSubscription = async (req, res) => {
     let customer
     const customers = await stripe.customers.list({ email, limit: 1 })
 
-    customer =
-      customers.data.length > 0
+    customer
+      = customers.data.length > 0
         ? customers.data[0]
         : await stripe.customers.create({
             payment_method: paymentMethodId,

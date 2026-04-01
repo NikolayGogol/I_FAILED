@@ -43,9 +43,9 @@ export const usePasswordStore = defineStore('password', () => {
       currentPassword.value = ''
       newPassword.value = ''
       confirmPassword.value = ''
-    } catch (err) {
+    } catch (error_) {
       // Обробка помилок Firebase
-      error.value = authStore.getErrorMessage(err.code) || 'Failed to change password. Please check your current password.'
+      error.value = authStore.getErrorMessage(error_.code) || 'Failed to change password. Please check your current password.'
     } finally {
       isLoading.value = false
     }
