@@ -15,10 +15,9 @@ import {
   updateDoc,
   where,
 } from 'firebase/firestore'
-import { getDownloadURL, ref as storageRef, uploadBytes } from 'firebase/storage'
 import { defineStore } from 'pinia'
 import api from '@/axios.js'
-import { auth, db, storage, updateProfile } from '@/firebase.js'
+import { db } from '@/firebase.js'
 import { useAuthStore } from '@/stores/auth.js'
 import { isDoNotDisturbActive } from '@/stores/single-post/single-post.js'
 import { useUserStore } from '@/stores/user.js'

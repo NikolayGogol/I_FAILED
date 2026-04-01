@@ -58,7 +58,7 @@
             size="20"
             width="2"
           />
-          <template v-else class="">Confirm</template>
+          <template v-else>Confirm</template>
         </div>
       </div>
     </v-card>

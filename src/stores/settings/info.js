@@ -11,7 +11,6 @@ export const useInfoSettingsStore = defineStore('infoSettings', () => {
   const authStore = useAuthStore()
   const rootSettingsStore = useSettingsStore()
   const toast = useToast()
-  const router = useRouter()
   const { user } = storeToRefs(authStore)
 
   // State
