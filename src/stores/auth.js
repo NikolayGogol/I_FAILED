@@ -21,6 +21,7 @@ import {
   signInWithPopup,
   updatePassword,
 } from '@/firebase'
+import { useAccountStore } from '@/stores/account' // Import the account store
 const USER_COLLECTION = import.meta.env.VITE_USERS_COLLECTION
 // =================================================================================================
 // Helper Functions
@@ -137,12 +138,18 @@ export const useAuthStore = defineStore('auth', {
 
           // Subscribe to real-time updates of the user document in Firestore
           unsubscribeFromUserDoc = onSnapshot(userRef, docSnapshot => {
+            const accountStore = useAccountStore() // Get the account store instance
             if (docSnapshot.exists()) {
               this.user = { ...authData, ...docSnapshot.data() }
             } else {
-              // If user document doesn't exist, create it
-              this.user = authData
-              saveUserToFirestore(authData)
+              // Only create user document if we are not currently in the process of deleting the account
+              if (accountStore.isDeleting) {
+                // If deleting, set user to null to reflect the deleted state
+                this.user = null
+              } else {
+                this.user = authData
+                saveUserToFirestore(authData)
+              }
             }
           })
         } else {

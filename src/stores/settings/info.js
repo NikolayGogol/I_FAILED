@@ -1,6 +1,5 @@
 import { defineStore, storeToRefs } from 'pinia'
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
 import { useToast } from 'vue-toastification'
 import api from '@/axios.js' // Import axios for backend calls
 import { useAuthStore } from '@/stores/auth.js'
