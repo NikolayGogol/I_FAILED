@@ -14,6 +14,7 @@
   "dependencies": {
     "@fontsource/roboto": "5.2.7",
     "@mdi/font": "7.4.47",
+    "@stripe/stripe-js": "^9.0.1",
     "@vuepic/vue-datepicker": "^12.1.0",
     "@vueup/vue-quill": "^1.2.0",
     "axios": "^1.6.7",
@@ -26,9 +27,9 @@
     "vue": "^3.5.28",
     "vue-router": "^4.5.1",
     "vue-toastification": "^2.0.0-rc.5",
+    "vue3-emoji-picker": "^1.1.8",
     "vuefire": "^3.2.2",
-    "vuetify": "^3.11.8",
-    "vue3-emoji-picker": "^1.1.8"
+    "vuetify": "^3.11.8"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^6.0.1",

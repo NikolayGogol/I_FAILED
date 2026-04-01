@@ -8,8 +8,9 @@ require('dotenv').config() // Load environment variables from .env
 admin.initializeApp()
 
 const authRoutes = require('./routes/auth')
-const emailVerificationRoutes = require('./routes/emailVerificationRoutes') // Import the new router
-const notificationRoutes = require('./routes/notifications') // Import the new router
+const emailVerificationRoutes = require('./routes/emailVerificationRoutes')
+const notificationRoutes = require('./routes/notifications')
+const paymentRoutes = require('./routes/paymentRoutes') // Import the new payment router
 const postsRoutes = require('./routes/posts')
 const { dailyDigest, weeklyDigest } = require('./scheduled/dijest')
 const { publishScheduledPosts } = require('./scheduled/publish-posts')
@@ -27,8 +28,9 @@ app.use(express.json())
 // Mount the routers
 app.use(authRoutes)
 app.use(postsRoutes)
-app.use(notificationRoutes) // Use the new router
-app.use(emailVerificationRoutes) // Use the new router
+app.use(notificationRoutes)
+app.use(emailVerificationRoutes)
+app.use(paymentRoutes) // Use the new payment router
 
 // Export the API as a single Cloud Function
 exports.api = onRequest(app)

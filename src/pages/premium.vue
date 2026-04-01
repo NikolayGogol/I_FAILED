@@ -7,9 +7,18 @@
 </route>
 <script setup>
   import { ref } from 'vue'
+  import { useToast } from 'vue-toastification'
+  import PaymentModal from '@/components/modals/PaymentModal.vue'
   import { getIcon } from '@/models/icons.js'
+  import { useSubscriptionStore } from '@/stores/subscription.js'
   import '../styles/pages/premium.scss'
-  //
+
+  const subscriptionStore = useSubscriptionStore()
+  const toast = useToast()
+
+  const paymentDialog = ref(false)
+  const isSubscribing = ref(false)
+
   const tabs = [
     {
       label: 'Monthly',
@@ -103,9 +112,31 @@
       premium: getIcon('green-check'),
     },
   ]
+
+  function openPaymentModal () {
+    paymentDialog.value = true
+  }
+
+  async function handlePaymentConfirm (paymentMethodId) {
+    isSubscribing.value = true
+    const success = await subscriptionStore.createSubscription(paymentMethodId)
+    if (success) {
+      toast.success('Subscription successful! Welcome to Premium.')
+      paymentDialog.value = false
+    } else {
+      toast.error(subscriptionStore.error || 'Failed to process payment.')
+    }
+    isSubscribing.value = false
+  }
 </script>
 <template>
   <div class="premium-page">
+    <PaymentModal
+      :dialog="paymentDialog"
+      :loading="isSubscribing"
+      @close="paymentDialog = false"
+      @confirm="handlePaymentConfirm"
+    />
     <div class="premium-wrapper">
       <div class="label text-white text-center font-weight-semibold">✨ PREMIUM</div>
       <h1 class="text-center text-white font-weight-bold">Level Up Your <br>Failure Journey</h1>
@@ -130,7 +161,7 @@
         <div class="period">{{ selectedTab.period }}</div>
       </div>
       <div v-show="selectedTab?.billed" class="billed">{{ selectedTab.billed }}</div>
-      <button class="button" type="button">Upgrade to Premium</button>
+      <button class="button" type="button" @click="openPaymentModal">Upgrade to Premium</button>
       <p class="returned">30-day money-back guarantee • Cancel anytime</p>
     </div>
     <section class="everything-wrapper section">
