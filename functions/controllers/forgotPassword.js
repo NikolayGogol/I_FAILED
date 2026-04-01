@@ -34,7 +34,7 @@ exports.forgotPassword = async (req, res) => {
       // If user is not found, return a 404 error
       if (error.code === 'auth/user-not-found') {
         logger.warn(`Forgot password attempt for non-existent user: ${email}`)
-        return res.status(404).json({ message: 'No account found with this email' })
+        return res.status(404).json({ message: 'No account-tabs found with this email' })
       }
       // For other errors, log and re-throw
       logger.error('Error checking user in Firebase Auth:', error)

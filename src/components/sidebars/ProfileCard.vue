@@ -13,7 +13,7 @@
     {
       title: 'Profile',
       path: '/profile',
-      icon: getIcon('account'),
+      icon: getIcon('account-tabs'),
     },
     {
       title: 'Settings',

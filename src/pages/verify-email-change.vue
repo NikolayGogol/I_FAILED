@@ -8,7 +8,7 @@
 
 <script setup>
   import { onMounted, ref } from 'vue'
-  import {  useRouter } from 'vue-router'
+  import { useRouter } from 'vue-router'
   import '@/styles/pages/verify-new-user.scss'
 
   const router = useRouter()

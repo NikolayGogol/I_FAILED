@@ -153,7 +153,7 @@ export const useAuthStore = defineStore('auth', {
     },
 
     /**
-     * Creates a new user account.
+     * Creates a new user account-tabs.
      * @param {object} payload - The user creation data.
      * @returns {Promise} A promise that resolves with the API response.
      */
@@ -303,8 +303,8 @@ export const useAuthStore = defineStore('auth', {
         'auth/invalid-email': 'Invalid email address',
         'auth/operation-not-allowed': 'Operation not allowed',
         'auth/weak-password': 'Password should be at least 6 characters',
-        'auth/user-disabled': 'This account has been disabled',
-        'auth/user-not-found': 'No account found with this email',
+        'auth/user-disabled': 'This account-tabs has been disabled',
+        'auth/user-not-found': 'No account-tabs found with this email',
         'auth/wrong-password': 'Incorrect password',
         'auth/invalid-credential': 'Invalid email or password',
         'auth/too-many-requests': 'Too many requests. Please try again later',

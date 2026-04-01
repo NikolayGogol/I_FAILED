@@ -21,12 +21,12 @@
   import { getIcon } from '@/models/icons.js'
   import '@/styles/pages/settings.scss'
 
-  const currentTabId = ref(window.innerWidth > 768 ? 'account' : '')
+  const currentTabId = ref(window.innerWidth > 768 ? 'account-tabs' : '')
   const { smAndDown } = useDisplay()
 
   const tabs = [
     {
-      id: 'account',
+      id: 'account-tabs',
       label: 'Account',
       icon: getIcon('account', 20, 20),
       component: AccountSettings,

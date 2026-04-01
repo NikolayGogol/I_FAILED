@@ -145,7 +145,7 @@
 
         <template v-if="!isBlocked">
           <v-list-item class="cursor-pointer" @click="handleFollow">
-            <v-icon class="mr-2" :icon="isFollowing ? 'mdi-account-minus-outline' : 'mdi-account-plus-outline'" />
+            <v-icon class="mr-2" :icon="isFollowing ? 'mdi-account-tabs-minus-outline' : 'mdi-account-tabs-plus-outline'" />
             {{ isFollowing ? 'Unfollow' : 'Follow' }} @{{ post.user.displayName.replaceAll(' ', '_') }}
           </v-list-item>
           <v-list-item class="cursor-pointer text-danger" @click="handleBlock">
@@ -183,7 +183,7 @@
 
       <template v-if="!isBlocked">
         <v-list-item class="cursor-pointer" @click="handleFollow">
-          <v-icon class="mr-2" :icon="isFollowing ? 'mdi-account-minus-outline' : 'mdi-account-plus-outline'" />
+          <v-icon class="mr-2" :icon="isFollowing ? 'mdi-account-tabs-minus-outline' : 'mdi-account-tabs-plus-outline'" />
           {{ isFollowing ? 'Unfollow' : 'Follow' }} @{{ post.user.displayName.replaceAll(' ', '_') }}
         </v-list-item>
         <v-list-item class="cursor-pointer text-danger" @click="handleBlock">

@@ -27,7 +27,7 @@ exports.createUser = async (req, res) => {
       const userRecord = await admin.auth().getUserByEmail(email)
       if (userRecord) {
         logger.warn(`Registration attempt for existing email: ${email}`)
-        return res.status(409).json({ error: 'User already exists', message: 'The email address is already in use by another account.' })
+        return res.status(409).json({ error: 'User already exists', message: 'The email address is already in use by another account-tabs.' })
       }
     } catch (error) {
       // If error.code is 'auth/user-not-found', it means the user does NOT exist, which is good.

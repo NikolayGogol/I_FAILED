@@ -100,7 +100,7 @@
     toast.info('Block user functionality coming soon')
   }
 
-  // Open the "About this account" dialog
+  // Open the "About this account-tabs" dialog
   function aboutAccount () {
     aboutDialog.value = true
     isMobileAction.value = false
@@ -248,7 +248,7 @@
         <activity v-if="activeTabIndex === 1" :user-id="userId" />
       </div>
     </section>
-    <!-- "About this account" modal -->
+    <!-- "About this account-tabs" modal -->
     <AboutAccountModal v-model="aboutDialog" :user="user" />
     <MobileSlide v-model="isMobileAction">
       <v-list>

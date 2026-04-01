@@ -6,7 +6,7 @@ const { sendVerificationEmail } = require('../utils/email')
 const db = admin.firestore()
 
 /**
- * Resends the verification email to a user who has not yet verified their account.
+ * Resends the verification email to a user who has not yet verified their account-tabs.
  */
 async function resendVerificationEmail (req, res) {
   // Extract the verification token from the request body

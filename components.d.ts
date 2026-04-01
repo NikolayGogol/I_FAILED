@@ -32,6 +32,7 @@ declare module 'vue' {
     ForYouTab: typeof import('./src/components/feed/tabs/ForYouTab.vue')['default']
     GoogleLoginButton: typeof import('./src/components/GoogleLoginButton.vue')['default']
     HelpSettings: typeof import('./src/components/settings/HelpSettings.vue')['default']
+    Info: typeof import('./src/components/settings/account-tabs/Info.vue')['default']
     LatestTab: typeof import('./src/components/feed/tabs/LatestTab.vue')['default']
     LikeCard: typeof import('./src/components/notifications/LikeCard.vue')['default']
     MentionCard: typeof import('./src/components/notifications/MentionCard.vue')['default']

@@ -1,7 +1,7 @@
 <script setup>
   import { VueDatePicker } from '@vuepic/vue-datepicker'
   import { storeToRefs } from 'pinia'
-  import { reactive, ref, watch } from 'vue'
+  import { ref } from 'vue'
   import { useDoNotDisturbStore } from '@/stores/settings/do-not-disturb'
   import '@vuepic/vue-datepicker/dist/main.css'
   import '@/styles/components/date-picker.scss'
