@@ -1,20 +1,10 @@
 import { initializeApp } from 'firebase/app'
 /* eslint-disable */
 import {
-  browserLocalPersistence,
-  browserSessionPersistence,
-  confirmPasswordReset,
-  createUserWithEmailAndPassword,
   FacebookAuthProvider,
   getAuth,
   GoogleAuthProvider,
   onAuthStateChanged,
-  sendPasswordResetEmail,
-  setPersistence,
-  signInWithEmailAndPassword,
-  signInWithPopup,
-  updatePassword,
-  updateProfile,
 } from 'firebase/auth'
 import { getFirestore } from 'firebase/firestore'
 import { getFunctions } from 'firebase/functions'
@@ -55,7 +45,9 @@ export {
   browserSessionPersistence,
   confirmPasswordReset,
   createUserWithEmailAndPassword,
+  EmailAuthProvider, // Додано
   onAuthStateChanged,
+  reauthenticateWithCredential, // Додано
   sendPasswordResetEmail,
   setPersistence,
   signInWithEmailAndPassword,

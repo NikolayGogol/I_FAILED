@@ -44,6 +44,7 @@ declare module 'vue' {
     NotificationSettings: typeof import('./src/components/settings/NotificationSettings.vue')['default']
     NotifiMenu: typeof import('./src/components/notifications/notifi-menu.vue')['default']
     NotifyMenu: typeof import('./src/components/notifications/NotifyMenu.vue')['default']
+    Password: typeof import('./src/components/settings/account-tabs/password.vue')['default']
     PaymentModal: typeof import('./src/components/modals/PaymentModal.vue')['default']
     PopularTab: typeof import('./src/components/feed/tabs/PopularTab.vue')['default']
     PopularTags: typeof import('./src/components/sidebars/PopularTags.vue')['default']

@@ -2,16 +2,34 @@ const admin = require('firebase-admin')
 const functions = require('firebase-functions')
 const Stripe = require('stripe')
 
-// Initialize Stripe with your secret key from Firebase Functions config
-const stripe = new Stripe(functions.config().stripe.secret_key, {
-  apiVersion: '2020-08-27', // Use a consistent API version
-})
+// Safely get the secret key from Firebase Functions config
+const stripeSecretKey = functions.config().stripe?.secret_key
+let stripe = null
+
+if (stripeSecretKey) {
+  stripe = new Stripe(stripeSecretKey, {
+    apiVersion: '2020-08-27',
+  })
+  functions.logger.info('Stripe SDK initialized successfully.')
+} else {
+  functions.logger.warn(
+    'Stripe secret key is not configured. The payment processing service will be unavailable.',
+  )
+}
 
 /**
  * Creates a Stripe customer and subscribes them to a premium plan.
- * Assumes a single premium product/price ID is configured in Stripe.
  */
 exports.createSubscription = async (req, res) => {
+  if (!stripe) {
+    functions.logger.error(
+      'Attempted to process a payment, but Stripe is not configured. Please set stripe.secret_key in Firebase Functions config.',
+    )
+    return res.status(503).json({
+      message: 'The payment service is currently unavailable. Please try again later.',
+    })
+  }
+
   try {
     const { uid, paymentMethodId } = req.body
 
@@ -19,25 +37,23 @@ exports.createSubscription = async (req, res) => {
       return res.status(400).json({ message: 'Missing uid or paymentMethodId.' })
     }
 
-    // Get user's email from Firebase Auth
     const userRecord = await admin.auth().getUser(uid)
     const email = userRecord.email
 
-    // 1. Create or retrieve a Stripe Customer
     let customer
     const customers = await stripe.customers.list({ email, limit: 1 })
 
-    customer = customers.data.length > 0
-      ? customers.data[0]
-      : (await stripe.customers.create({
-          payment_method: paymentMethodId,
-          email,
-          invoice_settings: {
-            default_payment_method: paymentMethodId,
-          },
-        }))
+    customer =
+      customers.data.length > 0
+        ? customers.data[0]
+        : await stripe.customers.create({
+            payment_method: paymentMethodId,
+            email,
+            invoice_settings: {
+              default_payment_method: paymentMethodId,
+            },
+          })
 
-    // 2. Attach the PaymentMethod to the Customer (if not already default)
     if (customer.invoice_settings.default_payment_method !== paymentMethodId) {
       await stripe.paymentMethods.attach(paymentMethodId, { customer: customer.id })
       await stripe.customers.update(customer.id, {
@@ -47,11 +63,12 @@ exports.createSubscription = async (req, res) => {
       })
     }
 
-    // 3. Create the Subscription
-    // You need to replace 'price_YOUR_PREMIUM_PRICE_ID' with your actual Stripe Price ID
-    const priceId = functions.config().stripe.premium_price_id
+    const priceId = functions.config().stripe?.premium_price_id
     if (!priceId) {
-      throw new Error('Stripe premium_price_id is not configured in Firebase Functions.')
+      functions.logger.error('Stripe premium_price_id is not configured.')
+      return res.status(503).json({
+        message: 'The payment service is not fully configured (missing price ID).',
+      })
     }
 
     const subscription = await stripe.subscriptions.create({
@@ -60,42 +77,36 @@ exports.createSubscription = async (req, res) => {
       expand: ['latest_invoice.payment_intent'],
     })
 
-    // Handle potential payment confirmation (e.g., 3D Secure)
     const latestInvoice = subscription.latest_invoice
-    if (latestInvoice && latestInvoice.payment_intent && latestInvoice.payment_intent.status === 'requires_action') {
-      // This scenario would require client-side confirmation, which is more complex
-      // For simplicity, we'll assume direct payment for now or handle it as a failure.
-      // In a real app, you'd send back client_secret for client-side confirmation.
-      functions.logger.warn(`Subscription requires action for user ${uid}. Payment Intent ID: ${latestInvoice.payment_intent.id}`)
+    if (latestInvoice?.payment_intent?.status === 'requires_action') {
+      functions.logger.warn(`Subscription for user ${uid} requires further action.`)
       return res.status(402).json({
-        message: 'Payment requires additional action. Please complete it on the client.',
+        message: 'Payment requires additional action.',
         requiresAction: true,
         clientSecret: latestInvoice.payment_intent.client_secret,
       })
     }
 
-    // 4. Update user's Firestore document
     const userDocRef = admin.firestore().collection('users').doc(uid)
     const premiumSince = admin.firestore.FieldValue.serverTimestamp()
     const premiumUntil = new Date()
-    premiumUntil.setFullYear(premiumUntil.getFullYear() + 1) // Example: 1 year subscription
+    premiumUntil.setFullYear(premiumUntil.getFullYear() + 1)
 
     await userDocRef.update({
       isPremium: true,
       premiumSince,
-      premiumUntil, // Store as a Date object or Firestore Timestamp
+      premiumUntil,
       stripeCustomerId: customer.id,
       stripeSubscriptionId: subscription.id,
-      // Add other relevant subscription details
     })
 
-    functions.logger.info(`User ${uid} subscribed successfully. Subscription ID: ${subscription.id}`)
+    functions.logger.info(`User ${uid} subscribed successfully.`)
     return res.status(200).json({
       status: 'success',
       message: 'Subscription created successfully!',
       isPremium: true,
       premiumSince,
-      premiumUntil: premiumUntil.toISOString(), // Send ISO string for client
+      premiumUntil: premiumUntil.toISOString(),
     })
   } catch (error) {
     functions.logger.error('Error creating subscription:', error)
