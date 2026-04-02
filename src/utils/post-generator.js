@@ -26,7 +26,8 @@ export async function generateRandomPost () {
 
   try {
     const randomCategory = getRandomElement(categories)
-    const isAnonymous = Math.random() > 0.5
+    // const isAnonymous = Math.random() > 0.5
+    const isAnonymous = false
 
     // Get 1 to 3 random emotion tags
     const numEmotions = Math.floor(Math.random() * 3) + 1
