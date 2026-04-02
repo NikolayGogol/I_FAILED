@@ -12,6 +12,7 @@
   import Achievement from '@/components/failure-age/achievement.vue'
   import Age from '@/components/failure-age/age.vue'
   import Dashboard from '@/components/failure-age/dashboard.vue'
+  import Emotial from '@/components/failure-age/emotial.vue'
   import Growth from '@/components/failure-age/growth.vue'
   import ThemeChart from '@/components/failure-age/theme-chart.vue'
   import Timeline from '@/components/failure-age/timeline.vue'
@@ -55,6 +56,9 @@
       <v-row class="mt-4">
         <v-col cols="12" sm="6">
           <theme-chart />
+        </v-col>
+        <v-col cols="12" sm="6">
+          <emotial />
         </v-col>
       </v-row>
     </div>

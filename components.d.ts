@@ -27,6 +27,7 @@ declare module 'vue' {
     Delete: typeof import('./src/components/settings/account-tabs/delete.vue')['default']
     DoNotDisturb: typeof import('./src/components/settings/notify-tabs/DoNotDisturb.vue')['default']
     Email: typeof import('./src/components/settings/notify-tabs/Email.vue')['default']
+    Emotial: typeof import('./src/components/failure-age/emotial.vue')['default']
     FacebookLoginButton: typeof import('./src/components/FacebookLoginButton.vue')['default']
     Filter: typeof import('./src/components/feed/Filter.vue')['default']
     FollowCard: typeof import('./src/components/notifications/FollowCard.vue')['default']

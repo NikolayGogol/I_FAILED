@@ -387,6 +387,7 @@
       transition: all .4s ease-in-out;
       padding: 5px 10px;
       border-radius: $radius-sm;
+
       &:hover {
         background-color: #f4f6f8;
       }
@@ -409,6 +410,99 @@
       border-radius: 50%;
       margin-right: 8px;
       display: inline-block;
+    }
+  }
+
+  .emotional-card {
+    .emotional-card {
+      background: $color-surface;
+      border-radius: 24px;
+      padding: 24px;
+      max-width: 400px;
+      border: 1px solid $color-tag-bg;
+    }
+
+    .title-section {
+      font-size: 22px;
+      font-weight: 700;
+      color: $color-text-primary;
+      margin-bottom: 4px;
+    }
+
+    .text-description {
+      font-size: 14px;
+      color: $color-text-secondary;
+      margin-bottom: 24px;
+    }
+
+    .tags-cloud {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 30px;
+    }
+
+    .tag-item {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid $color-tag-bg;
+      background-color: #fffaf7;
+      color: $color-primary;
+      border-radius: 100px;
+      font-weight: 600;
+      text-align: center;
+      line-height: 1.2;
+      transition: transform 0.2s ease;
+
+      &:hover {
+        cursor: pointer;
+        transform: scale(1.05);
+      }
+
+      &.tag-huge {
+        font-size: 24px;
+        padding: 14px 28px;
+        width: 100%;
+        max-width: 280px;
+      }
+
+      &.tag-large {
+        font-size: 18px;
+        padding: 10px 20px;
+      }
+
+      &.tag-medium {
+        font-size: 14px;
+        padding: 8px 16px;
+      }
+
+      &.tag-small {
+        font-size: 13px;
+        padding: 6px 14px;
+        font-weight: 500;
+      }
+    }
+
+    .common-failure-box {
+      background-color: #fef5ed;
+      border-radius: 16px;
+      padding: 16px;
+      margin-top: 10px;
+
+      .label {
+        font-size: 14px;
+        color: #444;
+        margin-bottom: 4px;
+      }
+
+      .value {
+        font-size: 16px;
+        font-weight: 700;
+        color: #000;
+      }
     }
   }
 }
