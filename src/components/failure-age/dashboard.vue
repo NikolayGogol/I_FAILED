@@ -27,7 +27,7 @@
       .filter(Boolean)
     const daysCount = lessonLearned.reduce((acc, curr) => acc + curr, 0)
     const average = daysCount / lessonLearned.length
-    return `${average} days`
+    return `${average || 0} days`
   })
 </script>
 
