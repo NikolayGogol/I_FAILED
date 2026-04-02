@@ -1,5 +1,5 @@
 <script setup>
-  import { computed, reactive, ref, watch } from 'vue'
+  import { computed, reactive, watch } from 'vue'
   import { getIcon } from '@/models/icons.js'
   import { useFailureAgeStore } from '@/stores/failure-age.js'
   const failureAgeStore = useFailureAgeStore()

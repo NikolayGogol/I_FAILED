@@ -37,7 +37,7 @@
       <li v-for="(step, index) in list" :key="index">
         <div class="d-flex align-center">
           <div class="step mr-4">
-            <div v-if="failureAgeStore.totalAgeData > step.age" class="complete">
+            <div v-if="failureAgeStore.totalAgeData >= step.age" class="complete">
               <img alt="" src="../../assets/age/Container.png">
             </div>
             <span v-else>{{ index + 1 }}</span>
@@ -47,7 +47,7 @@
             <p class="text-description fs-14">Age {{ step.age }}</p>
           </div>
         </div>
-        <div v-if="failureAgeStore.totalAgeData > step.age" class="badge">Achieved</div>
+        <div v-if="failureAgeStore.totalAgeData >= step.age" class="badge">Achieved</div>
       </li>
     </ul>
   </section>

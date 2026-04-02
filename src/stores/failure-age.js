@@ -1,4 +1,4 @@
-import { collection, getDocs, query, where } from 'firebase/firestore'
+import { collection, getDocs, orderBy, query, where } from 'firebase/firestore'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { db } from '@/firebase'
@@ -16,10 +16,11 @@ export const useFailureAgeStore = defineStore('failureAge', () => {
   const loading = ref(false)
   const error = ref(null)
   const commentHelpfull = 2
-  const actualAge = ref(24)
+  const actualAge = ref(34)
   const lessonsCount = ref(0)
   const withoutLessonsCount = ref(0)
   const shareFailurePublic = ref(0)
+  const posts = ref([])
   // --- Actions ---
   async function fetchFailureAgeStats () {
     const authStore = useAuthStore()
@@ -39,13 +40,19 @@ export const useFailureAgeStore = defineStore('failureAge', () => {
     try {
       // Fetch posts for Major Failures and Lessons Learned
       const postsRef = collection(db, VITE_POST_COLLECTION)
-      const postsQuery = query(postsRef, where('uid', '==', user.uid))
+      const postsQuery = query(postsRef,
+        orderBy('createdAt', 'desc'),
+        where('uid', '==', user.uid))
       const postsSnapshot = await getDocs(postsQuery)
 
       majorFailuresShared.value = postsSnapshot.size
 
       // eslint-disable-next-line
       postsSnapshot.forEach(doc => {
+        posts.value.push({
+          id: doc.id,
+          ...doc.data(),
+        })
         if (doc.data().lessonLearned) {
           lessonsCount.value++
         } else {
@@ -127,6 +134,7 @@ export const useFailureAgeStore = defineStore('failureAge', () => {
     wisdomGapData,
     totalAgeData,
     calculateProgressData,
+    posts,
     // Actions
     fetchFailureAgeStats,
   }

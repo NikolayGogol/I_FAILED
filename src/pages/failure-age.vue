@@ -12,6 +12,7 @@
   import Achievement from '@/components/failure-age/achievement.vue'
   import Age from '@/components/failure-age/age.vue'
   import Growth from '@/components/failure-age/growth.vue'
+  import Timeline from '@/components/failure-age/timeline.vue'
   import '@/styles/pages/failure-age.scss'
   //
   const tabs = [
@@ -45,6 +46,7 @@
     <div v-if="selectedTab.value === 0" class="tab-content">
       <growth />
       <achievement class="mt-4" />
+      <timeline class="mt-4" />
     </div>
   </div>
 </template>

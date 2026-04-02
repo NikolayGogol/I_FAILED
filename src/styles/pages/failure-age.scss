@@ -183,7 +183,7 @@
 
           .complete {
             position: relative;
-            top: 2px;
+            top: 3px;
           }
 
           &:after {
@@ -259,6 +259,91 @@
         color: $color-text-secondary;
         font-size: 12px;
         font-weight: 600;
+      }
+    }
+  }
+
+  .recovery-timeline {
+    .line {
+      background: #E74C3C;
+      background: linear-gradient(180deg, rgba(231, 76, 60, 1) 0%, rgba(243, 156, 18, 1) 50%, rgba(39, 174, 96, 1) 100%);
+      width: 5px;
+      display: block;
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      left: 0;
+      height: 98%;
+    }
+
+    ul {
+      margin-top: 20px;
+
+      li {
+        list-style: none;
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+
+
+        .time-card {
+          margin-left: 40px;
+
+          p {
+            text-align: right;
+            color: $color-text-secondary;
+            font-size: 12px;
+          }
+        }
+
+        .content-card {
+          background-color: #FFF5F5;
+          border-radius: $radius-xs;
+          width: 100%;
+          padding: 15px 20px;
+          margin-left: 70px;
+          position: relative;
+          border-left: 5px solid #C8372B;
+
+          &:before {
+            content: '';
+            position: absolute;
+            background-color: #C8372B;
+            display: block;
+            width: 12px;
+            height: 12px;
+            border-radius: $radius-full;
+            left: -40px;
+            top: 50%;
+            transform: translateY(-50%);
+          }
+
+          .tag {
+            background-color: #C8372B;
+            border-radius: $radius-xs - 2;
+            padding: 4px 8px;
+            color: $color-surface;
+            font-size: 12px;
+            font-weight: 600;
+          }
+
+          .tag-green {
+            @extend .tag;
+            background-color: #31953A;
+          }
+
+          .tag-yellow {
+            @extend .tag;
+            background-color: #F39C12;
+          }
+
+          h5 {
+            font-weight: 600;
+            color: $color-text-primary;
+            font-size: 16px;
+            margin-top: 8px;
+          }
+        }
       }
     }
   }

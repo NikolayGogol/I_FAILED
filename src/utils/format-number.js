@@ -20,5 +20,9 @@ export function floatNumber (value, format = '0a.0') {
 }
 
 export function useNumeral (value, format = '0.0') {
-  return numeral(value).format(format)
+  const decimalPlaces = (format.split('.')[1] || []).length
+  const multiplier = Math.pow(10, decimalPlaces)
+  const truncatedValue = Math.floor(value * multiplier) / multiplier
+
+  return numeral(truncatedValue).format(format)
 }
