@@ -214,4 +214,52 @@
       }
     }
   }
+
+  .achievement-badges {
+    .item {
+      opacity: .6;
+      position: relative;
+
+      &.done {
+        opacity: 1;
+
+        .done-icon {
+          position: absolute;
+          top: 20px;
+          right: 20px;
+        }
+
+        .border-c {
+          border-color: #31953A;
+        }
+
+        .rule {
+          color: #31953A;
+        }
+      }
+
+      .border-c {
+        border: 1px solid $color-border;
+        border-radius: $radius-md;
+        padding: 10px 5px;
+      }
+
+      .title {
+        font-weight: 600;
+        font-size: 14px;
+        color: $color-text-primary;
+      }
+
+      .description {
+        font-size: 12px;
+        color: $color-text-secondary;
+      }
+
+      .rule {
+        color: $color-text-secondary;
+        font-size: 12px;
+        font-weight: 600;
+      }
+    }
+  }
 }

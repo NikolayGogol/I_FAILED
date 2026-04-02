@@ -17,7 +17,9 @@ export const useFailureAgeStore = defineStore('failureAge', () => {
   const error = ref(null)
   const commentHelpfull = 2
   const actualAge = ref(24)
-
+  const lessonsCount = ref(0)
+  const withoutLessonsCount = ref(0)
+  const shareFailurePublic = ref(0)
   // --- Actions ---
   async function fetchFailureAgeStats () {
     const authStore = useAuthStore()
@@ -42,18 +44,19 @@ export const useFailureAgeStore = defineStore('failureAge', () => {
 
       majorFailuresShared.value = postsSnapshot.size
 
-      let lessonsCount = 0
-      let withoutLessonsCount = 0
       // eslint-disable-next-line
       postsSnapshot.forEach(doc => {
         if (doc.data().lessonLearned) {
-          lessonsCount++
+          lessonsCount.value++
         } else {
-          withoutLessonsCount++
+          withoutLessonsCount.value++
+        }
+        if (doc.data().visibility.value === 1) {
+          shareFailurePublic.value++
         }
       })
-      lessonsLearnedCount.value = lessonsCount
-      unresolvedFailures.value = withoutLessonsCount
+      lessonsLearnedCount.value = lessonsCount.value
+      unresolvedFailures.value = withoutLessonsCount.value
 
       // Fetch comments for Helpful Comments
       const commentsRef = collection(db, VITE_COMMENTS_COLLECTION)
@@ -113,6 +116,9 @@ export const useFailureAgeStore = defineStore('failureAge', () => {
   return {
     // state
     actualAge,
+    majorFailuresShared,
+    shareFailurePublic,
+    lessonsLearnedCount,
     //
     majorFailuresSharedData,
     helpfulCommentsTotalData,

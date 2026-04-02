@@ -13,6 +13,7 @@ declare module 'vue' {
   export interface GlobalComponents {
     AboutAccountModal: typeof import('./src/components/profile/AboutAccountModal.vue')['default']
     AccountSettings: typeof import('./src/components/settings/AccountSettings.vue')['default']
+    Achievement: typeof import('./src/components/failure-age/achievement.vue')['default']
     Activity: typeof import('./src/components/profile/Activity.vue')['default']
     AddCollectionDialog: typeof import('./src/components/feed/AddCollectionDialog.vue')['default']
     AdditionalInfoPost: typeof import('./src/components/AdditionalInfoPost.vue')['default']
