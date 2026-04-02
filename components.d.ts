@@ -22,6 +22,7 @@ declare module 'vue' {
     ConfirmationModal: typeof import('./src/components/ConfirmationModal.vue')['default']
     ConfirmPasswordModal: typeof import('./src/components/modals/ConfirmPasswordModal.vue')['default']
     ContentSettings: typeof import('./src/components/settings/ContentSettings.vue')['default']
+    Dashboard: typeof import('./src/components/failure-age/dashboard.vue')['default']
     DatePickerInput: typeof import('./src/components/DatePickerInput.vue')['default']
     Delete: typeof import('./src/components/settings/account-tabs/delete.vue')['default']
     DoNotDisturb: typeof import('./src/components/settings/notify-tabs/DoNotDisturb.vue')['default']

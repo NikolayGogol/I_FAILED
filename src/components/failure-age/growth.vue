@@ -1,33 +1,9 @@
 <script setup>
+  import { list } from '@/models/age.js'
   import { useFailureAgeStore } from '@/stores/failure-age.js'
 
   const failureAgeStore = useFailureAgeStore()
-  const list = [
-    {
-      label: 'Failure Beginner',
-      age: 20,
-    },
-    {
-      label: 'Wise Stumbler',
-      age: 25,
-    },
-    {
-      label: 'Growth Master',
-      age: 30,
-    },
-    {
-      label: 'Resilience Master',
-      age: 35,
-    },
-    {
-      label: 'Wisdom Keeper',
-      age: 40,
-    },
-    {
-      label: 'Wisdom Sage',
-      age: 50,
-    },
-  ]
+
 </script>
 
 <template>
