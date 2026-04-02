@@ -1,10 +1,12 @@
 <script setup>
 
+  import { computed } from 'vue'
   import { list } from '@/models/age.js'
   import { getIcon } from '@/models/icons.js'
   import { useFailureAgeStore } from '@/stores/failure-age.js'
 
   const failureAgeStore = useFailureAgeStore()
+
   //
   function findLevel () {
     for (let i = list.length - 1; i >= 0; i--) {
@@ -16,6 +18,17 @@
       }
     }
   }
+
+  const averageRecoveryTime = computed(() => {
+    const lessonLearnedPosts = failureAgeStore.posts.map(el => el.lessonLearned)
+    const lessonLearned = lessonLearnedPosts
+      .filter(item => item?.recoveryTime)
+      .map(el => el.recoveryTime?.days)
+      .filter(Boolean)
+    const daysCount = lessonLearned.reduce((acc, curr) => acc + curr, 0)
+    const average = daysCount / lessonLearned.length
+    return `${average} days`
+  })
 </script>
 
 <template>
@@ -35,7 +48,7 @@
       <v-col class="px-1" cols="12" sm="3">
         <div class="d-flex flex-column item">
           <img alt="" src="../../assets/age/chart.png">
-          <div class="count">20 days</div>
+          <div class="count">{{ averageRecoveryTime }}</div>
           <p class="text-description fs-14 mt-2">Average recovery time</p>
         </div>
       </v-col>

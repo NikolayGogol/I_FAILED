@@ -67,6 +67,7 @@ declare module 'vue' {
     SearchInput: typeof import('./src/components/SearchInput.vue')['default']
     SecuritySettings: typeof import('./src/components/settings/SecuritySettings.vue')['default']
     Sidebar: typeof import('./src/components/sidebars/Sidebar.vue')['default']
+    ThemeChart: typeof import('./src/components/failure-age/theme-chart.vue')['default']
     Timeline: typeof import('./src/components/failure-age/timeline.vue')['default']
     UploadFile: typeof import('./src/components/UploadFile.vue')['default']
     UserCard: typeof import('./src/components/profile/UserCard.vue')['default']
