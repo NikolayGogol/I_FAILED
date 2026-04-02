@@ -32,21 +32,16 @@ export const useInfoSettingsStore = defineStore('infoSettings', () => {
   }
 
   function formatUsername (newValue) {
-    if (userName.value === newValue) {
-      return
-    }
     let formatted = newValue || ''
     if (!formatted.startsWith('@')) {
       formatted = '@' + formatted
     }
     const prefix = '@'
     let core = formatted.slice(1)
-    core = core.replace(/[\s-]/g, '_')
-    core = core.replace(/[^a-zA-Z0-9_]/g, '')
+    core = core.replace(' ', '_')
+    core = core.replace('-', '_')
     const finalUsername = prefix + core
-    if (finalUsername !== newValue) {
-      userName.value = finalUsername
-    }
+    userName.value = finalUsername
   }
 
   async function updateProfile () {
