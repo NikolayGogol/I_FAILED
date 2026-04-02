@@ -9,9 +9,10 @@
   import FormTextarea from '@/components/FormTextarea.vue'
   import { getIcon } from '@/models/icons.js'
   import { useAuthStore } from '@/stores/auth.js'
+  import { useFailureAgeStore } from '@/stores/failure-age.js'
   import { useProfileStore } from '@/stores/profile/profile.js'
   import { useSettingsStore } from '@/stores/settings.js' // Import the settings store
-  import { floatNumber } from '@/utils/format-number.js'
+  import { floatNumber, useNumeral } from '@/utils/format-number.js'
   import { transformUsername } from '../../utils/transform-username.js'
   import '@/styles/components/profile/user-card.scss'
 
@@ -77,6 +78,8 @@
     if (parts.length === 1) return parts[0].charAt(0).toUpperCase()
     return (parts[0].charAt(0) + (parts[1]?.charAt(0) || '')).toUpperCase()
   })
+  const failureAgeStore = useFailureAgeStore()
+
   // Format the join date of the user
   const joinDate = computed(() => {
     if (displayUser.value?.createdAt) {
@@ -102,6 +105,7 @@
     if (!props.user && authUser.value?.uid) {
       profileStore.fetchUserActivity(authUser.value.uid)
     }
+    failureAgeStore.fetchFailureAgeStats()
   })
 
   // =================================================================================================
@@ -202,7 +206,7 @@
 
         <!-- User badge -->
         <div class="user-badge">
-          Failure Age: 24.5 years
+          Failure Age: {{ useNumeral(failureAgeStore.totalAgeData) }} years
         </div>
       </div>
     </div>
