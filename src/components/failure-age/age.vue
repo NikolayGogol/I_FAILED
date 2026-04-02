@@ -1,19 +1,60 @@
 <script setup>
-  import { ref } from 'vue'
+  import { computed, onMounted, ref } from 'vue'
+  import { useFailureAgeStore } from '@/stores/failure-age'
+  import { useNumeral } from '@/utils/format-number.js'
 
-  const progress = ref(1)
   const showFormula = ref(false)
+  const actualAge = ref(18)
+
+  const failureAgeStore = useFailureAgeStore()
+
+  onMounted(() => {
+    failureAgeStore.fetchFailureAgeStats()
+  })
+
+  const majorFailuresShared = computed(() => {
+    return {
+      raw: failureAgeStore.majorFailuresShared,
+      count: failureAgeStore.majorFailuresShared * 1,
+    }
+  })
+  const lessonsLearnedTotal = computed(() => {
+    return {
+      raw: failureAgeStore.lessonsLearnedCount,
+      count: failureAgeStore.lessonsLearnedCount * 0.5,
+    }
+  })
+  const helpfulCommentsTotal = computed(() => {
+    return {
+      raw: failureAgeStore.helpfulCommentsCount,
+      count: failureAgeStore.helpfulCommentsCount * 0.25,
+    }
+  })
+  const unresolvedFailures = computed(() => {
+    return {
+      raw: failureAgeStore.unresolvedFailures,
+      count: -failureAgeStore.unresolvedFailures * 0.1,
+    }
+  })
+
+  const wisdomGap = computed(() => {
+    return majorFailuresShared.value.count + lessonsLearnedTotal.value.count + helpfulCommentsTotal.value.count + unresolvedFailures.value.count
+  })
+  const totalAge = computed(() => {
+    return actualAge.value + wisdomGap.value
+  })
+  const calculateProgress = computed(() => ((totalAge.value - actualAge.value) * 100) / (50 - actualAge.value))
 </script>
 
 <template>
   <div>
     <div class="ages-wrapper">
       <div class="d-flex align-center justify-center age-header">
-        <h1>43.1</h1>
+        <h1>{{ useNumeral(totalAge) }}</h1>
         <p class="ml-2">years</p>
       </div>
       <v-progress-linear
-        v-model="progress"
+        v-model="calculateProgress"
         color="primary"
         height="10"
         rounded
@@ -25,14 +66,17 @@
       <div class="d-flex calculator justify-center mt-6">
         <div class="d-flex flex-column px-13 align-center">
           <div class="label">Actual Age</div>
-          <p>32</p>
+          <p>{{ actualAge }}</p>
         </div>
         <div class="d-flex flex-column px-13 border-left align-center">
           <div class="label">Wisdom Gap</div>
-          <p>13.5</p>
+          <p>{{ useNumeral(wisdomGap) }}</p>
         </div>
       </div>
-      <div class="toggle-btn d-flex align-center justify-center mt-5 cursor-pointer" @click="showFormula = !showFormula">
+      <div
+        class="toggle-btn d-flex align-center justify-center mt-5 cursor-pointer"
+        @click="showFormula = !showFormula"
+      >
         <span class="text-primary fs-14">{{ showFormula ? 'Hide' : 'Show' }} Formula</span>
         <v-icon class="ml-3" color="primary" :icon="showFormula ? 'mdi-chevron-up' : 'mdi-chevron-down'" />
       </div>
@@ -59,9 +103,9 @@
                 <p class="text-description">+1.0 year each</p>
               </div>
             </div>
-            <div class="d-flex flex-column align-center justify-center">
-              <p class="text-description">1 x 1.0</p>
-              <div class="result" style="color: #F3A412">+1.0</div>
+            <div class="d-flex flex-column align-end justify-center">
+              <p class="text-description">{{ majorFailuresShared.raw }} x 1.0</p>
+              <div class="result" style="color: #F3A412">+{{ useNumeral(majorFailuresShared.count) }}</div>
             </div>
           </li>
           <li class="d-flex align-center justify-space-between">
@@ -72,9 +116,9 @@
                 <p class="text-description">+0.5 years each</p>
               </div>
             </div>
-            <div class="d-flex flex-column align-center justify-center">
-              <p class="text-description">2 × 0.5</p>
-              <div class="result" style="color: #31953A">+1.0</div>
+            <div class="d-flex flex-column align-end justify-center">
+              <p class="text-description">{{ lessonsLearnedTotal.raw }} × 0.5</p>
+              <div class="result" style="color: #31953A">+{{ useNumeral(lessonsLearnedTotal.count) }}</div>
             </div>
           </li>
           <li class="d-flex align-center justify-space-between">
@@ -85,9 +129,9 @@
                 <p class="text-description">+0.25 years each</p>
               </div>
             </div>
-            <div class="d-flex flex-column align-center justify-center">
-              <p class="text-description">2 × 0.5</p>
-              <div class="result">+0.5</div>
+            <div class="d-flex flex-column align-end justify-center">
+              <p class="text-description">{{ helpfulCommentsTotal.raw }} × 0.25</p>
+              <div class="result">+{{ useNumeral(helpfulCommentsTotal.count) }}</div>
             </div>
           </li>
           <li class="d-flex align-center justify-space-between bg-custom">
@@ -99,8 +143,8 @@
               </div>
             </div>
             <div class="d-flex flex-column align-center justify-center">
-              <p class="text-description">0 × 0.1</p>
-              <div class="result" style="color: #C8372B">-0.1</div>
+              <p class="text-description">{{ unresolvedFailures.raw }} × 0.1</p>
+              <div class="result" style="color: #C8372B">{{ useNumeral(unresolvedFailures.count) }}</div>
             </div>
           </li>
         </ul>

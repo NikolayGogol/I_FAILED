@@ -18,3 +18,7 @@ export function floatNumber (value, format = '0a.0') {
     return value
   }
 }
+
+export function useNumeral (value, format = '0.0') {
+  return numeral(value).format(format)
+}
