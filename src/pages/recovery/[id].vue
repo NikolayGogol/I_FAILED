@@ -78,7 +78,7 @@
           displayName: authStore.user.displayName,
           photoURL: authStore.user.photoURL,
         } }
-
+    obj.lessonLearned.createdAt = serverTimestamp()
     const response = await recoveryPostStore.recoveryPost(obj)
     if (response.success) {
       toast.success('Post recovered successfully!')
