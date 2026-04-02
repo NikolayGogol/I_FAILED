@@ -56,7 +56,6 @@ export const useProfileStore = defineStore('profile', {
         const postsRef = collection(db, VITE_POST_COLLECTION)
         const q = query(postsRef, where('uid', '==', userId), orderBy('createdAt', 'desc'))
         const querySnapshot = await getDocs(q)
-
         const posts = []
         const authStore = useAuthStore()
         const user = authStore.user
@@ -64,25 +63,24 @@ export const useProfileStore = defineStore('profile', {
 
         for (const doc of querySnapshot.docs) {
           const post = { id: doc.id, ...doc.data() }
-
           // Skip posts with not interested tags
-          if (post.tags && post.tags.some(tag => notInterestedTags.includes(tag))) {
-            continue
-          }
-
-          // Handle anonymous posts
-          if (post.isAnonymous) {
-            post.user = {
-              displayName: 'Anonymous',
-              photoURL: null,
-            }
-          } else if (post.uid && user) {
-            // Assign user data to the post
-            post.user = {
-              displayName: user.displayName,
-              photoURL: user.photoURL,
-            }
-          }
+          // if (post.tags && post.tags.some(tag => notInterestedTags.includes(tag))) {
+          //   continue
+          // }
+          //
+          // // Handle anonymous posts
+          // if (post.isAnonymous) {
+          //   post.user = {
+          //     displayName: 'Anonymous',
+          //     photoURL: null,
+          //   }
+          // } else if (post.uid && user) {
+          //   // Assign user data to the post
+          //   post.user = {
+          //     displayName: user.displayName,
+          //     photoURL: user.photoURL,
+          //   }
+          // }
           posts.push(post)
         }
         this.posts = posts
