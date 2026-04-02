@@ -36,6 +36,11 @@ export const useFailureAgeStore = defineStore('failureAge', () => {
 
     loading.value = true
     error.value = null
+    // Reset values
+    lessonsCount.value = 0
+    withoutLessonsCount.value = 0
+    shareFailurePublic.value = 0
+    posts.value = []
 
     try {
       // Fetch posts for Major Failures and Lessons Learned
