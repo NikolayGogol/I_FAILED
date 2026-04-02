@@ -47,7 +47,7 @@
 
       <div v-if="topTags.length > 0" class="common-failure-box">
         <p class="label">Most common emotion before failure:</p>
-        <p class="value">{{ topTags[0] }}</p>
+        <p class="value text-capitalize">{{ topTags[0] }}</p>
       </div>
     </section>
   </div>
