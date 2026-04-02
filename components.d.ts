@@ -16,6 +16,7 @@ declare module 'vue' {
     Activity: typeof import('./src/components/profile/Activity.vue')['default']
     AddCollectionDialog: typeof import('./src/components/feed/AddCollectionDialog.vue')['default']
     AdditionalInfoPost: typeof import('./src/components/AdditionalInfoPost.vue')['default']
+    Age: typeof import('./src/components/failure-age/age.vue')['default']
     CommentMenu: typeof import('./src/components/CommentMenu.vue')['default']
     ConfirmationModal: typeof import('./src/components/ConfirmationModal.vue')['default']
     ConfirmPasswordModal: typeof import('./src/components/modals/ConfirmPasswordModal.vue')['default']

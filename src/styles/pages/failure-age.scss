@@ -1,77 +1,100 @@
 @use '../settings.scss' as *;
 
 .failure-age-page {
-  min-height: 100vh;
-  padding-top: $spacing-md;
+  .ages-wrapper {
+    background: #F8EBE0;
+    background: linear-gradient(130deg, rgba(248, 235, 224, 1) 0%, rgba(233, 248, 227, 1) 100%);
+    border-radius: $radius-lg;
+    border: 1px solid $color-border;
+    padding: 32px;
 
-  .page-header {
-    margin-bottom: $spacing-lg;
-    text-align: center;
-
-    h1 {
-      font-size: 24px;
-      font-weight: bold;
-      color: $color-text-primary;
-      margin-bottom: $spacing-sm;
+    .v-progress-linear__background {
+      background-color: white !important;
+      opacity: 1;
     }
 
-    p {
-      color: $color-text-secondary;
-      font-size: 16px;
+    .age-header {
+      h1 {
+        font-size: 64px;
+        font-weight: 700;
+        color: $color-primary;
+      }
+
+      p {
+        color: $color-text-secondary;
+        font-size: 24px;
+      }
+    }
+
+    .legend {
+      margin-top: 5px;
+
+      p {
+        color: $color-text-secondary;
+        font-size: 12px;
+      }
+    }
+
+    .border-left {
+      border-left: 1px solid $color-border;
+    }
+
+    .calculator {
+      .label {
+        color: $color-text-secondary;
+        font-size: 12px;
+        margin-bottom: 0;
+      }
+
+      p {
+        color: $color-text-primary;
+        font-size: 24px;
+        font-weight: 700;
+      }
     }
   }
 
-  .age-calculator {
+  .formula {
     background-color: $color-surface;
     border: 1px solid $color-border;
-    border-radius: $radius-lg;
-    padding: $spacing-xl;
-    box-shadow: $shadow-sm;
-    text-align: center;
+    border-radius: $radius-xl + 4;
+    padding: 24px;
+    margin-top: 24px;
 
-    .calculator-input {
-      margin-bottom: $spacing-xl;
-
-      label {
-        display: block;
-        margin-bottom: $spacing-sm;
-        font-weight: bold;
-        color: $color-text-primary;
-      }
-
-      input {
-        width: 100%;
-        max-width: 200px;
-        padding: $spacing-sm $spacing-md;
-        border: 1px solid $color-border;
-        border-radius: $radius-md;
-        font-size: 18px;
-        text-align: center;
-
-        &:focus {
-          outline: none;
-          border-color: $color-primary;
-        }
-      }
+    .title {
+      font-size: 24px;
+      font-weight: 600;
+      color: $color-text-primary;
     }
 
-    .calculator-result {
-      p {
-        font-size: 18px;
-        color: $color-text-primary;
-        margin-bottom: $spacing-sm;
+    ul {
+      margin-top: 15px;
 
-        strong {
-          font-size: 32px;
-          color: $color-accent-text;
-          display: block;
-          margin-top: $spacing-xs;
+      li {
+        background-color: #F4FBF7;
+        padding: 15px;
+        border-radius: $radius-sm;
+        margin-bottom: 10px;
+
+        &:last-of-type {
+          margin-bottom: 0;
         }
-      }
 
-      .result-desc {
-        font-size: 14px;
-        color: $color-text-secondary;
+        &.bg-custom {
+          background-color: #FFF5F5;
+        }
+
+        .label {
+          font-weight: 600;
+          font-size: 16px;
+          color: $color-text-primary;
+        }
+
+        .result {
+          font-weight: 700;
+          font-size: 24px;
+          color: $color-text-primary;
+        }
       }
     }
   }
