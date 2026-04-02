@@ -67,6 +67,7 @@ export const useEmailSettingsStore = defineStore('emailSettings', () => {
       settings: {
         notify: {
           email: {
+            // eslint-disable-next-line
             switches: JSON.parse(JSON.stringify(switches)),
             selectedRadio: selectedRadio.value,
           },

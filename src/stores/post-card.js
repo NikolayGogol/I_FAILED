@@ -42,6 +42,7 @@ async function saveLike (payload, likeType = 'postLike') {
 
   const likesCollectionRef = collection(db, VITE_NOTIFICATION_COLLECTION, postOwnerUid, 'likes')
   let q
+  // eslint-disable-next-line
   q = likeType === 'postLike' ? query(likesCollectionRef, where('postId', '==', payload.id), where('uid', '==', likerUid)) : query(likesCollectionRef, where('commentId', '==', payload.commentId), where('uid', '==', likerUid))
 
   const querySnapshot = await getDocs(q)

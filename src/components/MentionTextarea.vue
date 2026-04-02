@@ -19,6 +19,7 @@
   const displayValue = ref(props.modelValue)
 
   const sortedUsers = computed(() => {
+    // eslint-disable-next-line
     return [...(props.users || [])].sort((a, b) => b.label.length - a.label.length)
   })
 

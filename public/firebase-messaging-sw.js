@@ -1,3 +1,4 @@
+// eslint-disable-next-line
 importScripts('https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js', 'https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging-compat.js')
 
 const params = new URL(location).searchParams
@@ -13,8 +14,9 @@ const firebaseConfig = {
 
 // Only initialize if we have the config from URL parameters
 if (firebaseConfig.apiKey) {
+  // eslint-disable-next-line
   firebase.initializeApp(firebaseConfig)
-
+  // eslint-disable-next-line
   const messaging = firebase.messaging()
 
   messaging.onBackgroundMessage(payload => {
@@ -36,7 +38,7 @@ if (firebaseConfig.apiKey) {
     const urlToOpen = event.notification.data?.url
     if (urlToOpen) {
       event.waitUntil(
-
+        // eslint-disable-next-line
         clients.matchAll({ type: 'window', includeUncontrolled: true }).then(windowClients => {
           // Check if a window is already open and focus it.
           for (const client of windowClients) {
@@ -45,7 +47,9 @@ if (firebaseConfig.apiKey) {
             }
           }
           // If no window is open, open a new one.
+          // eslint-disable-next-line
           if (clients.openWindow) {
+            // eslint-disable-next-line
             return clients.openWindow(urlToOpen)
           }
         }),

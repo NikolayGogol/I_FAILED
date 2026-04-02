@@ -1,6 +1,6 @@
 import { collection, getDocs, query, where } from 'firebase/firestore'
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { db } from '@/firebase'
 import { useAuthStore } from './auth'
 
@@ -15,7 +15,9 @@ export const useFailureAgeStore = defineStore('failureAge', () => {
   const unresolvedFailures = ref(0)
   const loading = ref(false)
   const error = ref(null)
-  const countHelpfull = 2
+  const commentHelpfull = 2
+  const actualAge = ref(24)
+
   // --- Actions ---
   async function fetchFailureAgeStats () {
     const authStore = useAuthStore()
@@ -61,7 +63,7 @@ export const useFailureAgeStore = defineStore('failureAge', () => {
       let helpfulCount = 0
       // eslint-disable-next-line
       commentsSnapshot.forEach(doc => {
-        if (doc.data().likes?.length >= 2) {
+        if (doc.data().likes?.length >= commentHelpfull) {
           helpfulCount++
         }
       })
@@ -76,14 +78,50 @@ export const useFailureAgeStore = defineStore('failureAge', () => {
       loading.value = false
     }
   }
+  const majorFailuresSharedData = computed(() => {
+    return {
+      raw: majorFailuresShared.value,
+      count: majorFailuresShared.value * 1,
+    }
+  })
+  const helpfulCommentsTotalData = computed(() => {
+    return {
+      raw: helpfulCommentsCount.value,
+      count: helpfulCommentsCount.value * 0.25,
+    }
+  })
+  const unresolvedFailuresData = computed(() => {
+    return {
+      raw: unresolvedFailures.value,
+      count: -unresolvedFailures.value * 0.1,
+    }
+  })
+  const wisdomGapData = computed(() => {
+    return majorFailuresSharedData.value.count + lessonsLearnedTotalData.value.count + helpfulCommentsTotalData.value.count + unresolvedFailuresData.value.count
+  })
+  const totalAgeData = computed(() => {
+    return actualAge.value + wisdomGapData.value
+  })
+  const lessonsLearnedTotalData = computed(() => {
+    return {
+      raw: lessonsLearnedCount.value,
+      count: lessonsLearnedCount.value * 0.5,
+    }
+  })
+  const calculateProgressData = computed(() => ((totalAgeData.value - actualAge.value) * 100) / (50 - actualAge.value))
 
   return {
-    majorFailuresShared,
-    lessonsLearnedCount,
-    helpfulCommentsCount,
-    unresolvedFailures,
-    loading,
-    error,
+    // state
+    actualAge,
+    //
+    majorFailuresSharedData,
+    helpfulCommentsTotalData,
+    lessonsLearnedTotalData,
+    unresolvedFailuresData,
+    wisdomGapData,
+    totalAgeData,
+    calculateProgressData,
+    // Actions
     fetchFailureAgeStats,
   }
 })

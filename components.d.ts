@@ -33,6 +33,7 @@ declare module 'vue' {
     FormTextarea: typeof import('./src/components/FormTextarea.vue')['default']
     ForYouTab: typeof import('./src/components/feed/tabs/ForYouTab.vue')['default']
     GoogleLoginButton: typeof import('./src/components/GoogleLoginButton.vue')['default']
+    Growth: typeof import('./src/components/failure-age/growth.vue')['default']
     HelpSettings: typeof import('./src/components/settings/HelpSettings.vue')['default']
     Info: typeof import('./src/components/settings/account-tabs/Info.vue')['default']
     LatestTab: typeof import('./src/components/feed/tabs/LatestTab.vue')['default']

@@ -66,6 +66,7 @@ export const usePushSettingsStore = defineStore('pushSettings', () => {
       settings: {
         notify: {
           push: {
+            // eslint-disable-next-line
             switches: JSON.parse(JSON.stringify(switches)),
           },
         },

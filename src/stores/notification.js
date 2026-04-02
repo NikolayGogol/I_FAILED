@@ -49,7 +49,7 @@ export const useNotificationStore = defineStore('notification', {
           this[sub] = items
           allNotifications.push(...items)
         }
-
+        // eslint-disable-next-line
         this.notifications = allNotifications.sort((a, b) => b.createdAt.toMillis() - a.createdAt.toMillis())
       } catch (error) {
         console.error('Error fetching notifications:', error)

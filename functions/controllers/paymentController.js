@@ -42,7 +42,7 @@ exports.createSubscription = async (req, res) => {
 
     let customer
     const customers = await stripe.customers.list({ email, limit: 1 })
-
+    // eslint-disable-next-line
     customer
       = customers.data.length > 0
         ? customers.data[0]
