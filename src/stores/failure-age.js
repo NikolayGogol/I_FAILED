@@ -15,7 +15,7 @@ export const useFailureAgeStore = defineStore('failureAge', () => {
   const unresolvedFailures = ref(0)
   const loading = ref(false)
   const error = ref(null)
-  const commentHelpfull = 2
+  const commentHelpFull = 2
   const actualAge = ref(34)
   const lessonsCount = ref(0)
   const withoutLessonsCount = ref(0)
@@ -73,7 +73,7 @@ export const useFailureAgeStore = defineStore('failureAge', () => {
       let helpfulCount = 0
       // eslint-disable-next-line
       commentsSnapshot.forEach(doc => {
-        if (doc.data().likes?.length >= commentHelpfull) {
+        if (doc.data().likes?.length >= commentHelpFull) {
           helpfulCount++
         }
       })
