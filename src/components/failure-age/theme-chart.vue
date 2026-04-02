@@ -1,6 +1,6 @@
 <script setup>
   import ApexCharts from 'apexcharts'
-  import { computed, ref } from 'vue'
+  import { computed } from 'vue'
   import apexchart from 'vue3-apexcharts'
   import { useFailureAgeStore } from '@/stores/failure-age.js'
 
@@ -82,13 +82,12 @@
 </script>
 
 <template>
-  <div class="section recurring-themes">
+  <div v-if="series.length > 0" class="section recurring-themes">
     <h3 class="title-section d-flex align-center">Your Recurring Themes</h3>
     <p class="text-description fs-14">Patterns that help you understand yourself better</p>
 
     <div class="chart-wrapper mt-10">
       <apexchart
-        v-if="series.length > 0"
         :options="chartOptions"
         :series="series"
         style="transform: scale(1.3)"

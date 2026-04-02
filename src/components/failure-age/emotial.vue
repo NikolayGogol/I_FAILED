@@ -29,7 +29,7 @@
 </script>
 
 <template>
-  <div class="emotional-card section">
+  <div v-if="topTags.length > 0" class="emotional-card section">
     <section class="section-emotional">
       <h3 class="title-section">Emotional Patterns</h3>
       <p class="text-description">Triggers that often appear in your journey</p>
