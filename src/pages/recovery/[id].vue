@@ -41,6 +41,7 @@
       store.enableTriggerWarning = res.enableTriggerWarning
       store.triggerTags = store.enableTriggerWarning ? res.triggerTags : []
       store.scheduleDate = store.scheduledAt ? res.scheduledAt : null
+      if (res.lessonLearned) router.push('/profile')
     })
 
   function handleTextChange (value, key) {
@@ -168,10 +169,11 @@
           <div class="form-group">
             <label class="form-label">Cost (optional)</label>
             <FormInput
-              v-model="store.lessonLearned.cost"
+              v-model.number="store.lessonLearned.cost"
               class="form-input"
               persistent-counter
               placeholder="Monetary or time, e.g., $5,000 or 6 months of time"
+              type="number"
             />
           </div>
           <div class="form-group">
