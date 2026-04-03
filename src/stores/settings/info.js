@@ -34,6 +34,7 @@ export const useInfoSettingsStore = defineStore('infoSettings', () => {
   }
 
   function formatUsername (newValue) {
+    // eslint-disable-next-line
     let formatted = newValue || ''
     if (!formatted.startsWith('@')) {
       formatted = '@' + formatted
@@ -133,6 +134,5 @@ export const useInfoSettingsStore = defineStore('infoSettings', () => {
     formatUsername,
     saveProfile,
     handlePasswordConfirm,
-    updateProfile,
   }
 })

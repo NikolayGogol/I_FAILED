@@ -59,6 +59,7 @@ export const useProfileStore = defineStore('profile', {
         const posts = []
         const authStore = useAuthStore()
         const user = authStore.user
+        // eslint-disable-next-line
         const notInterestedTags = user?.notInterestedTags || []
 
         for (const doc of querySnapshot.docs) {

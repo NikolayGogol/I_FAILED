@@ -27,6 +27,7 @@
       .filter(Boolean)
     const daysCount = lessonLearned.reduce((acc, curr) => acc + curr, 0)
     const average = daysCount / lessonLearned.length
+    sessionStorage.setItem('averageRecoveryTime', average || 0)
     return `${average || 0} days`
   })
 </script>
