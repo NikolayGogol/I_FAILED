@@ -3,7 +3,7 @@
   import { useFailureAgeStore } from '@/stores/failure-age.js'
 
   const failureAgeStore = useFailureAgeStore()
-  const tags = failureAgeStore.posts.map(el => el?.suggestedTags)
+  const tags = failureAgeStore.posts.map(el => el?.tags)
     .filter(Boolean)
   const tagsNumber = 8
   const topTags = computed(() => {
@@ -19,7 +19,7 @@
       .map(([tag]) => tag)
   })
 
-  // Функція для визначення розміру (класу) залежно від пріоритету
+  // Function to determine the size (class) based on priority
   function getTagClass (index) {
     if (index === 0) return 'tag-huge'
     if (index === 1 || index === 2) return 'tag-large'
@@ -29,7 +29,7 @@
 </script>
 
 <template>
-  <div v-if="topTags.length > 0" class="emotional-card section">
+  <div v-if="topTags.length > 0" class="emotional-card section h-100">
     <section class="section-emotional">
       <h3 class="title-section">Emotional Patterns</h3>
       <p class="text-description">Triggers that often appear in your journey</p>
