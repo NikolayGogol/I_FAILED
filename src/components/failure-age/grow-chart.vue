@@ -80,6 +80,7 @@
     }
   })
   const communityEngagementPercentage = computed(() => {
+    console.log(communityEngagement.value, 'communityEngagementPercentage');
     if (communityEngagement.value > 100) {
       return communityEngagement.value / 3
     } else if (communityEngagement.value > 500) {
