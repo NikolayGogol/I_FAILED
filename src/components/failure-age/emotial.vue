@@ -3,11 +3,15 @@
   import { useFailureAgeStore } from '@/stores/failure-age.js'
 
   const failureAgeStore = useFailureAgeStore()
-  const tags = failureAgeStore.posts.map(el => el?.tags)
-    .filter(Boolean)
+
+  const tags = computed(() => {
+    return failureAgeStore.posts.map(el => el?.tags)
+      .filter(Boolean)
+  })
+
   const tagsNumber = 8
   const topTags = computed(() => {
-    const allTags = tags.flat()
+    const allTags = tags.value.flat()
     const tagCounts = allTags.reduce((acc, tag) => {
       acc[tag] = (acc[tag] || 0) + 1
       return acc
