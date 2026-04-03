@@ -30,7 +30,7 @@
       value: 1,
     },
   ]
-  const selectedTab = ref(tabs[1])
+  const selectedTab = ref(tabs[0])
 </script>
 <template>
   <div class="failure-age-page">
