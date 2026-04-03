@@ -48,7 +48,7 @@ export const useSettingsStore = defineStore('settings', {
      * Updates the user's account information in Firestore and Firebase Auth.
      * This is the root function for persisting settings data.
      */
-    async updateAccountSettings ({ displayName, bio, userName, email, photoFile }) {
+    async updateAccountSettings ({ displayName, bio, userName, email, dob, photoFile }) {
       this.loading = true
       this.error = null
       const authStore = useAuthStore()
@@ -79,6 +79,7 @@ export const useSettingsStore = defineStore('settings', {
           bio,
           userName,
           email,
+          dob,
           photoURL: newPhotoURL,
         }
 

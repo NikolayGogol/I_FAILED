@@ -1,15 +1,28 @@
 <script setup>
   import { onMounted, ref } from 'vue'
+  import { useAuthStore } from '@/stores/auth.js'
   import { useFailureAgeStore } from '@/stores/failure-age'
   import { useNumeral } from '@/utils/format-number.js'
+  import DobModal from './DobModal.vue' // Import the new component
 
   const showFormula = ref(false)
+  const showDobModal = ref(false) // Still need this to control the modal
 
   const failureAgeStore = useFailureAgeStore()
+  const authStore = useAuthStore()
 
   onMounted(() => {
     failureAgeStore.fetchFailureAgeStats()
+    if (!authStore.user.dob) {
+      showDobModal.value = true
+    }
   })
+
+  function onDobUpdated () {
+    // Optionally, you can add logic here to refresh data that depends on the DOB.
+    // For example, re-fetching failure age stats if they are dependent on the user's age.
+    failureAgeStore.fetchFailureAgeStats()
+  }
 </script>
 
 <template>
@@ -116,5 +129,8 @@
         </ul>
       </div>
     </v-expand-transition>
+
+    <!-- DOB Input Modal -->
+    <dob-modal v-model="showDobModal" @dob-updated="onDobUpdated" />
   </div>
 </template>

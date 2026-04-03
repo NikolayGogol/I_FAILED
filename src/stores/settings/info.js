@@ -18,6 +18,7 @@ export const useInfoSettingsStore = defineStore('infoSettings', () => {
   const userName = ref('')
   const bio = ref('')
   const email = ref('')
+  const dob = ref('') // Added dob field
   const initialEmail = ref('')
   const confirmPasswordDialog = ref(false)
   const modalLoading = ref(false)
@@ -28,6 +29,7 @@ export const useInfoSettingsStore = defineStore('infoSettings', () => {
     userName.value = user.value?.userName || ''
     bio.value = user.value?.bio || ''
     email.value = user.value?.email || ''
+    dob.value = user.value?.dob || '' // Initialize dob
     initialEmail.value = user.value?.email || ''
   }
 
@@ -63,6 +65,7 @@ export const useInfoSettingsStore = defineStore('infoSettings', () => {
         userName: userName.value,
         bio: bio.value,
         email: email.value,
+        dob: dob.value, // Include dob in the update
       })
 
       if (emailChanged) {
@@ -122,6 +125,7 @@ export const useInfoSettingsStore = defineStore('infoSettings', () => {
     userName,
     bio,
     email,
+    dob, // Expose dob
     initialEmail,
     confirmPasswordDialog,
     modalLoading,
@@ -129,5 +133,6 @@ export const useInfoSettingsStore = defineStore('infoSettings', () => {
     formatUsername,
     saveProfile,
     handlePasswordConfirm,
+    updateProfile,
   }
 })

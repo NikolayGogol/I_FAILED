@@ -1,7 +1,7 @@
 <script setup>
   import dayjs from 'dayjs'
   import { storeToRefs } from 'pinia'
-  import { onMounted, watch } from 'vue'
+  import { onMounted, ref, watch } from 'vue' // Import ref
   import ConfirmPasswordModal from '@/components/modals/ConfirmPasswordModal.vue'
   import { useAuthStore } from '@/stores/auth.js'
   import { useInfoSettingsStore } from '@/stores/settings/info.js'
@@ -19,6 +19,7 @@
     userName,
     bio,
     email,
+    dob, // Destructure dob
     confirmPasswordDialog,
     modalLoading,
   } = storeToRefs(infoSettingsStore)
@@ -33,6 +34,9 @@
   const { user } = storeToRefs(authStore)
   const emit = defineEmits(['back'])
 
+  // Reactive variable for the date picker menu
+  const dobMenu = ref(false)
+
   // Initialize the store's state when the component mounts
   onMounted(() => {
     initialize()
@@ -41,6 +45,13 @@
   // Watch for changes in the userName ref and call the store action
   watch(userName, newValue => {
     formatUsername(newValue)
+  })
+
+  // Watch for changes in dob and format it
+  watch(dob, newValue => {
+    if (newValue && dayjs(newValue).isValid()) {
+      dob.value = dayjs(newValue).format('MM/DD/YYYY')
+    }
   })
 </script>
 
@@ -82,6 +93,36 @@
           type="email"
         />
       </div>
+
+      <!-- Date of Birth Picker -->
+      <div class="form-group mt-3">
+        <v-menu
+          v-model="dobMenu"
+          :close-on-content-click="false"
+          min-width="auto"
+          offset-y
+          transition="scale-transition"
+        >
+          <template #activator="{ props }">
+            <form-input
+              v-model="dob"
+              v-bind="props"
+              hide-details
+              label="Date of Birth"
+              placeholder="MM/DD/YYYY"
+              prepend-inner-icon="mdi-calendar"
+              readonly
+            />
+          </template>
+          <v-date-picker
+            v-model="dob"
+            color="primary"
+            :max="dayjs().format('YYYY-MM-DD')"
+            @update:model-value="dobMenu = false"
+          />
+        </v-menu>
+      </div>
+
       <p class="mt-6">Account creation</p>
       <p class="text-description" style="font-size: 12px">{{ dayjs.unix(user?.createdAt?.seconds).format('DD MMM YYYY') }}</p>
       <div class="d-flex justify-center mt-6">

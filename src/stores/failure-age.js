@@ -1,3 +1,4 @@
+import dayjs from 'dayjs'
 import { collection, getDocs, orderBy, query, where } from 'firebase/firestore'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
@@ -15,8 +16,8 @@ export const useFailureAgeStore = defineStore('failureAge', () => {
   const unresolvedFailures = ref(0)
   const loading = ref(false)
   const error = ref(null)
-  const commentHelpFull = 2
-  const actualAge = ref(34)
+  const commentHelpFull = 1
+  const actualAge = ref(22)
   const lessonsCount = ref(0)
   const withoutLessonsCount = ref(0)
   const shareFailurePublic = ref(0)
@@ -25,7 +26,12 @@ export const useFailureAgeStore = defineStore('failureAge', () => {
   async function fetchFailureAgeStats () {
     const authStore = useAuthStore()
     const user = authStore.user
-
+    if (user.dob) {
+      const birthDate = dayjs(user.dob, 'MM/DD/YYYY')
+      const today = dayjs()
+      const age = today.diff(birthDate, 'year')
+      actualAge.value = age
+    }
     if (!user || !user.uid) {
       console.warn('User is not authenticated. Cannot fetch stats.')
       majorFailuresShared.value = 0
