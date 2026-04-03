@@ -302,6 +302,20 @@
             }
           }
         }
+        &.lesson-tag {
+          .content-card {
+            background-color: #FFF9F0;
+            border-color: #F3A412;
+
+            &:before {
+              background-color: #F3A412;
+            }
+
+            p {
+              color: $color-text-secondary;
+            }
+          }
+        }
 
         .time-card {
           width: 100px;
