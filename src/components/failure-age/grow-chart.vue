@@ -7,12 +7,15 @@
   const growChartStore = useGrowChartStore()
   const communityAverageRecoveryTime = ref(0)
   const userAverageRecoveryTime = ref(0)
-
+  const communityEngagement = ref(0)
+  const userEngagement = ref(0)
   const maxRecoveryDays = Math.max(...recoveryTimeOptions.map(opt => opt.days))
 
   onMounted(async () => {
     await growChartStore.fetchLessonLearnedPosts()
+    await growChartStore.fetchComments()
     calculateCommunityAverageRecoveryTime()
+    calculateEngagement()
     const userAverage = +sessionStorage.getItem('averageRecoveryTime')
     if (!Number.isNaN(userAverage)) {
       userAverageRecoveryTime.value = userAverage
@@ -38,6 +41,19 @@
     }
   }
 
+  function calculateEngagement () {
+    const communityComments = growChartStore.commentsList
+    const communityLikes = growChartStore.likesList
+    if (communityComments.length > 0 || communityLikes.length > 0) {
+      communityEngagement.value = communityComments.length + communityLikes.length
+    }
+    const userComments = growChartStore.commentsListOwn
+    const userLikes = growChartStore.likesListOwn
+    if (userComments.length > 0 || userLikes.length > 0) {
+      userEngagement.value = userComments.length + userLikes.length
+    }
+  }
+
   const communityAveragePercentage = computed(() => {
     if (communityAverageRecoveryTime.value > 0) {
       return Math.round((communityAverageRecoveryTime.value / maxRecoveryDays) * 100)
@@ -52,6 +68,28 @@
     return 0
   })
 
+  const userEngagementPercentage = computed(() => {
+    if (userEngagement.value > 100) {
+      return userEngagement.value / 3
+    } else if (userEngagement.value > 500) {
+      return userEngagement.value / 2
+    } else if (userEngagement.value > 1000) {
+      return userEngagement.value / 4
+    } else {
+      return userEngagement.value
+    }
+  })
+  const communityEngagementPercentage = computed(() => {
+    if (communityEngagement.value > 100) {
+      return communityEngagement.value / 3
+    } else if (communityEngagement.value > 500) {
+      return communityEngagement.value / 2
+    } else if (communityEngagement.value > 1000) {
+      return communityEngagement.value / 4
+    } else {
+      return communityEngagement.value
+    }
+  })
   const chartOptions = computed(() => ({
     chart: {
       type: 'bar',
@@ -60,7 +98,7 @@
         show: false,
       },
     },
-    colors: ['#E77136', '#FFD4A3'], // Custom colors: green for user, blue for community
+    colors: ['#E77136', '#FFD4A3'],
     plotOptions: {
       bar: {
         horizontal: false,
@@ -77,7 +115,7 @@
       colors: ['transparent'],
     },
     xaxis: {
-      categories: ['Recovery Time'],
+      categories: ['Recovery Time', 'Engagement'],
       labels: {
         style: {
           fontSize: '12px',
@@ -115,11 +153,11 @@
   const series = computed(() => ([
     {
       name: 'You',
-      data: [userAveragePercentage.value],
+      data: [userAveragePercentage.value, Math.min(userEngagementPercentage.value, 100)],
     },
     {
       name: 'Community Avg',
-      data: [communityAveragePercentage.value],
+      data: [communityAveragePercentage.value, Math.min(communityEngagementPercentage.value, 100)],
     },
   ]))
 
