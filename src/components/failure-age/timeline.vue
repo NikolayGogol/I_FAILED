@@ -61,13 +61,13 @@
       const currentFailureAge = actualAgeAtEventTime + wisdomGap
 
       // Check if a milestone was crossed
-      const lastAchievedMilestoneAge = timelineItems
+      let lastAchievedMilestoneAge = timelineItems
         .filter(i => i.isMilestone)
         .reduce((max, i) => Math.max(max, i.milestoneAge), 0)
 
-      const milestoneJustAchieved = ageMilestones.find(m => m.age > lastAchievedMilestoneAge && currentFailureAge >= m.age)
+      let milestoneJustAchieved = ageMilestones.find(m => m.age > lastAchievedMilestoneAge && currentFailureAge >= m.age)
 
-      if (milestoneJustAchieved) {
+      while (milestoneJustAchieved) {
         timelineItems.push({
           id: `age-milestone-${milestoneJustAchieved.age}`,
           title: `🎉 Reached ${milestoneJustAchieved.age} Failure Age`,
@@ -78,18 +78,33 @@
           milestoneAge: milestoneJustAchieved.age,
           description: milestoneJustAchieved.label,
         })
+        lastAchievedMilestoneAge = milestoneJustAchieved.age
+        milestoneJustAchieved = ageMilestones.find(m => m.age > lastAchievedMilestoneAge && currentFailureAge >= m.age)
       }
     }
 
     // 4. Sort the final combined list for display (newest first)
     return timelineItems.toSorted((a, b) => {
+      // Primary sort: newest first by creation time
       if (b.createdAt.seconds !== a.createdAt.seconds) {
         return b.createdAt.seconds - a.createdAt.seconds
       }
-      // If events have the same timestamp, define a clear order: Milestone > Lesson > Post
-      if (a.isMilestone !== b.isMilestone) return b.isMilestone ? 1 : -1
-      if (a.isLesson !== b.isLesson) return b.isLesson ? 1 : -1
-      return 0
+
+      // Secondary sort for items with the same creation time
+      // Higher milestone age comes first
+      if (a.isMilestone && b.isMilestone) {
+        return b.milestoneAge - a.milestoneAge
+      }
+
+      // Milestones come before anything else
+      if (a.isMilestone) return -1
+      if (b.isMilestone) return 1
+
+      // Lessons come before posts
+      if (a.isLesson && !b.isLesson) return -1
+      if (!a.isLesson && b.isLesson) return 1
+
+      return 0 // Keep original order if all other criteria are equal
     })
   })
 </script>
@@ -116,6 +131,8 @@
           <div class="content-card">
             <div v-if="card.selectedCategories && !card.isLesson" class="d-flex align-center justify-space-between">
               <div v-if="card?.selectedCategories[0]?.label" class="tag">{{ card.selectedCategories[0].label }}</div>
+              <div v-if="card.lessonLearned" class="tag-green">RECOVERED</div>
+              <div v-else class="tag-yellow">RECOVERING</div>
             </div>
             <h5>
               <template v-if="card.isLesson">💡</template>
