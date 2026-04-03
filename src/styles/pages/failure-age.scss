@@ -285,6 +285,23 @@
         align-items: center;
         margin-bottom: 15px;
 
+        &.milestone-tag {
+          .content-card {
+            background-color: #F4FBF7;
+            border-color: #31953A;
+
+            &:before {
+              background-color: #31953A;
+            }
+
+            h5 {
+              color: #31953A;
+            }
+            p {
+              color: $color-text-secondary;
+            }
+          }
+        }
 
         .time-card {
           width: 100px;
