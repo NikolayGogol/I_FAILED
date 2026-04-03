@@ -8,7 +8,7 @@
 </script>
 
 <template>
-  <section class="section recovery-timeline">
+  <section v-if="listData.length > 0" class="section recovery-timeline">
     <div class="title-section">Recovery Timeline</div>
     <div class="position-relative">
       <div class="line" />

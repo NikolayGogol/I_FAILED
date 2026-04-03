@@ -11,6 +11,7 @@
   import { ref } from 'vue'
   import Achievement from '@/components/failure-age/achievement.vue'
   import Age from '@/components/failure-age/age.vue'
+  import Calendar from '@/components/failure-age/calendar.vue'
   import Dashboard from '@/components/failure-age/dashboard.vue'
   import Emotial from '@/components/failure-age/emotial.vue'
   import Growth from '@/components/failure-age/growth.vue'
@@ -61,6 +62,7 @@
           <emotial />
         </v-col>
       </v-row>
+      <calendar class="mt-4" />
     </div>
   </div>
 </template>
