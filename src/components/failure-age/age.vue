@@ -3,7 +3,7 @@
   import { useAuthStore } from '@/stores/auth.js'
   import { useFailureAgeStore } from '@/stores/failure-age'
   import { useNumeral } from '@/utils/format-number.js'
-  import DobModal from './DobModal.vue' // Import the new component
+  import DobModal from './dob-modal.vue' // Import the new component
 
   const showFormula = ref(false)
   const showDobModal = ref(false) // Still need this to control the modal

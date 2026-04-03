@@ -14,6 +14,7 @@
   import Calendar from '@/components/failure-age/calendar.vue'
   import Dashboard from '@/components/failure-age/dashboard.vue'
   import Emotial from '@/components/failure-age/emotial.vue'
+  import GrowChart from '@/components/failure-age/grow-chart.vue'
   import Growth from '@/components/failure-age/growth.vue'
   import ThemeChart from '@/components/failure-age/theme-chart.vue'
   import Timeline from '@/components/failure-age/timeline.vue'
@@ -29,7 +30,7 @@
       value: 1,
     },
   ]
-  const selectedTab = ref(tabs[0])
+  const selectedTab = ref(tabs[1])
 </script>
 <template>
   <div class="failure-age-page">
@@ -54,6 +55,7 @@
     </div>
     <div v-if="selectedTab.value === 1" class="tab-content">
       <dashboard />
+      <grow-chart class="mt-4" />
       <v-row class="mt-4">
         <v-col cols="12" sm="6">
           <theme-chart />
