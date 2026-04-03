@@ -16,7 +16,13 @@
         counts[category.label] = (counts[category.label] || 0) + 1
       }
     }
-    return counts
+
+    // Sort by count, take top 3, and convert back to an object
+    const sortedCategories = Object.entries(counts)
+      .toSorted(([, a], [, b]) => b - a)
+      .slice(0, 3)
+
+    return Object.fromEntries(sortedCategories)
   })
 
   const series = computed(() => Object.values(categoryCounts.value))
@@ -43,13 +49,13 @@
     },
     // Main colors
     colors: [
-      '#E77136', '#263d9a', '#FB6EAB', '#9B59B6', '#4BC0C0',
+      '#E77136', '#FB6EAB', '#FFEAA3', '#263d9a', '#9B59B6',
       '#73aa20', '#5DADE2', '#48C9B0', '#F7DC6F', '#AF7AC5',
     ],
     stroke: { show: true, width: 2, colors: ['#fff'] },
     plotOptions: {
       pie: {
-        donut: { size: '60%' },
+        donut: { size: '50%' },
       },
     },
     labels: chartLabels.value,
