@@ -94,9 +94,9 @@
     <p class="text-description fs-14">Heatmap view of active failure periods</p>
 
     <div class="calendar-controls mt-4">
-      <v-btn color="primary" density="small" icon="mdi-chevron-left" @click="previousMonth" />
+      <v-btn color="primary" density="comfortable" icon="mdi-chevron-left" @click="previousMonth" />
       <span class="month-name">{{ currentMonthName }} {{ currentYear }}</span>
-      <v-btn color="primary" density="small" icon="mdi-chevron-right" @click="nextMonth" />
+      <v-btn color="primary" density="comfortable" icon="mdi-chevron-right" @click="nextMonth" />
     </div>
     <div class="d-flex justify-center">
       <ul class="list-week">

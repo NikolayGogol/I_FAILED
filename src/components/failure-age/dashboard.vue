@@ -38,28 +38,21 @@
       Your Personal Dashboard
     </h3>
     <v-row class="mt-4">
-      <v-col class="px-1" cols="12" sm="3">
+      <v-col class="px-1" cols="12" sm="4">
         <div class="d-flex flex-column item">
           <img alt="" src="../../assets/age/heart.png">
           <div class="count">{{ failureAgeStore.posts.length }}</div>
           <p class="text-description fs-14 mt-2">Total failures shared</p>
         </div>
       </v-col>
-      <v-col class="px-1" cols="12" sm="3">
+      <v-col class="px-1" cols="12" sm="4">
         <div class="d-flex flex-column item">
           <img alt="" src="../../assets/age/chart.png">
           <div class="count">{{ averageRecoveryTime }}</div>
           <p class="text-description fs-14 mt-2">Average recovery time</p>
         </div>
       </v-col>
-      <v-col class="px-1" cols="12" sm="3">
-        <div class="d-flex flex-column item">
-          <img alt="" src="../../assets/age/calendar.png">
-          <div class="count">23 days</div>
-          <p class="text-description fs-14 mt-2">Current growth streak</p>
-        </div>
-      </v-col>
-      <v-col class="px-1" cols="12" sm="3">
+      <v-col class="px-1" cols="12" sm="4">
         <div class="d-flex flex-column item">
           <img alt="" src="../../assets/age/star.png">
           <div class="count">Level {{ findLevel().level }}</div>
