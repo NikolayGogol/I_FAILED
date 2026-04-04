@@ -62,7 +62,7 @@
       <div class="d-flex align-center">
         <v-icon color="grey-darken-1" icon="mdi-plus" @click="$router.push('/create-post')" />
         <div class="position-relative ml-2" @click="$router.push('/notifications')">
-          <div class="badge">{{ notifications }}</div>
+          <div v-if="notifications > 0" class="badge">{{ notifications }}</div>
           <div class="d-flex" v-html="getIcon('bell')" />
         </div>
         <div class="profile-avatar ml-3" @click="drawer = true">
