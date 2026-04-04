@@ -265,7 +265,7 @@
                 native
                 @select="onSelectEmoji"
               />
-              <v-icon class="emoji-icon cursor-pointer" icon="mdi-emoticon-outline" @click="showEmojiPicker = !showEmojiPicker" />
+              <div class="d-flex cursor-pointer" @click="showEmojiPicker = !showEmojiPicker" v-html="getIcon('smile')" />
             </div>
           </div>
           <div class="d-flex justify-start mt-2">
@@ -374,7 +374,7 @@
                         native
                         @select="emoji => onSelectReplyEmoji(emoji, comment.id)"
                       />
-                      <v-icon class="emoji-icon cursor-pointer" icon="mdi-emoticon-outline" @click="showReplyEmojiPicker[comment.id] = !showReplyEmojiPicker[comment.id]" />
+                      <div class="d-flex cursor-pointer" @click="showReplyEmojiPicker[comment.id] = !showReplyEmojiPicker[comment.id]" v-html="getIcon('smile')" />
                     </div>
                   </div>
                   <div class="d-flex mt-2">
@@ -480,7 +480,7 @@
                             native
                             @select="emoji => onSelectReplyEmoji(emoji, reply.id)"
                           />
-                          <v-icon class="emoji-icon cursor-pointer" icon="mdi-emoticon-outline" @click="showReplyEmojiPicker[reply.id] = !showReplyEmojiPicker[reply.id]" />
+                          <div class="d-flex cursor-pointer" @click="showReplyEmojiPicker[reply.id] = !showReplyEmojiPicker[reply.id]" v-html="getIcon('smile')" />
                         </div>
                       </div>
                       <div class="d-flex mt-2">

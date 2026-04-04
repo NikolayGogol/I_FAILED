@@ -13,6 +13,22 @@
     width: 32px;
   }
 
+  .badge {
+    background-color: #C8372B;
+    color: white;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    font-size: 10px;
+    position: absolute;
+    top: -10px;
+    left: 7px;
+    text-transform: uppercase;
+  }
+
   .profile-avatar {
     width: 32px;
     height: 32px;

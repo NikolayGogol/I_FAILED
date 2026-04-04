@@ -19,6 +19,7 @@ const myCustomTheme = {
     'warning': '#6E240F',
     'orange-accent-1': '#F9EAD5',
     'grey-darken-4': '#454541',
+    'grey-darken-1': '#808079',
     'grey-darken-3': '#1C1C1B',
   },
 }

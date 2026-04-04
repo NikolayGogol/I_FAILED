@@ -4,11 +4,14 @@
   import { useRouter } from 'vue-router'
   import { useDisplay } from 'vuetify'
   import MobileSlide from '@/components/MobileSlide.vue'
+  import { getIcon } from '@/models/icons.js'
   import { useAuthStore } from '@/stores/auth.js'
+  import { useMainStore } from '@/stores/main/main.js'
   import '@/styles/components/mobile-navbar.scss'
   const { mdAndUp } = useDisplay()
 
   const logoutDialog = ref(false)
+  const mainStore = useMainStore()
 
   const drawer = ref(false)
   const aside = ref(false)
@@ -45,6 +48,8 @@
     drawer.value = false
     await router.push('/login')
   }
+  const notifications = computed(() => mainStore.notifications)
+
 </script>
 
 <template>
@@ -55,8 +60,11 @@
         <img alt="" class="logo ml-4" src="../assets/Logo.png" @click="$router.push('/')">
       </div>
       <div class="d-flex align-center">
-        <v-icon icon="mdi-plus" />
-        <v-icon class="ml-3" icon="mdi-bell-outline" />
+        <v-icon color="grey-darken-1" icon="mdi-plus" @click="$router.push('/create-post')" />
+        <div class="position-relative ml-2" @click="$router.push('/notifications')">
+          <div class="badge">{{ notifications }}</div>
+          <div class="d-flex" v-html="getIcon('bell')" />
+        </div>
         <div class="profile-avatar ml-3" @click="drawer = true">
           <v-img
             v-if="currentUserPhoto"

@@ -1,5 +1,6 @@
 <script setup>
   import { nextTick, onMounted, ref, watch } from 'vue'
+  import { getIcon } from '@/models/icons.js'
 
   // Define component props
   const props = defineProps({
@@ -103,7 +104,7 @@
       @change="onFileChange"
     >
     <!-- The visible icon that triggers the file dialog -->
-    <v-icon class="cursor-pointer" icon="mdi-image-outline" @click="openFileDialog" />
+    <div class="d-flex cursor-pointer mr-2" @click="openFileDialog" v-html="getIcon('image')" />
 
     <!-- Teleport the preview to the target element if `teleportTo` is provided and the target is ready -->
     <Teleport v-if="targetReady && teleportTo" :to="teleportTo">
