@@ -154,6 +154,12 @@ export const useCommentsStore = defineStore('comments', {
 
       await singlePostStore.saveCommentAction(post, { id: commentId, text })
 
+      // Send notifications
+      if (post.uid !== user.uid) {
+        await singlePostStore.sendCommentEmail({ post, authStore: user, comment: { text, id: commentId } })
+        await singlePostStore.sendCommentPush(post, commentId)
+      }
+
       // Handle mentions
       const mentions = extractMentions(text)
       if (mentions.length > 0) {
@@ -257,6 +263,12 @@ export const useCommentsStore = defineStore('comments', {
 
       const docRef = await addDoc(collection(db, comments_collection), newReplyData)
       const commentId = docRef.id // Reply is also a comment in the collection
+
+      // Send notifications
+      if (post.uid !== user.uid) {
+        await singlePostStore.sendCommentEmail({ post, authStore: user, comment: { text, id: commentId } })
+        await singlePostStore.sendCommentPush(post, commentId)
+      }
 
       // Handle mentions
       const mentions = extractMentions(text)

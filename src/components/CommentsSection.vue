@@ -11,6 +11,7 @@
   import { getIcon } from '@/models/icons.js'
   import { useAuthStore } from '@/stores/auth'
   import { useCommentsStore } from '@/stores/comments'
+  import { usePostCardStore } from '@/stores/post-card.js'
 
   dayjs.extend(relativeTime)
 
@@ -33,6 +34,7 @@
 
   const authStore = useAuthStore()
   const commentsStore = useCommentsStore()
+  const postCardStore = usePostCardStore()
   const toast = useToast()
 
   const newComment = ref('')
@@ -117,8 +119,26 @@
       return
     }
     const isLiked = comment.likes?.includes(authStore.user.uid) || false
-    await commentsStore.toggleCommentLike(comment.id, authStore.user.uid, isLiked)
-    emit('reload-comments')
+
+    try {
+      await commentsStore.toggleCommentLike(comment.id, authStore.user.uid, isLiked)
+
+      if (!isLiked) {
+        const actionType = comment.parentId ? 'replyLike' : 'commentLike'
+        const actionData = {
+          commentId: comment.id,
+          postId: props.post.id,
+          post: props.post,
+          comment,
+        }
+        await postCardStore.saveLikeAction(actionData, actionType)
+      }
+
+      emit('reload-comments')
+    } catch (error) {
+      console.error('Failed to toggle like:', error)
+      toast.error('Failed to toggle like.')
+    }
   }
 
   function formatCommentDate (timestamp) {
@@ -308,22 +328,7 @@
             <!-- Display Comment Content -->
             <div v-else class="comment-item__content mb-2">
               <div v-if="comment.imageUrl" class="my-2">
-                <v-img
-                  :aspect-ratio="16/9"
-                  class="rounded-lg"
-                  :lazy-src="comment.imageUrl"
-                  max-height="300"
-                  :src="comment.imageUrl"
-                >
-                  <template #placeholder>
-                    <div class="d-flex align-center justify-center fill-height bg-grey-lighten-4">
-                      <v-progress-circular
-                        color="primary"
-                        indeterminate
-                      />
-                    </div>
-                  </template>
-                </v-img>
+                <v-img class="rounded-lg" max-height="300" :src="comment.imageUrl" />
               </div>
               <div v-html="renderCommentText(comment.text)" />
             </div>
@@ -347,12 +352,7 @@
             <div v-if="showReplyInput[comment.id]" class="mt-2 mb-4 ml-4">
               <div class="d-flex">
                 <v-avatar class="mr-3" color="grey-lighten-2" size="40">
-                  <v-img
-                    v-if="authStore.user?.photoURL"
-                    alt="User avatar"
-                    cover
-                    :src="authStore.user?.photoURL"
-                  />
+                  <v-img v-if="authStore.user?.photoURL" alt="User avatar" cover :src="authStore.user?.photoURL" />
                   <span v-else class="text-subtitle-1">{{ authStore.user?.displayName?.charAt(0).toUpperCase() || 'U' }}</span>
                 </v-avatar>
                 <div class="d-block w-100">
@@ -436,22 +436,7 @@
                     <div v-else class="mt-2">
                       <div class="text-body-2" v-html="renderCommentText(reply.text)" />
                       <div v-if="reply.imageUrl" class="my-2">
-                        <v-img
-                          :aspect-ratio="16/9"
-                          class="rounded-lg"
-                          :lazy-src="reply.imageUrl"
-                          max-height="300"
-                          :src="reply.imageUrl"
-                        >
-                          <template #placeholder>
-                            <div class="d-flex align-center justify-center fill-height bg-grey-lighten-4">
-                              <v-progress-circular
-                                color="primary"
-                                indeterminate
-                              />
-                            </div>
-                          </template>
-                        </v-img>
+                        <v-img class="rounded-lg" max-height="300" :src="reply.imageUrl" />
                       </div>
                       <div class="d-flex align-center mt-1">
                         <div class="px-0 d-flex hover-underline align-center cursor-pointer" @click="toggleLike(reply)">
@@ -554,22 +539,7 @@
                         <div v-else class="mt-2">
                           <div class="text-body-2" v-html="renderCommentText(subReply.text)" />
                           <div v-if="subReply.imageUrl" class="my-2">
-                            <v-img
-                              :aspect-ratio="16/9"
-                              class="rounded-lg"
-                              :lazy-src="subReply.imageUrl"
-                              max-height="300"
-                              :src="subReply.imageUrl"
-                            >
-                              <template #placeholder>
-                                <div class="d-flex align-center justify-center fill-height bg-grey-lighten-4">
-                                  <v-progress-circular
-                                    color="primary"
-                                    indeterminate
-                                  />
-                                </div>
-                              </template>
-                            </v-img>
+                            <v-img class="rounded-lg" max-height="300" :src="subReply.imageUrl" />
                           </div>
                           <div class="d-flex align-center mt-1">
                             <div class="px-0 d-flex align-center cursor-pointer" @click="toggleLike(subReply)">

@@ -4,6 +4,7 @@
   import NotifyMenu from '@/components/notifications/NotifyMenu.vue'
   import ProfileInfo from '@/components/notifications/ProfileInfo.vue'
   import { backgroundColors } from '@/models/no-data.js'
+  import { useCommentsStore } from '@/stores/comments'
   import { useSinglePostStore } from '@/stores/single-post/single-post.js'
   import { useUserStore } from '@/stores/user.js'
 
@@ -19,6 +20,7 @@
     description: '',
   })
   const singlePostStore = useSinglePostStore()
+  const commentsStore = useCommentsStore()
   const userStore = useUserStore()
 
   onMounted(() => {
@@ -57,7 +59,7 @@
       cardData.user = user
     })
     cardData.createdAt = data.createdAt
-    singlePostStore.getComments(data.postId)
+    commentsStore.getComments(data.postId)
       .then(comments => {
         const comment = comments.find(c => c.id === data.commentId)
         if (comment) {
