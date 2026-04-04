@@ -124,7 +124,7 @@
       autocomplete="off"
       density="compact"
       hide-details
-      placeholder="Search posts (title, content, category, tags, user...)"
+      placeholder="Search posts"
       prepend-inner-icon="mdi-magnify"
       variant="outlined"
       @focus="openDropdown"
