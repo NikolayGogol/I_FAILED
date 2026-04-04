@@ -1,13 +1,10 @@
 import {
   addDoc,
-  arrayRemove,
-  arrayUnion,
   collection,
   doc,
   getDoc,
   getDocs,
   increment,
-  orderBy,
   query,
   serverTimestamp,
   setDoc,
@@ -21,14 +18,18 @@ import { useAuthStore } from '@/stores/auth.js'
 import { useUserStore } from '@/stores/user.js'
 import { findSwitch } from '@/utils/find-switch.js'
 
+// Firestore collection names from environment variables
 const collection_db = import.meta.env.VITE_POST_COLLECTION
-const comments_collection = import.meta.env.VITE_COMMENTS
 const user_category_reads_collection = import.meta.env.VITE_USER_CATEGORY_READS_COLLECTION
 const VITE_USERS_COLLECTION = import.meta.env.VITE_USERS_COLLECTION
 const VITE_NOTIFICATION_COLLECTION = import.meta.env.VITE_NOTIFICATION_COLLECTION
 const VITE_STATISTIC_COLLECTION = import.meta.env.VITE_STATISTIC_COLLECTION
 
-// Helper function to check if Do Not Disturb is active
+/**
+ * Helper function to check if Do Not Disturb (DND) is active for a user.
+ * @param {object} dndSettings - The DND settings object from the user's profile.
+ * @returns {boolean} - True if DND is active, false otherwise.
+ */
 export function isDoNotDisturbActive (dndSettings) {
   if (!dndSettings || !dndSettings.from || !dndSettings.to) {
     return false
@@ -37,60 +38,37 @@ export function isDoNotDisturbActive (dndSettings) {
   const { from, to, timezone } = dndSettings
 
   if (!timezone) {
-    // If no timezone, can't reliably determine DND, so assume not active
     return false
   }
 
   try {
     const now = new Date()
-    // Get current time in the target user's timezone
     const userTime = new Date(now.toLocaleString('en-US', { timeZone: timezone }))
-
     const startTime = new Date(userTime)
     startTime.setHours(from.hours, from.minutes, 0, 0)
-
     const endTime = new Date(userTime)
     endTime.setHours(to.hours, to.minutes, 0, 0)
 
-    // Handle overnight DND period (e.g., 10 PM to 7 AM)
     if (startTime > endTime) {
-      // If current time is after start OR before end, DND is active
       return userTime >= startTime || userTime < endTime
     }
 
-    // Handle same-day DND period (e.g., 9 AM to 5 PM)
     return userTime >= startTime && userTime < endTime
   } catch (error) {
     console.error('Error checking Do Not Disturb status:', error)
-    // Fail safe: if timezone is invalid or something else goes wrong, don't block notifications
     return false
   }
 }
 
+/**
+ * Creates a document ID for user-category reads.
+ * @param {object} params - The parameters for creating the doc ID.
+ * @param {string} params.userId - The user's ID.
+ * @param {string} params.categoryId - The category's ID.
+ * @returns {string} - The generated document ID.
+ */
 function getDocId ({ userId, categoryId }) {
-  // Firestore doc IDs cannot contain `/`, so we encode anything potentially unsafe.
   return `${userId}__${encodeURIComponent(String(categoryId))}`
-}
-
-// Helper function to extract mentions from text
-function extractMentions (text) {
-  const mentionRegex = /@\[([^\]]+)\]\(([^)]+)\)/g
-  const mentions = []
-  let match
-
-  while ((match = mentionRegex.exec(text)) !== null) {
-    const displayName = match[1]
-    let uid = match[2]
-    if (uid) {
-      uid = uid.replace(/[()]/g, '').trim()
-    }
-
-    mentions.push({
-      displayName,
-      uid,
-    })
-  }
-  return mentions
 }
 
 export const useSinglePostStore = defineStore('singlePost', {
@@ -98,6 +76,11 @@ export const useSinglePostStore = defineStore('singlePost', {
     topCategories: [],
   }),
   actions: {
+    /**
+     * Fetches a single post by its ID.
+     * @param {string} id - The ID of the post to fetch.
+     * @returns {Promise<object|string>} - The post object or an error message.
+     */
     async getPostById (id) {
       try {
         const docRef = doc(db, collection_db, id)
@@ -107,6 +90,11 @@ export const useSinglePostStore = defineStore('singlePost', {
         return 'Failed to load the post.'
       }
     },
+
+    /**
+     * Increments the view count of a post.
+     * @param {string} id - The ID of the post.
+     */
     async incrementViewCount (id) {
       try {
         const docRef = doc(db, collection_db, id)
@@ -117,6 +105,13 @@ export const useSinglePostStore = defineStore('singlePost', {
         console.error('Error incrementing view count:', error)
       }
     },
+
+    /**
+     * Increments the read count for a specific category for a user.
+     * @param {object} params - The parameters.
+     * @param {string} params.userId - The user's ID.
+     * @param {object} params.category - The category object.
+     */
     async incrementCategoryRead ({ userId, category }) {
       if (!userId || !category) {
         return
@@ -137,190 +132,11 @@ export const useSinglePostStore = defineStore('singlePost', {
         lastReadAt: serverTimestamp(),
       }, { merge: true })
     },
-    async addComment (postId, user, text) {
-      try {
-        const post = await this.getPostById(postId)
 
-        if (!post || post === 'Post not found.') {
-          console.error('Post not found for comment notification.')
-          return
-        }
-
-        const newCommentData = {
-          postId,
-          parentId: null,
-          user: {
-            uid: user.uid,
-            displayName: user.displayName,
-            photoURL: user.photoURL,
-          },
-          text,
-          likes: [],
-          createdAt: serverTimestamp(),
-        }
-
-        const docRef = await addDoc(collection(db, comments_collection), newCommentData)
-        const commentId = docRef.id
-
-        await this.saveCommentAction(post, { id: commentId, text })
-
-        // Handle mentions
-        const mentions = extractMentions(text)
-        if (mentions.length > 0) {
-          const userStore = useUserStore()
-          for (const mention of mentions) {
-            if (mention.uid && mention.uid !== user.uid) {
-              try {
-                const mentionedUidStr = String(mention.uid).trim()
-                const mentionedUser = await userStore.getUserById(mentionedUidStr)
-                if (mentionedUser) {
-                  const fullMentionedUser = { ...mentionedUser, uid: mentionedUidStr }
-                  await this.saveMentionAction(post, { id: commentId, text }, fullMentionedUser, user)
-                  await this.sendMentionEmail(post, { id: commentId, text }, fullMentionedUser, user)
-                  await this.sendMentionPush(post, fullMentionedUser)
-                }
-              } catch (error) {
-                console.error(`Error processing mention for uid ${mention.uid}:`, error)
-              }
-            } else if (!mention.uid) {
-              console.warn('Mention extracted without a valid UID:', mention)
-            }
-          }
-        }
-
-        return commentId
-      } catch (error) {
-        console.error('Error adding comment:', error)
-        throw error
-      }
-    },
-    async updateComment (commentId, newText, user) {
-      try {
-        const commentRef = doc(db, comments_collection, commentId)
-        await updateDoc(commentRef, {
-          text: newText,
-          updatedAt: serverTimestamp(),
-        })
-
-        const commentSnap = await getDoc(commentRef)
-        if (!commentSnap.exists()) {
-          console.error('Comment not found after update.')
-          return
-        }
-        const comment = { id: commentSnap.id, ...commentSnap.data() }
-
-        const post = await this.getPostById(comment.postId)
-        if (!post || post === 'Post not found.') {
-          console.error('Post not found for comment notification.')
-          return
-        }
-
-        // Handle mentions
-        const mentions = extractMentions(newText)
-        if (mentions.length > 0) {
-          const userStore = useUserStore()
-          for (const mention of mentions) {
-            if (mention.uid && mention.uid !== user.uid) {
-              try {
-                const mentionedUidStr = String(mention.uid).trim()
-                const mentionedUser = await userStore.getUserById(mentionedUidStr)
-                if (mentionedUser) {
-                  const fullMentionedUser = { ...mentionedUser, uid: mentionedUidStr }
-                  await this.saveMentionAction(post, comment, fullMentionedUser, user)
-                  await this.sendMentionEmail(post, comment, fullMentionedUser, user)
-                  await this.sendMentionPush(post, fullMentionedUser)
-                }
-              } catch (error) {
-                console.error(`Error processing mention for uid ${mention.uid}:`, error)
-              }
-            } else if (!mention.uid) {
-              console.warn('Mention extracted without a valid UID:', mention)
-            }
-          }
-        }
-      } catch (error) {
-        console.error('Error updating comment:', error)
-        throw error
-      }
-    },
-    async addReply (postId, parentId, user, text) {
-      try {
-        const post = await this.getPostById(postId)
-
-        if (!post || post === 'Post not found.') {
-          console.error('Post not found for reply notification.')
-          return
-        }
-
-        const newReplyData = {
-          postId,
-          parentId,
-          user: {
-            uid: user.uid,
-            displayName: user.displayName,
-            photoURL: user.photoURL,
-          },
-          text,
-          likes: [],
-          createdAt: serverTimestamp(),
-        }
-
-        const docRef = await addDoc(collection(db, comments_collection), newReplyData)
-        const commentId = docRef.id // Reply is also a comment in the collection
-
-        // Handle mentions
-        const mentions = extractMentions(text)
-        if (mentions.length > 0) {
-          const userStore = useUserStore()
-          for (const mention of mentions) {
-            if (mention.uid && mention.uid !== user.uid) {
-              try {
-                const mentionedUidStr = String(mention.uid).trim()
-                const mentionedUser = await userStore.getUserById(mentionedUidStr)
-                if (mentionedUser) {
-                  const fullMentionedUser = { ...mentionedUser, uid: mentionedUidStr }
-                  await this.saveMentionAction(post, { id: commentId, text }, fullMentionedUser, user)
-                  await this.sendMentionEmail(post, { id: commentId, text }, fullMentionedUser, user)
-                  await this.sendMentionPush(post, fullMentionedUser)
-                }
-              } catch (error) {
-                console.error(`Error processing mention for uid ${mention.uid}:`, error)
-              }
-            } else if (!mention.uid) {
-              console.warn('Mention extracted without a valid UID:', mention)
-            }
-          }
-        }
-        return commentId
-      } catch (error) {
-        console.error('Error adding reply:', error)
-        throw error
-      }
-    },
-    async toggleCommentLike (commentId, userId, isLiked) {
-      try {
-        const docRef = doc(db, comments_collection, commentId)
-        await updateDoc(docRef, {
-          likes: isLiked ? arrayRemove(userId) : arrayUnion(userId),
-        })
-      } catch (error) {
-        console.error('Error toggling like:', error)
-      }
-    },
-    async getComments (postId) {
-      try {
-        const q = query(
-          collection(db, comments_collection),
-          where('postId', '==', postId),
-          orderBy('createdAt', 'desc'),
-        )
-        const querySnapshot = await getDocs(q)
-        return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
-      } catch (error) {
-        console.error('Error getting comments:', error)
-        return []
-      }
-    },
+    /**
+     * Fetches all users for mention suggestions.
+     * @returns {Promise<Array<object>>} - An array of user objects.
+     */
     async getUsersForMentions () {
       try {
         const q = query(collection(db, VITE_USERS_COLLECTION))
@@ -334,6 +150,14 @@ export const useSinglePostStore = defineStore('singlePost', {
         return []
       }
     },
+
+    /**
+     * Sends an email notification for a new comment.
+     * @param {object} params - The parameters.
+     * @param {object} params.post - The post object.
+     * @param {object} params.authStore - The auth store user object.
+     * @param {object} params.comment - The comment object.
+     */
     async sendCommentEmail ({ post, authStore, comment }) {
       const userStore = useUserStore()
       const res = await userStore.getUserById(post.uid)
@@ -356,6 +180,12 @@ export const useSinglePostStore = defineStore('singlePost', {
         }
       }
     },
+
+    /**
+     * Sends a push notification for a new comment.
+     * @param {object} payload - The post object.
+     * @param {string} id - The comment ID.
+     */
     async sendCommentPush (payload, id) {
       const userStore = useUserStore()
       const res = await userStore.getUserById(payload.uid)
@@ -387,6 +217,12 @@ export const useSinglePostStore = defineStore('singlePost', {
         }
       }
     },
+
+    /**
+     * Saves a notification for a comment action.
+     * @param {object} post - The post object.
+     * @param {object} comment - The comment object.
+     */
     async saveCommentAction (post, comment) {
       if (!auth.currentUser) {
         console.error('No user logged in to save comment action.')
@@ -399,7 +235,6 @@ export const useSinglePostStore = defineStore('singlePost', {
       const commentId = comment.id
       const commentText = comment.text
 
-      // Do not save a notification if a user comments on their own post.
       if (commenterUid === postOwnerUid) {
         return
       }
@@ -423,8 +258,15 @@ export const useSinglePostStore = defineStore('singlePost', {
         }
         return await addDoc(commentsNotificationCollectionRef, notificationPayload)
       }
-      console.log('Comment notification for this comment already exists.')
     },
+
+    /**
+     * Saves a notification for a mention action.
+     * @param {object} post - The post object.
+     * @param {object} comment - The comment object.
+     * @param {object} mentionedUser - The user who was mentioned.
+     * @param {object} mentionerUser - The user who made the mention.
+     */
     async saveMentionAction (post, comment, mentionedUser, mentionerUser) {
       if (!auth.currentUser) {
         console.error('No user logged in to save mention action.')
@@ -437,7 +279,6 @@ export const useSinglePostStore = defineStore('singlePost', {
       const commentId = comment.id
       const commentText = comment.text
 
-      // Do not save a notification if a user mentions themselves.
       if (mentionerUid === mentionedUid) {
         return
       }
@@ -461,8 +302,15 @@ export const useSinglePostStore = defineStore('singlePost', {
         }
         return await addDoc(mentionsNotificationCollectionRef, notificationPayload)
       }
-      console.log('Mention notification for this comment already exists.')
     },
+
+    /**
+     * Sends an email notification for a mention.
+     * @param {object} post - The post object.
+     * @param {object} comment - The comment object.
+     * @param {object} mentionedUser - The user who was mentioned.
+     * @param {object} mentionerUser - The user who made the mention.
+     */
     async sendMentionEmail (post, comment, mentionedUser, mentionerUser) {
       const dndSettings = mentionedUser?.settings?.notify?.doNotDisturb
       if (isDoNotDisturbActive(dndSettings)) {
@@ -471,7 +319,7 @@ export const useSinglePostStore = defineStore('singlePost', {
       }
 
       const obj = mentionedUser?.settings?.notify?.email
-      const mentionSwitch = findSwitch(obj?.switches, 2) // Assuming switch 2 is for mentions
+      const mentionSwitch = findSwitch(obj?.switches, 2)
 
       if (obj && mentionSwitch) {
         try {
@@ -480,7 +328,7 @@ export const useSinglePostStore = defineStore('singlePost', {
             mentionerName: mentionerUser.displayName,
             postTitle: post.title,
             commentText: comment.text,
-            postLink: `${window.location.origin}/post/${post.id}`, // Adjust as needed for your frontend route
+            postLink: `${window.location.origin}/post/${post.id}`,
           })
           return { success: true }
         } catch (error) {
@@ -489,6 +337,12 @@ export const useSinglePostStore = defineStore('singlePost', {
         }
       }
     },
+
+    /**
+     * Sends a push notification for a mention.
+     * @param {object} post - The post object.
+     * @param {object} mentionedUser - The user who was mentioned.
+     */
     async sendMentionPush (post, mentionedUser) {
       const dndSettings = mentionedUser?.settings?.notify?.doNotDisturb
       if (isDoNotDisturbActive(dndSettings)) {
@@ -514,6 +368,10 @@ export const useSinglePostStore = defineStore('singlePost', {
       }
     },
 
+    /**
+     * Adds a post to a user's "read" list.
+     * @param {object} payload - The post object.
+     */
     async addToRead (payload) {
       try {
         const uid = auth.currentUser.uid

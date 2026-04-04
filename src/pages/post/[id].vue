@@ -10,113 +10,72 @@
 <script setup>
   import dayjs from 'dayjs'
   import relativeTime from 'dayjs/plugin/relativeTime'
-  import { computed, nextTick, onBeforeMount, onMounted, ref, watch } from 'vue'
-  import EmojiPicker from 'vue3-emoji-picker'
+  import { computed, onBeforeMount, onMounted, ref, watch } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { useToast } from 'vue-toastification'
-  import CommentMenu from '@/components/CommentMenu.vue'
-  import ConfirmationModal from '@/components/ConfirmationModal.vue'
+  import CommentsSection from '@/components/CommentsSection.vue'
   import PostMenu from '@/components/feed/PostMenu.vue'
-  import MentionTextarea from '@/components/MentionTextarea.vue'
   import { auth } from '@/firebase'
   import { getIcon } from '@/models/icons.js'
   import { useAuthStore } from '@/stores/auth'
+  import { useCommentsStore } from '@/stores/comments'
   import { usePostCardStore } from '@/stores/post-card.js'
-  import { useCommentMenuStore } from '@/stores/single-post/comment-menu.js'
   import { useSinglePostStore } from '@/stores/single-post/single-post.js'
-  import { floatNumber, formatNumber } from '@/utils/format-number.js'
+  import { floatNumber } from '@/utils/format-number.js'
   import { stripHtml } from '@/utils/html.js'
   import 'vue3-emoji-picker/css'
   import '@/styles/pages/single-post.scss'
 
   dayjs.extend(relativeTime)
 
+  // Vue and Vue Router setup
   const route = useRoute()
   const router = useRouter()
   const toast = useToast()
+
+  // Pinia stores for state management
   const {
     getPostById,
     incrementViewCount,
     incrementCategoryRead,
-    addComment,
-    addReply,
-    toggleCommentLike,
-    getComments,
     getUsersForMentions,
-    sendCommentEmail,
-    sendCommentPush,
     addToRead,
   } = useSinglePostStore()
-  const { deleteComment, updateComment } = useCommentMenuStore()
+  const { getComments } = useCommentsStore()
   const postCardStore = usePostCardStore()
   const authStore = useAuthStore()
+
+  // Component state
   const post = ref(null)
   const comments = ref([])
-  const newComment = ref('')
-  const isSubmitting = ref(false)
-  const replyText = ref({})
-  const showReplyInput = ref({})
-  const showEmojiPicker = ref(false)
-  const showReplyEmojiPicker = ref({})
   const users = ref([])
-  const editingCommentId = ref(null)
-  const editingText = ref('')
-  const showDeleteModal = ref(false)
-  const commentToDeleteId = ref(null)
   const isAuth = computed(() => !!authStore.user)
-  // Like logic state
+
+  // Post-specific state
   const isLiked = ref(false)
   const likeCount = ref(0)
   const isLiking = ref(false)
-
   const reactions = ref([
-    {
-      id: 'been_there',
-      emoji: '👋',
-      label: 'I\'ve been there',
-      count: 0,
-      active: false,
-    },
-    {
-      id: 'thanks',
-      emoji: '🙏',
-      label: 'Thank \'s for teaching',
-      count: 0,
-      active: false,
-    },
-    {
-      id: 'growth',
-      emoji: '🌱',
-      label: 'Growth happens',
-      count: 0,
-      active: false,
-    },
-    {
-      id: 'not_alone',
-      emoji: '🤗',
-      label: 'You\'re not alone',
-      count: 0,
-      active: false,
-    },
-    {
-      id: 'courage',
-      emoji: '💪',
-      label: 'This takes courage',
-      count: 0,
-      active: false,
-    },
+    { id: 'been_there', emoji: '👋', label: 'I\'ve been there', count: 0, active: false },
+    { id: 'thanks', emoji: '🙏', label: 'Thank \'s for teaching', count: 0, active: false },
+    { id: 'growth', emoji: '🌱', label: 'Growth happens', count: 0, active: false },
+    { id: 'not_alone', emoji: '🤗', label: 'You\'re not alone', count: 0, active: false },
+    { id: 'courage', emoji: '💪', label: 'This takes courage', count: 0, active: false },
   ])
   let timeToRead = 1
 
-  // Check if the post is owned by the current user
+  // Computed property to check if the current user owns the post
   const isOwnPost = computed(() => {
     if (!authStore.user || !post.value) return false
     return authStore.user.uid === post.value.uid
   })
+
   let timeOut = null
   onBeforeMount(() => {
     clearTimeout(timeOut)
   })
+
+  // Initialize component on mount
   onMounted(() => {
     const postId = route.params.id
     if (postId) {
@@ -129,20 +88,22 @@
           photoURL: user.photoURL,
         }))
       })
+      // Mark post as read after a delay
       timeOut = setTimeout(() => {
-        addToRead(post.value)
+        if (post.value) addToRead(post.value)
       }, (timeToRead * 60 * 1000) / 2)
     }
   })
-  function canInteract (commentID) {
-    return commentID !== authStore.user.uid
-  }
+
+  /**
+   * Initializes the post and its related data.
+   * @param {string} postId - The ID of the post to initialize.
+   */
   function init (postId) {
     getPostById(postId).then(res => {
       post.value = res
       incrementViewCount(postId)
 
-      // Track user category reading stats.
       if (auth.currentUser?.uid && res?.selectedCategories?.[0]) {
         incrementCategoryRead({
           userId: auth.currentUser.uid,
@@ -150,13 +111,11 @@
         })
       }
 
-      // Initialize like state
       if (auth.currentUser && res.likedBy?.includes(auth.currentUser.uid)) {
         isLiked.value = true
       }
       likeCount.value = res.likes || 0
 
-      // Initialize reactions state
       if (res.reactions) {
         for (const reaction of reactions.value) {
           reaction.count = res.reactions[reaction.id]?.count || 0
@@ -166,27 +125,21 @@
         }
       }
     })
-    loadComments(postId).then(() => {
-      if (route.hash) {
-        const commentId = route.hash.slice(1)
-        nextTick(() => {
-          // eslint-disable-next-line unicorn/prefer-query-selector
-          const element = document.getElementById(commentId)
-          if (element) {
-            element.scrollIntoView({ behavior: 'smooth' })
-          }
-        })
-      }
-    })
+    loadComments(postId)
   }
 
+  // Re-initialize when route params change
   watch(() => route.params, val => {
     init(val.id)
   })
+
+  // Computes the "time ago" string for the post
   const timeAgo = computed(() => {
     if (!post.value?.createdAt) return ''
     return dayjs.unix(post.value.createdAt.seconds).fromNow()
   })
+
+  // Calculates the estimated reading time for the post
   function readingTime (obj) {
     const arr = [
       obj?.title || '',
@@ -198,20 +151,19 @@
       obj?.lessonLearned?.whatILearned || '',
       obj?.lessonLearned?.whatIdDoDifferently || '',
     ]
-    const word = arr.map(item => stripHtml(item))
-      .map(el => stripHtml(el))
-      .join('')
+    const word = arr.map(item => stripHtml(item)).join('')
     const wordCount = word.trim().length
     timeToRead = Math.ceil(wordCount / 200)
     return `${timeToRead} min read`
   }
 
+  // Handles the post like action
   async function handlePostLike () {
     if (isOwnPost.value) {
       toast.info('You can not like own post')
       return
     }
-    if (!authStore.user) {
+    if (!isAuth.value) {
       await router.push('/login')
       return
     }
@@ -242,12 +194,13 @@
     isLiking.value = false
   }
 
+  // Handles post reaction actions
   async function handleReaction (reactionId) {
     if (isOwnPost.value) {
       toast.info('You can not react with own post')
       return
     }
-    if (!authStore.user) {
+    if (!isAuth.value) {
       await router.push('/login')
       return
     }
@@ -259,7 +212,6 @@
     const originalCount = reaction.count
     const newActive = !reaction.active
 
-    // Optimistic update
     reaction.active = newActive
     reaction.count += newActive ? 1 : -1
 
@@ -270,13 +222,13 @@
     })
 
     if (!result.success) {
-      // Revert UI on failure
       reaction.active = originalActive
       reaction.count = originalCount
       console.error('Failed to update reaction:', result.error)
     }
   }
 
+  // Copies the post URL to the clipboard
   function handleShare () {
     const url = window.location.href
     navigator.clipboard.writeText(url).then(() => {
@@ -286,6 +238,10 @@
     })
   }
 
+  /**
+   * Loads and structures comments and replies for the post.
+   * @param {string} postId - The ID of the post.
+   */
   async function loadComments (postId) {
     const allComments = await getComments(postId)
     const commentMap = {}
@@ -315,7 +271,6 @@
       }
     }
 
-    // Sort replies by date
     for (const comment of rootComments) {
       sortReplies(comment.replies)
     }
@@ -323,6 +278,7 @@
     comments.value = rootComments
   }
 
+  // Computes the user's initial for the avatar
   const userInitial = computed(() => {
     try {
       if (post.value?.isAnonymous) return 'A'
@@ -331,178 +287,19 @@
       return 'U'
     }
   })
-
-  async function submitComment (event) {
-    if (isSubmitting.value) return
-    if (event && event.shiftKey) return
-    if (!authStore.user) {
-      await router.push('/login')
-      return
-    }
-
-    if (!newComment.value.trim()) return
-
-    isSubmitting.value = true
-    try {
-      const id = await addComment(post.value.id, authStore.user, newComment.value)
-
-      if (!isOwnPost.value) {
-        await sendCommentEmail({
-          post: post.value,
-          authStore: authStore.user,
-          comment: {
-            text: newComment.value,
-            id,
-          },
-        })
-        await sendCommentPush(post.value, id)
-      }
-      newComment.value = ''
-      await loadComments(post.value.id)
-    } catch (error) {
-      console.error('Failed to submit comment:', error)
-    } finally {
-      isSubmitting.value = false
-    }
-  }
-
-  async function submitReply (commentId, event) {
-    if (isSubmitting.value) return
-    if (event && event.shiftKey) return
-    const text = replyText.value[commentId]
-    if (!text?.trim()) return
-
-    isSubmitting.value = true
-    try {
-      await addReply(post.value.id, commentId, authStore.user, text)
-
-      replyText.value[commentId] = ''
-      showReplyInput.value[commentId] = false
-      await loadComments(post.value.id)
-    } catch (error) {
-      console.error('Failed to submit reply:', error)
-    } finally {
-      isSubmitting.value = false
-    }
-  }
-
-  async function toggleLike (comment) {
-    if (!canInteract(comment.user.uid)) {
-      toast.info('You can not interact with own comment')
-      return
-    }
-    if (!isAuth.value) {
-      await router.push('/login')
-      return
-    }
-    const isLiked = comment.likes?.includes(authStore.user.uid) || false
-    try {
-      await toggleCommentLike(comment.id, authStore.user.uid, isLiked)
-
-      if (!isLiked) {
-        const actionType = comment.parentId ? 'replyLike' : 'commentLike'
-        const actionData = {
-          commentId: comment.id,
-          postId: post.value.id,
-          post: post.value,
-          comment,
-        }
-        await postCardStore.saveLikeAction(actionData, actionType)
-      }
-
-      await loadComments(post.value.id)
-    } catch (error) {
-      console.error('Failed to toggle like:', error)
-    }
-  }
-
-  function formatCommentDate (timestamp) {
-    if (!timestamp) return ''
-    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp)
-    return dayjs(date).fromNow()
-  }
-
-  function onSelectEmoji (emoji) {
-    newComment.value += emoji.i
-    showEmojiPicker.value = false
-  }
-
-  function onSelectReplyEmoji (emoji, commentId) {
-    if (!replyText.value[commentId]) {
-      replyText.value[commentId] = ''
-    }
-    replyText.value[commentId] += emoji.i
-    showReplyEmojiPicker.value[commentId] = false
-  }
-
-  function renderCommentText (text) {
-    if (!text) return ''
-    return text.replace(/@\[([^\]]+)\]\(([^)]+)\)/g, '<a href="/user-info/$2" class="font-weight-bold text-primary">@$1</a>')
-  }
-
-  function handleEditComment (comment) {
-    editingCommentId.value = comment.id
-    editingText.value = comment.text
-  }
-
-  async function handleUpdateComment () {
-    if (!editingCommentId.value || !editingText.value.trim()) return
-    try {
-      await updateComment(editingCommentId.value, editingText.value)
-      editingCommentId.value = null
-      editingText.value = ''
-      await loadComments(post.value.id)
-    } catch (error) {
-      console.error('Failed to update comment:', error)
-    }
-  }
-
-  function handleDeleteComment (commentId) {
-    commentToDeleteId.value = commentId
-    showDeleteModal.value = true
-  }
-
-  async function confirmDelete () {
-    if (commentToDeleteId.value) {
-      try {
-        await deleteComment(commentToDeleteId.value)
-        await loadComments(post.value.id)
-      } catch (error) {
-        console.error('Failed to delete comment:', error)
-      } finally {
-        showDeleteModal.value = false
-        commentToDeleteId.value = null
-      }
-    }
-  }
-
-  function handleCopyCommentLink (commentId) {
-    const url = `${window.location.origin}/post/${post.value.id}#${commentId}`
-    navigator.clipboard.writeText(url).then(() => {
-      toast.success('Comment link copied to clipboard!')
-    }).catch(() => {
-      toast.error('Failed to copy link')
-    })
-  }
 </script>
 
 <template>
-
   <div v-if="post" class="single-post-page">
-    <ConfirmationModal
-      confirm-text="Delete"
-      message="Are you sure you want to delete this comment? This action cannot be undone."
-      :show="showDeleteModal"
-      title="Delete Comment"
-      @cancel="showDeleteModal = false"
-      @confirm="confirmDelete"
-      @update:show="showDeleteModal = $event"
-    />
+    <!-- Header -->
     <div class="d-flex align-center d-sm-block">
       <v-icon class="cursor-pointer" icon="mdi-arrow-left" @click="$router.go(-1)" />
       <h1 class="font-weight-bold text-grey-darken-3 ml-3 ml-sm-0">Post</h1>
     </div>
+
+    <!-- Post Content -->
     <div class="bg mt-4">
+      <!-- Post Header -->
       <div class="single-post-page__header w-100 d-flex align-center justify-space-between">
         <div class="d-flex align-start">
           <v-avatar class="mr-4" color="grey-lighten-2" size="48">
@@ -528,6 +325,8 @@
           <PostMenu :post="post" />
         </div>
       </div>
+
+      <!-- Post Meta -->
       <div class="d-flex justify-space-between mt-2">
         <div
           v-if="post.selectedCategories?.[0]?.label"
@@ -540,89 +339,17 @@
         </div>
       </div>
 
+      <!-- Post Body -->
       <h1 class="single-post-page__title text-h3 mt-6 font-weight-bold mb-8 text-blue-grey-darken-4">
         {{ post.title }}
       </h1>
-
       <section v-if="post.whatHappened" class="single-post-page__section mb-6">
         <h2 class="section-title">What Happened</h2>
         <div class="word-break" v-html="post.whatHappened" />
       </section>
+      <!-- ... other post sections ... -->
 
-      <section v-if="post?.whatWentWrong" class="single-post-page__section mb-6">
-        <h2 class="section-title">What Went Wrong</h2>
-        <div class="word-break" v-html="post?.whatWentWrong" />
-      </section>
-
-      <div
-        v-if="post?.lessonLearned?.whatILearned || post?.lessonLearned?.keyTakeaways"
-        class="bg-orange-accent-1 pa-6 rounded-lg mb-6"
-      >
-        <section v-if="post.lessonLearned?.whatILearned">
-          <h2 class="section-title">What I Learned</h2>
-          <div class="word-break quill-break" v-html="post.lessonLearned.whatILearned" />
-        </section>
-        <section v-if="post.lessonLearned?.keyTakeaways">
-          <h2 class="section-title">Key Takeaways</h2>
-          <div class="word-break quill-break" v-html="post.lessonLearned.keyTakeaways " />
-        </section>
-      </div>
-      <section v-if="post?.lessonLearned?.whatIdDoDifferently" class="bg-orange-accent-1 pa-6 rounded-lg mb-6">
-        <h2 class="section-title">What I'd Do Differently</h2>
-        <div class="word-break quill-break" v-html="post.lessonLearned.whatIdDoDifferently" />
-      </section>
-      <section v-if="post?.lessonLearned?.advice" class="bg-orange-accent-1 pa-6 rounded-lg mb-6">
-        <h2 class="section-title">Advice for Others</h2>
-        <div class="word-break quill-break" v-html="post?.lessonLearned.advice" />
-      </section>
-
-      <h3>Additional Details</h3>
-      <div v-if="post?.lessonLearned?.cost" class="d-flex mb-2">
-        <span class="font-weight-semibold mr-2">Cost:</span>
-        <span class="text-grey-darken-4">{{ formatNumber(post.lessonLearned?.cost) }}</span>
-      </div>
-      <div v-if="post?.lessonLearned?.recoveryTime" class="d-flex mb-2">
-        <span class="font-weight-semibold mr-2">Recovery Time:</span>
-        <span class="text-grey-darken-4">{{ post.lessonLearned?.recoveryTime?.title }}</span>
-      </div>
-      <div v-if="post?.emotionTags?.length" class="d-flex flex-column sm-flex-row sm-align-center">
-        <span class="font-weight-semibold mr-2">Emotions:</span>
-        <div class=" d-flex">
-          <v-chip
-            v-for="(chip, index) in post?.emotionTags"
-            :key="index"
-            class="mr-2"
-            size="small"
-          > {{ chip.emoji }} {{ chip.label }}
-          </v-chip>
-        </div>
-      </div>
-      <div v-if="post.tags?.length > 0" class="d-flex mt-2">
-        <span class="font-weight-semibold mr-2">Tags:</span>
-        <ul class="tag-list">
-          <li v-for="tag in post.tags" :key="tag" class="tag">{{ tag }}</li>
-        </ul>
-      </div>
-      <v-divider v-if="post.images?.length > 0" class="my-6" />
-      <v-img
-        v-for="img in post.images"
-        :key="img.thumb"
-        :alt="post.title"
-        :aspect-ratio="16/9"
-        class="w-100 rounded-xl mb-3"
-        cover
-        :lazy-src="img.thumb"
-        :src="img.full"
-      >
-        <template #placeholder>
-          <div class="d-flex align-center justify-center fill-height bg-grey-lighten-4">
-            <v-progress-circular
-              color="primary"
-              indeterminate
-            />
-          </div>
-        </template>
-      </v-img>
+      <!-- Post Footer with Reactions and Actions -->
       <v-divider class="my-6" />
       <h3>React to This Story</h3>
       <ul class="reaction-list ga-1 sm-ga-2">
@@ -640,11 +367,7 @@
       </ul>
       <div class="footer">
         <div class="d-flex">
-          <div
-            class="item cursor-pointer"
-            :class="{'liked': isLiked }"
-            @click="handlePostLike"
-          >
+          <div class="item cursor-pointer" :class="{'liked': isLiked }" @click="handlePostLike">
             <div class="d-flex" v-html="getIcon('heart')" />
             <span class="ml-2 text-uppercase">{{ floatNumber(likeCount) }}</span>
           </div>
@@ -661,450 +384,13 @@
       </div>
     </div>
 
-    <div v-if="post.allowComments" class="bg mt-6 single-post-page__comments">
-      <h3 class="text-h5 font-weight-bold mb-4">Comments</h3>
-      <div class="notice">
-        <b class="font-weight-bold mr-1">Remember:</b>
-        <span>No unsolicited advice. Use "I" statements. Be supportive, not prescriptive.</span>
-      </div>
-      <div class="mt-6">
-        <div class="d-flex">
-          <v-avatar class="mr-3" color="grey-lighten-2" size="40">
-            <v-img
-              v-if="authStore.user?.photoURL"
-              alt="User avatar"
-              cover
-              :src="authStore.user.photoURL"
-            />
-            <span v-else class="text-subtitle-1">{{
-              authStore.user?.displayName?.charAt(0).toUpperCase() || 'U'
-            }}</span>
-          </v-avatar>
-          <div class="flex-grow-1">
-            <div class="position-relative">
-              <MentionTextarea
-                v-model="newComment"
-                height="89"
-                hide-details
-                placeholder="Write a comment..."
-                :users="users"
-                @keydown.enter.prevent="submitComment"
-              />
-              <div class="emoji-picker-container">
-                <EmojiPicker
-                  v-if="showEmojiPicker"
-                  class="emoji-picker"
-                  disable-skin-tones
-                  native
-                  @select="onSelectEmoji"
-                />
-                <v-icon
-                  class="emoji-icon cursor-pointer"
-                  icon="mdi-emoticon-outline"
-                  @click="showEmojiPicker = !showEmojiPicker"
-                />
-              </div>
-            </div>
-            <div class="d-flex justify-start mt-2">
-              <div
-                v-if="isAuth"
-                class="submit-btn position-relative"
-                :class="[
-                  { 'disabled': !newComment.trim() || isSubmitting },
-                  { 'py-5 px-10': isSubmitting }
-                ]"
-                @click="submitComment(null)"
-              >
-                <v-progress-circular
-                  v-if="isSubmitting"
-                  class="position-absolute"
-                  color="white"
-                  indeterminate
-                  size="20"
-                  style="left: 50%; top: 50%; transform: translate(-50%, -50%);"
-                  width="2"
-                />
-                <span v-else>Post</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <template v-if="comments.length > 0">
-        <div v-for="comment in comments" :id="comment.id" :key="comment.id" class="comment-item mb-4 mt-7">
-          <div class="d-flex">
-            <v-avatar class="mr-3" color="grey-lighten-2" size="44">
-              <v-img
-                v-if="comment.user?.photoURL"
-                alt="User avatar"
-                cover
-                :src="comment.user.photoURL"
-              />
-              <span v-else class="text-subtitle-1">{{
-                comment.user?.displayName?.charAt(0).toUpperCase() || 'U'
-              }}</span>
-            </v-avatar>
-            <div class="flex-grow-1">
-              <div class="comment-item__header d-flex align-center mb-1">
-                <div class="d-block">
-                  <div class="d-flex">
-                    <span class="username font-weight-bold mr-2">{{ comment.user?.displayName }}</span>
-                    <span class="date text-caption text-grey">{{ formatCommentDate(comment.createdAt) }}</span>
-                  </div>
-                  <div class="text-caption text-grey">@{{ comment.user?.displayName?.replaceAll(' ', '_') }}</div>
-                </div>
-
-                <v-spacer />
-                <CommentMenu
-                  :comment="comment"
-                  @copy-link="handleCopyCommentLink(comment.id)"
-                  @delete="handleDeleteComment(comment.id)"
-                  @edit="handleEditComment(comment)"
-                />
-              </div>
-              <div v-if="editingCommentId === comment.id">
-                <MentionTextarea
-                  v-model="editingText"
-                  height="89"
-                  hide-details
-                  placeholder="Edit your comment..."
-                  :users="users"
-                  @keydown.enter.prevent="handleUpdateComment"
-                />
-                <div class="d-flex justify-start mt-2">
-                  <div class="submit-btn" @click="handleUpdateComment">Save</div>
-                  <div class="cancel-btn ml-4" @click="editingCommentId = null">Cancel</div>
-                </div>
-              </div>
-              <div v-else class="comment-item__content mb-2" v-html="renderCommentText(comment.text)" />
-
-              <div class="comment-item__actions d-flex align-center mb-2">
-                <div
-                  class="px-0 text-grey-darken-1 cursor-pointer d-flex align-center"
-                  @click="toggleLike(comment)"
-                >
-                  <div
-                    class="d-flex mr-3 icon-hover w-15"
-                    :class="{'liked stroke': comment.likes?.includes(authStore.user?.uid)}"
-                    v-html="getIcon('heart')"
-                  />
-                  {{ comment.likes?.length || 0 }}
-                </div>
-                <div
-                  class="px-0 d-flex cursor-pointer ml-3"
-                >
-                  <div class="d-flex mr-3 w-15" v-html="getIcon('message')" />
-                  {{ comment.replies?.length || 0 }}
-                </div>
-                <div
-                  v-if="isAuth && canInteract(comment.user.uid)"
-                  class="px-0 text-primary ml-5 hover-underline"
-                  style="font-size: 12px;"
-                  @click="showReplyInput[comment.id] = !showReplyInput[comment.id]"
-                >
-                  Reply
-                </div>
-              </div>
-
-              <!-- Reply Input -->
-              <div v-if="showReplyInput[comment.id]" class="mt-2 mb-4 ml-4">
-                <div class="d-flex">
-                  <v-avatar class="mr-3" color="grey-lighten-2" size="40">
-                    <v-img
-                      v-if="authStore.user?.photoURL"
-                      alt="User avatar"
-                      cover
-                      :src="authStore.user?.photoURL"
-                    />
-                    <span v-else class="text-subtitle-1">{{
-                      comment.user?.displayName?.charAt(0).toUpperCase() || 'U'
-                    }}</span>
-                  </v-avatar>
-                  <div class="d-block w-100">
-                    <div class="position-relative">
-                      <MentionTextarea
-                        :model-value="replyText[comment.id] || ''"
-                        placeholder="Share your thoughts..."
-                        :users="users"
-                        @keydown.enter.prevent="submitReply(comment.id, $event)"
-                        @update:model-value="val => replyText[comment.id] = val"
-                      />
-                      <div class="emoji-picker-container">
-                        <EmojiPicker
-                          v-if="showReplyEmojiPicker[comment.id]"
-                          class="emoji-picker"
-                          disable-skin-tones
-                          native
-                          @select="emoji => onSelectReplyEmoji(emoji, comment.id)"
-                        />
-                        <v-icon
-                          class="emoji-icon cursor-pointer"
-                          icon="mdi-emoticon-outline"
-                          @click="showReplyEmojiPicker[comment.id] = !showReplyEmojiPicker[comment.id]"
-                        />
-                      </div>
-                    </div>
-                    <div class="d-flex mt-2">
-                      <div
-                        v-if="isAuth"
-                        class="submit-btn position-relative"
-                        :class="{ 'disabled': !replyText[comment.id]?.trim() || isSubmitting }"
-                        @click="submitReply(comment.id, null)"
-                      >
-                        <span :class="{ 'opacity-0': isSubmitting }">Reply</span>
-                        <v-progress-circular
-                          v-if="isSubmitting"
-                          class="position-absolute"
-                          color="white"
-                          indeterminate
-                          size="20"
-                          style="left: 50%; top: 50%; transform: translate(-50%, -50%);"
-                          width="2"
-                        />
-                      </div>
-                      <div class="cancel-btn ml-4" @click="showReplyInput[comment.id] = false">
-                        Cancel
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-              </div>
-
-              <!-- Replies -->
-              <div v-if="comment.replies?.length" class="comment-item__replies ml-8 mt-2">
-                <div v-for="reply in comment.replies" :id="reply.id" :key="reply.id" class="reply-item mb-3">
-                  <div class="d-flex align-start mb-1 w-100">
-                    <v-avatar class="mr-2" color="grey-lighten-2" size="44">
-                      <v-img
-                        v-if="reply.user?.photoURL"
-                        alt="User avatar"
-                        cover
-                        :src="reply.user.photoURL"
-                      />
-
-                      <span v-else class="text-caption">{{
-                        reply.user?.displayName?.charAt(0).toUpperCase() || 'U'
-                      }}</span>
-                    </v-avatar>
-                    <div class="d-flex flex-column w-100">
-                      <div class="d-flex justify-space-between">
-                        <div class="d-flex align-start">
-                          <div class="d-block">
-                            <div class="d-flex">
-                              <span class="font-weight-bold text-body-2 mr-2">{{ reply.user?.displayName }}</span>
-                              <span class="date text-caption text-grey">{{ formatCommentDate(reply.createdAt) }}</span>
-                            </div>
-                            <div class="text-caption text-grey">@{{
-                              reply.user?.displayName?.replaceAll(' ', '_')
-                            }}
-                            </div>
-                          </div>
-                        </div>
-                        <CommentMenu
-                          :comment="reply"
-                          @copy-link="handleCopyCommentLink(reply.id)"
-                          @delete="handleDeleteComment(reply.id)"
-                          @edit="handleEditComment(reply)"
-                        />
-                      </div>
-                      <div v-if="editingCommentId === reply.id">
-                        <MentionTextarea
-                          v-model="editingText"
-                          height="89"
-                          hide-details
-                          placeholder="Edit your reply..."
-                          :users="users"
-                          @keydown.enter.prevent="handleUpdateComment"
-                        />
-                        <div class="d-flex justify-start mt-2">
-                          <div class="submit-btn" @click="handleUpdateComment">Save</div>
-                          <div class="cancel-btn ml-4" @click="editingCommentId = null">Cancel</div>
-                        </div>
-                      </div>
-                      <div v-else class="mt-2">
-                        <div class="text-body-2" v-html="renderCommentText(reply.text)" />
-                        <div class="d-flex align-center mt-1">
-                          <div
-                            class="px-0 d-flex hover-underline align-center cursor-pointer"
-                            @click="toggleLike(reply)"
-                          >
-                            <div
-                              class="d-flex mr-3 w-15"
-                              :class="{ 'liked stroke': reply.likes?.includes(authStore.user?.uid) }"
-                              v-html="getIcon('heart')"
-                            />
-                            <span class="text-caption">{{ reply.likes?.length || 0 }}</span>
-                          </div>
-                          <div
-                            class="px-0 d-flex align-center cursor-pointer"
-                            @click="toggleLike(reply)"
-                          >
-                            <div class="d-flex mx-3 w-15" v-html="getIcon('message')" />
-                            <span class="text-caption">{{ reply.replies?.length || 0 }}</span>
-                          </div>
-                          <div
-                            v-if="canInteract(reply.user.uid)"
-                            class="px-0 text-primary ml-3 hover-underline"
-                            style="font-size: 12px;"
-                            @click="showReplyInput[reply.id] = !showReplyInput[reply.id]"
-                          >
-                            Reply
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Reply Input (Nested) -->
-                  <div v-if="showReplyInput[reply.id]" class="mt-2 mb-4 ml-4">
-                    <div class="d-flex">
-                      <v-avatar class="mr-3" color="grey-lighten-2" size="40">
-                        <v-img
-                          v-if="authStore.user?.photoURL"
-                          alt="User avatar"
-                          cover
-                          :src="authStore.user?.photoURL"
-                        />
-                        <span v-else class="text-subtitle-1">{{
-                          reply.user?.displayName?.charAt(0).toUpperCase() || 'U'
-                        }}</span>
-                      </v-avatar>
-                      <div class="d-block w-100">
-                        <div class="position-relative">
-                          <MentionTextarea
-                            :model-value="replyText[reply.id] || ''"
-                            placeholder="Share your thoughts..."
-                            :users="users"
-                            @keydown.enter.prevent="submitReply(reply.id, $event)"
-                            @update:model-value="val => replyText[reply.id] = val"
-                          />
-                          <div class="emoji-picker-container">
-                            <EmojiPicker
-                              v-if="showReplyEmojiPicker[reply.id]"
-                              class="emoji-picker"
-                              disable-skin-tones
-                              native
-                              @select="emoji => onSelectReplyEmoji(emoji, reply.id)"
-                            />
-                            <v-icon
-                              class="emoji-icon cursor-pointer"
-                              icon="mdi-emoticon-outline"
-                              @click="showReplyEmojiPicker[reply.id] = !showReplyEmojiPicker[reply.id]"
-                            />
-                          </div>
-                        </div>
-                        <div class="d-flex mt-2">
-                          <div
-                            class="submit-btn position-relative"
-                            :class="{ 'disabled': !replyText[reply.id]?.trim() || isSubmitting }"
-                            @click="submitReply(reply.id, null)"
-                          >
-                            <span :class="{ 'opacity-0': isSubmitting }">Reply</span>
-                            <v-progress-circular
-                              v-if="isSubmitting"
-                              class="position-absolute"
-                              color="white"
-                              indeterminate
-                              size="20"
-                              style="left: 50%; top: 50%; transform: translate(-50%, -50%);"
-                              width="2"
-                            />
-                          </div>
-                          <div class="cancel-btn ml-4" @click="showReplyInput[reply.id] = false">
-                            Cancel
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Level 2 Replies -->
-                  <div v-if="reply.replies?.length" class="comment-item__replies ml-8 mt-2">
-                    <div v-for="subReply in reply.replies" :id="subReply.id" :key="subReply.id" class="reply-item mb-3">
-                      <div class="d-flex align-start mb-1 w-100">
-                        <v-avatar class="mr-2" color="grey-lighten-2" size="44">
-                          <v-img
-                            v-if="subReply.user?.photoURL"
-                            alt="User avatar"
-                            cover
-                            :src="subReply.user.photoURL"
-                          />
-
-                          <span v-else class="text-caption">{{
-                            subReply.user?.displayName?.charAt(0).toUpperCase() || 'U'
-                          }}</span>
-                        </v-avatar>
-                        <div class="d-flex flex-column w-100">
-                          <div class="d-flex">
-                            <div class="d-block">
-                              <div class="d-flex">
-                                <span class="font-weight-bold text-body-2 mr-2">{{ subReply.user?.displayName }}</span>
-                                <span class="date text-caption text-grey">{{
-                                  formatCommentDate(subReply.createdAt)
-                                }}</span>
-                              </div>
-                              <div class="text-caption text-grey">@{{
-                                subReply.user?.displayName?.replaceAll(' ', '_')
-                              }}
-                              </div>
-                            </div>
-                            <v-spacer />
-                            <CommentMenu
-                              :comment="subReply"
-                              @copy-link="handleCopyCommentLink(subReply.id)"
-                              @delete="handleDeleteComment(subReply.id)"
-                              @edit="handleEditComment(subReply)"
-                            />
-                          </div>
-                          <div v-if="editingCommentId === subReply.id">
-                            <MentionTextarea
-                              v-model="editingText"
-                              height="89"
-                              hide-details
-                              placeholder="Edit your reply..."
-                              :users="users"
-                              @keydown.enter.prevent="handleUpdateComment"
-                            />
-                            <div class="d-flex justify-start mt-2">
-                              <div class="submit-btn" @click="handleUpdateComment">Save</div>
-                              <div class="cancel-btn ml-4" @click="editingCommentId = null">Cancel</div>
-                            </div>
-                          </div>
-                          <div v-else class="mt-2">
-                            <div class="text-body-2" v-html="renderCommentText(subReply.text)" />
-                            <div class="d-flex align-center mt-1">
-                              <div
-                                class="px-0 d-flex align-center cursor-pointer"
-                                @click="toggleLike(subReply)"
-                              >
-                                <div
-                                  class="d-flex mr-3 w-15"
-                                  :class="{ 'liked stroke': subReply.likes?.includes(authStore.user?.uid) }"
-                                  v-html="getIcon('heart')"
-                                />
-                                <span class="text-caption">{{ subReply.likes?.length || 0 }}</span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </template>
-      <div v-else class="d-flex flex-column align-center mt-12 no-comments pb-6">
-        <div class="icon">
-          <v-icon icon="mdi-comment-outline" />
-        </div>
-        <div class="title">There are no comments yet</div>
-        <div class="sub-title">Write a comment and it appears here</div>
-      </div>
-    </div>
+    <!-- Comments Section -->
+    <CommentsSection
+      v-if="post.allowComments"
+      :comments="comments"
+      :post="post"
+      :users="users"
+      @reload-comments="loadComments(post.id)"
+    />
   </div>
 </template>
