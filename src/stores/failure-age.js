@@ -129,7 +129,7 @@ export const useFailureAgeStore = defineStore('failureAge', () => {
       count: lessonsLearnedCount.value * 0.5,
     }
   })
-  const calculateProgressData = computed(() => ((totalAgeData.value - actualAge.value) * 100) / (50 - actualAge.value))
+  const calculateProgressData = computed(() => ((totalAgeData.value - 18) * 100) / (50 - 18))
 
   return {
     // state
