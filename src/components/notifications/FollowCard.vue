@@ -6,7 +6,7 @@
   import { useAuthStore } from '@/stores/auth.js'
   import { useUserStore } from '@/stores/user.js'
   import { useWhoToFollowStore } from '@/stores/who-to-follow.js'
-  import {timeTransformAgo} from "@/utils/time.js";
+  import { timeTransformAgo } from '@/utils/time.js'
   const authStore = useAuthStore()
   const whoToFollowStore = useWhoToFollowStore()
   //

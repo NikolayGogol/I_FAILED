@@ -170,13 +170,26 @@
     authStore.user?.uid === p.post.uid ? router.push('/profile') : router.push(`/user-info/${p.post.uid}`)
   }
 
-  function handleShare () {
+  async function handleShare () {
     const url = `${window.location.origin}/post/${p.post.id}`
-    navigator.clipboard.writeText(url).then(() => {
-      toast.success('Link copied to clipboard!')
-    }).catch(() => {
-      toast.error('Failed to copy link')
-    })
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: p.post.title,
+          text: p.post.whatHappened,
+          url,
+        })
+        toast.success('Post shared successfully!')
+      } catch {
+        toast.error('Failed to share post.')
+      }
+    } else {
+      navigator.clipboard.writeText(url).then(() => {
+        toast.success('Link copied to clipboard!')
+      }).catch(() => {
+        toast.error('Failed to copy link')
+      })
+    }
   }
 
   function addTo () {

@@ -200,9 +200,24 @@
   const openCollection = item => router.push(`/library/${item.id}`)
   const timeAgo = time => time?.seconds ? dayjs.unix(time.seconds).fromNow() : 'no time'
 
-  function shareLink (item) {
-    navigator.clipboard.writeText(`${window.location.origin}/library/${item.id}`)
-    toast.info('Link copied')
+  async function shareLink (item) {
+    const url = `${window.location.origin}/library/${item.id}`
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: item.name,
+          text: `Check out this collection: ${item.name}`,
+          url,
+        })
+        toast.success('Link shared successfully!')
+      } catch {
+        toast.error('Failed to share link.')
+      }
+    } else {
+      navigator.clipboard.writeText(url).then(() => {
+        toast.info('Link copied')
+      })
+    }
   }
 </script>
 

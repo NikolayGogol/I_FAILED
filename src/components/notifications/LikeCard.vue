@@ -7,7 +7,7 @@
   import { useCommentsStore } from '@/stores/comments'
   import { useSinglePostStore } from '@/stores/single-post/single-post.js'
   import { useUserStore } from '@/stores/user.js'
-  import {timeTransformAgo} from "@/utils/time.js";
+  import { timeTransformAgo } from '@/utils/time.js'
 
   const props = defineProps({
     data: {

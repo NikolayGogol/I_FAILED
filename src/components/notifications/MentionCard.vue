@@ -5,7 +5,7 @@
   import ProfileInfo from '@/components/notifications/ProfileInfo.vue'
   import { backgroundColors } from '@/models/no-data.js'
   import { useUserStore } from '@/stores/user.js'
-  import {timeTransformAgo} from "@/utils/time.js";
+  import { timeTransformAgo } from '@/utils/time.js'
   //
   const userStore = useUserStore()
   //
