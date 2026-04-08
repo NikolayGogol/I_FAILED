@@ -105,11 +105,14 @@ export const useGrowChartStore = defineStore('growChart', () => {
       // Client-side filter: check for lessonLearned and exclude current user's posts
       if (postData.lessonLearned && postData.uid !== currentUser.uid) {
         posts.learnedCommunity.push({ id: doc.id, ...postData })
-      } else if (postData.lessonLearned && postData.uid === currentUser.uid) {
+      }
+      if (postData.lessonLearned && postData.uid === currentUser.uid) {
         posts.learnedOwn.push({ id: doc.id, ...postData })
-      } else if (postData.uid !== currentUser.uid) {
+      }
+      if (postData.uid !== currentUser.uid) {
         posts.postCommunity.push({ id: doc.id, ...postData })
-      } else if (postData.uid === currentUser.uid) {
+      }
+      if (postData.uid === currentUser.uid) {
         posts.postOwn.push({ id: doc.id, ...postData })
       }
     })
