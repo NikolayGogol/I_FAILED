@@ -49,9 +49,7 @@
       <div class="picker-wrapper">
         <VueDatePicker
           v-model="doNotDisturb.to"
-          :class="{'pointer-events-none opacity-60': !doNotDisturb.from}"
           clearable
-          :min-time="doNotDisturb.from"
           placeholder="To"
           time-picker
         />

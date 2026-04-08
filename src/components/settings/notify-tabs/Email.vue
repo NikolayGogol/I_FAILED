@@ -52,7 +52,9 @@
         :value="radio.value"
       />
     </v-radio-group>
-    <p class="text-description">Lorem ipsum dolor sit amet, consectetur adipisicing elit. A cum dicta doloribus error modi! A at consequatur ex ipsa officiis, possimus, praesentium, quaerat recusandae repudiandae vero vitae voluptatibus. Ullam, voluptas?</p>
+    <p class="text-description">
+      Stay updated your way. Choose to receive a summary every day, once a week, or not at all.
+    </p>
     <div class="title mt-6">Related to you and your posts</div>
     <ul class="mt-3">
       <li class="cursor-default all-item px-5">

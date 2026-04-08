@@ -31,6 +31,38 @@
       border-radius: $radius-md;
     }
 
+    .dp__selection_preview {
+      display: none;
+    }
+
+    .dp__time_display {
+      width: 50px;
+    }
+
+    .dp__menu {
+      border-radius: $radius-md;
+    }
+
+    .dp__action_buttons {
+      display: flex;
+      justify-content: center;
+      flex: none;
+      margin-inline-start: unset;
+      width: 100%;
+
+      .dp__action_button {
+        height: auto;
+      }
+
+      .dp__action_cancel {
+        @extend .cancel-btn;
+      }
+
+      .dp__action_select {
+        @extend .submit-btn;
+      }
+    }
+
     .dp__action_select {
       background-color: $color-primary;
     }
