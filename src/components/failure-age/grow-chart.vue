@@ -175,9 +175,3 @@
     </div>
   </div>
 </template>
-
-<style scoped lang="scss">
-.text-error {
-  color: red;
-}
-</style>
