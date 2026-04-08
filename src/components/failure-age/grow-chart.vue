@@ -109,6 +109,7 @@
     }
   })
   const userResiliencePercentage = computed(() => {
+    console.log(userReliesence.value);
     if (userReliesence.value > 100) {
       return userReliesence.value / 3
     } else if (userReliesence.value > 500) {
