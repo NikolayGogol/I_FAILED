@@ -78,8 +78,20 @@
   const userEngagementPercentage = computed(() => {
     return (userEngagement.value * 100) / communityEngagement.value
   })
+  const communityEngagementPercentage = computed(() => {
+    if (communityEngagement.value > 0) {
+      return Math.round((communityEngagement.value * 100) / growChartStore.posts.postCommunity.length)
+    }
+    return 0
+  })
   const userResiliencePercentage = computed(() => {
     return (userResilience.value * 100) / communityResilience.value
+  })
+  const communityResiliencePercentage = computed(() => {
+    if (communityResilience.value > 0) {
+      return Math.round((communityResilience.value * 100) / growChartStore.posts.postCommunity.length)
+    }
+    return 0
   })
   const chartOptions = computed(() => ({
     chart: {
@@ -148,7 +160,7 @@
     },
     {
       name: 'Community Avg',
-      data: [communityAveragePercentage.value, 100, 100],
+      data: [communityAveragePercentage.value, communityEngagementPercentage.value, communityResiliencePercentage.value],
     },
   ]))
 
@@ -156,6 +168,7 @@
 
 <template>
   <div class="section mt-6 grow-chart">
+    {{ communityEngagementPercentage }}
     <h3 class="title-section">You're Growing at Your Own Pace</h3>
     <p class="text-description fs-14">Your journey compared to community averages</p>
     <div class="mt-4">

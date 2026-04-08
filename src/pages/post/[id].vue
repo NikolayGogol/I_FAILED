@@ -21,13 +21,13 @@
   import { useCommentsStore } from '@/stores/comments'
   import { usePostCardStore } from '@/stores/post-card.js'
   import { useSinglePostStore } from '@/stores/single-post/single-post.js'
+  import { useUserStore } from '@/stores/user.js'
   import { floatNumber, formatNumber } from '@/utils/format-number.js'
   import { stripHtml } from '@/utils/html.js'
   import { timeTransformAgo } from '@/utils/time.js'
   import { transformUsername } from '@/utils/transform-username.js'
   import 'vue3-emoji-picker/css'
   import '@/styles/pages/single-post.scss'
-  import {useUserStore} from "@/stores/user.js";
   const props = defineProps({
     id: {
       type: String,
