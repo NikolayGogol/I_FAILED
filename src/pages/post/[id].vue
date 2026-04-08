@@ -24,8 +24,10 @@
   import { floatNumber, formatNumber } from '@/utils/format-number.js'
   import { stripHtml } from '@/utils/html.js'
   import { timeTransformAgo } from '@/utils/time.js'
+  import { transformUsername } from '@/utils/transform-username.js'
   import 'vue3-emoji-picker/css'
   import '@/styles/pages/single-post.scss'
+  import {useUserStore} from "@/stores/user.js";
   const props = defineProps({
     id: {
       type: String,
@@ -33,6 +35,7 @@
     },
   })
   dayjs.extend(relativeTime)
+  const userStore = useUserStore()
 
   // Vue and Vue Router setup
   const route = useRoute()
@@ -108,6 +111,10 @@
   function init (postId) {
     getPostById(postId).then(res => {
       post.value = res
+      userStore.getUserById(res.uid)
+        .then(res => {
+          post.value.user = res
+        })
       incrementViewCount(postId)
 
       if (auth.currentUser?.uid && res?.selectedCategories?.[0]) {
@@ -316,7 +323,7 @@
               <div class="create-at">{{ timeTransformAgo(post.createdAt) }}</div>
             </div>
             <div v-if="!post.isAnonymous" class="text-caption text-grey">
-              @{{ post.user?.displayName?.replaceAll(' ', '_') }}
+              {{ transformUsername(post.user.userName, post.user.displayName) }}
             </div>
           </div>
         </div>
