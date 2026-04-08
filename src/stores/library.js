@@ -1,5 +1,6 @@
 import {
   addDoc,
+  arrayRemove,
   arrayUnion,
   collection,
   deleteDoc,
@@ -60,11 +61,14 @@ export const useLibraryStore = defineStore('library', {
           throw 'Document does not exist!'
         }
 
-        const newItems = arrayUnion(post.id)
-        // Since arrayUnion is a transform, we can't easily get the new length on the client.
-        // Instead, we'll get the length from the server and add 1 if the item is not already in the array.
         const currentItems = collectionDoc.data().items || []
-        const newCounter = currentItems.includes(post.id) ? currentItems.length : currentItems.length + 1
+
+        if (currentItems.includes(post.id)) {
+          throw new Error('Post already exists in this collection.')
+        }
+
+        const newItems = arrayUnion(post.id)
+        const newCounter = currentItems.length + 1
 
         transaction.update(docRef, {
           items: newItems,
@@ -113,6 +117,13 @@ export const useLibraryStore = defineStore('library', {
       const orderedPosts = postIds.map(id => postsById.get(id)).filter(Boolean)
 
       return orderedPosts
+    },
+    async removePostFromCollection (collectionId, postId, counter) {
+      const docRef = doc(db, VITE_LIBRARY, collectionId)
+      return await updateDoc(docRef, {
+        ...counter,
+        items: arrayRemove(postId),
+      })
     },
   },
 })

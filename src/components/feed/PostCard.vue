@@ -211,7 +211,7 @@
   <!-- Post card is only rendered if the post exists, is not muted, and the author is not blocked -->
   <div v-if="post && !isMuted && !isBlocked" class="post-card" :class="{'has-image': post.images[0]}">
     <!-- Post header -->
-    <header class="post-header">
+    <header class="post-header position-relative">
       <div class="post-avatar cursor-pointer" @click="openUserProfile">
         <img v-if="post.user && post.user.photoURL" alt="User avatar" :src="post.user.photoURL">
         <img v-else-if="post.isAnonymous" alt="User avatar" :src="noAvatar">

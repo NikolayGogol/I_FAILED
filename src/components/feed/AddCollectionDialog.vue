@@ -59,8 +59,12 @@
       }
       emit('post-saved')
     } catch (error) {
-      console.error('Failed to save to collection:', error)
-      toast.error('Failed to save post to collection.')
+      if (error.message === 'Post already exists in this collection.') {
+        toast.error('Post already exists in this collection.')
+      } else {
+        console.error('Failed to save to collection:', error)
+        toast.error('Failed to save post to collection.')
+      }
     } finally {
       isSaving.value = false
     }
