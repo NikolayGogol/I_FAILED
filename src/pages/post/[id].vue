@@ -23,6 +23,7 @@
   import { useSinglePostStore } from '@/stores/single-post/single-post.js'
   import { floatNumber } from '@/utils/format-number.js'
   import { stripHtml } from '@/utils/html.js'
+  import { timeTransformAgo } from '@/utils/time.js'
   import 'vue3-emoji-picker/css'
   import '@/styles/pages/single-post.scss'
 
@@ -131,12 +132,6 @@
   // Re-initialize when route params change
   watch(() => route.params, val => {
     init(val.id)
-  })
-
-  // Computes the "time ago" string for the post
-  const timeAgo = computed(() => {
-    if (!post.value?.createdAt) return ''
-    return dayjs.unix(post.value.createdAt.seconds).fromNow()
   })
 
   // Calculates the estimated reading time for the post
@@ -314,7 +309,7 @@
           <div>
             <div class="d-flex">
               <div class="font-weight-bold">{{ post.isAnonymous ? 'Anonymous' : post.user?.displayName }}</div>
-              <div class="create-at">{{ timeAgo }}</div>
+              <div class="create-at">{{ timeTransformAgo(post.createdAt) }}</div>
             </div>
             <div v-if="!post.isAnonymous" class="text-caption text-grey">
               @{{ post.user?.displayName?.replaceAll(' ', '_') }}

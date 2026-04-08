@@ -4,6 +4,7 @@
   import { computed, ref } from 'vue'
   import EmojiPicker from 'vue3-emoji-picker'
   import { useToast } from 'vue-toastification'
+  import { useDisplay } from 'vuetify/framework'
   import CommentMenu from '@/components/CommentMenu.vue'
   import ConfirmationModal from '@/components/ConfirmationModal.vue'
   import ImgComment from '@/components/ImgComment.vue'
@@ -12,8 +13,11 @@
   import { useAuthStore } from '@/stores/auth'
   import { useCommentsStore } from '@/stores/comments'
   import { usePostCardStore } from '@/stores/post-card.js'
+  import { timeTransformAgo } from '@/utils/time.js'
 
   dayjs.extend(relativeTime)
+
+  const { smAndUp } = useDisplay()
 
   const props = defineProps({
     post: {
@@ -139,11 +143,6 @@
       console.error('Failed to toggle like:', error)
       toast.error('Failed to toggle like.')
     }
-  }
-
-  function formatCommentDate (timestamp) {
-    if (!timestamp) return ''
-    return dayjs(timestamp.toDate()).fromNow()
   }
 
   function onSelectEmoji (emoji) {
@@ -297,11 +296,11 @@
           <div class="flex-grow-1">
             <div class="comment-item__header d-flex align-center mb-1">
               <div class="d-block">
-                <div class="d-flex">
-                  <span class="username font-weight-bold mr-2">{{ comment.user?.displayName }}</span>
-                  <span class="date text-caption text-grey">{{ formatCommentDate(comment.createdAt) }}</span>
+                <div class="d-flex align-center">
+                  <span class="username font-weight-bold mr-2" :class="{'mobile-username': !smAndUp}">{{ comment.user?.displayName }}</span>
+                  <span class="date text-caption text-grey">{{ timeTransformAgo(comment.createdAt) }}</span>
                 </div>
-                <div class="text-caption text-grey">@{{ comment.user?.displayName?.replaceAll(' ', '_') }}</div>
+                <div class="text-caption text-grey" :class="{'mobile-username': !smAndUp}">@{{ comment.user?.displayName?.replaceAll(' ', '_') }}</div>
               </div>
               <v-spacer />
               <CommentMenu :comment="comment" @copy-link="handleCopyCommentLink(comment.id)" @delete="handleDeleteComment(comment.id)" @edit="handleEditComment(comment)" />
@@ -397,7 +396,7 @@
             </div>
 
             <!-- Replies -->
-            <div v-if="comment.replies?.length" class="comment-item__replies ml-8 mt-2">
+            <div v-if="comment.replies?.length" class="comment-item__replies ml-4 sm:ml-8 mt-2">
               <div v-for="reply in comment.replies" :id="reply.id" :key="reply.id" class="reply-item mb-3">
                 <div class="d-flex align-start mb-1 w-100">
                   <v-avatar class="mr-2" color="grey-lighten-2" size="44">
@@ -409,10 +408,10 @@
                       <div class="d-flex align-start">
                         <div class="d-block">
                           <div class="d-flex">
-                            <span class="font-weight-bold text-body-2 mr-2">{{ reply.user?.displayName }}</span>
-                            <span class="date text-caption text-grey">{{ formatCommentDate(reply.createdAt) }}</span>
+                            <span class="font-weight-bold text-body-2 mr-2" :class="{'mobile-username': !smAndUp}">{{ reply.user?.displayName }}</span>
+                            <span class="date text-caption text-grey">{{ timeTransformAgo(reply.createdAt) }}</span>
                           </div>
-                          <div class="text-caption text-grey">@{{ reply.user?.displayName?.replaceAll(' ', '_') }}</div>
+                          <div class="text-caption text-grey" :class="{'mobile-username': !smAndUp}">@{{ reply.user?.displayName?.replaceAll(' ', '_') }}</div>
                         </div>
                       </div>
                       <CommentMenu :comment="reply" @copy-link="handleCopyCommentLink(reply.id)" @delete="handleDeleteComment(reply.id)" @edit="handleEditComment(reply)" />
@@ -434,7 +433,7 @@
                       </div>
                     </div>
                     <div v-else class="mt-2">
-                      <div class="text-body-2" v-html="renderCommentText(reply.text)" />
+                      <div class="text-body-2 text-wrap" v-html="renderCommentText(reply.text)" />
                       <div v-if="reply.imageUrl" class="my-2">
                         <v-img class="rounded-lg" max-height="300" :src="reply.imageUrl" />
                       </div>
@@ -501,7 +500,7 @@
                     </div>
                   </div>
                 </div>
-                <div v-if="reply.replies?.length" class="comment-item__replies ml-8 mt-2">
+                <div v-if="reply.replies?.length" class="comment-item__replies ml-4 sm:ml-8 mt-2">
                   <div v-for="subReply in reply.replies" :id="subReply.id" :key="subReply.id" class="reply-item mb-3">
                     <div class="d-flex align-start mb-1 w-100">
                       <v-avatar class="mr-2" color="grey-lighten-2" size="44">
@@ -512,10 +511,10 @@
                         <div class="d-flex">
                           <div class="d-block">
                             <div class="d-flex">
-                              <span class="font-weight-bold text-body-2 mr-2">{{ subReply.user?.displayName }}</span>
-                              <span class="date text-caption text-grey">{{ formatCommentDate(subReply.createdAt) }}</span>
+                              <span class="font-weight-bold text-body-2 mr-2" :class="{'mobile-username': !smAndUp}">{{ subReply.user?.displayName }}</span>
+                              <span class="date text-caption text-grey">{{ timeTransformAgo(subReply.createdAt) }}</span>
                             </div>
-                            <div class="text-caption text-grey">@{{ subReply.user?.displayName?.replaceAll(' ', '_') }}</div>
+                            <div class="text-caption text-grey" :class="{'mobile-username': !smAndUp}">@{{ subReply.user?.displayName?.replaceAll(' ', '_') }}</div>
                           </div>
                           <v-spacer />
                           <CommentMenu :comment="subReply" @copy-link="handleCopyCommentLink(subReply.id)" @delete="handleDeleteComment(subReply.id)" @edit="handleEditComment(subReply)" />
@@ -537,7 +536,7 @@
                           </div>
                         </div>
                         <div v-else class="mt-2">
-                          <div class="text-body-2" v-html="renderCommentText(subReply.text)" />
+                          <div class="text-body-2 text-wrap" v-html="renderCommentText(subReply.text)" />
                           <div v-if="subReply.imageUrl" class="my-2">
                             <v-img class="rounded-lg" max-height="300" :src="subReply.imageUrl" />
                           </div>
@@ -574,3 +573,14 @@
     />
   </div>
 </template>
+
+<style scoped>
+.mobile-username {
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 120px;
+  vertical-align: text-bottom;
+}
+</style>

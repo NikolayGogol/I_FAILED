@@ -299,9 +299,12 @@
 
     .comment-item__replies {
       @include media-down($breakpoint-sm) {
-        margin-left: 16px !important; // Reduce nesting indent on mobile
+        margin-left: 8px !important; // Reduce nesting indent on mobile
         border-left: 2px solid $color-border;
         padding-left: 8px;
+        .mt-2 {
+          word-break: break-all;
+        }
       }
     }
 

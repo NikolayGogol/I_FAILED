@@ -15,6 +15,7 @@
   import { useAuthStore } from '@/stores/auth.js'
   import { usePostCardStore } from '@/stores/post-card.js'
   import { floatNumber, formatNumber } from '@/utils/format-number.js'
+  import { timeTransformAgo } from '@/utils/time.js'
   import { transformUsername } from '@/utils/transform-username.js'
   import '@/styles/components/feed/post-card.scss'
 
@@ -169,16 +170,6 @@
     authStore.user?.uid === p.post.uid ? router.push('/profile') : router.push(`/user-info/${p.post.uid}`)
   }
 
-  function timeAgo (time) {
-    if (time?._seconds) {
-      return dayjs.unix(time._seconds).fromNow()
-    }
-    if (time?.seconds) {
-      return dayjs.unix(time.seconds).fromNow()
-    }
-    return ''
-  }
-
   function handleShare () {
     const url = `${window.location.origin}/post/${p.post.id}`
     navigator.clipboard.writeText(url).then(() => {
@@ -216,7 +207,7 @@
       <div class="post-author cursor-pointer" @click="openUserProfile">
         <div class="d-flex align-center">
           <div class="post-author-name">{{ post.user.displayName }}</div>
-          <p class="ml-2"> • {{ timeAgo(post.createdAt) }}</p>
+          <p class="ml-2"> • {{ timeTransformAgo(post.createdAt) }}</p>
         </div>
         <div class="post-author-handle">
           {{ transformUsername(post.user.userName, post.user.displayName) }}
