@@ -9,13 +9,17 @@
   const userAverageRecoveryTime = ref(0)
   const communityEngagement = ref(0)
   const userEngagement = ref(0)
+  const userReliesence = ref(0)
+  const communityReliesence = ref(0)
   const maxRecoveryDays = Math.max(...recoveryTimeOptions.map(opt => opt.days))
 
   onMounted(async () => {
     await growChartStore.fetchLessonLearnedPosts()
     await growChartStore.fetchComments()
+    await growChartStore.fetchResilience()
     calculateCommunityAverageRecoveryTime()
     calculateEngagement()
+    calculateResilience()
     const userAverage = +sessionStorage.getItem('averageRecoveryTime')
     if (!Number.isNaN(userAverage)) {
       userAverageRecoveryTime.value = userAverage
@@ -53,7 +57,10 @@
       userEngagement.value = userComments.length + userLikes.length
     }
   }
-
+  function calculateResilience () {
+    userReliesence.value = growChartStore.posts.postOwn.length - growChartStore.posts.learnedOwn.length
+    communityReliesence.value = growChartStore.posts.postCommunity.length - growChartStore.posts.learnedCommunity.length
+  }
   const communityAveragePercentage = computed(() => {
     if (communityAverageRecoveryTime.value > 0) {
       return Math.round((communityAverageRecoveryTime.value / maxRecoveryDays) * 100)
@@ -90,6 +97,28 @@
       return communityEngagement.value
     }
   })
+  const communityResiliencePercentage = computed(() => {
+    if (communityReliesence.value > 100) {
+      return communityReliesence.value / 3
+    } else if (communityReliesence.value > 500) {
+      return communityReliesence.value / 2
+    } else if (communityReliesence.value > 1000) {
+      return communityReliesence.value / 4
+    } else {
+      return communityReliesence.value
+    }
+  })
+  const userResiliencePercentage = computed(() => {
+    if (userReliesence.value > 100) {
+      return userReliesence.value / 3
+    } else if (userReliesence.value > 500) {
+      return userReliesence.value / 2
+    } else if (userReliesence.value > 1000) {
+      return userReliesence.value / 4
+    } else {
+      return userReliesence.value
+    }
+  })
   const chartOptions = computed(() => ({
     chart: {
       type: 'bar',
@@ -115,7 +144,7 @@
       colors: ['transparent'],
     },
     xaxis: {
-      categories: ['Recovery Time', 'Engagement'],
+      categories: ['Recovery Time', 'Engagement', 'Resilience'],
       labels: {
         style: {
           fontSize: '12px',
@@ -153,11 +182,11 @@
   const series = computed(() => ([
     {
       name: 'You',
-      data: [userAveragePercentage.value, Math.min(userEngagementPercentage.value, 100)],
+      data: [userAveragePercentage.value, Math.min(userEngagementPercentage.value, 100), Math.min(userResiliencePercentage.value, 100)],
     },
     {
       name: 'Community Avg',
-      data: [communityAveragePercentage.value, Math.min(communityEngagementPercentage.value, 100)],
+      data: [communityAveragePercentage.value, Math.min(communityEngagementPercentage.value, 100), Math.min(communityResiliencePercentage.value, 100)],
     },
   ]))
 
@@ -167,7 +196,6 @@
   <div class="section mt-6 grow-chart">
     <h3 class="title-section">You're Growing at Your Own Pace</h3>
     <p class="text-description fs-14">Your journey compared to community averages</p>
-
     <div class="mt-4">
       <VueApexCharts height="350" :options="chartOptions" :series="series" type="bar" />
     </div>

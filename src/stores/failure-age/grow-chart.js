@@ -1,6 +1,6 @@
 import { collection, getDocs, query } from 'firebase/firestore' // Removed 'where' from import
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { reactive, ref } from 'vue'
 import { db } from '@/firebase'
 import { useAuthStore } from '@/stores/auth.js'
 
@@ -16,7 +16,12 @@ export const useGrowChartStore = defineStore('growChart', () => {
   const loading = ref(false)
   const error = ref(null)
   const authStore = useAuthStore()
-
+  const posts = reactive({
+    learnedOwn: [],
+    learnedCommunity: [],
+    postOwn: [],
+    postCommunity: [],
+  })
   async function fetchLessonLearnedPosts () {
     loading.value = true
     error.value = null
@@ -84,6 +89,32 @@ export const useGrowChartStore = defineStore('growChart', () => {
       console.error('Error fetching lesson learned posts:', error_)
     }
   }
+  async function fetchResilience () {
+    const currentUser = authStore.user
+    if (!currentUser || !currentUser.uid) {
+      error.value = 'User not authenticated.'
+      loading.value = false
+      return
+    }
+    const postsRef = collection(db, VITE_POST_COLLECTION)
+    const q = query(postsRef) // Simplified query
+    const querySnapshot = await getDocs(q)
+    // eslint-disable-next-line
+    querySnapshot.forEach(doc => {
+      const postData = doc.data()
+      // Client-side filter: check for lessonLearned and exclude current user's posts
+      if (postData.lessonLearned && postData.uid !== currentUser.uid) {
+        posts.learnedCommunity.push({ id: doc.id, ...postData })
+      } else if (postData.lessonLearned && postData.uid === currentUser.uid) {
+        posts.learnedOwn.push({ id: doc.id, ...postData })
+      } else if (postData.uid !== currentUser.uid) {
+        posts.postCommunity.push({ id: doc.id, ...postData })
+      } else if (postData.uid === currentUser.uid) {
+        posts.postOwn.push({ id: doc.id, ...postData })
+      }
+    })
+    return posts
+  }
   return {
     lessonLearnedPosts,
     commentsList,
@@ -92,7 +123,9 @@ export const useGrowChartStore = defineStore('growChart', () => {
     likesListOwn,
     loading,
     error,
+    posts,
     fetchLessonLearnedPosts,
     fetchComments,
+    fetchResilience,
   }
 })
