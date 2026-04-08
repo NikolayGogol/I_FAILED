@@ -68,7 +68,7 @@
     <p v-if="isLoading" class="text-center">Loading ....</p>
     <template v-else>
       <div v-if="postList.length > 0" class="mt-4">
-        <post-card v-for="post in postList" :key="post.id" :post="post">
+        <post-card v-for="post in postList.reverse()" :key="post.id" :post="post">
           <template #recovered-content>
             <div class="d-flex" @click="openConfirmationModal(post)" v-html="getIcon('trash')" />
           </template>
