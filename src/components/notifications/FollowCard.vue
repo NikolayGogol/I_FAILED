@@ -6,6 +6,7 @@
   import { useAuthStore } from '@/stores/auth.js'
   import { useUserStore } from '@/stores/user.js'
   import { useWhoToFollowStore } from '@/stores/who-to-follow.js'
+  import {timeTransformAgo} from "@/utils/time.js";
   const authStore = useAuthStore()
   const whoToFollowStore = useWhoToFollowStore()
   //
@@ -30,45 +31,6 @@
       cardData.user = user
     })
     cardData.createdAt = data.createdAt
-  }
-  function timeAgo (time) {
-    if (window.innerWidth > 768) {
-      if (time?.seconds) {
-        return dayjs.unix(time.seconds).fromNow()
-      }
-      return ''
-    } else {
-      if (!time?.seconds) {
-        return ''
-      }
-      const date = dayjs.unix(time.seconds)
-      const now = dayjs()
-      const diffYears = now.diff(date, 'year')
-      if (diffYears > 0) {
-        return `${diffYears}y ago`
-      }
-      const diffMonths = now.diff(date, 'month')
-      if (diffMonths > 0) {
-        return `${diffMonths}M ago`
-      }
-      const diffDays = now.diff(date, 'day')
-      if (diffDays > 0) {
-        return `${diffDays}d ago`
-      }
-      const diffHours = now.diff(date, 'hour')
-      if (diffHours > 0) {
-        return `${diffHours}h ago`
-      }
-      const diffMinutes = now.diff(date, 'minute')
-      if (diffMinutes > 0) {
-        return `${diffMinutes}m ago`
-      }
-      const diffSeconds = now.diff(date, 'second')
-      if (diffSeconds > 0) {
-        return `${diffSeconds}s ago`
-      }
-      return 'just now'
-    }
   }
 
   function getInitials (name) {
@@ -127,7 +89,7 @@
         <div class="d-flex align-center justify-space-between">
           <div class="d-flex">
             <span class="user-name cursor-pointer">{{ cardData.user?.displayName }}</span>
-            <span class="time"> • {{ timeAgo(cardData.createdAt) }}</span>
+            <span class="time"> • {{ timeTransformAgo(cardData.createdAt) }}</span>
           </div>
           <NotifyMenu :data="data" />
         </div>
