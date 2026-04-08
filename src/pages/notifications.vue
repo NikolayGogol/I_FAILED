@@ -122,7 +122,7 @@
           density="comfortable"
           :length="totalPages"
           rounded
-          :total-visible="3"
+          :total-visible="5"
           @update:model-value="handlePageChange"
         />
       </div>
