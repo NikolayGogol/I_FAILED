@@ -125,7 +125,6 @@
           scale: 2,
           useCORS: true,
           logging: false,
-          width: 725,
         },
         jsPDF: {
           unit: 'in',
@@ -228,8 +227,11 @@
       <v-progress-linear color="primary" indeterminate />
     </div>
     <div v-if="isExporting" id="exporting-wrapper">
-      <div v-for="post in exportingPosts" :key="post.id" class="post-card-export">
-        <id :id="post.id" />
+      <div v-for="post in exportingPosts" :key="post.id">
+        <div class="post-card-export">
+          <id :id="post.id" />
+        </div>
+        <div class="html2pdf__page-break" />
       </div>
     </div>
 

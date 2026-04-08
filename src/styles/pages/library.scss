@@ -130,3 +130,11 @@
     font-size: 20px !important;
   }
 }
+
+.html2pdf__page-break {
+  page-break-after: always;
+}
+
+.post-card-export {
+  page-break-inside: avoid;
+}
