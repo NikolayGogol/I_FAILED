@@ -1,5 +1,4 @@
 <script setup>
-  import dayjs from 'dayjs'
   import { onMounted, reactive } from 'vue'
   import NotifyMenu from '@/components/notifications/NotifyMenu.vue'
   import ProfileInfo from '@/components/notifications/ProfileInfo.vue'

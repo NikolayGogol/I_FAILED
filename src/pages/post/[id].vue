@@ -21,12 +21,17 @@
   import { useCommentsStore } from '@/stores/comments'
   import { usePostCardStore } from '@/stores/post-card.js'
   import { useSinglePostStore } from '@/stores/single-post/single-post.js'
-  import { floatNumber } from '@/utils/format-number.js'
+  import { floatNumber, formatNumber } from '@/utils/format-number.js'
   import { stripHtml } from '@/utils/html.js'
   import { timeTransformAgo } from '@/utils/time.js'
   import 'vue3-emoji-picker/css'
   import '@/styles/pages/single-post.scss'
-
+  const props = defineProps({
+    id: {
+      type: String,
+      default: '',
+    },
+  })
   dayjs.extend(relativeTime)
 
   // Vue and Vue Router setup
@@ -78,7 +83,7 @@
 
   // Initialize component on mount
   onMounted(() => {
-    const postId = route.params.id
+    const postId = route.params.id || props.id
     if (postId) {
       window.scrollTo({ top: 0, behavior: 'smooth' })
       init(postId)
@@ -287,11 +292,10 @@
 <template>
   <div v-if="post" class="single-post-page">
     <!-- Header -->
-    <div class="d-flex align-center d-sm-block">
+    <div v-if="!props.id" class="d-flex align-center d-sm-block">
       <v-icon class="cursor-pointer" icon="mdi-arrow-left" @click="$router.go(-1)" />
       <h1 class="font-weight-bold text-grey-darken-3 ml-3 ml-sm-0">Post</h1>
     </div>
-
     <!-- Post Content -->
     <div class="bg mt-4">
       <!-- Post Header -->
@@ -342,25 +346,99 @@
         <h2 class="section-title">What Happened</h2>
         <div class="word-break" v-html="post.whatHappened" />
       </section>
-      <!-- ... other post sections ... -->
 
-      <!-- Post Footer with Reactions and Actions -->
+      <section v-if="post?.whatWentWrong" class="single-post-page__section mb-6">
+        <h2 class="section-title">What Went Wrong</h2>
+        <div class="word-break" v-html="post?.whatWentWrong" />
+      </section>
+
+      <div
+        v-if="post?.lessonLearned?.whatILearned || post?.lessonLearned?.keyTakeaways"
+        class="bg-orange-accent-1 pa-6 rounded-lg mb-6"
+      >
+        <section v-if="post.lessonLearned?.whatILearned">
+          <h2 class="section-title">What I Learned</h2>
+          <div class="word-break quill-break" v-html="post.lessonLearned.whatILearned" />
+        </section>
+        <section v-if="post.lessonLearned?.keyTakeaways">
+          <h2 class="section-title">Key Takeaways</h2>
+          <div class="word-break quill-break" v-html="post.lessonLearned.keyTakeaways " />
+        </section>
+      </div>
+      <section v-if="post?.lessonLearned?.whatIdDoDifferently" class="bg-orange-accent-1 pa-6 rounded-lg mb-6">
+        <h2 class="section-title">What I'd Do Differently</h2>
+        <div class="word-break quill-break" v-html="post.lessonLearned.whatIdDoDifferently" />
+      </section>
+      <section v-if="post?.lessonLearned?.advice" class="bg-orange-accent-1 pa-6 rounded-lg mb-6">
+        <h2 class="section-title">Advice for Others</h2>
+        <div class="word-break quill-break" v-html="post?.lessonLearned.advice" />
+      </section>
+
+      <h3>Additional Details</h3>
+      <div v-if="post?.lessonLearned?.cost" class="d-flex mb-2">
+        <span class="font-weight-semibold mr-2">Cost:</span>
+        <span class="text-grey-darken-4">{{ formatNumber(post.lessonLearned?.cost) }}</span>
+      </div>
+      <div v-if="post?.lessonLearned?.recoveryTime" class="d-flex mb-2">
+        <span class="font-weight-semibold mr-2">Recovery Time:</span>
+        <span class="text-grey-darken-4">{{ post.lessonLearned?.recoveryTime?.title }}</span>
+      </div>
+      <div v-if="post?.emotionTags?.length" class="d-flex flex-column sm-flex-row sm-align-center">
+        <span class="font-weight-semibold mr-2">Emotions:</span>
+        <div class=" d-flex">
+          <v-chip
+            v-for="(chip, index) in post?.emotionTags"
+            :key="index"
+            class="mr-2"
+            size="small"
+          > {{ chip.emoji }} {{ chip.label }}
+          </v-chip>
+        </div>
+      </div>
+      <div v-if="post.tags?.length > 0" class="d-flex mt-2">
+        <span class="font-weight-semibold mr-2">Tags:</span>
+        <ul class="tag-list">
+          <li v-for="tag in post.tags" :key="tag" class="tag">{{ tag }}</li>
+        </ul>
+      </div>
+      <v-divider v-if="post.images?.length > 0" class="my-6" />
+      <v-img
+        v-for="img in post.images"
+        :key="img.thumb"
+        :alt="post.title"
+        :aspect-ratio="16/9"
+        class="w-100 rounded-xl mb-3"
+        cover
+        :lazy-src="img.thumb"
+        :src="img.full"
+      >
+        <template #placeholder>
+          <div class="d-flex align-center justify-center fill-height bg-grey-lighten-4">
+            <v-progress-circular
+              color="primary"
+              indeterminate
+            />
+          </div>
+        </template>
+      </v-img>
       <v-divider class="my-6" />
-      <h3>React to This Story</h3>
-      <ul class="reaction-list ga-1 sm-ga-2">
-        <li
-          v-for="(item, index) in reactions"
-          :key="index"
-          class="cursor-pointer"
-          :class="{ 'active': item.active }"
-          @click="handleReaction(item.id)"
-        >
-          <p class="emoji">{{ item.emoji }}</p>
-          <p class="label text-center">{{ item.label }}</p>
-          <p class="count text-center font-weight-bold text-uppercase">{{ floatNumber(item.count) }}</p>
-        </li>
-      </ul>
-      <div class="footer">
+      <template v-if="!props.id">
+        <h3>React to This Story</h3>
+        <ul class="reaction-list ga-1 sm-ga-2">
+          <li
+            v-for="(item, index) in reactions"
+            :key="index"
+            class="cursor-pointer"
+            :class="{ 'active': item.active }"
+            @click="handleReaction(item.id)"
+          >
+            <p class="emoji">{{ item.emoji }}</p>
+            <p class="label text-center">{{ item.label }}</p>
+            <p class="count text-center font-weight-bold text-uppercase">{{ floatNumber(item.count) }}</p>
+          </li>
+        </ul>
+      </template>
+      <div v-if="!props.id" class="footer">
         <div class="d-flex">
           <div class="item cursor-pointer" :class="{'liked': isLiked }" @click="handlePostLike">
             <div class="d-flex" v-html="getIcon('heart')" />
@@ -378,14 +456,16 @@
         <div class="d-flex cursor-pointer icon-hover" @click="handleShare" v-html="getIcon('share')" />
       </div>
     </div>
+    <template v-if="!props.id">
+      <!-- Comments Section -->
+      <CommentsSection
+        v-if="post.allowComments"
+        :comments="comments"
+        :post="post"
+        :users="users"
+        @reload-comments="loadComments(post.id)"
+      />
+    </template>
 
-    <!-- Comments Section -->
-    <CommentsSection
-      v-if="post.allowComments"
-      :comments="comments"
-      :post="post"
-      :users="users"
-      @reload-comments="loadComments(post.id)"
-    />
   </div>
 </template>

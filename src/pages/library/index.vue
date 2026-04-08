@@ -15,8 +15,8 @@
   import { useToast } from 'vue-toastification'
   import { useDisplay } from 'vuetify/framework'
   import ConfirmationModal from '@/components/ConfirmationModal.vue'
-  import PostCard from '@/components/feed/PostCard.vue' // Переконайтеся, що імпорт правильний
   import { getIcon } from '@/models/icons.js'
+  import id from '@/pages/post/[id].vue'
   import { useLibraryStore } from '@/stores/library.js'
   import '@/styles/pages/library.scss'
   const { smAndDown } = useDisplay()
@@ -229,7 +229,7 @@
     </div>
     <div v-if="isExporting" id="exporting-wrapper">
       <div v-for="post in exportingPosts" :key="post.id" class="post-card-export">
-        <PostCard :post="post" />
+        <id :id="post.id" />
       </div>
     </div>
 

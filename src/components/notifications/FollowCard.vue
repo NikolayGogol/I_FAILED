@@ -1,5 +1,4 @@
 <script setup>
-  import dayjs from 'dayjs'
   import { onMounted, reactive } from 'vue'
   import ProfileInfo from '@/components/notifications/ProfileInfo.vue'
   import { backgroundColors } from '@/models/no-data.js'
