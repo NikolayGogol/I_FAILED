@@ -9,8 +9,8 @@
   const userAverageRecoveryTime = ref(0)
   const communityEngagement = ref(0)
   const userEngagement = ref(0)
-  const userReliesence = ref(0)
-  const communityReliesence = ref(0)
+  const userResilience = ref(0)
+  const communityResilience = ref(0)
   const maxRecoveryDays = Math.max(...recoveryTimeOptions.map(opt => opt.days))
 
   onMounted(async () => {
@@ -58,8 +58,8 @@
     }
   }
   function calculateResilience () {
-    userReliesence.value = growChartStore.posts.postOwn.length - growChartStore.posts.learnedOwn.length
-    communityReliesence.value = growChartStore.posts.postCommunity.length - growChartStore.posts.learnedCommunity.length
+    userResilience.value = growChartStore.posts.postOwn.length - growChartStore.posts.learnedOwn.length
+    communityResilience.value = growChartStore.posts.postCommunity.length - growChartStore.posts.learnedCommunity.length
   }
   const communityAveragePercentage = computed(() => {
     if (communityAverageRecoveryTime.value > 0) {
@@ -76,49 +76,10 @@
   })
 
   const userEngagementPercentage = computed(() => {
-    if (userEngagement.value > 100) {
-      return userEngagement.value / 3
-    } else if (userEngagement.value > 500) {
-      return userEngagement.value / 2
-    } else if (userEngagement.value > 1000) {
-      return userEngagement.value / 4
-    } else {
-      return userEngagement.value
-    }
-  })
-  const communityEngagementPercentage = computed(() => {
-    if (communityEngagement.value > 100) {
-      return communityEngagement.value / 3
-    } else if (communityEngagement.value > 500) {
-      return communityEngagement.value / 2
-    } else if (communityEngagement.value > 1000) {
-      return communityEngagement.value / 4
-    } else {
-      return communityEngagement.value
-    }
-  })
-  const communityResiliencePercentage = computed(() => {
-    if (communityReliesence.value > 100) {
-      return communityReliesence.value / 3
-    } else if (communityReliesence.value > 500) {
-      return communityReliesence.value / 2
-    } else if (communityReliesence.value > 1000) {
-      return communityReliesence.value / 4
-    } else {
-      return communityReliesence.value
-    }
+    return (userEngagement.value * 100) / communityEngagement.value
   })
   const userResiliencePercentage = computed(() => {
-    console.log(userReliesence.value)
-    if (userReliesence.value > 100) {
-      return userReliesence.value / 3
-    } else if (userReliesence.value > 500) {
-      return userReliesence.value / 2
-    } else if (userReliesence.value > 1000) {
-      return userReliesence.value / 4
-    } else {
-      return userReliesence.value
-    }
+    return (userResilience.value * 100) / communityResilience.value
   })
   const chartOptions = computed(() => ({
     chart: {
@@ -187,7 +148,7 @@
     },
     {
       name: 'Community Avg',
-      data: [communityAveragePercentage.value, Math.min(communityEngagementPercentage.value, 100), Math.min(communityResiliencePercentage.value, 100)],
+      data: [communityAveragePercentage.value, 100, 100],
     },
   ]))
 
