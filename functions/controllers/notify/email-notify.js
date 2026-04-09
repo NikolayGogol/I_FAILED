@@ -17,6 +17,7 @@ async function sendLikeEmail (req, res) {
     await sendLikeNotificationEmail(email, displayName, postTitle, verificationLink)
     return res.status(200).json({
       status: 'success',
+      to: email,
     })
   } catch (error) {
     logger.error('Error in registration process:', error)
@@ -36,6 +37,7 @@ async function sendCommentEmail (req, res) {
     await sendCommentNotificationEmail(email, displayName, postTitle, commentText, postLink)
     return res.status(200).json({
       status: 'success',
+      to: email,
     })
   } catch (error) {
     logger.error('Error in registration process:', error)
@@ -53,20 +55,22 @@ async function sendMentionEmail (req, res) {
       postLink)
     return res.status(200).json({
       status: 'success',
+      to: recipientEmail,
     })
   } catch (error) {
     logger.error('Error in registration process:', error)
     res.status(500).json({ error: 'Failed send email', message: error.message })
   }
 }
-
 async function sendFollowerEmail (req, res) {
   try {
     const { recipientEmail, followerName, followerId } = req.body
     const followerProfileLink = `${process.env.VERIFY_LINK}/user-info/${followerId}`
+    console.log(recipientEmail)
     await sendFollowerNotificationEmail(recipientEmail, followerName, followerProfileLink)
     return res.status(200).json({
       status: 'success',
+      to: recipientEmail,
     })
   } catch (error) {
     logger.error('Error in follower email process:', error)

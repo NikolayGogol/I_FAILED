@@ -16,7 +16,32 @@
   const popoverStyle = ref({})
   const searchQuery = ref('')
   const selectedIndex = ref(0)
-  const displayValue = ref(props.modelValue)
+
+  function renderMentions (text) {
+    if (!text) return ''
+    return text.replace(/@\[([^\]]+)\]\(([^)]+)\)/g, '@$1')
+  }
+
+  function buildModelValue (text) {
+    if (!text || !text.includes('@')) return text || ''
+    let res = text
+    for (const user of sortedUsers.value) {
+      const escaped = user.label.replace(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`)
+      const regex = new RegExp(String.raw`(^|[^\p{L}\p{N}_])@${escaped}(?![\p{L}\p{N}_])`, 'gu')
+      res = res.replace(regex, `$1@[${user.label}](${user.value})`)
+    }
+    return res
+  }
+
+  const displayValue = computed({
+    get () {
+      return renderMentions(props.modelValue)
+    },
+    set (newValue) {
+      onInput(newValue)
+      emit('update:modelValue', buildModelValue(newValue))
+    },
+  })
 
   const sortedUsers = computed(() => {
     // eslint-disable-next-line
@@ -36,21 +61,6 @@
     selectedIndex.value = 0
   })
 
-  watch(() => props.modelValue, newValue => {
-    displayValue.value = renderMentions(newValue)
-  })
-
-  function buildModelValue (text) {
-    if (!text || !text.includes('@')) return text || ''
-    let res = text
-    for (const user of sortedUsers.value) {
-      const escaped = user.label.replace(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`)
-      const regex = new RegExp(String.raw`(^|[^\p{L}\p{N}_])@${escaped}(?![\p{L}\p{N}_])`, 'gu')
-      res = res.replace(regex, `$1@[${user.label}](${user.value})`)
-    }
-    return res
-  }
-
   function onInput (value) {
     const textarea = formTextarea.value.$el.querySelector('textarea')
     const caretPos = textarea.selectionStart
@@ -69,7 +79,6 @@
         showPopover.value = true
       }
     }
-    emit('update:modelValue', buildModelValue(value))
   }
 
   function onKeydown (e) {
@@ -115,7 +124,7 @@
     if (!user) return
 
     const textarea = formTextarea.value.$el.querySelector('textarea')
-    const text = displayValue.value
+    const text = textarea.value
     const caretPos = textarea.selectionStart
     const atIndex = text.lastIndexOf('@', caretPos - 1)
 
@@ -125,7 +134,6 @@
         + text.slice(caretPos)
 
     displayValue.value = newDisplayValue
-    emit('update:modelValue', buildModelValue(newDisplayValue))
     showPopover.value = false
 
     nextTick(() => {
@@ -146,22 +154,16 @@
       width: `auto`,
     }
   }
-
-  function renderMentions (text) {
-    if (!text) return ''
-    return text.replace(/@\[([^\]]+)\]\(([^)]+)\)/g, '@$1')
-  }
 </script>
 
 <template>
   <div ref="wrapper" class="mention-textarea-wrapper">
     <FormTextarea
       ref="formTextarea"
-      :model-value="displayValue"
+      v-model="displayValue"
       v-bind="$attrs"
       @blur="onBlur"
       @keydown="onKeydown"
-      @update:model-value="onInput"
     />
     <div v-if="showPopover" class="mention-popover" :style="popoverStyle">
       <ul>

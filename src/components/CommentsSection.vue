@@ -76,7 +76,7 @@
       if (newCommentImage.value) {
         imageUrl = await commentsStore.uploadCommentImage(newCommentImage.value)
       }
-      console.log(props.post);
+      console.log(props.post)
       await commentsStore.addComment(props.post.id, authStore.user, newComment.value, imageUrl, props.post)
       newComment.value = ''
       newCommentImage.value = null

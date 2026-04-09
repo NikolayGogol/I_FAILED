@@ -130,12 +130,12 @@ export const useCommentsStore = defineStore('comments', {
      */
     async addComment (postId, user, text, imageUrl = null, post) {
       const singlePostStore = useSinglePostStore()
-      console.log(post);
+      console.log(post)
 
       if (!post || post === 'Post not found.') {
         throw new Error('Post not found for comment notification.')
       }
-      console.log(post);
+      console.log(post)
       const newCommentData = {
         postId,
         parentId: null,
