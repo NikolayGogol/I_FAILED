@@ -127,7 +127,11 @@
       <p class="text-description" style="font-size: 12px">{{ dayjs.unix(user?.createdAt?.seconds).format('DD MMM YYYY') }}</p>
       <div class="d-flex justify-center mt-6">
         <!-- The click handler now calls the store's saveProfile action -->
-        <div class="submit-btn" @click="saveProfile">
+        <div
+          class="submit-btn"
+          :class="{'opacity-60 pointer-events-none': !dob || !userName}"
+          @click="saveProfile"
+        >
           <v-progress-circular
             v-if="loading"
             color="white"
