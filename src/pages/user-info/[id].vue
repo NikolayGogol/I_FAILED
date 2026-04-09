@@ -19,6 +19,7 @@
   import Activity from '@/components/profile/Activity.vue'
   import UserCard from '@/components/profile/UserCard.vue'
   import { useAuthStore } from '@/stores/auth.js'
+  import { usePostMenuStore } from '@/stores/profile/post-menu.js'
   import { useProfileStore } from '@/stores/profile/profile.js'
   import { useUserInfoStore } from '@/stores/user-info.js'
   import '@/styles/pages/profile.scss'
@@ -29,6 +30,7 @@
   const userInfoStore = useUserInfoStore()
   const authStore = useAuthStore()
   const profileStore = useProfileStore()
+  const postMenuStore = usePostMenuStore()
   const route = useRoute()
   const router = useRouter()
   const toast = useToast()
@@ -61,6 +63,11 @@
   // Check if the authenticated user is following the currently viewed user
   const isFollowing = computed(() => {
     return authUser.value?.following?.includes(userId.value)
+  })
+
+  const isBlocked = computed(() => {
+    if (!authStore.user || !authStore.user.blockedUsers) return false
+    return authStore.user.blockedUsers.includes(userId.value)
   })
 
   // =================================================================================================
@@ -96,8 +103,27 @@
   }
 
   // Placeholder for blocking a user
-  function blockUser () {
-    toast.info('Block user functionality coming soon')
+  async function toggleBlockUser () {
+    if (!authStore.user) {
+      await router.push('/login')
+      return
+    }
+
+    if (isBlocked.value) {
+      const success = await postMenuStore.unblockUser(userId.value)
+      if (success) {
+        toast.info(`Unblocked ${user.value.displayName}`)
+      } else {
+        toast.error(`Failed to unblock ${user.value.displayName}`)
+      }
+    } else {
+      const success = await postMenuStore.blockUser(userId.value)
+      if (success) {
+        toast.info(`Blocked ${user.value.displayName}`)
+      } else {
+        toast.error(`Failed to block ${user.value.displayName}`)
+      }
+    }
   }
 
   // Open the "About this account-tabs" dialog
@@ -182,10 +208,10 @@
                     Copy link to profile
                   </v-list-item-title>
                 </v-list-item>
-                <v-list-item v-if="!isCurrentUser" class="text-error" @click="blockUser">
+                <v-list-item v-if="!isCurrentUser" class="text-error" @click="toggleBlockUser">
                   <v-list-item-title>
                     <v-icon class="mr-2" icon="mdi-block-helper" />
-                    Block this user
+                    {{ isBlocked ? 'Unblock this user' : 'Block this user' }}
                   </v-list-item-title>
                 </v-list-item>
               </v-list>
@@ -264,10 +290,10 @@
             Copy link to profile
           </v-list-item-title>
         </v-list-item>
-        <v-list-item v-if="!isCurrentUser" class="text-error" @click="blockUser">
+        <v-list-item v-if="!isCurrentUser" class="text-error" @click="toggleBlockUser">
           <v-list-item-title>
             <v-icon class="mr-2" icon="mdi-block-helper" />
-            Block this user
+            {{ isBlocked ? 'Unblock this user' : 'Block this user' }}
           </v-list-item-title>
         </v-list-item>
       </v-list>
