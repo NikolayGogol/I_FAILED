@@ -2,6 +2,7 @@
   import { ref } from 'vue'
   import BlockedUsers from '@/components/settings/content-activity-tabs/BlockedUsers.vue'
   import HiddenPosts from '@/components/settings/content-activity-tabs/HiddenPosts.vue'
+  import MutedTags from '@/components/settings/content-activity-tabs/MutedTags.vue'
   import { getIcon } from '@/models/icons.js'
   import '@/styles/components/settings/content.scss'
   const list = [
@@ -14,6 +15,11 @@
       label: 'Muted users',
       icon: getIcon('mute', 20, 20),
       id: 1,
+    },
+    {
+      label: 'Muted tags',
+      icon: getIcon('dies', 20, 20),
+      id: 2,
     },
   ]
   const activeTab = ref(null)
@@ -40,5 +46,6 @@
     </ul>
     <HiddenPosts v-if="activeTab?.id === 0" @back="activeTab = null" />
     <BlockedUsers v-if="activeTab?.id === 1" @back="activeTab = null" />
+    <MutedTags v-if="activeTab?.id === 2" @back="activeTab = null" />
   </div>
 </template>

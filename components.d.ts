@@ -54,6 +54,7 @@ declare module 'vue' {
     MentionTextarea: typeof import('./src/components/MentionTextarea.vue')['default']
     MobileSlide: typeof import('./src/components/MobileSlide.vue')['default']
     MoblileNavbar: typeof import('./src/components/MoblileNavbar.vue')['default']
+    MutedTags: typeof import('./src/components/settings/content-activity-tabs/MutedTags.vue')['default']
     MyPostMenu: typeof import('./src/components/feed/MyPostMenu.vue')['default']
     NotificationSettings: typeof import('./src/components/settings/NotificationSettings.vue')['default']
     NotifiMenu: typeof import('./src/components/notifications/notifi-menu.vue')['default']

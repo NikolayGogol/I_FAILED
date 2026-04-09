@@ -312,8 +312,13 @@ const icons = [
       + '</svg>\n',
   },
   {
-    name: '',
-    icon: '',
+    name: 'dies',
+    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">\n'
+      + '<path d="M5.94727 21.1588L8.97353 3" stroke="#1C1C1B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>\n'
+      + '<path d="M15.0269 21.1588L18.0531 3" stroke="#1C1C1B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>\n'
+      + '<path d="M21.9999 7.60101H3.5791" stroke="#1C1C1B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>\n'
+      + '<path d="M20.4208 16.558H2" stroke="#1C1C1B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>\n'
+      + '</svg>\n',
   },
   {
     name: '',

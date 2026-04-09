@@ -34,7 +34,10 @@
 
 <template>
   <div class="notify-tab">
-
+    <div class="d-flex tab-header" @click="emit('back')">
+      <v-icon class="mr-6" icon="mdi-chevron-left" />
+      <span>Email notifications</span>
+    </div>
     <v-radio-group
       v-model="selectedRadio"
       class="mt-4"

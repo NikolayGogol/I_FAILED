@@ -113,4 +113,16 @@
       }
     }
   }
+  &.muted-tags{
+    ul {
+      li {
+        border-bottom: 1px solid $color-border;
+        padding: 15px 0;
+
+        &:last-of-type {
+          border-bottom: 0;
+        }
+      }
+    }
+  }
 }
