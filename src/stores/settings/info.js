@@ -66,7 +66,7 @@ export const useInfoSettingsStore = defineStore('infoSettings', () => {
         userName: userName.value,
         bio: bio.value,
         email: email.value,
-        dob: dob.value, // Include dob in the update
+        dob: dob.value || null,
       })
 
       if (emailChanged) {

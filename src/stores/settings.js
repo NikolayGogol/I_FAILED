@@ -73,16 +73,14 @@ export const useSettingsStore = defineStore('settings', {
         })
 
         const userDocRef = doc(db, VITE_USERS_COLLECTION, user.uid)
-
         const dataToUpdate = {
           displayName,
           bio,
           userName,
           email,
-          dob,
+          dob: dob ?? authStore.user.dob,
           photoURL: newPhotoURL,
         }
-
         await updateDoc(userDocRef, dataToUpdate)
 
         authStore.$patch({
