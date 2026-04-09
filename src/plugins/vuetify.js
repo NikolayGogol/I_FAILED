@@ -21,6 +21,7 @@ const myCustomTheme = {
     'grey-darken-4': '#454541',
     'grey-darken-1': '#808079',
     'grey-darken-3': '#1C1C1B',
+    'success': '#31953A',
   },
 }
 // https://vuetifyjs.com/en/introduction/why-vuetify/#feature-guides

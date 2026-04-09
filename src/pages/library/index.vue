@@ -10,7 +10,7 @@
 <script setup>
   import dayjs from 'dayjs'
   import relativeTime from 'dayjs/plugin/relativeTime'
-  import { nextTick, onMounted, ref } from 'vue'
+  import { nextTick, onBeforeMount, onMounted, ref } from 'vue'
   import { useRouter } from 'vue-router'
   import { useToast } from 'vue-toastification'
   import { useDisplay } from 'vuetify/framework'
@@ -48,6 +48,10 @@
     { label: 'Z-A', value: 'nameDesc' },
   ]
 
+  onBeforeMount(() => {
+    removeScript('https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js')
+  })
+
   onMounted(() => {
     getCollectionList()
     addScript('https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js')
@@ -59,6 +63,13 @@
     const script = document.createElement('script')
     script.src = url
     document.head.append(script)
+  }
+
+  function removeScript (url) {
+    const script = document.querySelector(`script[src="${url}"]`)
+    if (script) {
+      script.remove()
+    }
   }
 
   function getCollectionList () {
