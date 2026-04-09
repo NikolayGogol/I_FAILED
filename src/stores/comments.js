@@ -124,17 +124,18 @@ export const useCommentsStore = defineStore('comments', {
      * @param {string} postId - The ID of the post.
      * @param {object} user - The user object of the commenter.
      * @param {string} text - The comment text.
+     * @param {object} post - Post data.
      * @param {string|null} imageUrl - The URL of the attached image, if any.
      * @returns {Promise<string>} - The ID of the newly created comment.
      */
-    async addComment (postId, user, text, imageUrl = null) {
+    async addComment (postId, user, text, imageUrl = null, post) {
       const singlePostStore = useSinglePostStore()
-      const post = await singlePostStore.getPostById(postId)
+      console.log(post);
 
       if (!post || post === 'Post not found.') {
         throw new Error('Post not found for comment notification.')
       }
-
+      console.log(post);
       const newCommentData = {
         postId,
         parentId: null,
@@ -151,7 +152,6 @@ export const useCommentsStore = defineStore('comments', {
 
       const docRef = await addDoc(collection(db, comments_collection), newCommentData)
       const commentId = docRef.id
-
       await singlePostStore.saveCommentAction(post, { id: commentId, text })
 
       // Send notifications
