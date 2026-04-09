@@ -85,6 +85,7 @@ export const useProfileStore = defineStore('profile', {
           posts.push(post)
         }
         this.posts = posts
+        return this.posts
       } catch (error) {
         console.error('Error fetching user posts:', error)
         this.error = 'Failed to fetch posts.'

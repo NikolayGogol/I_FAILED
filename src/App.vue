@@ -5,7 +5,7 @@
 </template>
 
 <script setup>
-  import { computed, onMounted } from 'vue'
+  import { computed, onMounted, watch } from 'vue'
   import { useRoute } from 'vue-router'
   import AuthLayout from '@/layouts/AuthLayout.vue'
   import AuthMinLayout from '@/layouts/AuthMinLayout.vue'
@@ -30,5 +30,8 @@
   onMounted(() => {
     // Initialize auth state listener
     authStore.initAuthListener()
+  })
+  watch(() => route.path, () => {
+    window.scrollTo(0, 0)
   })
 </script>

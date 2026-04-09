@@ -1,69 +1,82 @@
 @use '../settings.scss' as *;
 
 .failure-resume-page {
-  min-height: 100vh;
-  padding-top: $spacing-md;
-
-  .page-header {
-    margin-bottom: $spacing-lg;
-    text-align: center;
-
+  .header {
     h1 {
-      font-size: 24px;
-      font-weight: bold;
+      font-size: 32xp;
+      font-weight: 600;
       color: $color-text-primary;
-      margin-bottom: $spacing-sm;
-    }
-
-    p {
-      color: $color-text-secondary;
-      font-size: 16px;
+      line-height: 40px;
     }
   }
 
-  .resume-content {
+  .stat-panel {
     background-color: $color-surface;
+    border-radius: $radius-xl;
     border: 1px solid $color-border;
-    border-radius: $radius-lg;
-    padding: $spacing-xl;
-    box-shadow: $shadow-sm;
 
-    .resume-section {
-      margin-bottom: $spacing-xl;
-      padding-left: $spacing-lg;
-      border-left: 2px solid $color-border;
-      position: relative;
-
-      &::before {
-        content: '';
-        position: absolute;
-        left: -6px;
-        top: 0;
-        width: 10px;
-        height: 10px;
-        background-color: $color-primary;
-        border-radius: 50%;
-      }
-
-      &:last-child {
-        margin-bottom: 0;
-      }
-
+    .item {
       h2 {
-        font-size: 20px;
-        font-weight: bold;
-        color: $color-text-primary;
-        margin-bottom: $spacing-md;
+        font-size: 36px;
+        font-weight: 700;
+        line-height: 44px;
       }
 
-      ul {
-        list-style: disc;
-        padding-left: $spacing-lg;
-        color: $color-text-secondary;
+      p {
+        line-height: 20px;
+      }
+    }
+  }
 
-        li {
-          margin-bottom: $spacing-sm;
-          line-height: 1.5;
+  .main-content {
+    background-color: $color-surface;
+    border-radius: $radius-xl;
+    border: 1px solid $color-border;
+
+    h4 {
+      font-weight: 600;
+      color: $color-text-primary;
+      font-size: 18px;
+      line-height: 28px;
+    }
+
+    ul {
+      li {
+        list-style: none;
+        display: flex;
+        align-items: flex-start;
+        border: 1px solid $color-border;
+        border-radius: $radius-sm;
+        margin-bottom: 10px;
+        padding: 15px;
+
+        &.selected {
+          border-color: $color-primary;
+        }
+
+        .tag {
+          background-color: $color-tag-bg;
+          color: $color-tag;
+          font-size: 10px;
+          line-height: 12px;
+          padding: 5px 10px;
+          border-radius: $radius-md;
+        }
+
+        .title {
+          color: $color-text-primary;
+          font-weight: 600;
+          font-size: 16px;
+          line-height: 24px;
+          margin-top: 8px;
+        }
+
+        .item-panel {
+          font-size: 12px;
+          line-height: 16px;
+          color: $color-text-quaternary;
+          display: flex;
+          margin-top: 8px;
         }
       }
     }
