@@ -6,8 +6,8 @@
   import { getIcon } from '@/models/icons.js'
   import { useAuthStore } from '@/stores/auth.js'
   import { usePostMenuStore } from '@/stores/profile/post-menu.js'
+  import { transformUsername } from '@/utils/transform-username.js'
   import '@/styles/components/feed/post-menu.scss'
-  import {transformUsername} from "../../utils/transform-username.js";
   const { smAndDown } = useDisplay()
 
   const props = defineProps({
