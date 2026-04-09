@@ -62,7 +62,7 @@
       return
     }
     const userId = props.post.uid
-    const userName = props.post.user.displayName
+    const userName = transformUsername(props.post.user.userName, props.post.user.displayName)
 
     if (isFollowing.value) {
       const success = await postMenuStore.unfollowUser(userId)
