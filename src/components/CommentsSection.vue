@@ -49,6 +49,7 @@
   const showReplyInput = ref({})
   const showEmojiPicker = ref(false)
   const showReplyEmojiPicker = ref({})
+  const showEditEmojiPicker = ref(false)
   const editingCommentId = ref(null)
   const editingText = ref('')
   const editingImage = ref(null)
@@ -154,9 +155,22 @@
     showReplyEmojiPicker.value[commentId] = false
   }
 
+  function onSelectEditEmoji (emoji) {
+    editingText.value += emoji.i
+    showEditEmojiPicker.value = false
+  }
+
   function renderCommentText (text) {
     if (!text) return ''
     return text.replace(/@\[([^\]]+)\]\(([^)]+)\)/g, '<a href="/user-info/$2" class="font-weight-bold text-primary">@$1</a>')
+  }
+
+  function cancelEdit () {
+    editingCommentId.value = null
+    editingText.value = ''
+    editingImage.value = null
+    originalImageUrl.value = null
+    showEditEmojiPicker.value = false
   }
 
   function handleEditComment (comment) {
@@ -164,6 +178,7 @@
     editingText.value = comment.text
     editingImage.value = comment.imageUrl ? { url: comment.imageUrl } : null
     originalImageUrl.value = comment.imageUrl
+    showEditEmojiPicker.value = false
   }
 
   async function handleUpdateComment () {
@@ -187,10 +202,7 @@
 
       await commentsStore.updateComment(editingCommentId.value, editingText.value, authStore.user, newImageUrl)
 
-      editingCommentId.value = null
-      editingText.value = ''
-      editingImage.value = null
-      originalImageUrl.value = null
+      cancelEdit()
       emit('reload-comments')
     } catch (error) {
       console.error('Failed to update comment:', error)
@@ -307,19 +319,31 @@
 
             <!-- Edit Comment Form -->
             <div v-if="editingCommentId === comment.id">
-              <div :id="`edit-comment-preview-target-${comment.id}`" />
-              <MentionTextarea
-                v-model="editingText"
-                height="89"
-                hide-details
-                placeholder="Edit your comment..."
-                :users="users"
-                @keydown.enter.prevent="handleUpdateComment"
-              />
-              <ImgComment v-model="editingImage" class="mt-2" :max-files="1" :teleport-to="`#edit-comment-preview-target-${comment.id}`" />
+              <div class="position-relative">
+                <div :id="`edit-comment-preview-target-${comment.id}`" />
+                <MentionTextarea
+                  v-model="editingText"
+                  height="89"
+                  hide-details
+                  placeholder="Edit your comment..."
+                  :users="users"
+                  @keydown.enter.prevent="handleUpdateComment"
+                />
+                <div class="d-flex emoji-picker-container">
+                  <ImgComment v-model="editingImage" :max-files="1" :teleport-to="`#edit-comment-preview-target-${comment.id}`" />
+                  <EmojiPicker
+                    v-if="showEditEmojiPicker"
+                    class="emoji-picker"
+                    disable-skin-tones
+                    native
+                    @select="onSelectEditEmoji"
+                  />
+                  <div class="d-flex cursor-pointer" @click="showEditEmojiPicker = !showEditEmojiPicker" v-html="getIcon('smile')" />
+                </div>
+              </div>
               <div class="d-flex justify-start mt-2">
                 <div class="submit-btn" @click="handleUpdateComment">Save</div>
-                <div class="cancel-btn ml-4" @click="editingCommentId = null">Cancel</div>
+                <div class="cancel-btn ml-4" @click="cancelEdit">Cancel</div>
               </div>
             </div>
 
@@ -416,19 +440,31 @@
                       <CommentMenu :comment="reply" @copy-link="handleCopyCommentLink(reply.id)" @delete="handleDeleteComment(reply.id)" @edit="handleEditComment(reply)" />
                     </div>
                     <div v-if="editingCommentId === reply.id">
-                      <div :id="`edit-comment-preview-target-${reply.id}`" />
-                      <MentionTextarea
-                        v-model="editingText"
-                        height="89"
-                        hide-details
-                        placeholder="Edit your reply..."
-                        :users="users"
-                        @keydown.enter.prevent="handleUpdateComment"
-                      />
-                      <ImgComment v-model="editingImage" class="mt-2" :max-files="1" :teleport-to="`#edit-comment-preview-target-${reply.id}`" />
+                      <div class="position-relative">
+                        <div :id="`edit-comment-preview-target-${reply.id}`" />
+                        <MentionTextarea
+                          v-model="editingText"
+                          height="89"
+                          hide-details
+                          placeholder="Edit your reply..."
+                          :users="users"
+                          @keydown.enter.prevent="handleUpdateComment"
+                        />
+                        <div class="d-flex emoji-picker-container">
+                          <ImgComment v-model="editingImage" :max-files="1" :teleport-to="`#edit-comment-preview-target-${reply.id}`" />
+                          <EmojiPicker
+                            v-if="showEditEmojiPicker"
+                            class="emoji-picker"
+                            disable-skin-tones
+                            native
+                            @select="onSelectEditEmoji"
+                          />
+                          <div class="d-flex cursor-pointer" @click="showEditEmojiPicker = !showEditEmojiPicker" v-html="getIcon('smile')" />
+                        </div>
+                      </div>
                       <div class="d-flex justify-start mt-2">
                         <div class="submit-btn" @click="handleUpdateComment">Save</div>
-                        <div class="cancel-btn ml-4" @click="editingCommentId = null">Cancel</div>
+                        <div class="cancel-btn ml-4" @click="cancelEdit">Cancel</div>
                       </div>
                     </div>
                     <div v-else class="mt-2">
@@ -519,19 +555,31 @@
                           <CommentMenu :comment="subReply" @copy-link="handleCopyCommentLink(subReply.id)" @delete="handleDeleteComment(subReply.id)" @edit="handleEditComment(subReply)" />
                         </div>
                         <div v-if="editingCommentId === subReply.id">
-                          <div :id="`edit-comment-preview-target-${subReply.id}`" />
-                          <MentionTextarea
-                            v-model="editingText"
-                            height="89"
-                            hide-details
-                            placeholder="Edit your reply..."
-                            :users="users"
-                            @keydown.enter.prevent="handleUpdateComment"
-                          />
-                          <ImgComment v-model="editingImage" class="mt-2" :max-files="1" :teleport-to="`#edit-comment-preview-target-${subReply.id}`" />
+                          <div class="position-relative">
+                            <div :id="`edit-comment-preview-target-${subReply.id}`" />
+                            <MentionTextarea
+                              v-model="editingText"
+                              height="89"
+                              hide-details
+                              placeholder="Edit your reply..."
+                              :users="users"
+                              @keydown.enter.prevent="handleUpdateComment"
+                            />
+                            <div class="d-flex emoji-picker-container">
+                              <ImgComment v-model="editingImage" :max-files="1" :teleport-to="`#edit-comment-preview-target-${subReply.id}`" />
+                              <EmojiPicker
+                                v-if="showEditEmojiPicker"
+                                class="emoji-picker"
+                                disable-skin-tones
+                                native
+                                @select="onSelectEditEmoji"
+                              />
+                              <div class="d-flex cursor-pointer" @click="showEditEmojiPicker = !showEditEmojiPicker" v-html="getIcon('smile')" />
+                            </div>
+                          </div>
                           <div class="d-flex justify-start mt-2">
                             <div class="submit-btn" @click="handleUpdateComment">Save</div>
-                            <div class="cancel-btn ml-4" @click="editingCommentId = null">Cancel</div>
+                            <div class="cancel-btn ml-4" @click="cancelEdit">Cancel</div>
                           </div>
                         </div>
                         <div v-else class="mt-2">

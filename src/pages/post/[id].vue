@@ -88,7 +88,17 @@
   onMounted(() => {
     const postId = route.params.id || props.id
     if (postId) {
-      window.scrollTo({ top: 0, behavior: 'smooth' })
+      setTimeout(() => {
+        if (route.hash) {
+          // eslint-disable-next-line unicorn/prefer-query-selector
+          const el = document.getElementById(route.hash.replace('#', ''))
+          if (el) {
+            window.scrollTo({ top: el.offsetTop - 50, behavior: 'smooth' })
+          }
+        } else {
+          window.scrollTo({ top: 0, behavior: 'smooth' })
+        }
+      }, 500)
       init(postId)
       getUsersForMentions().then(res => {
         users.value = res.map(user => ({
