@@ -93,8 +93,6 @@
     if (isSubmitting.value) return
     const text = replyText.value[commentId]
     const image = replyImage.value[commentId]
-    if (!text?.trim() && !image) return
-
     isSubmitting.value = true
     try {
       let imageUrl = null
