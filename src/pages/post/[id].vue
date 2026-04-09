@@ -98,7 +98,7 @@
         } else {
           window.scrollTo({ top: 0, behavior: 'smooth' })
         }
-      }, 500)
+      }, 1000)
       init(postId)
       getUsersForMentions().then(res => {
         users.value = res.map(user => ({
