@@ -29,6 +29,10 @@
       type: Object,
       required: true,
     },
+    enableMuted: {
+      type: Boolean,
+      default: false,
+    },
   })
 
   // =================================================================================================
@@ -76,6 +80,7 @@
 
   // Check if the post is muted by the current user
   const isMuted = computed(() => {
+    if (p.enableMuted) return false
     if (route.name.includes('user-info')) return false
     if (!authStore.user || !authStore.user.mutedPosts) return false
     return authStore.user.mutedPosts.includes(p.post.id)

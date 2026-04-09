@@ -37,19 +37,34 @@
     return authStore.user.blockedUsers.includes(props.post.uid)
   })
 
+  const isMuted = computed(() => {
+    if (!authStore.user || !authStore.user.mutedPosts) return false
+    return authStore.user.mutedPosts.includes(props.post.id)
+  })
+
   /**
-   * Mutes the current post.
+   * Mutes or unmutes the current post.
    */
   async function handleMutePost () {
     if (!authStore.user) {
       await router.push('/login')
       return
     }
-    const success = await postMenuStore.mutePost(props.post.id)
-    if (success) {
-      toast.info('Post muted')
+
+    if (isMuted.value) {
+      const success = await postMenuStore.unmutePost(props.post.id)
+      if (success) {
+        toast.info('Post unmuted')
+      } else {
+        toast.error('Failed to unmute post')
+      }
     } else {
-      toast.error('Failed to mute post')
+      const success = await postMenuStore.mutePost(props.post.id)
+      if (success) {
+        toast.info('Post muted')
+      } else {
+        toast.error('Failed to mute post')
+      }
     }
   }
 
@@ -141,7 +156,7 @@
       <v-list class="rounded-xl elevation-1">
         <v-list-item class="cursor-pointer" @click="handleMutePost">
           <div class="mr-2" v-html="getIcon('mute')" />
-          Hide this post
+          {{ isMuted ? 'Show this post' : 'Hide this post' }}
         </v-list-item>
 
         <template v-if="!isBlocked">
@@ -178,8 +193,8 @@
   <MobileSlide v-model="mobileDrawer">
     <v-list class="rounded-lg">
       <v-list-item class="cursor-pointer" @click="handleMutePost">
-        <v-icon class="mr-2" icon="mdi-volume-off" />
-        Hide this post
+        <v-icon class="mr-2" :icon="isMuted ? 'mdi-volume-high' : 'mdi-volume-off'" />
+        {{ isMuted ? 'Unhide this post' : 'Hide this post' }}
       </v-list-item>
 
       <template v-if="!isBlocked">

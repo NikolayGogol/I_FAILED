@@ -9,6 +9,11 @@ export const usePostMenuStore = defineStore('postMenu', {
       return await feedStore.mutePost(postId)
     },
 
+    async unmutePost (postId) {
+      const feedStore = useFeedStore()
+      return await feedStore.unmutePost(postId)
+    },
+
     async followUser (userId) {
       const whoToFollowStore = useWhoToFollowStore()
       return await whoToFollowStore.followUser(userId)

@@ -1,17 +1,44 @@
+<script setup>
+  import { ref } from 'vue'
+  import BlockedUsers from '@/components/settings/content-activity-tabs/BlockedUsers.vue'
+  import HiddenPosts from '@/components/settings/content-activity-tabs/HiddenPosts.vue'
+  import { getIcon } from '@/models/icons.js'
+  import '@/styles/components/settings/content.scss'
+  const list = [
+    {
+      label: 'Hidden posts',
+      icon: getIcon('eye', 20, 20),
+      id: 0,
+    },
+    {
+      label: 'Muted users',
+      icon: getIcon('mute', 20, 20),
+      id: 1,
+    },
+  ]
+  const activeTab = ref(null)
+  //
+  function selectTab (tab) {
+    activeTab.value = tab
+  }
+</script>
+
 <template>
   <div class="settings-section">
-    <h2>Content & Activity</h2>
-    <div class="setting-item">
-      <label>Autoplay Videos</label>
-      <input checked type="checkbox">
-    </div>
-    <div class="setting-item">
-      <label>Show Sensitive Content</label>
-      <input type="checkbox">
-    </div>
+    <ul v-if="!activeTab">
+      <li
+        v-for="item in list"
+        :key="item.label"
+        @click="selectTab(item)"
+      >
+        <div class="d-flex">
+          <div class="icon d-flex mr-4" v-html="item.icon" />
+          <span>{{ item.label }}</span>
+        </div>
+        <v-icon icon="mdi-chevron-right" />
+      </li>
+    </ul>
+    <HiddenPosts v-if="activeTab?.id === 0" @back="activeTab = null" />
+    <BlockedUsers v-if="activeTab?.id === 1" @back="activeTab = null" />
   </div>
 </template>
-
-<style scoped lang="scss">
-@use '@/styles/components/settings/content.scss';
-</style>
