@@ -1,8 +1,8 @@
 <script setup>
   import { onMounted, ref } from 'vue'
+  import { useToast } from 'vue-toastification'
   import { useMutedTagsStore } from '@/stores/mutedTags.js'
   import { usePopularTagsStore } from '@/stores/popular-tags.js'
-  import {useToast} from "vue-toastification";
 
   const mutedTagsStore = useMutedTagsStore()
   const emit = defineEmits(['back'])
@@ -14,7 +14,7 @@
   onMounted(() => {
     getData()
   })
-  function getData() {
+  function getData () {
     mutedTagsStore.getMutedTags()
       .then(res => {
         tagsList.value = res
