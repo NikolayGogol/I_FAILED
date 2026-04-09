@@ -7,6 +7,7 @@
   import { useAuthStore } from '@/stores/auth.js'
   import { usePostMenuStore } from '@/stores/profile/post-menu.js'
   import '@/styles/components/feed/post-menu.scss'
+  import {transformUsername} from "../../utils/transform-username.js";
   const { smAndDown } = useDisplay()
 
   const props = defineProps({
@@ -145,8 +146,8 @@
 
         <template v-if="!isBlocked">
           <v-list-item class="cursor-pointer" @click="handleFollow">
-            <v-icon class="mr-2" :icon="isFollowing ? 'mdi-account-tabs-minus-outline' : 'mdi-account-tabs-plus-outline'" />
-            {{ isFollowing ? 'Unfollow' : 'Follow' }} @{{ post.user.displayName.replaceAll(' ', '_') }}
+            <v-icon class="mr-2" :icon="isFollowing ? 'mdi-account-minus-outline' : 'mdi-account-plus-outline'" />
+            {{ isFollowing ? 'Unfollow' : 'Follow' }} {{ transformUsername(post.user.userName, post.user.displayName) }}
           </v-list-item>
           <v-list-item class="cursor-pointer text-danger" @click="handleBlock">
             <v-icon class="mr-2" icon="mdi-block-helper" />
