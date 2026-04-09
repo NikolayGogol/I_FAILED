@@ -17,7 +17,7 @@
   function getData () {
     mutedTagsStore.getMutedTags()
       .then(res => {
-        tagsList.value = res
+        tagsList.value = res || []
       })
       .finally(() => {
         isLoading.value = false

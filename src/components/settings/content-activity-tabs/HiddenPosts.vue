@@ -16,7 +16,7 @@
     isLoading.value = true
     hiddenPostsStore.getHiddenPosts()
       .then(res => {
-        posts.value = res
+        posts.value = res || []
       })
       .finally(() => {
         isLoading.value = false

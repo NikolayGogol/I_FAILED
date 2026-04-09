@@ -18,7 +18,7 @@
   onMounted(() => {
     blockedUsersStore.getBlockedUsers()
       .then(res => {
-        userList.value = res
+        userList.value = res || []
       })
       .finally(() => {
         isLoading.value = false
