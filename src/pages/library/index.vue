@@ -10,10 +10,11 @@
 <script setup>
   import dayjs from 'dayjs'
   import relativeTime from 'dayjs/plugin/relativeTime'
-  import { nextTick, onBeforeMount, onMounted, ref } from 'vue'
+  import { nextTick, onBeforeMount, onMounted, ref, watch } from 'vue'
   import { useRouter } from 'vue-router'
   import { useToast } from 'vue-toastification'
   import { useDisplay } from 'vuetify/framework'
+  import { storeToRefs } from 'pinia'
   import ConfirmationModal from '@/components/ConfirmationModal.vue'
   import { getIcon } from '@/models/icons.js'
   import id from '@/pages/post/[id].vue'
@@ -27,7 +28,8 @@
   const router = useRouter()
 
   // State
-  const collectionList = ref([])
+  const { collections } = storeToRefs(libraryStore) // Use storeToRefs to get reactive collections
+  const collectionList = ref([]) // This will now be a computed property or updated from 'collections'
   const mobileDriver = ref([])
   const isCreateDialog = ref(false)
   const isRenameDialog = ref(false)
@@ -57,6 +59,11 @@
     addScript('https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js')
   })
 
+  watch(collections, (newCollections) => {
+    collectionList.value = [...newCollections]
+    sortCollections(selectedSort.value)
+  }, { deep: true })
+
   // Logic
   function addScript (url) {
     if (document.querySelector(`script[src="${url}"]`)) return
@@ -75,10 +82,6 @@
   function getCollectionList () {
     postIsLoading.value = true
     libraryStore.getCollections()
-      .then(res => {
-        collectionList.value = res
-        sortCollections(selectedSort.value)
-      })
       .finally(() => {
         postIsLoading.value = false
       })
@@ -169,7 +172,6 @@
       .then(() => {
         isCreateDialog.value = false
         newCollection.value = ''
-        getCollectionList()
         toast.info('New collection created')
       })
       .finally(() => isSaving.value = false)
@@ -179,7 +181,6 @@
     isSaving.value = true
     libraryStore.deleteCollection(selectedCollection.value.id)
       .then(() => {
-        getCollectionList()
         toast.info('Collection deleted')
         isDeleteDialogOpen.value = false
       })
@@ -190,7 +191,11 @@
     isSaving.value = true
     libraryStore.updateCollection(editedCollection.value.id, { name: editedCollection.value.name })
       .then(() => {
-        getCollectionList()
+        // Find and update the name in the local collectionList
+        const index = collectionList.value.findIndex(c => c.id === editedCollection.value.id)
+        if (index !== -1) {
+          collectionList.value[index].name = editedCollection.value.name
+        }
         toast.info('Collection renamed')
         isRenameDialog.value = false
       })

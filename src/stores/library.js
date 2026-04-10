@@ -8,6 +8,7 @@ import {
   documentId,
   getDoc,
   getDocs,
+  increment,
   orderBy,
   query,
   runTransaction,
@@ -23,7 +24,9 @@ const VITE_LIBRARY = import.meta.env.VITE_LIBRARY
 const VITE_POSTS = import.meta.env.VITE_POST_COLLECTION
 
 export const useLibraryStore = defineStore('library', {
-  state: () => ({}),
+  state: () => ({
+    collections: [],
+  }),
   actions: {
     async createNewCollection (name) {
       const authStore = useAuthStore()
@@ -35,7 +38,9 @@ export const useLibraryStore = defineStore('library', {
         counter: 0,
         uid: authStore.user.uid,
       }
-      return await addDoc(collection(db, VITE_LIBRARY), params)
+      const docRef = await addDoc(collection(db, VITE_LIBRARY), params)
+      this.collections.unshift({ id: docRef.id, ...params })
+      return docRef
     },
     async getCollections () {
       const authStore = useAuthStore()
@@ -50,6 +55,7 @@ export const useLibraryStore = defineStore('library', {
         const post = { id: doc.id, ...doc.data() }
         posts.push(post)
       }
+      this.collections = posts
       return posts
     },
     async saveToCollection (payload) {
@@ -79,8 +85,9 @@ export const useLibraryStore = defineStore('library', {
       })
     },
     async deleteCollection (id) {
-      const docRef = doc(db, VITE_LIBRARY, id)
-      const collectionSnap = await getDoc(docRef)
+      const authStore = useAuthStore()
+      const collectionDocRef = doc(db, VITE_LIBRARY, id)
+      const collectionSnap = await getDoc(collectionDocRef)
       if (!collectionSnap.exists()) {
         return
       }
@@ -88,28 +95,24 @@ export const useLibraryStore = defineStore('library', {
 
       const batch = writeBatch(db)
 
+      // For each post in the collection, remove the user from bookmarkedBy and decrement the bookmarks counter
       if (postIds && postIds.length > 0) {
-        // To avoid deleting posts that are in other collections, we get all collections first.
-        const allCollections = await this.getCollections()
-        const otherCollections = allCollections.filter(c => c.id !== id)
-        const postsInOtherCollections = new Set()
-        otherCollections.forEach(c => {
-          (c.items || []).forEach(postId => postsInOtherCollections.add(postId))
-        })
-
-        // Find posts that exist only in the collection being deleted.
-        const postsToDelete = postIds.filter(postId => !postsInOtherCollections.has(postId))
-
-        postsToDelete.forEach(postId => {
+        postIds.forEach(postId => {
           const postRef = doc(db, VITE_POSTS, postId)
-          batch.delete(postRef)
+          batch.update(postRef, {
+            bookmarkedBy: arrayRemove(authStore.user.uid),
+            bookmarks: increment(-1),
+          })
         })
       }
 
-      // Delete the collection document itself.
-      batch.delete(docRef)
+      // Delete the collection document itself
+      batch.delete(collectionDocRef)
 
-      return await batch.commit()
+      await batch.commit()
+
+      // Update local state
+      this.collections = this.collections.filter(c => c.id !== id)
     },
     async updateCollection (id, payload) {
       const docRef = doc(db, VITE_LIBRARY, id)
@@ -149,11 +152,31 @@ export const useLibraryStore = defineStore('library', {
       return orderedPosts
     },
     async removePostFromCollection (collectionId, postId, counter) {
-      const docRef = doc(db, VITE_LIBRARY, collectionId)
-      return await updateDoc(docRef, {
+      const authStore = useAuthStore()
+      const collectionDocRef = doc(db, VITE_LIBRARY, collectionId)
+      const postDocRef = doc(db, VITE_POSTS, postId)
+
+      const batch = writeBatch(db)
+
+      // 1. Remove post from collection's items array and update counter
+      batch.update(collectionDocRef, {
         ...counter,
         items: arrayRemove(postId),
       })
+
+      // 2. Remove user's ID from post's bookmarkedBy array and decrement bookmarks count
+      batch.update(postDocRef, {
+        bookmarkedBy: arrayRemove(authStore.user.uid),
+        bookmarks: increment(-1),
+      })
+
+      await batch.commit()
+
+      // Update local state
+      const collectionIndex = this.collections.findIndex(c => c.id === collectionId)
+      if (collectionIndex !== -1) {
+        this.collections[collectionIndex].counter = counter.counter
+      }
     },
   },
 })

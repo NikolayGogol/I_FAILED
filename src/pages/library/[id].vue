@@ -41,11 +41,14 @@
 
   function confirmDelete () {
     if (postToDelete.value) {
+      console.log('Post to delete:', postToDelete.value.id)
+      console.log('Post list before deletion:', postList.value.map(p => p.id))
       libraryStore.removePostFromCollection(route.params.id, postToDelete.value.id, {
         counter: postList.value.length - 1,
       })
         .then(() => {
           postList.value = postList.value.filter(p => p.id !== postToDelete.value.id)
+          console.log('Post list after deletion:', postList.value.map(p => p.id))
           cancelDelete()
         })
         .catch(error => {
