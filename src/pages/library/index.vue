@@ -10,11 +10,11 @@
 <script setup>
   import dayjs from 'dayjs'
   import relativeTime from 'dayjs/plugin/relativeTime'
+  import { storeToRefs } from 'pinia'
   import { nextTick, onBeforeMount, onMounted, ref, watch } from 'vue'
   import { useRouter } from 'vue-router'
   import { useToast } from 'vue-toastification'
   import { useDisplay } from 'vuetify/framework'
-  import { storeToRefs } from 'pinia'
   import ConfirmationModal from '@/components/ConfirmationModal.vue'
   import { getIcon } from '@/models/icons.js'
   import id from '@/pages/post/[id].vue'
@@ -59,7 +59,7 @@
     addScript('https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js')
   })
 
-  watch(collections, (newCollections) => {
+  watch(collections, newCollections => {
     collectionList.value = [...newCollections]
     sortCollections(selectedSort.value)
   }, { deep: true })

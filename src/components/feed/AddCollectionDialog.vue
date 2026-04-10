@@ -25,12 +25,14 @@
   onMounted(() => {
     getCollections()
   })
+
   function getCollections () {
     libraryStore.getCollections()
       .then(res => {
         items.value = res
       })
   }
+
   function createCollection () {
     libraryStore.createNewCollection(newField.value)
       .then(() => {
@@ -39,6 +41,7 @@
         newField.value = ''
       })
   }
+
   async function saveToCollection () {
     if (isSaving.value) return
     isSaving.value = true
@@ -93,7 +96,11 @@
         >Create
         </div>
       </div>
-      <v-radio-group v-model="selectedCollection" color="primary">
+      <v-radio-group
+        v-model="selectedCollection"
+        class="list"
+        color="primary"
+      >
         <div
           v-for="item in items"
           :key="item.id"
@@ -137,5 +144,8 @@
 </template>
 
 <style scoped lang="scss">
-
+.list {
+  max-height: 350px;
+  overflow-y: auto;
+}
 </style>

@@ -97,13 +97,13 @@ export const useLibraryStore = defineStore('library', {
 
       // For each post in the collection, remove the user from bookmarkedBy and decrement the bookmarks counter
       if (postIds && postIds.length > 0) {
-        postIds.forEach(postId => {
+        for (const postId of postIds) {
           const postRef = doc(db, VITE_POSTS, postId)
           batch.update(postRef, {
             bookmarkedBy: arrayRemove(authStore.user.uid),
             bookmarks: increment(-1),
           })
-        })
+        }
       }
 
       // Delete the collection document itself
