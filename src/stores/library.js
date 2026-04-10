@@ -13,6 +13,7 @@ import {
   runTransaction,
   updateDoc,
   where,
+  writeBatch,
 } from 'firebase/firestore'
 import { defineStore } from 'pinia'
 import { db } from '@/firebase'
@@ -79,7 +80,36 @@ export const useLibraryStore = defineStore('library', {
     },
     async deleteCollection (id) {
       const docRef = doc(db, VITE_LIBRARY, id)
-      return await deleteDoc(docRef)
+      const collectionSnap = await getDoc(docRef)
+      if (!collectionSnap.exists()) {
+        return
+      }
+      const postIds = collectionSnap.data().items
+
+      const batch = writeBatch(db)
+
+      if (postIds && postIds.length > 0) {
+        // To avoid deleting posts that are in other collections, we get all collections first.
+        const allCollections = await this.getCollections()
+        const otherCollections = allCollections.filter(c => c.id !== id)
+        const postsInOtherCollections = new Set()
+        otherCollections.forEach(c => {
+          (c.items || []).forEach(postId => postsInOtherCollections.add(postId))
+        })
+
+        // Find posts that exist only in the collection being deleted.
+        const postsToDelete = postIds.filter(postId => !postsInOtherCollections.has(postId))
+
+        postsToDelete.forEach(postId => {
+          const postRef = doc(db, VITE_POSTS, postId)
+          batch.delete(postRef)
+        })
+      }
+
+      // Delete the collection document itself.
+      batch.delete(docRef)
+
+      return await batch.commit()
     },
     async updateCollection (id, payload) {
       const docRef = doc(db, VITE_LIBRARY, id)
