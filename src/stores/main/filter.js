@@ -13,7 +13,7 @@ export const useFilterStore = defineStore('filter', () => {
     postedBy: null,
   })
 
-  async function applyFilters () {
+  async function applyFilters (refreshFeed = true) {
     try {
       const params = {
         // Keep category objects (id + label) so both:
@@ -27,7 +27,9 @@ export const useFilterStore = defineStore('filter', () => {
         // (but we still support an object shape as a fallback).
         postedBy: selectedFilter.postedBy?.value ?? selectedFilter.postedBy,
       }
-      await mainStore.applyPostFilters(params)
+      if (refreshFeed) {
+        await mainStore.applyPostFilters(params)
+      }
       return mainStore.filteredPosts.length > 0
     } catch (error) {
       console.error('Error applying filters:', error)
@@ -35,13 +37,15 @@ export const useFilterStore = defineStore('filter', () => {
     }
   }
 
-  function clearFilters () {
+  function clearFilters (refreshFeed = true) {
     selectedFilter.categories = []
     selectedFilter.emojiTags = []
     selectedFilter.recoveryTime = []
     selectedFilter.costRange = []
     selectedFilter.postedBy = null
-    mainStore.applyPostFilters(null)
+    if (refreshFeed) {
+      mainStore.applyPostFilters(null)
+    }
   }
 
   return {

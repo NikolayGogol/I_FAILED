@@ -7,4 +7,3 @@
     <h2>dsdsd</h2>
   </div>
 </template>
-

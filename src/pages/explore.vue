@@ -9,12 +9,12 @@
 
 <script setup>
   import { computed, markRaw, onBeforeMount, reactive, ref } from 'vue'
+  import Discover from '@/components/explore/tabs/Discover.vue'
   import Trending from '@/components/explore/tabs/Trending.vue'
   import Filter from '@/components/feed/Filter.vue'
   import { getIcon } from '@/models/icons.js'
   import { useFilterStore } from '@/stores/main/filter.js'
   import '@/styles/pages/explore.scss'
-  import Discover from "@/components/explore/tabs/Discover.vue";
   const tabs = reactive([
     { label: '🔥 Trending', value: 'trending', component: markRaw(Trending) },
     { label: '✨ Discover', value: 'discover', component: markRaw(Discover) },
@@ -37,7 +37,7 @@
   const filterStore = useFilterStore()
   //
   onBeforeMount(() => {
-    filterStore.clearFilters()
+    filterStore.clearFilters(false)
   })
   function toggleFilter () {
     isFilterPanel.value = !isFilterPanel.value
@@ -75,7 +75,12 @@
       </div>
     </div>
     <v-slide-y-transition>
-      <Filter v-if="isFilterPanel" @apply="applyFilters" @close="isFilterPanel = false" />
+      <Filter
+        v-if="isFilterPanel"
+        :refresh-feed="false"
+        @apply="applyFilters"
+        @close="isFilterPanel = false"
+      />
     </v-slide-y-transition>
     <div class="feed-tabs">
       <button
