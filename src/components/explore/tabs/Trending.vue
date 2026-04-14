@@ -115,7 +115,7 @@
 
     <v-progress-linear v-if="loading" class="mt-9" color="primary" indeterminate />
 
-    <div v-if="!hasMore && !loading" class="no-more-posts">
+    <div v-if="!hasMore && !loading" class="no-more-posts text-center mt-10">
       <p>No more posts to show.</p>
     </div>
   </div>

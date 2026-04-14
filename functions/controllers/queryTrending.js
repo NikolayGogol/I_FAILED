@@ -35,8 +35,8 @@ function buildCostPredicate (costRange) {
       return false
     }
 
-    return ranges.some(rv => {
-      const r = normalizeString(rv)
+    return ranges.some(range => {
+      const r = normalizeString(range?.value ?? range)
       if (r === 'free') {
         return costNum <= 0
       }
@@ -66,6 +66,19 @@ function matchesFilters (postData, filters) {
   const recoveryTime = Array.isArray(f.recoveryTime) ? f.recoveryTime : []
   const costRange = Array.isArray(f.costRange) ? f.costRange : []
   const postedBy = f.postedBy || null
+  const searchText = normalizeString(f.searchText)
+
+  // Search Text
+  if (searchText) {
+    const searchableText = [
+      postData?.title,
+      postData?.lessonLearned?.story,
+    ].map(normalizeString).join(' ')
+
+    if (!searchableText.includes(searchText)) {
+      return false
+    }
+  }
 
   // 1) postedBy
   if (postedBy) {
@@ -129,7 +142,7 @@ function matchesFilters (postData, filters) {
       .map(t => (typeof t === 'string' ? t : (t?.value ?? t?.label ?? '')))
       .map(element => normalizeString(element)))
 
-    const match = emojiTags.some(tagVal => postEmotionValues.has(normalizeString(tagVal)))
+    const match = emojiTags.some(tag => postEmotionValues.has(normalizeString(tag?.value ?? tag)))
     if (!match) {
       return false
     }
@@ -142,7 +155,7 @@ function matchesFilters (postData, filters) {
       ? postRecovery
       : (postRecovery?.value ?? postRecovery?.title ?? '')
 
-    const match = recoveryTime.some(rv => normalizeString(rv) === normalizeString(postRecoveryVal))
+    const match = recoveryTime.some(rt => normalizeString(rt?.value ?? rt) === normalizeString(postRecoveryVal))
     if (!match) {
       return false
     }

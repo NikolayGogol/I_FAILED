@@ -47,7 +47,10 @@
 
   function applyFilters () {
     if (activeTab.value === 'trending') {
-      trendingStore.fetchTrendingPosts(filterStore.selectedFilter)
+      trendingStore.fetchTrendingPosts({
+        ...filterStore.selectedFilter,
+        searchText: searchValue.value
+      })
     }
   }
   function selectTab (tab) {
@@ -70,7 +73,7 @@
         <form-input v-model="searchValue" hide-details />
         <div class="position-absolute search-icon d-flex" v-html="getIcon('search')" />
       </div>
-      <div class="submit-btn">Search</div>
+      <div class="submit-btn" @click="applyFilters">Search</div>
       <div class="composer-filter">
         <v-badge v-if="activeFilterCount > 0" color="primary" :content="activeFilterCount" floating>
           <v-icon icon="mdi-filter-variant" @click="toggleFilter" />

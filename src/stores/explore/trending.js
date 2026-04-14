@@ -33,7 +33,6 @@ export const useTrendingStore = defineStore('trending', {
 
         // Corrected: Using the original '/explore/trending' route
         const response = await api.post('/explore/trending', {
-          tab: 'trending',
           pageSize: 3, // Default to 3 as requested
           cursor: this.nextCursorDocId,
           filters: this.filters,
