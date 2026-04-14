@@ -2,6 +2,49 @@
 @use '../global/fonts' as *;
 
 .explore-page {
+  .feed-tabs {
+    display: flex;
+    border-bottom: 1px solid $color-border;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    margin-bottom: $spacing-md;
+    background-color: $color-background;
+    @include media-down($breakpoint-sm) {
+      top: 57px;
+      z-index: 1;
+    }
+
+    .feed-tab {
+      flex: 1;
+      padding: $spacing-sm $spacing-xs;
+      text-align: center;
+      color: $color-text-secondary;
+      background: none;
+      border: none;
+      cursor: pointer;
+      transition: color 0.2s, border-color 0.2s;
+      border-bottom: $border-width-md solid transparent;
+      font-size: $font-size-sm;
+      font-weight: 500;
+
+      @include media-up($breakpoint-sm) {
+        padding: $spacing-md;
+        font-weight: 600;
+      }
+
+      &:hover {
+        color: $color-primary;
+      }
+
+      &.active {
+        color: $color-primary;
+        border-bottom-color: $color-primary;
+        font-weight: 700;
+      }
+    }
+  }
+
   .search-wrapper {
     background-color: $color-surface;
     padding: $spacing-md;

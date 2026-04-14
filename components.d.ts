@@ -79,6 +79,7 @@ declare module 'vue' {
     Sidebar: typeof import('./src/components/sidebars/Sidebar.vue')['default']
     ThemeChart: typeof import('./src/components/failure-age/theme-chart.vue')['default']
     Timeline: typeof import('./src/components/failure-age/timeline.vue')['default']
+    Trending: typeof import('./src/components/explore/tabs/Trending.vue')['default']
     UploadFile: typeof import('./src/components/UploadFile.vue')['default']
     UserCard: typeof import('./src/components/profile/UserCard.vue')['default']
     WhoToFollow: typeof import('./src/components/sidebars/WhoToFollow.vue')['default']

@@ -8,11 +8,16 @@
 </route>
 
 <script setup>
-  import { computed, onBeforeMount, ref } from 'vue'
+  import { computed, markRaw, onBeforeMount, reactive, ref } from 'vue'
+  import Trending from '@/components/explore/tabs/Trending.vue'
   import Filter from '@/components/feed/Filter.vue'
   import { getIcon } from '@/models/icons.js'
   import { useFilterStore } from '@/stores/main/filter.js'
   import '@/styles/pages/explore.scss'
+  const tabs = reactive([
+    { label: 'Trending', value: 'trending', component: markRaw(Trending) },
+  ])
+  const activeTab = ref('trending')
   //
   const searchValue = ref('')
   const activeFilterCount = computed(() => {
@@ -38,6 +43,10 @@
 
   function applyFilters () {
     console.log(filterStore.selectedFilter)
+  }
+  function selectTab (tab) {
+    activeTab.value = tab.value
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 </script>
 
@@ -66,5 +75,17 @@
     <v-slide-y-transition>
       <Filter v-if="isFilterPanel" @apply="applyFilters" @close="isFilterPanel = false" />
     </v-slide-y-transition>
+    <div class="feed-tabs">
+      <button
+        v-for="tab in tabs"
+        :key="tab.value"
+        class="feed-tab"
+        :class="{ active: activeTab === tab.value }"
+        @click="selectTab(tab)"
+      >
+        {{ tab.label }}
+      </button>
+    </div>
+    <component :is="tabs.find(t => t.value === activeTab).component" class="mt-4" />
   </div>
 </template>
