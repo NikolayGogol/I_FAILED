@@ -16,6 +16,7 @@
   ]
   const mostSaved = ref([])
   const sentinel = ref(null)
+  const isloading = ref(true)
   let observer = null
   function loadMore () {
     if (hasMore.value && !loading.value) {
@@ -30,6 +31,9 @@
     trendingStore.fetchWeeklyBookmarkedPosts()
       .then(res => {
         mostSaved.value = res
+      })
+      .finally(() => {
+        isloading.value = false
       })
 
     observer = new IntersectionObserver(
@@ -125,34 +129,39 @@
     </div>
 
     <h2 class="my-6">Most Saved This Week</h2>
-
-    <div class="posts-container">
-      <div v-for="post in mostSaved" :key="post.id" class="post">
-        <div class="d-block w-100">
-          <div class="d-flex">
-            <v-img
-              v-if="post.user?.photoURL"
-              :alt="post.user?.displayName"
-              class="user-avatar"
-              cover
-              :src="post.user?.photoURL"
-            />
-            <div v-else class="avatar" :style="{ backgroundColor: getRandomColor() }">
-              {{ getInitials(post.user.displayName) }}
-            </div>
-            <div class="user-info ml-4 w-100">
-              <div class="d-flex align-center justify-space-between w-100">
-                <div class="d-flex align-center">
-                  <p class="title">{{ post.title }}</p>
-                </div>
-                <div class="d-flex align-center bookmarked">
-                  <div class="d-flex mr-4" v-html="getIcon('mark', 18, 18)"></div>
-                  <span>{{ post.bookmarks || 0 }}</span>
+    <v-progress-linear v-if="isloading" class="mt-9" color="primary" indeterminate />
+    <div v-else class="posts-container">
+      <template v-if="mostSaved.length > 0">
+        <div v-for="post in mostSaved" :key="post.id" class="post">
+          <div class="d-block w-100">
+            <div class="d-flex">
+              <v-img
+                v-if="post.user?.photoURL"
+                :alt="post.user?.displayName"
+                class="user-avatar"
+                cover
+                :src="post.user?.photoURL"
+              />
+              <div v-else class="avatar" :style="{ backgroundColor: getRandomColor() }">
+                {{ getInitials(post.user.displayName) }}
+              </div>
+              <div class="user-info ml-4 w-100">
+                <div class="d-flex align-center justify-space-between w-100">
+                  <div class="d-flex align-center">
+                    <p class="title">{{ post.title }}</p>
+                  </div>
+                  <div class="d-flex align-center bookmarked">
+                    <div class="d-flex mr-4" v-html="getIcon('mark', 18, 18)" />
+                    <span>{{ post.bookmarks || 0 }}</span>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
+      </template>
+      <div v-else class="no-more-posts text-center mt-10">
+        <p>No more posts to show.</p>
       </div>
     </div>
   </div>
