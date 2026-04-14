@@ -153,26 +153,26 @@
       <p class="text-description fs-16">Transform your failures into a shareable resume of growth</p>
     </div>
     <div class="stat-panel mt-4">
-      <v-row class="ga-2 pa-6">
-        <v-col>
+      <v-row class="sm:ga-2 pa-6">
+        <v-col cols="6" lg="3" sm="4">
           <div class="d-flex flex-column align-center justify-center item">
             <h2>{{ selectedPosts.length }}</h2>
             <p class="text-description">Failures Selected</p>
           </div>
         </v-col>
-        <v-col>
+        <v-col cols="6" lg="3" sm="4">
           <div class="d-flex flex-column align-center justify-center item">
             <h2>{{ lessonsLearned }}</h2>
             <p class="text-description">Lessons Learned</p>
           </div>
         </v-col>
-        <v-col>
+        <v-col cols="6" lg="3" sm="4">
           <div class="d-flex flex-column align-center justify-center item">
             <h2 class="text-uppercase">${{ floatNumber(totalCost) }}</h2>
             <p class="text-description">Total Cost</p>
           </div>
         </v-col>
-        <v-col>
+        <v-col cols="6" lg="3" sm="4">
           <div class="d-flex flex-column align-center justify-center item">
             <h2 class="text-success">{{ recoveryTime }}%</h2>
             <p class="text-description">Recovery Rate</p>

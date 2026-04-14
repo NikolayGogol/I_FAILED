@@ -1,6 +1,9 @@
 @use '../settings.scss' as *;
 
 .failure-resume-page {
+  @include media-down($breakpoint-sm) {
+    padding: 15px;
+  }
   .overlay {
     position: fixed;
     top: 0;
