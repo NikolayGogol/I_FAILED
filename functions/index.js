@@ -9,6 +9,7 @@ admin.initializeApp()
 
 const authRoutes = require('./routes/auth')
 const emailVerificationRoutes = require('./routes/emailVerificationRoutes')
+const exploreRoutes = require('./routes/explore')
 const notificationRoutes = require('./routes/notifications')
 const paymentRoutes = require('./routes/paymentRoutes') // Import the new payment router
 const postsRoutes = require('./routes/posts')
@@ -28,6 +29,7 @@ app.use(express.json())
 // Mount the routers
 app.use(authRoutes)
 app.use(postsRoutes)
+app.use(exploreRoutes)
 app.use(notificationRoutes)
 app.use(emailVerificationRoutes)
 app.use(paymentRoutes) // Use the new payment router
