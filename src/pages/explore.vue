@@ -14,8 +14,10 @@
   import { getIcon } from '@/models/icons.js'
   import { useFilterStore } from '@/stores/main/filter.js'
   import '@/styles/pages/explore.scss'
+  import Discover from "@/components/explore/tabs/Discover.vue";
   const tabs = reactive([
-    { label: 'Trending', value: 'trending', component: markRaw(Trending) },
+    { label: '🔥 Trending', value: 'trending', component: markRaw(Trending) },
+    { label: '✨ Discover', value: 'discover', component: markRaw(Discover) },
   ])
   const activeTab = ref('trending')
   //

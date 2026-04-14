@@ -4,10 +4,7 @@
 
 <template>
   <div class="tab">
-    <h2>Trending Failures (Last 24h)</h2>
+    <h2>dsdsd</h2>
   </div>
 </template>
 
-<style scoped lang="scss">
-
-</style>

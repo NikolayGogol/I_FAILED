@@ -28,6 +28,7 @@ declare module 'vue' {
     Dashboard: typeof import('./src/components/failure-age/dashboard.vue')['default']
     DatePickerInput: typeof import('./src/components/DatePickerInput.vue')['default']
     Delete: typeof import('./src/components/settings/account-tabs/delete.vue')['default']
+    Discover: typeof import('./src/components/explore/tabs/Discover.vue')['default']
     DobModal: typeof import('./src/components/failure-age/dob-modal.vue')['default']
     DoNotDisturb: typeof import('./src/components/settings/notify-tabs/DoNotDisturb.vue')['default']
     Email: typeof import('./src/components/settings/notify-tabs/Email.vue')['default']
