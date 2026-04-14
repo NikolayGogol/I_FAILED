@@ -7,7 +7,7 @@
 </route>
 
 <script setup>
-import {computed, markRaw, onBeforeMount, reactive, ref} from 'vue'
+  import { computed, markRaw, onBeforeMount, reactive, ref } from 'vue'
   import { useDisplay } from 'vuetify'
   import Filter from '@/components/feed/Filter.vue'
   import ForYouTab from '@/components/feed/tabs/ForYouTab.vue'

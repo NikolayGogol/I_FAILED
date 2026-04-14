@@ -152,6 +152,19 @@
           font-size: 16px;
           margin-top: 16px;
         }
+
+        .bookmarked {
+          svg {
+            * {
+              stroke: $color-primary;
+            }
+          }
+          span {
+            font-weight: 600;
+            color: $color-text-primary;
+            font-size: 16px;
+          }
+        }
       }
     }
   }

@@ -49,7 +49,7 @@
     if (activeTab.value === 'trending') {
       trendingStore.fetchTrendingPosts({
         ...filterStore.selectedFilter,
-        searchText: searchValue.value
+        searchText: searchValue.value,
       })
     }
   }
