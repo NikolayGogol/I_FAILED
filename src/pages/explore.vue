@@ -8,11 +8,12 @@
 </route>
 
 <script setup>
-  import { computed, markRaw, onBeforeMount, reactive, ref } from 'vue'
+  import { computed, markRaw, onBeforeMount, onMounted, reactive, ref } from 'vue'
   import Discover from '@/components/explore/tabs/Discover.vue'
   import Trending from '@/components/explore/tabs/Trending.vue'
   import Filter from '@/components/feed/Filter.vue'
   import { getIcon } from '@/models/icons.js'
+  import { useTrendingStore } from '@/stores/explore/trending.js'
   import { useFilterStore } from '@/stores/main/filter.js'
   import '@/styles/pages/explore.scss'
   const tabs = reactive([
@@ -20,6 +21,7 @@
     { label: '✨ Discover', value: 'discover', component: markRaw(Discover) },
   ])
   const activeTab = ref('trending')
+  const trendingStore = useTrendingStore()
   //
   const searchValue = ref('')
   const activeFilterCount = computed(() => {
@@ -39,12 +41,17 @@
   onBeforeMount(() => {
     filterStore.clearFilters(false)
   })
+  onMounted(() => {
+    trendingStore.fetchPost(filterStore.selectedFilter)
+  })
   function toggleFilter () {
     isFilterPanel.value = !isFilterPanel.value
   }
 
   function applyFilters () {
-    console.log(filterStore.selectedFilter)
+    if (activeTab.value === 'trending') {
+      trendingStore.fetchPost(filterStore.selectedFilter)
+    }
   }
   function selectTab (tab) {
     activeTab.value = tab.value
