@@ -2,74 +2,45 @@
 @use '../global/fonts' as *;
 
 .explore-page {
-  min-height: 100vh;
-  padding-top: $spacing-md;
-
-  .page-header {
-    margin-bottom: $spacing-lg;
-    text-align: center;
-
-    h1 {
-      font-size: $font-size-2xl;
-      font-weight: bold;
-      color: $color-text-primary;
-      margin-bottom: $spacing-sm;
-    }
-
-    p {
-      color: $color-text-secondary;
-      font-size: $font-size-base;
+  .search-wrapper {
+    background-color: $color-surface;
+    padding: $spacing-md;
+    border: 1px solid $color-border;
+    border-radius: $radius-lg;
+    &.card-open {
+      border-bottom: 0;
+      border-radius: $radius-md $radius-md 0 0;
     }
   }
 
-  .explore-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax($card-min-width, 1fr));
-    gap: $spacing-lg;
-
-    .explore-card {
-      background-color: $color-surface;
-      border: 1px solid $color-border;
-      border-radius: $radius-lg;
-      overflow: hidden;
-      transition: transform 0.2s, box-shadow 0.2s;
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
-
-      &:hover {
-        transform: translateY(-2px);
-        box-shadow: $shadow-lg;
-      }
-
-      .explore-image-placeholder {
-        height: $card-image-height;
-        background-color: $color-accent-bg;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: $color-accent-text;
-      }
-
-      .explore-content {
-        padding: $spacing-md;
-        flex-grow: 1;
-        display: flex;
-        flex-direction: column;
-
-        h3 {
-          font-size: $font-size-base;
-          font-weight: bold;
-          color: $color-text-primary;
-          margin-bottom: $spacing-xs;
-        }
-
-        p {
-          color: $color-text-secondary;
-          font-size: $font-size-sm;
-          margin-top: auto;
-        }
-      }
+  .search-panel {
+    .search-icon {
+      top: 50%;
+      left: 20px;
+      transform: translateY(-50%);
     }
+
+    input {
+      padding-left: 50px !important;
+    }
+  }
+
+  .composer-filter {
+    background-color: $color-surface;
+    border-radius: $radius-sm;
+    border: 1px solid $color-border;
+    padding: $spacing-sm;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 50px;
+  }
+
+  .submit-btn {
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 }

@@ -4,6 +4,7 @@
   import '@/styles/components/feed/filter.scss'
 
   const filterStore = useFilterStore()
+  const emit = defineEmits(['apply'])
   const radios = [
     {
       label: 'Anonymous only',
@@ -81,7 +82,7 @@
       />
     </v-radio-group>
     <div class="d-flex align-center mt-2">
-      <div class="submit-btn" @click="filterStore.applyFilters">Apply</div>
+      <div class="submit-btn" @click="filterStore.applyFilters(); emit('apply')">Apply</div>
       <div class="clear" @click="filterStore.clearFilters">Clear all filters</div>
     </div>
   </div>
