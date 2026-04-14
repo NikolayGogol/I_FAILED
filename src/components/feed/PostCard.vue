@@ -181,7 +181,7 @@
       try {
         await navigator.share({
           title: p.post.title,
-          text: p.post.whatHappened,
+          text: '',
           url,
         })
         toast.success('Post shared successfully!')
