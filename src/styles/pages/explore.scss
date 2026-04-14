@@ -50,6 +50,7 @@
     padding: $spacing-md;
     border: 1px solid $color-border;
     border-radius: $radius-lg;
+
     &.card-open {
       border-bottom: 0;
       border-radius: $radius-md $radius-md 0 0;
@@ -86,11 +87,72 @@
     align-items: center;
     justify-content: center;
   }
-  .tab{
+
+  .tab {
     h2 {
       color: $color-text-primary;
       font-weight: 600;
       font-size: 20px;
+    }
+
+    .posts-container {
+      .post {
+        background-color: $color-surface;
+        border-radius: $radius-sm;
+        border: 1px solid $color-border;
+        padding: $spacing-lg;
+        margin-top: 16px;
+
+        .position {
+          width: 50px;
+          font-size: 24px;
+          font-weight: 700;
+        }
+
+        .user-avatar {
+          width: 45px;
+          height: 45px;
+          border-radius: $radius-full;
+        }
+
+        .avatar {
+          width: 45px;
+          height: 45px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: $radius-full;
+          color: $color-surface;
+          font-size: 16px;
+        }
+
+        .time {
+          font-size: 14px;
+          color: $color-text-quaternary;
+        }
+
+        .tag {
+          font-size: 12px;
+          font-weight: 600;
+          color: $color-tag;
+          background-color: $color-tag-bg;
+          padding: 4px 8px;
+          border-radius: 8px;
+        }
+
+        .title {
+          color: $color-text-primary;
+          font-weight: 700;
+          font-size: 20px;
+          margin-top: 10px;
+        }
+
+        .footer-panel {
+          color: $color-text-quaternary;
+          font-size: 16px;
+          margin-top: 16px;
+        }
+      }
     }
   }
 }

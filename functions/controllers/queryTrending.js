@@ -69,9 +69,6 @@ function matchesFilters (postData, filters) {
 
   // 1) postedBy
   if (postedBy) {
-    // In the UI, `postedBy` values are:
-    // - 'anonymous' => only anonymous posts
-    // - 'public' => only non-anonymous posts
     if (postedBy === 'anonymous') {
       if (!postData?.isAnonymous) {
         return false
@@ -81,7 +78,6 @@ function matchesFilters (postData, filters) {
         return false
       }
     } else {
-      // Fallback: if someone passes a uid, match by uid.
       if (normalizeString(postData?.uid) !== normalizeString(postedBy)) {
         return false
       }
@@ -164,260 +160,65 @@ function matchesFilters (postData, filters) {
   return true
 }
 
-// eslint-disable-next-line complexity
-function matchesForYou (postData, followedUsersSet, followedTagsSet, preferredCategoriesSet) {
-  /**
-   * Personalized "For You" matching.
-   *
-   * A post is included if it matches at least one user signal:
-   *  - followed author       => post.uid in `followedUsersSet`
-   *  - followed tag          => any postData.tags entry in `followedTagsSet`
-   *  - preferred category    => any postData.selectedCategories entry in `preferredCategoriesSet`
-   *
-   * Special rule:
-   *  - Anonymous posts are never shown when the author is a followed user.
-   */
-  const hasUserPref = followedUsersSet && followedUsersSet.size > 0
-  const hasTagPref = followedTagsSet && followedTagsSet.size > 0
-  const hasCategoryPref = preferredCategoriesSet && preferredCategoriesSet.size > 0
-
-  if (!hasUserPref && !hasTagPref && !hasCategoryPref) {
-    return false
-  }
-
-  const postUidNorm = normalizeString(postData?.uid)
-
-  // If the author is a followed user, do not show anonymous posts from them.
-  if (postData?.isAnonymous && postUidNorm && hasUserPref && followedUsersSet.has(postUidNorm)) {
-    return false
-  }
-
-  // 1) Author match (followed users)
-  if (hasUserPref && postUidNorm && followedUsersSet.has(postUidNorm)) {
-    return true
-  }
-
-  // 2) Tag match (followed tags)
-  // Note: tags are usually stored as strings, but we defensively handle objects too.
-  const postTags = Array.isArray(postData?.tags) ? postData.tags : []
-  if (hasTagPref && postTags.length > 0) {
-    for (const t of postTags) {
-      const raw = typeof t === 'string' ? t : (t?.value ?? t?.label ?? t?.id ?? '')
-      const tagNorm = normalizeString(raw)
-      if (tagNorm && followedTagsSet.has(tagNorm)) {
-        return true
-      }
-    }
-  }
-
-  // 3) Category match (based on user's read stats)
-  // Note: selectedCategories can contain objects or strings depending on the origin.
-  if (hasCategoryPref) {
-    const postCats = Array.isArray(postData?.selectedCategories) ? postData.selectedCategories : []
-    for (const pc of postCats) {
-      const raw = typeof pc === 'string' ? pc : (pc?.id ?? pc?.label ?? pc?.categoryId ?? pc?.categoryLabel ?? pc?.value ?? '')
-      const catNorm = normalizeString(raw)
-      if (catNorm && preferredCategoriesSet.has(catNorm)) {
-        return true
-      }
-    }
-  }
-
-  return false
-}
-
-function matchesForYouFallback (postData, followedUsersSet, currentUserIdNorm) {
-  /**
-   * Fallback "remaining posts" matching.
-   *
-   * This is used to keep the feed infinite when personalized recommendations
-   * are exhausted. We intentionally relax the matching constraints, but keep:
-   *  - no current user's own posts
-   *  - no anonymous posts from followed authors
-   */
-  const postUidNorm = normalizeString(postData?.uid)
-
-  // Exclude user's own posts.
-  if (currentUserIdNorm && postUidNorm && postUidNorm === currentUserIdNorm) {
-    return false
-  }
-
-  // Never show anonymous posts when the author is a followed user.
-  if (postData?.isAnonymous && postUidNorm && followedUsersSet.has(postUidNorm)) {
-    return false
-  }
-
-  // Otherwise include everything.
-  return true
-}
-
-// eslint-disable-next-line complexity
 exports.queryPostsExplore = async (req, res) => {
   try {
-    const {
-      tab,
-      pageSize,
-      cursor,
-      filters,
-      followedUsers,
-      followedTags,
-      preferredCategories,
-      fallback,
-      currentUserId,
-    } = req.body || {}
-
-    const effectivePageSize = Math.max(1, Number(pageSize) || 10)
-    const activeTab = tab || 'latest'
+    const { pageSize, cursor, filters } = req.body || {}
+    const effectivePageSize = Math.max(1, Number(pageSize) || 3)
+    const page = Number(cursor) || 1
 
     const POST_COLLECTION = process.env.POST_COLLECTION
     const postsRef = db.collection(POST_COLLECTION)
 
-    // We only sort by a single field here to avoid Firestore's composite index requirements.
-    // All other filter types are evaluated in memory.
-    const orderField = activeTab === 'popular' ? 'views' : 'createdAt'
-    const orderDirection = 'desc'
-
-    /**
-     * Pre-compute personalization sets for the "For You" feed.
-     *
-     * We convert arrays into Sets for O(1) membership checks.
-     * We also normalize strings to make matching case-insensitive and whitespace-tolerant.
-     *
-     * Important:
-     * - These sets are only used when `activeTab === 'for-you'`.
-     * - When `activeTab !== 'for-you'` we just use the generic `matchesFilters()` logic.
-     */
-    const followedUsersSet = new Set()
-    const followedTagsSet = new Set()
-    const preferredCategoriesSet = new Set()
-    if (activeTab === 'for-you') {
-      const fus = Array.isArray(followedUsers) ? followedUsers : []
-      for (const uid of fus) {
-        const uidNorm = normalizeString(uid)
-        if (uidNorm) {
-          followedUsersSet.add(uidNorm)
-        }
-      }
-
-      const fts = Array.isArray(followedTags) ? followedTags : []
-      for (const t of fts) {
-        const tagNorm = normalizeString(t)
-        if (tagNorm) {
-          followedTagsSet.add(tagNorm)
-        }
-      }
-
-      const pcs = Array.isArray(preferredCategories) ? preferredCategories : []
-      for (const c of pcs) {
-        if (typeof c === 'string') {
-          const catNorm = normalizeString(c)
-          if (catNorm) {
-            preferredCategoriesSet.add(catNorm)
-          }
-          continue
-        }
-        const idNorm = normalizeString(c?.id)
-        const labelNorm = normalizeString(c?.label)
-        if (idNorm) {
-          preferredCategoriesSet.add(idNorm)
-        }
-        if (labelNorm) {
-          preferredCategoriesSet.add(labelNorm)
-        }
-      }
-    }
-
-    const currentUserIdNorm = normalizeString(currentUserId)
-    // When `fallback` is true we relax matching to keep the feed infinite.
-    const isForYouFallback = activeTab === 'for-you' && !!fallback
-
-    // How many documents we pull per Firestore request.
-    // We fetch more than `effectivePageSize` because many candidates may not match filters.
-    const batchLimit = Math.min(100, Math.max(30, effectivePageSize * 5))
-
-    // Cap the scan to prevent very expensive calls when filters are restrictive.
+    // Fetch a pool of potential trending candidates, ordered by views as a baseline
+    const batchLimit = 100
     const maxBatches = 10
+    const candidates = []
+    let lastDocSnap = null
 
-    // Cursor is the last document id from the previous page.
-    // We implement the cursor via `startAfter(cursorDocSnap)` (not by result count).
-    let cursorDocSnap = null
-    if (cursor) {
-      const cursorDoc = await postsRef.doc(cursor).get()
-      cursorDocSnap = cursorDoc.exists ? cursorDoc : null
-    }
-
-    // Final filtered results returned to the client.
-    const results = []
-    let lastDocId = null
-
-    // Indicates if there might be more matches after the returned page.
-    let hasMore = false
-
-    // We keep scanning subsequent pages from Firestore until we collect enough matches,
-    // or until we determine the Firestore feed is exhausted.
-    for (let batches = 0; batches < maxBatches; batches++) {
-      let q = postsRef.orderBy(orderField, orderDirection).limit(batchLimit)
-      if (cursorDocSnap) {
-        q = q.startAfter(cursorDocSnap)
+    for (let i = 0; i < maxBatches; i++) {
+      let query = postsRef.orderBy('views', 'desc').limit(batchLimit)
+      if (lastDocSnap) {
+        query = query.startAfter(lastDocSnap)
       }
 
-      const snapshot = await q.get()
+      const snapshot = await query.get()
       if (snapshot.empty) {
         break
       }
 
-      // We must track the last DOCUMENT we actually processed.
-      // Otherwise we can skip candidate documents and the next page becomes "empty".
-      for (let i = 0; i < snapshot.docs.length; i++) {
-        const docSnap = snapshot.docs[i]
-        const data = docSnap.data() || {}
+      const twentyFourHoursAgoMillis = Date.now() - 24 * 60 * 60 * 1000
+      for (const doc of snapshot.docs) {
+        const data = doc.data()
+        const postTimestamp = data.createdAt
+        const isRecent = postTimestamp && postTimestamp.toMillis() >= twentyFourHoursAgoMillis
 
-        // For each candidate post we decide whether it should be included in the final feed.
-        // This decision is:
-        //  - `matchesFilters(data, filters)` for generic filters (categories/emoji/cost/etc).
-        //  - plus an additional `For You` layer when `activeTab === 'for-you'`.
-        let includeForYou = true
-        if (activeTab === 'for-you') {
-          includeForYou = isForYouFallback
-            ? matchesForYouFallback(data, followedUsersSet, currentUserIdNorm)
-            : matchesForYou(data, followedUsersSet, followedTagsSet, preferredCategoriesSet)
-        }
-        if (matchesFilters(data, filters) && includeForYou) {
-          results.push({ id: docSnap.id, ...data })
-          lastDocId = docSnap.id
-          // We only stop scanning once we have enough matches.
-          // Cursor will point to the last analyzed docSnap, not to the last doc in snapshot.
-          if (results.length >= effectivePageSize) {
-            // If we still have docs left after the cursor in this same Firestore batch,
-            // there could be more matches, so we keep `hasMore=true`.
-            const moreDocsAfterCursorInThisBatch = i < snapshot.docs.length - 1
-            hasMore = moreDocsAfterCursorInThisBatch || snapshot.size === batchLimit
-            break
-          }
-        } else {
-          lastDocId = docSnap.id
+        if (isRecent && matchesFilters(data, filters)) {
+          candidates.push({ id: doc.id, ...data })
         }
       }
 
-      if (results.length >= effectivePageSize) {
-        break
-      }
-
-      // Prepare cursor for the next batch scan.
-      // Cursor points to the last doc in the batch, not only the last matching doc.
-      // This lets the next request resume correctly in the Firestore ordering.
-      cursorDocSnap = snapshot.docs.at(-1) || null
-
-      // If the snapshot isn't full, Firestore likely reached the end of the feed.
-      hasMore = snapshot.size === batchLimit
-      if (!hasMore) {
+      lastDocSnap = snapshot.docs.at(-1)
+      if (snapshot.size < batchLimit) {
         break
       }
     }
 
+    // Sort candidates by score (views + bookmarks)
+    candidates.sort((a, b) => {
+      const scoreA = (a.views || 0) + (a.bookmarks || 0)
+      const scoreB = (b.views || 0) + (b.bookmarks || 0)
+      return scoreB - scoreA
+    })
+
+    // Paginate the sorted results
+    const startIndex = (page - 1) * effectivePageSize
+    const results = candidates.slice(startIndex, startIndex + effectivePageSize)
+    const hasMore = (startIndex + effectivePageSize) < candidates.length
+    const nextCursor = hasMore ? String(page + 1) : null
+
     res.status(200).json({
       posts: results,
-      nextCursorDocId: lastDocId,
+      nextCursorDocId: nextCursor,
       hasMore,
     })
   } catch (error) {

@@ -1,11 +1,11 @@
 const express = require('express')
-const { queryTrending } = require('../controllers/queryTrending')
+// Correctly import the 'queryPostsExplore' function that contains the trending logic
+const { queryPostsExplore } = require('../controllers/queryTrending')
 
 const router = express.Router()
 
 // Feed endpoint used by the frontend to load posts with filters.
-// Intentionally implemented to avoid Firestore composite index explosion:
-// we sort by a single field, page, and filter in memory.
-router.post('/explore/trending', queryTrending)
+// It now correctly points to the queryPostsExplore controller function.
+router.post('/explore/trending', queryPostsExplore)
 
 module.exports = router

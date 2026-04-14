@@ -8,7 +8,7 @@
 </route>
 
 <script setup>
-  import { computed, markRaw, onBeforeMount, onMounted, reactive, ref } from 'vue'
+  import { computed, markRaw, onBeforeMount, reactive, ref } from 'vue'
   import Discover from '@/components/explore/tabs/Discover.vue'
   import Trending from '@/components/explore/tabs/Trending.vue'
   import Filter from '@/components/feed/Filter.vue'
@@ -41,16 +41,13 @@
   onBeforeMount(() => {
     filterStore.clearFilters(false)
   })
-  onMounted(() => {
-    trendingStore.fetchPost(filterStore.selectedFilter)
-  })
   function toggleFilter () {
     isFilterPanel.value = !isFilterPanel.value
   }
 
   function applyFilters () {
     if (activeTab.value === 'trending') {
-      trendingStore.fetchPost(filterStore.selectedFilter)
+      trendingStore.fetchTrendingPosts(filterStore.selectedFilter)
     }
   }
   function selectTab (tab) {
