@@ -14,9 +14,9 @@
   import Filter from '@/components/feed/Filter.vue'
   import { getIcon } from '@/models/icons.js'
   import { useTrendingStore } from '@/stores/explore/trending.js'
+  import { useForYouStore } from '@/stores/feed/forYou.js'
   import { useFilterStore } from '@/stores/main/filter.js'
   import '@/styles/pages/explore.scss'
-  import {useForYouStore} from "@/stores/feed/forYou.js";
   const tabs = reactive([
     { label: '🔥 Trending', value: 'trending', component: markRaw(Trending) },
     { label: '✨ Discover', value: 'discover', component: markRaw(Discover) },

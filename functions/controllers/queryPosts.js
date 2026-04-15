@@ -66,6 +66,16 @@ function matchesFilters (postData, filters) {
   const recoveryTime = Array.isArray(f.recoveryTime) ? f.recoveryTime : []
   const costRange = Array.isArray(f.costRange) ? f.costRange : []
   const postedBy = f.postedBy || null
+  const searchText = normalizeString(f.searchText)
+
+  // 0) searchText
+  if (searchText) {
+    const title = normalizeString(postData?.title)
+    const text = normalizeString(postData?.text)
+    if (!title.includes(searchText) && !text.includes(searchText)) {
+      return false
+    }
+  }
 
   // 1) postedBy
   if (postedBy) {

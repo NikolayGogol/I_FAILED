@@ -79,6 +79,7 @@ export const useForYouStore = defineStore('forYou', {
     /**
      * Applies filters and refreshes the posts list.
      * @param {object} filters - The filters to apply.
+     * @param {string} [filters.searchText] - Text to search for in posts.
      */
     applyPostFilters (filters) {
       this.currentFilters = filters
@@ -225,7 +226,7 @@ export const useForYouStore = defineStore('forYou', {
           currentUserId,
           filters: this.currentFilters,
         }
-        console.log(payload);
+
         const response = await api.post('posts/feed', payload)
         const { posts: backendPosts = [], nextCursorDocId = null, hasMore: hasMoreFromBackend = false } = response.data || {}
 
