@@ -33,6 +33,7 @@ export const useForYouStore = defineStore('forYou', {
     fallbackTried: false,
     preferredCategories: [],
     preferredCategoriesFetchedAt: 0,
+    currentFilters: null,
   }),
   getters: {
     /**
@@ -75,6 +76,14 @@ export const useForYouStore = defineStore('forYou', {
     },
   },
   actions: {
+    /**
+     * Applies filters and refreshes the posts list.
+     * @param {object} filters - The filters to apply.
+     */
+    applyPostFilters (filters) {
+      this.currentFilters = filters
+      this.fetchPosts({ refresh: true })
+    },
     /**
      * Loads top categories by user's read stats for the "For You" feed.
      * @param {object} options
@@ -214,8 +223,9 @@ export const useForYouStore = defineStore('forYou', {
           preferredCategories: this.preferredCategories,
           fallback: isForYouFallback,
           currentUserId,
+          filters: this.currentFilters,
         }
-
+        console.log(payload);
         const response = await api.post('posts/feed', payload)
         const { posts: backendPosts = [], nextCursorDocId = null, hasMore: hasMoreFromBackend = false } = response.data || {}
 

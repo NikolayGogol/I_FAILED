@@ -37,7 +37,7 @@
       <p class="text-description cursor-pointer">See all</p>
     </div>
     <div class="posts-container">
-      <div v-for="post in posts" :key="post.id" class="post">
+      <div v-for="post in posts.splice(0, 3)" :key="post.id" class="post">
         <div class="d-flex align-center">
           <div class="d-block ml-6 w-100">
             <div class="d-flex">

@@ -16,12 +16,14 @@
   import { useTrendingStore } from '@/stores/explore/trending.js'
   import { useFilterStore } from '@/stores/main/filter.js'
   import '@/styles/pages/explore.scss'
+  import {useForYouStore} from "@/stores/feed/forYou.js";
   const tabs = reactive([
     { label: '🔥 Trending', value: 'trending', component: markRaw(Trending) },
     { label: '✨ Discover', value: 'discover', component: markRaw(Discover) },
   ])
   const activeTab = ref('discover')
   const trendingStore = useTrendingStore()
+  const forYouStore = useForYouStore()
   //
   const searchValue = ref('')
   const activeFilterCount = computed(() => {
@@ -48,6 +50,11 @@
   function applyFilters () {
     if (activeTab.value === 'trending') {
       trendingStore.fetchTrendingPosts({
+        ...filterStore.selectedFilter,
+        searchText: searchValue.value,
+      })
+    } else if (activeTab.value === 'discover') {
+      forYouStore.applyPostFilters({
         ...filterStore.selectedFilter,
         searchText: searchValue.value,
       })

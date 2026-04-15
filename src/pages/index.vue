@@ -15,6 +15,7 @@
   import PopularTab from '@/components/feed/tabs/PopularTab.vue'
   import MobileSlide from '@/components/MobileSlide.vue'
   import { useAuthStore } from '@/stores/auth'
+  import { useForYouStore } from '@/stores/feed/forYou.js'
   import { useLatestStore } from '@/stores/feed/latest'
   import { usePopularStore } from '@/stores/feed/popular'
   import { useFilterStore } from '@/stores/main/filter.js'
@@ -26,6 +27,7 @@
   const filterStore = useFilterStore()
   const latestStore = useLatestStore()
   const popularStore = usePopularStore()
+  const forYouStore = useForYouStore()
 
   const activeTab = ref('latest')
   const isFilterPanel = ref(false)
@@ -82,10 +84,23 @@
    * @param {object} filters - The filters to apply.
    */
   function applyFilters (filters) {
-    if (activeTab.value === 'latest') {
-      latestStore.applyPostFilters(filters)
-    } else if (activeTab.value === 'popular') {
-      popularStore.applyPostFilters(filters)
+    switch (activeTab.value) {
+      case 'latest': {
+        latestStore.applyPostFilters(filters)
+
+        break
+      }
+      case 'popular': {
+        popularStore.applyPostFilters(filters)
+
+        break
+      }
+      case 'for-you': {
+        forYouStore.applyPostFilters(filters)
+
+        break
+      }
+    // No default
     }
     isFilterPanel.value = false
   }
