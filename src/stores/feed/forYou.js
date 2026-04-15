@@ -83,7 +83,7 @@ export const useForYouStore = defineStore('forYou', {
      */
     applyPostFilters (filters) {
       this.currentFilters = filters
-      this.fetchPosts({ refresh: true })
+      this.fetchPosts({ pageSize: 3, refresh: true })
     },
     /**
      * Loads top categories by user's read stats for the "For You" feed.

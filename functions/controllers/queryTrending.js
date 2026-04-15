@@ -73,7 +73,7 @@ function matchesFilters (postData, filters) {
     const searchableText = [
       postData?.title,
       postData?.lessonLearned?.story,
-    ].map(normalizeString).join(' ')
+    ].map(element => normalizeString(element)).join(' ')
 
     if (!searchableText.includes(searchText)) {
       return false

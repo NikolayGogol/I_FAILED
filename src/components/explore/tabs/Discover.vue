@@ -1,24 +1,42 @@
 <script setup>
   import { storeToRefs } from 'pinia'
-  import { onMounted } from 'vue'
+  import { onMounted, ref, watch } from 'vue'
+  import { categories } from '@/models/categories.js'
   import { getIcon } from '@/models/icons.js'
   import { backgroundColors } from '@/models/no-data.js'
-  import { useDiscoverStore } from '@/stores/discover.js'
+  import { useDiscoverStore } from '@/stores/explore/discover.js'
   import { useForYouStore } from '@/stores/feed/forYou.js'
+
   const store = useForYouStore()
   const { filteredPosts: posts, loading } = storeToRefs(store)
   const discoverStore = useDiscoverStore()
-  onMounted(() => {
+  const peopleRead = ref('')
+  const similarPosts = ref([])
+  const similarList = ref([])
+  const browseList = ref([])
+  const loading1 = ref(true)
+  const loading2 = ref(true)
+  onMounted(async () => {
     store.fetchPosts({ pageSize: 3, refresh: true })
-    discoverStore.fetchSimilarPost()
-      .then(res => {
-        console.log(res)
-      })
+    const simPost = await discoverStore.fetchSimilarPost()
+    similarPosts.value = simPost
+    const arr = simPost.map(cat => {
+      return {
+        id: cat.categoryId,
+        label: cat.categoryLabel,
+      }
+    })
+    similarList.value = await discoverStore.countPostByCategory(arr)
+    loading1.value = false
+    browseList.value = await discoverStore.countPostByCategory(categories)
+    loading2.value = false
   })
+
   function getRandomColor () {
     const randomIndex = Math.floor(Math.random() * backgroundColors.length)
     return backgroundColors[randomIndex]
   }
+
   function getInitials (name) {
     if (!name) return ''
     const parts = name.split(' ')
@@ -28,16 +46,20 @@
     return (parts[0].charAt(0) + (parts[1]?.charAt(0) || '')).toUpperCase()
   }
 
+  watch(() => posts.value, val => {
+    const text = val.map(el => el.selectedCategories[0].label)
+    peopleRead.value = [...new Set(text)].join(', ')
+  })
 </script>
 
 <template>
-  <div class="tab">
+  <div class="tab tab-discover">
     <div class="d-flex align-center justify-space-between">
       <h2>Similar to What You've Read</h2>
       <p class="text-description cursor-pointer">See all</p>
     </div>
     <div class="posts-container">
-      <div v-for="post in posts.splice(0, 3)" :key="post.id" class="post">
+      <div v-for="post in posts" :key="post.id" class="post">
         <div class="d-flex align-center">
           <div class="d-block ml-6 w-100">
             <div class="d-flex">
@@ -73,9 +95,38 @@
       </div>
     </div>
     <v-progress-linear v-if="loading" class="mt-9" color="primary" indeterminate />
-    <div v-if="!loading && posts.length === 0" class="text-center py-10 text-gray-500">
-      No posts for you yet. Follow more people and tags to see their posts here.
+    <h2 class="my-6">People who read "{{ peopleRead }}" failures also viewed</h2>
+    <v-progress-linear v-if="loading1" class="mt-9" color="primary" indeterminate />
+    <div v-else-if="!loading1 && similarList.length > 0" class="similar-posts">
+      <ul>
+        <li
+          v-for="item in similarList"
+          :key="item.id"
+          class="d-flex align-center justify-space-between cursor-pointer"
+        >
+          <div class="d-flex ">
+            <div class="d-flex icon mr-4" v-html="getIcon('clipboard')" />
+            <div class="d-block">
+              <div class="title font-weight-semibold">{{ item.label }}</div>
+              <div class="text-description">{{ item.count || 0 }} stories</div>
+            </div>
+          </div>
+          <v-icon icon="mdi-chevron-right" />
+        </li>
+      </ul>
     </div>
-    <h2 class="my-6">People who read "Business" failures also viewed</h2>
+    <div v-else class="text-center my-10">Nothing to show</div>
+    <h2 class="my-6">Browse by Category</h2>
+    <v-progress-linear v-if="loading2" class="mt-9" color="primary" indeterminate />
+    <v-row v-else-if="!loading2 && browseList.length > 0">
+      <v-col v-for="cat in browseList" :key="cat.id" sm="4">
+        <div class="d-flex browse-block flex-column align-center cursor-pointer">
+          <div class="icon d-flex mb-4" v-html="getIcon(cat.id)"></div>
+          <h4 class="mb-2">{{ cat.label }}</h4>
+          <p class="text-description">{{ cat.count }} posts</p>
+        </div>
+      </v-col>
+    </v-row>
+    <div v-else class="text-center my-10">Nothing to show</div>
   </div>
 </template>

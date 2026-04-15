@@ -159,11 +159,59 @@
               stroke: $color-primary;
             }
           }
+
           span {
             font-weight: 600;
             color: $color-text-primary;
             font-size: 16px;
           }
+        }
+      }
+    }
+
+    &.tab-discover {
+      .similar-posts {
+        background-color: $color-surface;
+        border-radius: $radius-sm;
+        border: 1px solid $color-border;
+        padding: $spacing-lg;
+
+        li {
+          margin-bottom: 16px;
+        }
+
+        .icon {
+          width: 44px;
+          height: 44px;
+          background-color: $color-tag-bg;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: $radius-full;
+        }
+      }
+
+      .browse-block {
+        background-color: $color-surface;
+        padding: $spacing-lg;
+        border-radius: $radius-sm;
+        border: 1px solid $color-border;
+
+        h4 {
+          font-size: 14px;
+          font-weight: 600;
+          color: $color-text-primary;
+        }
+
+        .icon {
+          width: 48px;
+          height: 48px;
+          background-color: $color-tag-bg;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: $radius-full;
+          font-size: 24px;
         }
       }
     }
