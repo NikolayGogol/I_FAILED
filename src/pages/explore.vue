@@ -20,7 +20,7 @@
     { label: '🔥 Trending', value: 'trending', component: markRaw(Trending) },
     { label: '✨ Discover', value: 'discover', component: markRaw(Discover) },
   ])
-  const activeTab = ref('trending')
+  const activeTab = ref('discover')
   const trendingStore = useTrendingStore()
   //
   const searchValue = ref('')
