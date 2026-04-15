@@ -28,7 +28,8 @@
     })
     similarList.value = await discoverStore.countPostByCategory(arr)
     loading1.value = false
-    browseList.value = await discoverStore.countPostByCategory(categories)
+    const filteredCategories = categories.filter(el => !arr.some(cat => cat.id === el.id))
+    browseList.value = await discoverStore.countPostByCategory(filteredCategories)
     loading2.value = false
   })
 
