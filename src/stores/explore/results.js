@@ -7,7 +7,7 @@ export const useResultsStore = defineStore('results', {
     async searchAction (payload) {
       api.post('/explore/search', payload)
         .then(res => {
-          console.log(res);
+          console.log(res)
         })
     },
   },
