@@ -10,20 +10,17 @@
 <script setup>
   import { computed, markRaw, onBeforeMount, reactive, ref } from 'vue'
   import Discover from '@/components/explore/tabs/Discover.vue'
+  import Result from '@/components/explore/tabs/Result.vue'
   import Trending from '@/components/explore/tabs/Trending.vue'
   import Filter from '@/components/feed/Filter.vue'
   import { getIcon } from '@/models/icons.js'
-  import { useTrendingStore } from '@/stores/explore/trending.js'
-  import { useForYouStore } from '@/stores/feed/forYou.js'
   import { useFilterStore } from '@/stores/main/filter.js'
   import '@/styles/pages/explore.scss'
   const tabs = reactive([
     { label: '🔥 Trending', value: 'trending', component: markRaw(Trending) },
     { label: '✨ Discover', value: 'discover', component: markRaw(Discover) },
   ])
-  const activeTab = ref('discover')
-  const trendingStore = useTrendingStore()
-  const forYouStore = useForYouStore()
+  const activeTab = ref('trending')
   //
   const searchValue = ref('')
   const activeFilterCount = computed(() => {
@@ -48,17 +45,10 @@
   }
 
   function applyFilters () {
-    if (activeTab.value === 'trending') {
-      trendingStore.fetchTrendingPosts({
-        ...filterStore.selectedFilter,
-        searchText: searchValue.value,
-      })
-    } else if (activeTab.value === 'discover') {
-      forYouStore.applyPostFilters({
-        ...filterStore.selectedFilter,
-        searchText: searchValue.value,
-      })
-    }
+    tabs.push(
+      { label: '🔍 Result', value: 'result', component: markRaw(Result) },
+    )
+    activeTab.value = 'result'
   }
   function selectTab (tab) {
     activeTab.value = tab.value

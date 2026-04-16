@@ -109,7 +109,7 @@
       <h1 class="font-weight-bold text-grey-darken-3 ml-3 ml-sm-0">{{ category.label }}</h1>
     </div>
     <p class="text-description">{{ route.query.counter }} posts</p>
-    <div class="mt-6" v-if="posts.length > 0">
+    <div v-if="posts.length > 0" class="mt-6">
       <PostCard v-for="post in posts" :key="post.id" :post="post" />
     </div>
     <div v-else-if="!loading" class="text-center my-10">
@@ -123,7 +123,7 @@
       indeterminate
     />
 
-    <div ref="scrollTrigger" v-if="hasMore && !loading" />
+    <div v-if="hasMore && !loading" ref="scrollTrigger" />
   </div>
 </template>
 

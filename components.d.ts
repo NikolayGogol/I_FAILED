@@ -72,6 +72,7 @@ declare module 'vue' {
     ProfileCard: typeof import('./src/components/sidebars/ProfileCard.vue')['default']
     ProfileInfo: typeof import('./src/components/notifications/ProfileInfo.vue')['default']
     Push: typeof import('./src/components/settings/notify-tabs/Push.vue')['default']
+    Result: typeof import('./src/components/explore/tabs/Result.vue')['default']
     Rightbar: typeof import('./src/components/sidebars/Rightbar.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
