@@ -8,12 +8,14 @@
 </route>
 
 <script setup>
-  import { computed, markRaw, onBeforeMount, reactive, ref } from 'vue'
+  import { computed, markRaw, onBeforeMount, onMounted, reactive, ref } from 'vue'
+  import { useRoute, useRouter } from 'vue-router'
   import Discover from '@/components/explore/tabs/Discover.vue'
   import Result from '@/components/explore/tabs/Result.vue'
   import Trending from '@/components/explore/tabs/Trending.vue'
   import Filter from '@/components/feed/Filter.vue'
   import { getIcon } from '@/models/icons.js'
+  import { useResultsStore } from '@/stores/explore/results.js'
   import { useFilterStore } from '@/stores/main/filter.js'
   import '@/styles/pages/explore.scss'
   const tabs = reactive([
@@ -23,6 +25,9 @@
   const activeTab = ref('trending')
   //
   const searchValue = ref('')
+  const router = useRouter()
+  const route = useRoute()
+  const resultStore = useResultsStore()
   const activeFilterCount = computed(() => {
     const filters = filterStore.selectedFilter
     if (!filters) return 0
@@ -43,11 +48,28 @@
   function toggleFilter () {
     isFilterPanel.value = !isFilterPanel.value
   }
+  onMounted(() => {
+    if (route.query) {
+      searchValue.value = route.query.searchValue
+      applyFilters()
+    }
+  })
 
   function applyFilters () {
-    tabs.push(
-      { label: '🔍 Result', value: 'result', component: markRaw(Result) },
-    )
+    const obj = tabs.find(el => el.value === 'result')
+    if (!obj) {
+      tabs.push({ label: '🔍 Result', value: 'result', component: markRaw(Result) })
+    }
+    router.push({
+      path: '/explore',
+      query: {
+        searchValue: searchValue.value,
+      },
+    })
+    resultStore.searchAction({
+      ...filterStore.selectedFilter,
+      searchText: searchValue.value,
+    })
     activeTab.value = 'result'
   }
   function selectTab (tab) {
@@ -67,7 +89,7 @@
       ]"
     >
       <div class="search-panel w-75 position-relative">
-        <form-input v-model="searchValue" hide-details />
+        <form-input v-model="searchValue" hide-details @keyup.enter="applyFilters" />
         <div class="position-absolute search-icon d-flex" v-html="getIcon('search')" />
       </div>
       <div class="submit-btn" @click="applyFilters">Search</div>
