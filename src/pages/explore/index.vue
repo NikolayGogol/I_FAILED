@@ -8,6 +8,7 @@
 </route>
 
 <script setup>
+  import * as sea from 'node:sea'
   import { computed, markRaw, onBeforeMount, onMounted, reactive, ref } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import Discover from '@/components/explore/tabs/Discover.vue'
@@ -18,6 +19,8 @@
   import { useResultsStore } from '@/stores/explore/results.js'
   import { useFilterStore } from '@/stores/main/filter.js'
   import '@/styles/pages/explore.scss'
+
+  //
   const tabs = reactive([
     { label: '🔥 Trending', value: 'trending', component: markRaw(Trending) },
     { label: '✨ Discover', value: 'discover', component: markRaw(Discover) },
@@ -41,6 +44,7 @@
   })
   const isFilterPanel = ref(false)
   const filterStore = useFilterStore()
+  const suggestionList = ref([])
   //
   onBeforeMount(() => {
     filterStore.clearFilters(false)
@@ -76,6 +80,20 @@
     activeTab.value = tab.value
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
+  let timeout = null
+  function suggestAction () {
+    clearTimeout(timeout)
+    timeout = setTimeout(async () => {
+      const response = await fetch(`https://api.datamuse.com/words?sp=${searchValue.value}*&max=4`)
+      suggestionList.value = await response.json()
+    }, 500)
+  }
+
+  function selectSuggest(item) {
+    searchValue.value = item.word
+    suggestionList.value = []
+    applyFilters()
+  }
 </script>
 
 <template>
@@ -89,8 +107,21 @@
       ]"
     >
       <div class="search-panel w-75 position-relative">
-        <form-input v-model="searchValue" hide-details @keyup.enter="applyFilters" />
+        <form-input
+          v-model="searchValue"
+          hide-details
+          @keydown="suggestAction"
+          @keyup.enter="applyFilters"
+        />
         <div class="position-absolute search-icon d-flex" v-html="getIcon('search')" />
+        <ul v-if="suggestionList.length > 0" class="suggestion-list">
+          <li v-for="(item, index) in suggestionList"
+              @click="selectSuggest(item)"
+              :key="index">
+            <div class="d-flex mr-4" v-html="getIcon('search')" />
+            <span>{{ item.word }}</span>
+          </li>
+        </ul>
       </div>
       <div class="submit-btn" @click="applyFilters">Search</div>
       <div class="composer-filter">

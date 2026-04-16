@@ -67,6 +67,31 @@
     input {
       padding-left: 50px !important;
     }
+
+    .suggestion-list {
+      position: absolute;
+      top: 50px;
+      left: 0;
+      background-color: $color-surface;
+      width: 100%;
+      z-index: 999;
+      border: 1px solid $color-border;
+      border-radius: $radius-md;
+
+      li {
+        list-style: none;
+        display: flex;
+        align-items: center;
+        flex-direction: row;
+        padding: $spacing-md-sm $spacing-md;
+        cursor: pointer;
+        transition: all .5s ease-in-out;
+
+        &:hover {
+          background-color: $color-background;
+        }
+      }
+    }
   }
 
   .composer-filter {
@@ -178,6 +203,7 @@
 
         li {
           margin-bottom: 16px;
+
           &:last-of-type {
             margin-bottom: 0;
           }
