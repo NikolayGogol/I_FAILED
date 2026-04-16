@@ -8,8 +8,7 @@
 </route>
 
 <script setup>
-  import * as sea from 'node:sea'
-  import { computed, markRaw, onBeforeMount, onMounted, reactive, ref } from 'vue'
+  import { computed, markRaw, onBeforeMount, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import Discover from '@/components/explore/tabs/Discover.vue'
   import Result from '@/components/explore/tabs/Result.vue'
@@ -45,19 +44,34 @@
   const isFilterPanel = ref(false)
   const filterStore = useFilterStore()
   const suggestionList = ref([])
+  const searchPanelRef = ref(null) // Ref for the search panel
+
   //
   onBeforeMount(() => {
     filterStore.clearFilters(false)
   })
+
   function toggleFilter () {
     isFilterPanel.value = !isFilterPanel.value
   }
+
   onMounted(() => {
-    if (route.query) {
-      searchValue.value = route.query.searchValue
+    if (route.query.searchValue) {
+      searchValue.value = route.query.searchValue || ''
       applyFilters()
     }
+    document.addEventListener('click', handleClickOutside) // Add click listener
   })
+
+  onBeforeUnmount(() => {
+    document.removeEventListener('click', handleClickOutside) // Remove click listener
+  })
+
+  function handleClickOutside (event) {
+    if (searchPanelRef.value && !searchPanelRef.value.contains(event.target)) {
+      suggestionList.value = [] // Clear suggestions if clicked outside
+    }
+  }
 
   function applyFilters () {
     const obj = tabs.find(el => el.value === 'result')
@@ -75,6 +89,7 @@
       searchText: searchValue.value,
     })
     activeTab.value = 'result'
+    suggestionList.value = []
   }
   function selectTab (tab) {
     activeTab.value = tab.value
@@ -86,10 +101,16 @@
     timeout = setTimeout(async () => {
       const response = await fetch(`https://api.datamuse.com/words?sp=${searchValue.value}*&max=4`)
       suggestionList.value = await response.json()
+      await router.push({
+        path: '/explore',
+        query: {
+          searchValue: searchValue.value,
+        },
+      })
     }, 500)
   }
 
-  function selectSuggest(item) {
+  function selectSuggest (item) {
     searchValue.value = item.word
     suggestionList.value = []
     applyFilters()
@@ -106,7 +127,7 @@
         {'card-open':isFilterPanel}
       ]"
     >
-      <div class="search-panel w-75 position-relative">
+      <div ref="searchPanelRef" class="search-panel w-75 position-relative">
         <form-input
           v-model="searchValue"
           hide-details
@@ -115,9 +136,11 @@
         />
         <div class="position-absolute search-icon d-flex" v-html="getIcon('search')" />
         <ul v-if="suggestionList.length > 0" class="suggestion-list">
-          <li v-for="(item, index) in suggestionList"
-              @click="selectSuggest(item)"
-              :key="index">
+          <li
+            v-for="(item, index) in suggestionList"
+            :key="index"
+            @click="selectSuggest(item)"
+          >
             <div class="d-flex mr-4" v-html="getIcon('search')" />
             <span>{{ item.word }}</span>
           </li>

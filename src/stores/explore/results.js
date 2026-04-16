@@ -2,13 +2,22 @@ import { defineStore } from 'pinia'
 import api from '@/axios.js'
 
 export const useResultsStore = defineStore('results', {
-  state: () => ({}),
+  state: () => ({
+    posts: [],
+    users: [],
+    isLoading: false,
+  }),
   actions: {
     async searchAction (payload) {
-      api.post('/explore/search', payload)
-        .then(res => {
-          console.log(res)
-        })
+      this.isLoading = true
+      try {
+        const { data } = await api.post('/explore/search', payload)
+        this.posts = data.posts
+        this.users = data.users
+        return data
+      } finally {
+        this.isLoading = false
+      }
     },
   },
 })
