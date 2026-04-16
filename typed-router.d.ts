@@ -24,7 +24,9 @@ declare module 'vue-router/auto-routes' {
     '/congrats': RouteRecordInfo<'/congrats', '/congrats', Record<never, never>, Record<never, never>>,
     '/create-post': RouteRecordInfo<'/create-post', '/create-post', Record<never, never>, Record<never, never>>,
     '/edit-post/[id]': RouteRecordInfo<'/edit-post/[id]', '/edit-post/:id', { id: ParamValue<true> }, { id: ParamValue<false> }>,
-    '/explore': RouteRecordInfo<'/explore', '/explore', Record<never, never>, Record<never, never>>,
+    '/explore/': RouteRecordInfo<'/explore/', '/explore', Record<never, never>, Record<never, never>>,
+    '/explore/[id]': RouteRecordInfo<'/explore/[id]', '/explore/:id', { id: ParamValue<true> }, { id: ParamValue<false> }>,
+    '/explore/similar': RouteRecordInfo<'/explore/similar', '/explore/similar', Record<never, never>, Record<never, never>>,
     '/failure-age': RouteRecordInfo<'/failure-age', '/failure-age', Record<never, never>, Record<never, never>>,
     '/failure-resume': RouteRecordInfo<'/failure-resume', '/failure-resume', Record<never, never>, Record<never, never>>,
     '/forgot-password': RouteRecordInfo<'/forgot-password', '/forgot-password', Record<never, never>, Record<never, never>>,
@@ -81,8 +83,16 @@ declare module 'vue-router/auto-routes' {
       routes: '/edit-post/[id]'
       views: never
     }
-    'src/pages/explore.vue': {
-      routes: '/explore'
+    'src/pages/explore/index.vue': {
+      routes: '/explore/'
+      views: never
+    }
+    'src/pages/explore/[id].vue': {
+      routes: '/explore/[id]'
+      views: never
+    }
+    'src/pages/explore/similar.vue': {
+      routes: '/explore/similar'
       views: never
     }
     'src/pages/failure-age.vue': {

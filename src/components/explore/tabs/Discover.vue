@@ -1,6 +1,7 @@
 <script setup>
   import { storeToRefs } from 'pinia'
   import { onMounted, ref, watch } from 'vue'
+  import { useRouter } from 'vue-router'
   import { categories } from '@/models/categories.js'
   import { getIcon } from '@/models/icons.js'
   import { backgroundColors } from '@/models/no-data.js'
@@ -16,6 +17,7 @@
   const browseList = ref([])
   const loading1 = ref(true)
   const loading2 = ref(true)
+  const router = useRouter()
   onMounted(async () => {
     store.fetchPosts({ pageSize: 3, refresh: true })
     const simPost = await discoverStore.fetchSimilarPost()
@@ -51,13 +53,20 @@
     const text = val.map(el => el.selectedCategories[0].label)
     peopleRead.value = [...new Set(text)].join(', ')
   })
+  function goToCategory (item) {
+    router.push({ path: '/explore/category', query: {
+      id: item.id,
+      label: item.label,
+      counter: item.count,
+    } })
+  }
 </script>
 
 <template>
   <div class="tab tab-discover">
     <div class="d-flex align-center justify-space-between">
       <h2>Similar to What You've Read</h2>
-      <p class="text-description cursor-pointer">See all</p>
+      <p class="text-description cursor-pointer" @click="$router.push('/explore/similar')">See all</p>
     </div>
     <div class="posts-container">
       <div v-for="post in posts" :key="post.id" class="post">
@@ -104,8 +113,9 @@
           v-for="item in similarList"
           :key="item.id"
           class="d-flex align-center justify-space-between cursor-pointer"
+          @click="goToCategory(item)"
         >
-          <div class="d-flex ">
+          <div class="d-flex">
             <div class="d-flex icon mr-4" v-html="getIcon('clipboard')" />
             <div class="d-block">
               <div class="title font-weight-semibold">{{ item.label }}</div>
@@ -121,8 +131,8 @@
     <v-progress-linear v-if="loading2" class="mt-9" color="primary" indeterminate />
     <v-row v-else-if="!loading2 && browseList.length > 0">
       <v-col v-for="cat in browseList" :key="cat.id" sm="4">
-        <div class="d-flex browse-block flex-column align-center cursor-pointer">
-          <div class="icon d-flex mb-4" v-html="getIcon(cat.id)"></div>
+        <div class="d-flex browse-block flex-column align-center cursor-pointer" @click="goToCategory(cat)">
+          <div class="icon d-flex mb-4" v-html="getIcon(cat.id)" />
           <h4 class="mb-2">{{ cat.label }}</h4>
           <p class="text-description">{{ cat.count }} posts</p>
         </div>
