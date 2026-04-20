@@ -10,11 +10,10 @@ export const useSubscriptionStore = defineStore('subscription', () => {
   const error = ref(null)
 
   /**
-   * Creates a new premium subscription for the current user.
-   * @param {string} paymentMethodId - The Stripe PaymentMethod ID.
-   * @returns {Promise<boolean>} True if subscription was successful, false otherwise.
+   * Creates a new premium checkout for the current user.
+   * @returns {Promise<boolean>} True if checkout URL was successfully retrieved, false otherwise.
    */
-  async function createSubscription (paymentMethodId) {
+  async function createCheckout () {
     loading.value = true
     error.value = null
 
@@ -24,28 +23,19 @@ export const useSubscriptionStore = defineStore('subscription', () => {
         throw new Error('No authenticated user found.')
       }
 
-      const response = await api.post('/create-subscription', {
+      const response = await api.post('/create-checkout', {
         uid: user.uid,
-        paymentMethodId,
       })
 
-      if (response.data.status === 'success') {
-        // Update user's subscription status in auth store
-        authStore.$patch({
-          user: {
-            ...authStore.user,
-            isPremium: true,
-            premiumSince: response.data.premiumSince,
-            premiumUntil: response.data.premiumUntil,
-          },
-        })
-        return true
+      if (response.data.checkoutUrl) {
+          window.location.href = response.data.checkoutUrl
+          return true
       } else {
-        error.value = response.data.message || 'Failed to create subscription.'
+        error.value = response.data.message || 'Failed to create checkout.'
         return false
       }
     } catch (error_) {
-      console.error('Error creating subscription:', error_)
+      console.error('Error creating checkout:', error_)
       error.value = error_.response?.data?.message || error_.message || 'An unexpected error occurred.'
       return false
     } finally {
@@ -56,6 +46,6 @@ export const useSubscriptionStore = defineStore('subscription', () => {
   return {
     loading,
     error,
-    createSubscription,
+    createCheckout,
   }
 })

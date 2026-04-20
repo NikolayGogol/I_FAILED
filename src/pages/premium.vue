@@ -117,14 +117,12 @@
     paymentDialog.value = true
   }
 
-  async function handlePaymentConfirm (paymentMethodId) {
+  async function handlePaymentConfirm () {
     isSubscribing.value = true
-    const success = await subscriptionStore.createSubscription(paymentMethodId)
-    if (success) {
-      toast.success('Subscription successful! Welcome to Premium.')
-      paymentDialog.value = false
-    } else {
+    const success = await subscriptionStore.createCheckout()
+    if (!success) {
       toast.error(subscriptionStore.error || 'Failed to process payment.')
+      paymentDialog.value = false
     }
     isSubscribing.value = false
   }
