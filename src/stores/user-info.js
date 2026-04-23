@@ -45,9 +45,7 @@ export const useUserInfoStore = defineStore('userInfo', () => {
       const userDoc = await getDoc(doc(db, VITE_USERS_COLLECTION, userId))
       if (userDoc.exists()) {
         user.value = { id: userDoc.id, ...userDoc.data() }
-        if (user.value?.isPrivate) {
-          router.push('/')
-        }
+        return user.value
       } else {
         error.value = 'User not found'
         // Maybe redirect to a 404 page or home

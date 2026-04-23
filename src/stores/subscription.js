@@ -28,8 +28,8 @@ export const useSubscriptionStore = defineStore('subscription', () => {
       })
 
       if (response.data.checkoutUrl) {
-          window.location.href = response.data.checkoutUrl
-          return true
+        window.location.href = response.data.checkoutUrl
+        return true
       } else {
         error.value = response.data.message || 'Failed to create checkout.'
         return false

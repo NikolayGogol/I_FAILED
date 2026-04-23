@@ -1,6 +1,6 @@
+const LemonSqueezy = require('@lemonsqueezy/lemonsqueezy.js')
 const admin = require('firebase-admin')
 const functions = require('firebase-functions')
-const LemonSqueezy = require('@lemonsqueezy/lemonsqueezy.js')
 
 const lemonSqueezySecretKey = functions.config().lemonsqueezy?.secret_key
 let lemonSqueezy = null
@@ -46,19 +46,19 @@ exports.createCheckout = async (req, res) => {
     }
 
     const checkout = await lemonSqueezy.createCheckout({
-        store: functions.config().lemonsqueezy?.store_id,
-        variant: variantId,
-        custom: {
-            user_id: uid,
-        },
-        checkout_data: {
-            email: email,
-        }
+      store: functions.config().lemonsqueezy?.store_id,
+      variant: variantId,
+      custom: {
+        user_id: uid,
+      },
+      checkout_data: {
+        email,
+      },
     })
 
     functions.logger.info(`Checkout created for user ${uid}.`)
     return res.status(200).json({
-      checkoutUrl: checkout.url
+      checkoutUrl: checkout.url,
     })
   } catch (error) {
     functions.logger.error('Error creating checkout:', error)
@@ -70,44 +70,44 @@ exports.createCheckout = async (req, res) => {
  * Handles Lemon Squeezy webhooks to update user subscription status.
  */
 exports.webhook = async (req, res) => {
-    // This part will be more complex. I need to handle different webhook events.
-    // For now, I will just log the request and return 200.
-    functions.logger.info('Lemon Squeezy webhook received.')
-    // I need to verify the webhook signature here.
-    // I will add that later.
+  // This part will be more complex. I need to handle different webhook events.
+  // For now, I will just log the request and return 200.
+  functions.logger.info('Lemon Squeezy webhook received.')
+  // I need to verify the webhook signature here.
+  // I will add that later.
 
-    const { event_name, data } = req.body;
+  const { event_name, data } = req.body
 
-    if (event_name === 'subscription_created' || event_name === 'subscription_payment_success') {
-        const userId = data.attributes.custom_data?.user_id;
-        const customerId = data.attributes.customer_id;
-        const subscriptionId = data.id;
+  if (event_name === 'subscription_created' || event_name === 'subscription_payment_success') {
+    const userId = data.attributes.custom_data?.user_id
+    const customerId = data.attributes.customer_id
+    const subscriptionId = data.id
 
-        if (userId) {
-            const userDocRef = admin.firestore().collection('users').doc(userId);
-            const premiumSince = admin.firestore.FieldValue.serverTimestamp();
-            const premiumUntil = new Date(data.attributes.renews_at);
+    if (userId) {
+      const userDocRef = admin.firestore().collection('users').doc(userId)
+      const premiumSince = admin.firestore.FieldValue.serverTimestamp()
+      const premiumUntil = new Date(data.attributes.renews_at)
 
-            await userDocRef.update({
-                isPremium: true,
-                premiumSince,
-                premiumUntil,
-                lemonSqueezyCustomerId: customerId,
-                lemonSqueezySubscriptionId: subscriptionId,
-            });
-            functions.logger.info(`User ${userId} subscribed successfully.`);
-        }
-    } else if (event_name === 'subscription_cancelled' || event_name === 'subscription_expired') {
-        const userId = data.attributes.custom_data?.user_id;
-        if (userId) {
-            const userDocRef = admin.firestore().collection('users').doc(userId);
-            await userDocRef.update({
-                isPremium: false,
-                premiumUntil: admin.firestore.FieldValue.delete(),
-            });
-            functions.logger.info(`Subscription for user ${userId} cancelled or expired.`);
-        }
+      await userDocRef.update({
+        isPremium: true,
+        premiumSince,
+        premiumUntil,
+        lemonSqueezyCustomerId: customerId,
+        lemonSqueezySubscriptionId: subscriptionId,
+      })
+      functions.logger.info(`User ${userId} subscribed successfully.`)
     }
+  } else if (event_name === 'subscription_cancelled' || event_name === 'subscription_expired') {
+    const userId = data.attributes.custom_data?.user_id
+    if (userId) {
+      const userDocRef = admin.firestore().collection('users').doc(userId)
+      await userDocRef.update({
+        isPremium: false,
+        premiumUntil: admin.firestore.FieldValue.delete(),
+      })
+      functions.logger.info(`Subscription for user ${userId} cancelled or expired.`)
+    }
+  }
 
-    res.sendStatus(200);
+  res.sendStatus(200)
 }

@@ -139,6 +139,11 @@
   onMounted(() => {
     if (userId.value) {
       userInfoStore.fetchUser(userId.value)
+        .then(res => {
+          if (!isFollowing.value && res.isPrivate) {
+            router.push('/')
+          }
+        })
       userInfoStore.fetchUserPosts(userId.value)
       userInfoStore.fetchUserActivity(userId.value)
     }
@@ -147,6 +152,11 @@
   // Watch for changes in the route params and refetch user data
   watch(() => route.params.id, id => {
     userInfoStore.fetchUser(id)
+      .then(res => {
+        if (!isFollowing.value && res.isPrivate) {
+          router.push('/')
+        }
+      })
     userInfoStore.fetchUserPosts(id)
     userInfoStore.fetchUserActivity(id)
   })
