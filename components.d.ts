@@ -84,6 +84,7 @@ declare module 'vue' {
     Trending: typeof import('./src/components/explore/tabs/Trending.vue')['default']
     UploadFile: typeof import('./src/components/UploadFile.vue')['default']
     UserCard: typeof import('./src/components/profile/UserCard.vue')['default']
+    Visibility: typeof import('./src/components/settings/privacy-tabs/Visibility.vue')['default']
     WhoToFollow: typeof import('./src/components/sidebars/WhoToFollow.vue')['default']
   }
 }
