@@ -158,7 +158,7 @@
   })
 
   function smartRedirect (isPrivate) {
-    if (!authUser.value.uid && isPrivate) {
+    if (!authUser.value?.uid && isPrivate) {
       router.push('/')
     } else if (isPrivate && !isFollowing.value) {
       router.push('/')

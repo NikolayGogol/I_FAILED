@@ -26,7 +26,7 @@ export const useFailureAgeStore = defineStore('failureAge', () => {
   async function fetchFailureAgeStats () {
     const authStore = useAuthStore()
     const user = authStore.user
-    if (user.dob) {
+    if (user?.dob) {
       const birthDate = dayjs(user.dob, 'MM/DD/YYYY')
       const today = dayjs()
       const age = today.diff(birthDate, 'year')
