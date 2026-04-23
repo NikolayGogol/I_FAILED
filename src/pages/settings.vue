@@ -49,24 +49,24 @@
       icon: getIcon('content', 20, 20),
       component: ContentSettings,
     },
-    {
-      id: 'security',
-      label: 'Data & Security',
-      icon: getIcon('protect', 20, 20),
-      component: SecuritySettings,
-    },
-    {
-      id: 'premium',
-      label: 'Premium',
-      icon: getIcon('premium', 20, 20),
-      component: PremiumSettings,
-    },
-    {
-      id: 'help',
-      label: 'Help & About',
-      icon: getIcon('help', 20, 20),
-      component: HelpSettings,
-    },
+    // {
+    //   id: 'security',
+    //   label: 'Data & Security',
+    //   icon: getIcon('protect', 20, 20),
+    //   component: SecuritySettings,
+    // },
+    // {
+    //   id: 'premium',
+    //   label: 'Premium',
+    //   icon: getIcon('premium', 20, 20),
+    //   component: PremiumSettings,
+    // },
+    // {
+    //   id: 'help',
+    //   label: 'Help & About',
+    //   icon: getIcon('help', 20, 20),
+    //   component: HelpSettings,
+    // },
   ]
   const route = useRoute()
 
