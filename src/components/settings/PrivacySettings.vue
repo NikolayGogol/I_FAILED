@@ -1,6 +1,7 @@
 <script setup>
   import { ref } from 'vue'
   import Visibility from '@/components/settings/privacy-tabs/Visibility.vue'
+  import Activity from '@/components/settings/privacy-tabs/Activity.vue'
   import { getIcon } from '@/models/icons.js'
   import '../../styles/components/settings/privacy.scss'
   const list = [
@@ -8,6 +9,11 @@
       label: 'Profile visibility',
       icon: getIcon('account', 20, 20),
       id: 0,
+    },
+    {
+      label: 'Activity visibility',
+      icon: getIcon('eye', 20, 20),
+      id: 1,
     },
   ]
   const activeTab = ref(null)
@@ -32,5 +38,6 @@
       </li>
     </ul>
     <Visibility v-if="activeTab?.id === 0" @back="activeTab = null" />
+    <Activity v-if="activeTab?.id === 1" @back="activeTab = null" />
   </div>
 </template>
