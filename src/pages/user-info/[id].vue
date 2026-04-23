@@ -140,9 +140,7 @@
     if (userId.value) {
       userInfoStore.fetchUser(userId.value)
         .then(res => {
-          if (!isFollowing.value && res.isPrivate) {
-            router.push('/')
-          }
+          smartRedirect(res.isPrivate)
         })
       userInfoStore.fetchUserPosts(userId.value)
       userInfoStore.fetchUserActivity(userId.value)
@@ -153,14 +151,19 @@
   watch(() => route.params.id, id => {
     userInfoStore.fetchUser(id)
       .then(res => {
-        if (!isFollowing.value && res.isPrivate) {
-          router.push('/')
-        }
+        smartRedirect(res.isPrivate)
       })
     userInfoStore.fetchUserPosts(id)
     userInfoStore.fetchUserActivity(id)
   })
 
+  function smartRedirect (isPrivate) {
+    if (!authUser.value.uid && isPrivate) {
+      router.push('/')
+    } else if (isPrivate && !isFollowing.value) {
+      router.push('/')
+    }
+  }
   // =================================================================================================
   // Tab Navigation
   // =================================================================================================
