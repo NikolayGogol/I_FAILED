@@ -26,6 +26,9 @@
     padding: 24px;
     border-radius: $radius-md;
     border: 1px solid $color-border;
+    @include media-down($breakpoint-sm) {
+      padding: 16px;
+    }
   }
 
   h5 {
