@@ -26,13 +26,13 @@
 
   const tabs = [
     {
-      id: 'account-tabs',
+      id: 'Account',
       label: 'Account',
       icon: getIcon('account', 20, 20),
       component: AccountSettings,
     },
     {
-      id: 'privacy',
+      id: 'Privacy & Visibility',
       label: 'Privacy & Visibility',
       icon: getIcon('lock', 20, 20),
       component: PrivacySettings,
@@ -44,7 +44,7 @@
       component: NotificationSettings,
     },
     {
-      id: 'content',
+      id: 'Content & Activity',
       label: 'Content & Activity',
       icon: getIcon('content', 20, 20),
       component: ContentSettings,
@@ -144,7 +144,3 @@
     </div>
   </div>
 </template>
-
-<style scoped>
-
-</style>
