@@ -102,7 +102,38 @@
       gap: $spacing-lg;
       @include media-down($breakpoint-sm) {
         gap: $spacing-sm-md;
+        .submit-btn {
+          font-size: 12px;
+          padding: 8px;
+          white-space: nowrap;
+        }
       }
+    }
+  }
+
+  .private-content-warning {
+    margin-top: 50px;
+
+    .icon {
+      border: 1px solid $color-text-quaternary;
+      width: 80px;
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: $radius-full;
+
+      svg {
+        * {
+          stroke: $color-text-quaternary;
+        }
+      }
+    }
+
+    h4 {
+      font-weight: 600;
+      color: $color-text-primary;
+      margin-top: 5px;
     }
   }
 }

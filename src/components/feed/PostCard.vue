@@ -225,7 +225,7 @@
       <div class="post-author cursor-pointer" @click="openUserProfile">
         <div class="d-flex align-center">
           <div class="post-author-name">{{ post.user.displayName }}</div>
-          <p class="ml-2"> • {{ timeTransformAgo(post.createdAt) }}</p>
+          <p class="ml-2 text-no-wrap"> • {{ timeTransformAgo(post.createdAt) }}</p>
         </div>
         <div class="post-author-handle">
           {{ transformUsername(post.user.userName, post.user.displayName) }}
@@ -277,7 +277,7 @@
           </div>
         </template>
       </v-img>
-      <div v-if="post.emotionTags" class="post-chips">
+      <div v-if="post.emotionTags" class="post-chips mt-2">
         <span
           v-for="chip in post.emotionTags"
           :key="chip"

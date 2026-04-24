@@ -1,8 +1,9 @@
 <script setup>
-  import { ref } from 'vue'
+import {computed, ref} from 'vue'
   import { useRouter } from 'vue-router'
   import { useToast } from 'vue-toastification'
   import { usePostStore } from '@/stores/profile/post.js'
+import {useDisplay} from "vuetify";
 
   const props = defineProps({
     post: {
@@ -16,7 +17,8 @@
   const postStore = usePostStore()
   const showDeleteDialog = ref(false)
   const isDeleting = ref(false)
-
+  const { mobile } = useDisplay()
+  const buttonDensity = computed(() => mobile.value ? 'compact' : 'default')
   /**
    * Navigates to the edit post page.
    */
@@ -45,7 +47,7 @@
   <div>
     <v-menu open-on-hover>
       <template #activator="{ props: menuProps }">
-        <v-btn icon size="small" v-bind="menuProps" variant="text">
+        <v-btn icon size="small" class="ml-2 ml-sm-0" :density="buttonDensity" v-bind="menuProps" variant="text">
           <v-icon>mdi-dots-horizontal</v-icon>
         </v-btn>
       </template>

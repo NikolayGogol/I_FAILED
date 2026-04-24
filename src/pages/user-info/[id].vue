@@ -23,6 +23,7 @@
   import { useProfileStore } from '@/stores/profile/profile.js'
   import { useUserInfoStore } from '@/stores/user-info.js'
   import '@/styles/pages/profile.scss'
+  import {getIcon} from "@/models/icons.js";
 
   // =================================================================================================
   // Stores & Hooks
@@ -35,6 +36,7 @@
   const router = useRouter()
   const toast = useToast()
   const isMobileAction = ref(false)
+  const isPrivateContent = ref(false)
   // =================================================================================================
   // State
   // =================================================================================================
@@ -159,9 +161,13 @@
 
   function smartRedirect (isPrivate) {
     if (!authUser.value?.uid && isPrivate) {
-      router.push('/')
+      // router.push('/')
+      isPrivateContent.value = true
     } else if (isPrivate && !isFollowing.value) {
-      router.push('/')
+      // router.push('/')
+      isPrivateContent.value = true
+    } else {
+      isPrivateContent.value = false
     }
   }
   // =================================================================================================
@@ -250,9 +256,8 @@
           />
         </template>
       </UserCard>
-
       <!-- User's content feed -->
-      <div class="content-feed">
+      <div class="content-feed" v-if="!isPrivateContent">
         <!-- Tabs for posts and activity -->
         <nav class="user-tabs">
           <button
@@ -285,6 +290,11 @@
         </template>
         <!-- Activity tab content -->
         <activity v-if="activeTabIndex === 1" :user-id="userId" />
+      </div>
+      <div class="private-content-warning d-flex flex-column align-center" v-else>
+        <div class="icon" v-html="getIcon('lock', 40, 40)"></div>
+        <h4>This account is private</h4>
+        <p class="text-description">Follow this account to see their posts</p>
       </div>
     </section>
     <!-- "About this account-tabs" modal -->
