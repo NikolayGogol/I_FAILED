@@ -6,19 +6,35 @@
 }
 </route>
 <script setup>
-  import { ref } from 'vue'
+  import dayjs from 'dayjs'
+  import { computed, ref } from 'vue'
+  import { useRouter } from 'vue-router'
   import { useToast } from 'vue-toastification'
   import PaymentModal from '@/components/modals/PaymentModal.vue'
   import { getIcon } from '@/models/icons.js'
   import { useSubscriptionStore } from '@/stores/subscription.js'
-  import '../styles/pages/premium.scss'
-  import {isPremium} from "@/utils/premium.js";
+  import { useAuthStore } from '@/stores/auth.js'
+  import { isPremium } from '@/utils/premium.js'
 
+  import '../styles/pages/premium.scss'
+
+  const authStore = useAuthStore()
   const subscriptionStore = useSubscriptionStore()
+  const isCanceled = computed(() => authStore.user?.isCanceled === true)
+  const premiumUntilDate = computed(() => {
+    if (authStore.user?.premiumUntil) {
+      const seconds = authStore.user.premiumUntil.seconds
+      if (seconds) return dayjs.unix(seconds).format('DD.MM.YYYY')
+    }
+    return ''
+  })
   const toast = useToast()
+  const router = useRouter()
 
   const paymentDialog = ref(false)
   const isSubscribing = ref(false)
+  const isRenewing = ref(false)
+  const renewDialog = ref(false)
 
   const tabs = [
     {
@@ -130,16 +146,40 @@
 
   async function handleTrialCheckout () {
     isSubscribing.value = true
-    const success = await subscriptionStore.createCheckout('trial')
+    const success = await subscriptionStore.createCheckout(selectedTab.value.value, true)
     if (!success) {
       toast.error(subscriptionStore.error || 'Failed to start trial.')
     }
     isSubscribing.value = false
   }
+
+  async function handleRenewSubscription () {
+    isRenewing.value = true
+    const success = await subscriptionStore.renewSubscription(selectedTab.value.value)
+    isRenewing.value = false
+
+    if (success) {
+      renewDialog.value = false
+      toast.success('Subscription renewed successfully')
+    } else {
+      toast.error(subscriptionStore.error || 'Failed to renew subscription')
+    }
+  }
+
+  function openRenewDialog () {
+    renewDialog.value = true
+  }
+
+  function manageSubscription () {
+    router.push({ path: '/settings', query: { tab: 'premium' } })
+  }
 </script>
 <template>
   <div class="premium-page">
-    <template v-if="!isPremium">
+    <template v-if="!isPremium || isCanceled">
+      <div v-if="isCanceled" class="text-center mt-4 mb-4" style="color: #E53935; font-weight: 500;">
+        Your subscription is canceled and will expire on {{ premiumUntilDate }}.
+      </div>
       <PaymentModal
         :dialog="paymentDialog"
         :loading="isSubscribing"
@@ -170,7 +210,10 @@
           <div class="period">{{ selectedTab.period }}</div>
         </div>
         <div v-show="selectedTab?.billed" class="billed">{{ selectedTab.billed }}</div>
-        <button class="button" type="button" @click="openPaymentModal" :disabled="isSubscribing">Upgrade to Premium</button>
+        <button class="button" :disabled="isSubscribing || isRenewing" type="button" @click="isCanceled ? handleRenewSubscription() : openPaymentModal()">
+          <v-progress-circular v-if="isSubscribing || isRenewing" class="mr-2" indeterminate size="20" width="2" color="white"/>
+          <span v-else>{{ isCanceled ? 'Renew subscription' : 'Upgrade to Premium' }}</span>
+        </button>
         <p class="returned">30-day money-back guarantee • Cancel anytime</p>
       </div>
       <section class="everything-wrapper section">
@@ -215,31 +258,31 @@
           <v-expansion-panel-text>
             <v-table density="compact">
               <thead>
-              <tr>
-                <th class="text-left font-weight-semibold" style="font-size: 16px">
-                  Feature
-                </th>
-                <th class="text-center header-title">
-                  Free
-                </th>
-                <th class="text-center font-weight-semibold text-primary">
-                  Premium
-                </th>
-              </tr>
+                <tr>
+                  <th class="text-left font-weight-semibold" style="font-size: 16px">
+                    Feature
+                  </th>
+                  <th class="text-center header-title">
+                    Free
+                  </th>
+                  <th class="text-center font-weight-semibold text-primary">
+                    Premium
+                  </th>
+                </tr>
               </thead>
               <tbody>
-              <tr
-                v-for="(data, index) in tableData"
-                :key="index"
-              >
-                <td class="py-4 text-darken-4">{{ data.name }}</td>
-                <td>
-                  <div class="d-flex justify-center header-title font-weight-regular" v-html="data.free" />
-                </td>
-                <td>
-                  <div class="d-flex justify-center" v-html="data.premium" />
-                </td>
-              </tr>
+                <tr
+                  v-for="(data, index) in tableData"
+                  :key="index"
+                >
+                  <td class="py-4 text-darken-4">{{ data.name }}</td>
+                  <td>
+                    <div class="d-flex justify-center header-title font-weight-regular" v-html="data.free" />
+                  </td>
+                  <td>
+                    <div class="d-flex justify-center" v-html="data.premium" />
+                  </td>
+                </tr>
               </tbody>
             </v-table>
           </v-expansion-panel-text>
@@ -297,12 +340,34 @@
         <div class="title">What happens to my anonymous posts if I downgrade?</div>
         <p class="text-description">Your anonymous posts will remain anonymous, but you won't be able to create new ones without Premium.</p>
       </section>
-      <div class="trial">
+      <div v-if="!authStore.user?.hasUsedTrial && !isCanceled" class="trial">
         <h1>Try Premium free for 14 days</h1>
         <p>Unlock all premium features and explore the full experience. Cancel anytime during the trial.</p>
-        <button class="button" type="button" @click="handleTrialCheckout" :disabled="isSubscribing">
+        <button class="button" :disabled="isSubscribing" type="button" @click="handleTrialCheckout">
           {{ isSubscribing ? 'Starting...' : 'Start 14 days FREE trial' }}
         </button>
+      </div>
+    </template>
+
+    <template v-else>
+      <div class="premium-active-wrapper pt-10">
+        <h1 class="text-center font-weight-bold">👑 You're a Premium Member</h1>
+        <p class="text-center text-description mt-2">Thank you for supporting a safer space for growth.</p>
+
+        <div class="benefits-card section mx-auto mt-8">
+          <h3 class="text-center font-weight-bold mb-6">Your benefits</h3>
+          <ul class="benefits-list">
+            <li v-for="(item, index) in everything" :key="index" class="d-flex align-center justify-space-between py-3">
+              <span class="benefit-text">{{ item.text }}</span>
+              <span class="active-badge">Active</span>
+            </li>
+          </ul>
+          <div class="d-flex justify-center mt-8">
+            <button class="manage-btn" type="button" @click="manageSubscription">
+              <span>Manage subscription</span>
+            </button>
+          </div>
+        </div>
       </div>
     </template>
 

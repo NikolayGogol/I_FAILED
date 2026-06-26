@@ -330,4 +330,67 @@
       margin-top: 12px;
     }
   }
+
+  .premium-active-wrapper {
+    h1 {
+      font-size: 28px;
+      color: $color-text-primary;
+    }
+    
+    .text-description {
+      color: $color-text-secondary;
+      font-size: 16px;
+    }
+
+    .benefits-card {
+      max-width: 600px;
+      background-color: $color-surface;
+
+      h3 {
+        font-size: 20px;
+        color: $color-text-primary;
+      }
+
+      .benefits-list {
+        li {
+          border-bottom: 1px solid $color-border;
+          
+          &:last-of-type {
+            border-bottom: none;
+          }
+          
+          .benefit-text {
+            color: $color-text-primary;
+            font-size: 14px;
+            font-weight: 500;
+          }
+          
+          .active-badge {
+            background-color: #E8F5E9;
+            color: #2E7D32;
+            padding: 4px 12px;
+            border-radius: 40px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+          }
+        }
+      }
+      
+      .manage-btn {
+        background-color: transparent;
+        color: #D65A1F;
+        border: 1px solid #D65A1F;
+        padding: 10px 24px;
+        font-weight: 600;
+        font-size: 14px;
+        border-radius: $radius-md;
+        transition: all 0.3s;
+        
+        &:hover {
+          background-color: rgba(214, 90, 31, 0.05);
+        }
+      }
+    }
+  }
 }

@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router()
-const { createCheckout, webhook } = require('../controllers/paymentController')
+const { createCheckout, webhook, cancelSubscription, renewSubscription } = require('../controllers/paymentController')
 
 /**
  * @swagger
@@ -34,6 +34,48 @@ const { createCheckout, webhook } = require('../controllers/paymentController')
  *         description: Internal server error.
  */
 router.post('/create-checkout', createCheckout)
+
+/**
+ * @swagger
+ * /api/cancel-subscription:
+ *   post:
+ *     summary: Cancels a user's Stripe subscription.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               uid:
+ *                 type: string
+ *                 description: The user's unique ID.
+ *     responses:
+ *       200:
+ *         description: Subscription canceled successfully.
+ */
+router.post('/cancel-subscription', cancelSubscription)
+
+/**
+ * @swagger
+ * /api/renew-subscription:
+ *   post:
+ *     summary: Renews a canceled Stripe subscription.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               uid:
+ *                 type: string
+ *                 description: The user's unique ID.
+ *     responses:
+ *       200:
+ *         description: Subscription renewed successfully.
+ */
+router.post('/renew-subscription', renewSubscription)
 
 /**
  * @swagger

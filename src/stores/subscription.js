@@ -13,7 +13,7 @@ export const useSubscriptionStore = defineStore('subscription', () => {
    * @param {string} interval The plan interval ('monthly' or 'yearly')
    * @returns {Promise<boolean>} True if checkout URL was successfully retrieved, false otherwise.
    */
-  async function createCheckout (interval = 'monthly') {
+  async function createCheckout (interval = 'monthly', isTrial = false) {
     loading.value = true
     error.value = null
 
@@ -26,6 +26,7 @@ export const useSubscriptionStore = defineStore('subscription', () => {
       const response = await api.post('/create-checkout', {
         uid: user.uid,
         interval,
+        isTrial
       })
 
       if (response.data.checkoutUrl) {
@@ -44,9 +45,53 @@ export const useSubscriptionStore = defineStore('subscription', () => {
     }
   }
 
+  async function cancelSubscription () {
+    loading.value = true
+    error.value = null
+
+    try {
+      const user = authStore.user
+      if (!user || !user.uid) {
+        throw new Error('No authenticated user found.')
+      }
+
+      await api.post('/cancel-subscription', { uid: user.uid })
+      return true
+    } catch (error_) {
+      console.error('Error canceling subscription:', error_)
+      error.value = error_.response?.data?.message || error_.message || 'An unexpected error occurred.'
+      return false
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function renewSubscription (interval) {
+    loading.value = true
+    error.value = null
+
+    try {
+      const user = authStore.user
+      if (!user || !user.uid) {
+        throw new Error('No authenticated user found.')
+      }
+
+      await api.post('/renew-subscription', { uid: user.uid, interval })
+      return true
+    } catch (error_) {
+      console.error('Error renewing subscription:', error_)
+      error.value = error_.response?.data?.message || error_.message || 'An unexpected error occurred.'
+      return false
+    } finally {
+      loading.value = false
+    }
+  }
+
   return {
     loading,
     error,
     createCheckout,
+    cancelSubscription,
+    renewSubscription,
   }
 })

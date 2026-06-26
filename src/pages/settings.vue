@@ -21,7 +21,7 @@
   import { getIcon } from '@/models/icons.js'
   import '@/styles/pages/settings.scss'
 
-  const currentTabId = ref(window.innerWidth > 768 ? 'account-tabs' : '')
+  const route = useRoute()
   const { smAndDown } = useDisplay()
 
   const tabs = [
@@ -55,12 +55,12 @@
     //   icon: getIcon('protect', 20, 20),
     //   component: SecuritySettings,
     // },
-    // {
-    //   id: 'premium',
-    //   label: 'Premium',
-    //   icon: getIcon('premium', 20, 20),
-    //   component: PremiumSettings,
-    // },
+    {
+      id: 'premium',
+      label: 'Membership',
+      icon: getIcon('premium', 20, 20),
+      component: PremiumSettings,
+    },
     // {
     //   id: 'help',
     //   label: 'Help & About',
@@ -68,16 +68,14 @@
     //   component: HelpSettings,
     // },
   ]
-  const route = useRoute()
+
+  const currentTabId = ref(
+    route.query.tab ?? (window.innerWidth > 768 ? tabs[0].id : ''),
+  )
 
   const currentComponent = computed(() => {
-    if (route.query.tab) {
-      const tab = tabs.find(t => t.id === route.query.tab)
-      return tab ? tab.component : AccountSettings
-    } else {
-      const tab = tabs.find(t => t.id === currentTabId.value)
-      return tab ? tab.component : AccountSettings
-    }
+    const tab = tabs.find(t => t.id === currentTabId.value)
+    return tab ? tab.component : AccountSettings
   })
 </script>
 

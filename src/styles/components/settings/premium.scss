@@ -1,71 +1,153 @@
 @use "sass:color";
 @use '../../settings.scss' as *;
 
-.settings-section {
+.premium-settings-card {
   background-color: $color-surface;
   border: 1px solid $color-border;
   border-radius: $radius-lg;
-  padding: $spacing-lg;
+  padding: $spacing-xl;
 
-  h2 {
+  .title {
     font-size: 20px;
-    font-weight: bold;
+    font-weight: 700;
     color: $color-text-primary;
     margin-bottom: $spacing-lg;
-    padding-bottom: $spacing-md;
-    border-bottom: 1px solid $color-border;
   }
 
-  .setting-item {
+  .subscription-header {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    padding: $spacing-md 0;
-    border-bottom: 1px solid $color-border;
+    margin-bottom: $spacing-xl;
 
-    &:last-child {
-      border-bottom: none;
+    .logo-circle {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: 1px solid $color-border;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: $spacing-md;
+
+      .logo-f {
+        color: #D65A1F;
+        font-weight: 900;
+        font-size: 20px;
+      }
     }
 
-    label {
-      font-weight: bold;
-      color: $color-text-secondary;
-      width: 150px;
-    }
-
-    .value {
-      flex-grow: 1;
+    .subscription-name {
+      font-weight: 600;
       color: $color-text-primary;
-      font-weight: bold;
+      font-size: 16px;
     }
+  }
 
-    button {
-      padding: $spacing-xs $spacing-md;
-      border-radius: $radius-md;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background-color 0.2s;
-      font-size: 14px;
+  .details-list {
+    display: flex;
+    flex-direction: column;
 
-      &.upgrade-btn {
-        background-color: $color-accent-text;
-        color: $color-surface;
-        border: none;
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: $spacing-md 0;
+      border-bottom: 1px solid $color-border;
 
-        &:hover {
-          background-color: color.adjust($color-accent-text, $lightness: -10%);
-        }
+      .label {
+        color: $color-text-secondary;
+        font-size: 14px;
+        font-weight: 500;
       }
 
-      &.view-btn {
-        background-color: transparent;
-        border: 1px solid $color-border;
+      .value {
         color: $color-text-primary;
+        font-size: 14px;
+        font-weight: 600;
+      }
 
+      &.payment-method-row {
+        align-items: flex-start;
+
+        .method-info {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-end;
+
+          .card-details {
+            display: flex;
+            align-items: center;
+          }
+
+          .change-link {
+            color: #D65A1F;
+            font-size: 12px;
+            font-weight: 600;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            margin-top: 4px;
+
+            &:hover {
+              text-decoration: underline;
+            }
+          }
+        }
+      }
+
+      &.history-row {
+        cursor: pointer;
+        transition: background-color 0.2s;
+        
         &:hover {
-          background-color: $color-background;
+          background-color: rgba(0,0,0,0.02);
         }
       }
     }
+  }
+
+  .cancel-sub-btn {
+    margin-top: $spacing-xl;
+    padding: 10px 20px;
+    border: 1px solid #E53935;
+    color: #E53935;
+    background: transparent;
+    border-radius: $radius-md;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+      background-color: rgba(229, 57, 53, 0.05);
+    }
+  }
+
+  /* Free state styles */
+  .free-state {
+    .upgrade-btn {
+      background: #D65A1F;
+      background: linear-gradient(90deg, rgba(214, 90, 31, 1) 0%, rgba(206, 41, 19, 1) 100%);
+      color: $color-surface;
+      padding: 12px 24px;
+      font-weight: 600;
+      border-radius: $radius-md;
+      cursor: pointer;
+      border: none;
+      transition: opacity 0.2s;
+
+      &:hover {
+        opacity: 0.9;
+      }
+    }
+  }
+}
+
+/* Modal styles (placed outside the scoped wrapper to ensure they apply to the v-dialog content) */
+.cancel-modal-card {
+  .modal-benefits-list {
+    list-style: none;
+    padding-left: 0;
   }
 }

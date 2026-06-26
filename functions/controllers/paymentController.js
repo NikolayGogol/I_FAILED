@@ -28,7 +28,7 @@ exports.createCheckout = async (req, res) => {
   }
 
   try {
-    const { uid, interval } = req.body
+    const { uid, interval, isTrial } = req.body
 
     if (!uid) {
       return res.status(400).json({ message: 'Missing uid.' })
@@ -37,12 +37,10 @@ exports.createCheckout = async (req, res) => {
     const userRecord = await admin.auth().getUser(uid)
     const email = userRecord.email
 
-    const isTrial = interval === 'trial'
-    let priceId;
+    let priceId
     if (interval === 'yearly') {
       priceId = process.env.STRIPE_YEARLY_PRICE_ID
     } else {
-      // Use the monthly price for both 'monthly' and 'trial'
       priceId = process.env.STRIPE_MONTHLY_PRICE_ID
     }
 
@@ -56,6 +54,11 @@ exports.createCheckout = async (req, res) => {
     // Attempt to find if user already has a Stripe customer ID in Firestore
     const userDocRef = admin.firestore().collection('users').doc(uid)
     const userDoc = await userDocRef.get()
+    
+    if (isTrial && userDoc.data()?.hasUsedTrial) {
+      return res.status(403).json({ message: 'You have already used your free trial.' })
+    }
+
     let customerId = userDoc.data()?.stripeCustomerId
 
     // If no customer ID, create a new Stripe customer
@@ -111,6 +114,112 @@ exports.createCheckout = async (req, res) => {
   }
 }
 
+/**
+ * Cancels a user's subscription.
+ */
+exports.cancelSubscription = async (req, res) => {
+  const { uid } = req.body
+
+  if (!uid) {
+    return res.status(400).json({ message: 'Missing uid in request body.' })
+  }
+
+  try {
+    const userDoc = await admin.firestore().collection('users').doc(uid).get()
+    
+    if (!userDoc.exists) {
+      return res.status(404).json({ message: 'User not found.' })
+    }
+
+    const userData = userDoc.data()
+    const subscriptionId = userData.stripeSubscriptionId
+
+    if (!subscriptionId) {
+      return res.status(400).json({ message: 'User does not have an active Stripe subscription.' })
+    }
+
+    // Cancel the subscription at the end of the billing period
+    await stripe.subscriptions.update(subscriptionId, { cancel_at_period_end: true })
+
+    // Update Firestore to reflect the canceled state (user keeps premium until the end of the period)
+    await admin.firestore().collection('users').doc(uid).set({
+      isCanceled: true
+    }, { merge: true })
+
+    functions.logger.info(`Subscription ${subscriptionId} canceled for user ${uid}.`)
+    return res.status(200).json({ message: 'Subscription canceled successfully.' })
+
+  } catch (error) {
+    functions.logger.error('Error canceling subscription:', error.message)
+    return res.status(500).json({ message: 'Failed to cancel subscription.', error: error.message })
+  }
+}
+
+/**
+ * Renews a canceled (but still active) subscription.
+ */
+exports.renewSubscription = async (req, res) => {
+    const { uid, interval } = req.body
+    
+    if (!uid) {
+      return res.status(400).json({ message: 'Missing uid.' })
+    }
+
+    try {
+      const userDocRef = admin.firestore().collection('users').doc(uid)
+    const userDoc = await userDocRef.get()
+    
+    if (!userDoc.exists) {
+      return res.status(404).json({ message: 'User not found.' })
+    }
+
+    const userData = userDoc.data()
+    const subscriptionId = userData.stripeSubscriptionId
+
+    if (!subscriptionId) {
+      return res.status(400).json({ message: 'User does not have an active Stripe subscription.' })
+    }
+
+    const updateParams = { cancel_at_period_end: false }
+
+    if (interval) {
+      let priceId
+      if (interval === 'yearly') {
+        priceId = process.env.STRIPE_YEARLY_PRICE_ID
+      } else {
+        priceId = process.env.STRIPE_MONTHLY_PRICE_ID
+      }
+      
+      const subscription = await stripe.subscriptions.retrieve(subscriptionId)
+      if (subscription.items && subscription.items.data.length > 0) {
+        updateParams.items = [{
+          id: subscription.items.data[0].id,
+          price: priceId,
+        }]
+        updateParams.proration_behavior = 'create_prorations'
+        
+        if (subscription.status === 'trialing') {
+          updateParams.trial_end = 'now'
+        }
+      }
+    }
+
+    // Reactivate the subscription
+    await stripe.subscriptions.update(subscriptionId, updateParams)
+
+    await admin.firestore().collection('users').doc(uid).set({
+      isCanceled: false
+    }, { merge: true })
+
+    functions.logger.info(`Subscription ${subscriptionId} renewed for user ${uid}.`)
+    return res.status(200).json({ message: 'Subscription renewed successfully.' })
+
+  } catch (error) {
+    functions.logger.error('Error renewing subscription:', error.message)
+    return res.status(500).json({ message: 'Failed to renew subscription.', error: error.message })
+  }
+}
+
 const { FieldValue } = require('firebase-admin/firestore')
 
 /**
@@ -145,8 +254,10 @@ exports.webhook = async (req, res) => {
           const subscriptionId = session.subscription
           const customerId = session.customer
 
-          // Retrieve the subscription to get the metadata
-          const subscription = await stripe.subscriptions.retrieve(subscriptionId)
+          // Retrieve the subscription to get the metadata, expanding default_payment_method to get card details
+          const subscription = await stripe.subscriptions.retrieve(subscriptionId, {
+            expand: ['default_payment_method'],
+          })
           const userId = subscription.metadata.firebaseUID
 
           if (userId) {
@@ -155,13 +266,48 @@ exports.webhook = async (req, res) => {
             // current_period_end is a Unix timestamp in seconds
             const premiumUntil = new Date(subscription.current_period_end * 1000)
 
-            await userDocRef.set({
+            let planPrice = null
+            let planInterval = null
+            if (subscription.items?.data?.[0]?.price?.unit_amount) {
+              planPrice = `$${(subscription.items.data[0].price.unit_amount / 100).toFixed(2)}`
+              planInterval = subscription.items.data[0].plan?.interval || 'month'
+            }
+
+            let cardBrand = null
+            let cardLast4 = null
+            if (subscription.default_payment_method?.card) {
+              cardBrand = subscription.default_payment_method.card.brand
+              cardLast4 = subscription.default_payment_method.card.last4
+            } else {
+              const customer = await stripe.customers.retrieve(customerId, { expand: ['invoice_settings.default_payment_method'] })
+              if (customer.invoice_settings?.default_payment_method?.card) {
+                cardBrand = customer.invoice_settings.default_payment_method.card.brand
+                cardLast4 = customer.invoice_settings.default_payment_method.card.last4
+              }
+            }
+
+            const updateData = {
               isPremium: true,
               premiumSince,
               premiumUntil,
+              subscriptionStatus: subscription.status,
               stripeCustomerId: customerId,
               stripeSubscriptionId: subscriptionId,
-            }, { merge: true })
+              isCanceled: false,
+            }
+            if (subscription.status === 'trialing') {
+              updateData.hasUsedTrial = true
+            }
+            if (planPrice) updateData.planPrice = planPrice
+            if (planInterval) updateData.planInterval = planInterval
+            if (cardBrand) {
+              updateData.cardBrand = cardBrand
+            }
+            if (cardLast4) {
+              updateData.cardLast4 = cardLast4
+            }
+
+            await userDocRef.set(updateData, { merge: true })
             functions.logger.info(`User ${userId} subscribed successfully.`)
           } else {
             functions.logger.warn(`No firebaseUID found in metadata for subscription ${subscriptionId}`)
@@ -171,18 +317,55 @@ exports.webhook = async (req, res) => {
       }
 
       case 'customer.subscription.updated': {
-        const subscription = event.data.object
-        const userId = subscription.metadata.firebaseUID
+        const subscriptionEvent = event.data.object
+        const userId = subscriptionEvent.metadata.firebaseUID
 
         if (userId) {
           const userDocRef = admin.firestore().collection('users').doc(userId)
 
-          if (subscription.status === 'active' || subscription.status === 'trialing') {
+          if (subscriptionEvent.status === 'active' || subscriptionEvent.status === 'trialing') {
+            const subscription = await stripe.subscriptions.retrieve(subscriptionEvent.id, {
+              expand: ['default_payment_method'],
+            })
+
             const premiumUntil = new Date(subscription.current_period_end * 1000)
-            await userDocRef.set({
+
+            let planPrice = null
+            let planInterval = null
+            if (subscription.items?.data?.[0]?.price?.unit_amount) {
+              planPrice = `$${(subscription.items.data[0].price.unit_amount / 100).toFixed(2)}`
+              planInterval = subscription.items.data[0].plan?.interval || 'month'
+            }
+
+            let cardBrand = null
+            let cardLast4 = null
+            if (subscription.default_payment_method?.card) {
+              cardBrand = subscription.default_payment_method.card.brand
+              cardLast4 = subscription.default_payment_method.card.last4
+            } else {
+              const customer = await stripe.customers.retrieve(subscription.customer, { expand: ['invoice_settings.default_payment_method'] })
+              if (customer.invoice_settings?.default_payment_method?.card) {
+                cardBrand = customer.invoice_settings.default_payment_method.card.brand
+                cardLast4 = customer.invoice_settings.default_payment_method.card.last4
+              }
+            }
+
+            const updateData = {
               isPremium: true,
               premiumUntil,
-            }, { merge: true })
+              subscriptionStatus: subscription.status,
+              isCanceled: subscription.cancel_at_period_end === true
+            }
+            if (planPrice) updateData.planPrice = planPrice
+            if (planInterval) updateData.planInterval = planInterval
+            if (cardBrand) {
+              updateData.cardBrand = cardBrand
+            }
+            if (cardLast4) {
+              updateData.cardLast4 = cardLast4
+            }
+
+            await userDocRef.set(updateData, { merge: true })
             functions.logger.info(`Subscription updated for user ${userId}.`)
           } else if (subscription.status === 'canceled' || subscription.status === 'unpaid') {
             await userDocRef.set({
@@ -206,6 +389,7 @@ exports.webhook = async (req, res) => {
           await userDocRef.set({
             isPremium: false,
             premiumUntil: FieldValue.delete(),
+            isCanceled: FieldValue.delete(),
           }, { merge: true })
           functions.logger.info(`Subscription deleted for user ${userId}.`)
         }
@@ -218,12 +402,29 @@ exports.webhook = async (req, res) => {
         break
       }
 
-      case 'invoice.paid': {
+      case 'invoice.paid':
+      case 'invoice.payment_succeeded': {
         const invoice = event.data.object
         if (invoice.subscription) {
-          functions.logger.info(`Invoice paid for subscription ${invoice.subscription}.`)
-          // Note: Access is generally updated by 'customer.subscription.updated'
-          // because Stripe extends the subscription's 'current_period_end'.
+          functions.logger.info(`Invoice payment succeeded for subscription ${invoice.subscription}.`)
+          
+          const usersSnapshot = await admin.firestore().collection('users').where('stripeCustomerId', '==', invoice.customer).get()
+          if (!usersSnapshot.empty) {
+            const uid = usersSnapshot.docs[0].id
+            
+            await admin.firestore().collection('payments').add({
+              uid,
+              amount: invoice.amount_paid || 0,
+              currency: invoice.currency || 'usd',
+              status: invoice.status || 'paid',
+              createdAt: FieldValue.serverTimestamp(),
+              stripeInvoiceId: invoice.id || null,
+              stripeSubscriptionId: invoice.subscription || null,
+              hostedInvoiceUrl: invoice.hosted_invoice_url || null,
+              invoicePdf: invoice.invoice_pdf || null
+            })
+            functions.logger.info(`Payment history added for user ${uid}.`)
+          }
         }
         break
       }

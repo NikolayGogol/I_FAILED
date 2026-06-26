@@ -13,6 +13,8 @@ export const isPremium = computed(() => {
 export const premiumUntil = computed(() => {
   const authStore = useAuthStore()
   const dateStr = authStore.user?.premiumUntil
-  if (!dateStr) return null
+  if (!dateStr) {
+    return null
+  }
   return new Date(dateStr)
 })

@@ -69,7 +69,14 @@ exports.createUser = async (req, res) => {
     const verificationLink = `${verifyLinkBase}/verify-new-user?token=${verificationToken}`
 
     // Send the verification email to the user
-    await sendVerificationEmail(email, verificationLink)
+    try {
+      await sendVerificationEmail(email, verificationLink)
+    } catch (emailError) {
+      // If email fails, rollback the pending user creation
+      await pendingUserRef.delete()
+      logger.error('Failed to send verification email. Rolled back pending user creation.', emailError)
+      return res.status(500).json({ error: 'Failed to start registration', message: 'Failed to send email via SendGrid' })
+    }
 
     // Respond with success and the verification token
     return res.status(200).json({ status: 'success', message: 'Verification email sent.', verificationToken })
