@@ -127,10 +127,19 @@
     }
     isSubscribing.value = false
   }
+
+  async function handleTrialCheckout () {
+    isSubscribing.value = true
+    const success = await subscriptionStore.createCheckout('trial')
+    if (!success) {
+      toast.error(subscriptionStore.error || 'Failed to start trial.')
+    }
+    isSubscribing.value = false
+  }
 </script>
 <template>
   <div class="premium-page">
-    <template v-if="isPremium">
+    <template v-if="!isPremium">
       <PaymentModal
         :dialog="paymentDialog"
         :loading="isSubscribing"
@@ -161,7 +170,7 @@
           <div class="period">{{ selectedTab.period }}</div>
         </div>
         <div v-show="selectedTab?.billed" class="billed">{{ selectedTab.billed }}</div>
-        <button class="button" type="button" @click="openPaymentModal">Upgrade to Premium</button>
+        <button class="button" type="button" @click="openPaymentModal" :disabled="isSubscribing">Upgrade to Premium</button>
         <p class="returned">30-day money-back guarantee • Cancel anytime</p>
       </div>
       <section class="everything-wrapper section">
@@ -291,7 +300,9 @@
       <div class="trial">
         <h1>Try Premium free for 14 days</h1>
         <p>Unlock all premium features and explore the full experience. Cancel anytime during the trial.</p>
-        <button class="button" type="button">Start 14 days FREE trial</button>
+        <button class="button" type="button" @click="handleTrialCheckout" :disabled="isSubscribing">
+          {{ isSubscribing ? 'Starting...' : 'Start 14 days FREE trial' }}
+        </button>
       </div>
     </template>
 
