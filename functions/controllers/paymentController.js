@@ -37,9 +37,14 @@ exports.createCheckout = async (req, res) => {
     const userRecord = await admin.auth().getUser(uid)
     const email = userRecord.email
 
-    const priceId = interval === 'yearly'
-      ? process.env.STRIPE_YEARLY_PRICE_ID
-      : process.env.STRIPE_MONTHLY_PRICE_ID
+    const isTrial = interval === 'trial'
+    let priceId;
+    if (interval === 'yearly') {
+      priceId = process.env.STRIPE_YEARLY_PRICE_ID
+    } else {
+      // Use the monthly price for both 'monthly' and 'trial'
+      priceId = process.env.STRIPE_MONTHLY_PRICE_ID
+    }
 
     if (!priceId) {
       functions.logger.error(`Stripe price_id for interval '${interval}' is not configured.`)
@@ -70,7 +75,7 @@ exports.createCheckout = async (req, res) => {
     const successUrl = `${origin}/premium?success=true`
     const cancelUrl = `${origin}/premium?canceled=true`
 
-    const session = await stripe.checkout.sessions.create({
+    const sessionConfig = {
       payment_method_types: ['card'],
       mode: 'subscription',
       customer: customerId,
@@ -87,7 +92,14 @@ exports.createCheckout = async (req, res) => {
           firebaseUID: uid,
         },
       },
-    })
+    }
+
+    if (isTrial) {
+      // Add 14 days of free trial
+      sessionConfig.subscription_data.trial_period_days = 14
+    }
+
+    const session = await stripe.checkout.sessions.create(sessionConfig)
 
     functions.logger.info(`Checkout session created for user ${uid}.`)
     return res.status(200).json({

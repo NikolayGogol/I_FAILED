@@ -5,7 +5,6 @@ import { useAuthStore } from '@/stores/auth.js'
 
 export const useSubscriptionStore = defineStore('subscription', () => {
   const authStore = useAuthStore()
-
   const loading = ref(false)
   const error = ref(null)
 
