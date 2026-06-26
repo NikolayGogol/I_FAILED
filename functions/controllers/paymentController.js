@@ -210,7 +210,7 @@ exports.webhook = async (req, res) => {
         const invoice = event.data.object
         if (invoice.subscription) {
           functions.logger.info(`Invoice paid for subscription ${invoice.subscription}.`)
-          // Note: Access is generally updated by 'customer.subscription.updated' 
+          // Note: Access is generally updated by 'customer.subscription.updated'
           // because Stripe extends the subscription's 'current_period_end'.
         }
         break
