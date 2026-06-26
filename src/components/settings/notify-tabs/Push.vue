@@ -18,6 +18,7 @@
   })
 </script>
 
+
 <template>
   <div class="notify-tab">
     <div class="d-flex tab-header" @click="emit('back')">
