@@ -191,21 +191,21 @@
 
       <div class="user-main-info w-100">
         <!-- User name and edit button -->
-        <div class="user-name-row align-center justify-between">
-          <div class="d-flex align-center">
-            <h2>{{ displayName }}</h2>
+        <div class="user-name-row d-flex align-center justify-space-between w-100">
+          <div class="d-flex align-center" style="min-width: 0; flex: 1;">
+            <h2 class="text-truncate">{{ displayName }}</h2>
             <v-chip
               v-if="isPremium"
-              class="ml-3 font-weight-bold"
+              class="ml-3 font-weight-bold flex-shrink-0"
               color="primary"
               size="small"
               variant="flat"
             >✨ Premium</v-chip>
           </div>
-          <div class="d-flex">
+          <div class="d-flex flex-shrink-0 ml-4">
             <button v-if="isCurrentUser" class="cancel-btn" @click="openEditDialog">Edit profile</button>
+            <slot name="profile-actions" />
           </div>
-          <slot name="profile-actions" />
         </div>
         <!-- User handle -->
         <p class="user-email">{{ transformUsername(displayUser?.userName, displayName) }}</p>

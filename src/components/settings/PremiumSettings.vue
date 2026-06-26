@@ -62,7 +62,6 @@
 
   const subscriptionName = computed(() => {
     const status = authStore.user?.payment?.subscriptionStatus
-    console.log(authStore.user?.payment)
     if (status === 'trialing') {
       return 'Free Trial'
     } else if (authStore.user?.payment?.planInterval === 'year') {
@@ -70,7 +69,6 @@
     } else {
       return 'Monthly Premium'
     }
-    return ''
   })
 
   /**
