@@ -30,7 +30,7 @@
    * Confirms and processes the subscription cancellation.
    * Calls the backend to cancel the active Stripe subscription.
    */
-  async function confirmCancelSubscription() {
+  async function confirmCancelSubscription () {
     isCanceling.value = true
     const success = await subscriptionStore.cancelSubscription()
     isCanceling.value = false
@@ -47,7 +47,7 @@
    * Redirects the user to the premium page.
    * The user can select a plan (Monthly/Yearly) there before renewing.
    */
-  function handleRenewSubscription() {
+  function handleRenewSubscription () {
     router.push('/premium')
   }
 
@@ -138,8 +138,20 @@
         </div>
       </div>
 
-      <button v-if="isCanceled" class="submit-btn mt-6" style="padding: 10px 20px;" :class="{'opacity-60 pointer-events-none': isRenewing}" @click="handleRenewSubscription">
-        <v-progress-circular v-if="isRenewing" class="mr-2" indeterminate size="20" width="2" />
+      <button
+        v-if="isCanceled"
+        class="submit-btn mt-6"
+        :class="{'opacity-60 pointer-events-none': isRenewing}"
+        style="padding: 10px 20px;"
+        @click="handleRenewSubscription"
+      >
+        <v-progress-circular
+          v-if="isRenewing"
+          class="mr-2"
+          indeterminate
+          size="20"
+          width="2"
+        />
         <span v-else>Renew subscription</span>
       </button>
       <button v-else class="cancel-sub-btn" @click="showCancelModal = true">
@@ -165,7 +177,13 @@
             </v-col>
             <v-col cols="6">
               <button class="submit-btn w-100" :class="{'opacity-60 pointer-events-none': isCanceling}" @click="confirmCancelSubscription">
-                <v-progress-circular v-if="isCanceling" class="mr-2" indeterminate size="20" width="2" />
+                <v-progress-circular
+                  v-if="isCanceling"
+                  class="mr-2"
+                  indeterminate
+                  size="20"
+                  width="2"
+                />
                 <span v-else>Cancel subscription</span>
               </button>
             </v-col>

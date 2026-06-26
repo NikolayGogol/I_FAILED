@@ -26,7 +26,7 @@ export const useSubscriptionStore = defineStore('subscription', () => {
       const response = await api.post('/create-checkout', {
         uid: user.uid,
         interval,
-        isTrial
+        isTrial,
       })
 
       if (response.data.checkoutUrl) {

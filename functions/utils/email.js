@@ -1,5 +1,5 @@
-const sgMail = require('@sendgrid/mail')
 const { logger } = require('firebase-functions')
+const { Resend } = require('resend')
 const {
   colors,
   APP_NAME,
@@ -7,11 +7,15 @@ const {
   VERIFY_LINK,
 } = require('./constants')
 
+let resend = null
+
 function validateEnv () {
-  if (!process.env.EMAIL_USER || !process.env.SENDGRID_API_KEY) {
-    throw new Error('Missing environment variables for email sending.')
+  if (!process.env.EMAIL_USER || !process.env.RESEND_API_KEY) {
+    throw new Error('Missing environment variables for email sending (RESEND_API_KEY or EMAIL_USER).')
   }
-  sgMail.setApiKey(process.env.SENDGRID_API_KEY)
+  if (!resend) {
+    resend = new Resend(process.env.RESEND_API_KEY)
+  }
 }
 
 function renderMentionsInEmail (text) {
@@ -418,29 +422,24 @@ async function sendDigestEmail (email, totalPosts, categoryPostCounts, type) {
 }
 
 async function sendEmail ({ to, subject, html, text }) {
-  const msg = {
-    to,
-    from: {
-      email: process.env.EMAIL_USER,
-      name: APP_NAME,
-    },
-    subject,
-    text,
-    html,
-  }
-
   try {
-    await sgMail.send(msg)
-    logger.info(`Email sent to ${to}. Subject: ${subject}`)
-    return { success: true }
-  } catch (error) {
-    logger.error('SendGrid Error:', error)
+    const data = await resend.emails.send({
+      from: `${APP_NAME} <${process.env.EMAIL_USER}>`,
+      to: [to],
+      subject,
+      html,
+      text,
+    })
 
-    if (error.response) {
-      logger.error('SendGrid Response Body:', error.response.body)
+    if (data.error) {
+      throw new Error(data.error.message)
     }
 
-    throw new Error('Failed to send email via SendGrid')
+    logger.info(`Email sent via Resend to ${to}. Subject: ${subject}`)
+    return { success: true }
+  } catch (error) {
+    logger.error('Resend Error:', error)
+    throw new Error('Failed to send email via Resend')
   }
 }
 
