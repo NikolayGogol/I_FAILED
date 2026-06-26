@@ -70,7 +70,7 @@
   const displayName = computed(() => displayUser.value?.displayName || 'User')
   // Get the photo URL of the user
   const photoURL = computed(() => displayUser.value?.photoURL)
-  
+
   // Get the initials of the user for the avatar fallback
   const initials = computed(() => {
     const name = displayName.value

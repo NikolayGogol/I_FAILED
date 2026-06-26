@@ -4,9 +4,9 @@
   import { useRouter } from 'vue-router'
   import { useToast } from 'vue-toastification'
   import History from '@/components/settings/membership/History.vue'
+  import { getIcon } from '@/models/icons.js'
   import { useAuthStore } from '@/stores/auth.js'
   import { useSubscriptionStore } from '@/stores/subscription.js'
-  import {getIcon} from "@/models/icons.js";
 
   const router = useRouter()
   const authStore = useAuthStore()
@@ -95,7 +95,7 @@
     return null
   })
 
-  const planPrice = computed(() => authStore.user?.payment?.planPrice || '$9.99')
+  const planPrice = computed(() => authStore.user?.payment?.planPrice || 'N/A')
   const cardBrand = computed(() => {
     const brand = authStore.user?.payment?.cardBrand || 'Visa'
     return brand.charAt(0).toUpperCase() + brand.slice(1)
@@ -131,7 +131,7 @@
           <span class="label mb-0">Payment Method</span>
           <div class="method-info">
             <div class="card-details">
-              <div class="d-flex mr-2" v-html="getIcon('card')"></div>
+              <div class="d-flex mr-2" v-html="getIcon('card')" />
               <span class="value">{{ cardBrand }} **{{ cardLast4 }}</span>
             </div>
             <button class="change-link">Change</button>

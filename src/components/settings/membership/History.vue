@@ -1,6 +1,6 @@
 <script setup>
   import dayjs from 'dayjs'
-  import { computed, onMounted, ref } from 'vue'
+  import { computed, onMounted } from 'vue'
   import { useAuthStore } from '@/stores/auth.js'
   import { usePaymentStore } from '@/stores/payment.js'
 
@@ -23,10 +23,15 @@
 
   function formatDate (timestamp) {
     if (!timestamp) return ''
-    // Handle Firestore timestamp format { _seconds, _nanoseconds } or string
+    // Handle Firebase Client SDK Timestamp (has .seconds)
+    if (timestamp.seconds) {
+      return dayjs.unix(timestamp.seconds).format('DD.MM.YYYY')
+    }
+    // Handle Firebase Admin SDK serialized Timestamp (has ._seconds)
     if (timestamp._seconds) {
       return dayjs.unix(timestamp._seconds).format('DD.MM.YYYY')
     }
+    // Fallback for string dates (like ISO strings)
     return dayjs(timestamp).format('DD.MM.YYYY')
   }
 

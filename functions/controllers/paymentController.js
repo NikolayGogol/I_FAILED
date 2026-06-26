@@ -143,7 +143,7 @@ exports.cancelSubscription = async (req, res) => {
     await userDocRef.set({
       payment: {
         isCanceled: true,
-      }
+      },
     }, { merge: true })
 
     functions.logger.info(`Subscription ${subscriptionId} canceled for user ${uid}.`)
@@ -207,7 +207,7 @@ exports.renewSubscription = async (req, res) => {
     await userDocRef.set({
       payment: {
         isCanceled: false,
-      }
+      },
     }, { merge: true })
 
     functions.logger.info(`Subscription ${subscriptionId} renewed for user ${uid}.`)
@@ -261,6 +261,21 @@ exports.webhook = async (req, res) => {
 
           if (userId) {
             const userDocRef = admin.firestore().collection('users').doc(userId)
+
+            // Check for an existing active subscription
+            const userDoc = await userDocRef.get()
+            const existingSubscriptionId = userDoc.data()?.payment?.stripeSubscriptionId
+
+            // If the user already has a different subscription, cancel it immediately to prevent double billing
+            if (existingSubscriptionId && existingSubscriptionId !== subscriptionId) {
+              try {
+                await stripe.subscriptions.cancel(existingSubscriptionId)
+                functions.logger.info(`Automatically canceled old subscription ${existingSubscriptionId} for user ${userId} upon plan switch.`)
+              } catch (cancelError) {
+                functions.logger.error(`Failed to cancel old subscription ${existingSubscriptionId} for user ${userId}:`, cancelError)
+              }
+            }
+
             const premiumSince = FieldValue.serverTimestamp()
             // current_period_end is a Unix timestamp in seconds
             const premiumUntil = new Date(subscription.current_period_end * 1000)
@@ -380,7 +395,7 @@ exports.webhook = async (req, res) => {
               payment: {
                 isPremium: false,
                 premiumUntil: FieldValue.delete(),
-              }
+              },
             }, { merge: true })
             functions.logger.info(`Subscription deactivated for user ${userId}.`)
           }
@@ -402,7 +417,7 @@ exports.webhook = async (req, res) => {
               isPremium: false,
               premiumUntil: FieldValue.delete(),
               isCanceled: FieldValue.delete(),
-            }
+            },
           }, { merge: true })
           functions.logger.info(`Subscription deleted for user ${userId}.`)
         }
@@ -418,34 +433,43 @@ exports.webhook = async (req, res) => {
       case 'invoice.paid':
       case 'invoice.payment_succeeded': {
         const invoice = event.data.object
-        if (invoice.subscription) {
-          functions.logger.info(`Invoice payment succeeded for subscription ${invoice.subscription}.`)
+        functions.logger.info(`Invoice payment succeeded: ${invoice.id}, subscription: ${invoice.subscription}, customer: ${invoice.customer}`)
 
-          try {
-            // Retrieve the subscription to get the firebaseUID from metadata
+        try {
+          let uid = null
+
+          // Retrieve the subscription to get the firebaseUID from metadata
+          if (invoice.subscription) {
             const subscription = await stripe.subscriptions.retrieve(invoice.subscription)
-            const uid = subscription.metadata.firebaseUID
-
-            if (uid) {
-              const paymentsCollection = process.env.PAYMENTS_COLLECTION || 'payment_history'
-              await admin.firestore().collection(paymentsCollection).add({
-                uid,
-                amount: invoice.amount_paid || 0,
-                currency: invoice.currency || 'usd',
-                status: invoice.status || 'paid',
-                createdAt: FieldValue.serverTimestamp(),
-                stripeInvoiceId: invoice.id || null,
-                stripeSubscriptionId: invoice.subscription || null,
-                hostedInvoiceUrl: invoice.hosted_invoice_url || null,
-                invoicePdf: invoice.invoice_pdf || null,
-              })
-              functions.logger.info(`Payment history added for user ${uid}.`)
-            } else {
-              functions.logger.warn(`No firebaseUID found in metadata for subscription ${invoice.subscription} (Invoice ${invoice.id})`)
-            }
-          } catch (error) {
-            functions.logger.error(`Error processing invoice payment for ${invoice.id}:`, error)
+            uid = subscription.metadata?.firebaseUID
           }
+
+          // If no uid found on subscription, try customer metadata
+          if (!uid && invoice.customer) {
+            const customer = await stripe.customers.retrieve(invoice.customer)
+            uid = customer.metadata?.firebaseUID
+          }
+
+          if (uid) {
+            const paymentsCollection = process.env.PAYMENTS_COLLECTION
+            await admin.firestore().collection(paymentsCollection).doc(invoice.id).set({
+              uid,
+              // Use subtotal so the history reflects the plan price even if customer credit covered the cost
+              amount: invoice.subtotal || invoice.amount_paid,
+              currency: invoice.currency || 'usd',
+              status: invoice.status || 'paid',
+              createdAt: FieldValue.serverTimestamp(),
+              stripeInvoiceId: invoice.id || null,
+              stripeSubscriptionId: invoice.subscription || null,
+              hostedInvoiceUrl: invoice.hosted_invoice_url || null,
+              invoicePdf: invoice.invoice_pdf || null,
+            }, { merge: true })
+            functions.logger.info(`Payment history added for user ${uid}.`)
+          } else {
+            functions.logger.warn(`No firebaseUID found in metadata for invoice ${invoice.id}`)
+          }
+        } catch (error) {
+          functions.logger.error(`Error processing invoice payment for ${invoice.id}:`, error)
         }
         break
       }
@@ -490,17 +514,27 @@ exports.getPaymentHistory = async (req, res) => {
     const snapshot = await admin.firestore()
       .collection(paymentsCollection)
       .where('uid', '==', uid)
-      .orderBy('createdAt', 'desc')
       .get()
 
     if (snapshot.empty) {
       return res.status(200).json({ data: [] })
     }
 
-    const payments = snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-    }))
+    const payments = snapshot.docs.map(doc => {
+      const data = doc.data()
+      return {
+        id: doc.id,
+        ...data,
+        createdAt: data.createdAt ? data.createdAt.toDate().toISOString() : null,
+      }
+    })
+
+    // Sort by createdAt descending in memory to avoid Firestore composite index requirement
+    payments.sort((a, b) => {
+      const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0
+      const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0
+      return timeB - timeA
+    })
 
     return res.status(200).json({ data: payments })
   } catch (error) {

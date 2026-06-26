@@ -29,7 +29,7 @@
         <span class="text-h5 font-weight-bold">Upgrade to Premium</span>
       </v-card-title>
       <v-card-text class="text-center">
-        You will be redirected to Lemon Squeezy to complete your subscription securely.
+        You will be redirected to Stripe to complete your subscription securely.
       </v-card-text>
       <div class="d-flex justify-center mt-4">
         <div class="cancel-btn" @click="closeDialog">Cancel</div>
