@@ -1,5 +1,5 @@
-const { Resend } = require('resend')
 const { logger } = require('firebase-functions')
+const { Resend } = require('resend')
 const {
   colors,
   APP_NAME,
@@ -430,7 +430,7 @@ async function sendEmail ({ to, subject, html, text }) {
       html,
       text,
     })
-    
+
     if (data.error) {
       throw new Error(data.error.message)
     }

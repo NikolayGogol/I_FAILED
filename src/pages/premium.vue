@@ -12,8 +12,8 @@
   import { useToast } from 'vue-toastification'
   import PaymentModal from '@/components/modals/PaymentModal.vue'
   import { getIcon } from '@/models/icons.js'
-  import { useSubscriptionStore } from '@/stores/subscription.js'
   import { useAuthStore } from '@/stores/auth.js'
+  import { useSubscriptionStore } from '@/stores/subscription.js'
   import { isPremium } from '@/utils/premium.js'
 
   import '../styles/pages/premium.scss'
@@ -165,11 +165,6 @@
       toast.error(subscriptionStore.error || 'Failed to renew subscription')
     }
   }
-
-  function openRenewDialog () {
-    renewDialog.value = true
-  }
-
   function manageSubscription () {
     router.push({ path: '/settings', query: { tab: 'premium' } })
   }
@@ -211,7 +206,14 @@
         </div>
         <div v-show="selectedTab?.billed" class="billed">{{ selectedTab.billed }}</div>
         <button class="button" :disabled="isSubscribing || isRenewing" type="button" @click="isCanceled ? handleRenewSubscription() : openPaymentModal()">
-          <v-progress-circular v-if="isSubscribing || isRenewing" class="mr-2" indeterminate size="20" width="2" color="white"/>
+          <v-progress-circular
+            v-if="isSubscribing || isRenewing"
+            class="mr-2"
+            color="white"
+            indeterminate
+            size="20"
+            width="2"
+          />
           <span v-else>{{ isCanceled ? 'Renew subscription' : 'Upgrade to Premium' }}</span>
         </button>
         <p class="returned">30-day money-back guarantee • Cancel anytime</p>
