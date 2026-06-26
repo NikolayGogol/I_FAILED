@@ -1,30 +1,30 @@
 <script setup>
-import { onMounted } from 'vue'
-import { useActivityStore } from '@/stores/settings/activity'
-import { storeToRefs } from 'pinia'
+  import { storeToRefs } from 'pinia'
+  import { onMounted } from 'vue'
+  import { useActivityStore } from '@/stores/settings/activity'
 
-const emit = defineEmits(['back'])
-const radios = [
-  {
-    label: 'All users',
-    value: 'all',
-  },
-  {
-    label: 'Followers only',
-    value: 'followers',
-  },
-  {
-    label: 'Nobody',
-    value: 'nobody',
-  },
-]
+  const emit = defineEmits(['back'])
+  const radios = [
+    {
+      label: 'All users',
+      value: 'all',
+    },
+    {
+      label: 'Followers only',
+      value: 'followers',
+    },
+    {
+      label: 'Nobody',
+      value: 'nobody',
+    },
+  ]
 
-const activityStore = useActivityStore()
-const { selectedLikes, selectedComments } = storeToRefs(activityStore)
+  const activityStore = useActivityStore()
+  const { selectedLikes, selectedComments } = storeToRefs(activityStore)
 
-onMounted(() => {
-  activityStore.initializeActivitySettings()
-})
+  onMounted(() => {
+    activityStore.initializeActivitySettings()
+  })
 
 </script>
 
@@ -37,9 +37,9 @@ onMounted(() => {
     <h3 class="font-weight-bold mt-4">Who can see my likes?</h3>
     <v-radio-group
       v-model="selectedLikes"
-      @update:modelValue="activityStore.updateLikesVisibility"
       color="primary"
       hide-details
+      @update:model-value="activityStore.updateLikesVisibility"
     >
       <v-radio
         v-for="radio in radios"
@@ -51,9 +51,9 @@ onMounted(() => {
     <h3 class="font-weight-bold mt-4">Who can see my comments?</h3>
     <v-radio-group
       v-model="selectedComments"
-      @update:modelValue="activityStore.updateCommentsVisibility"
       color="primary"
       hide-details
+      @update:model-value="activityStore.updateCommentsVisibility"
     >
       <v-radio
         v-for="radio in radios"

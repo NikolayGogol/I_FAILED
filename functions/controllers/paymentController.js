@@ -1,26 +1,26 @@
-const LemonSqueezy = require('@lemonsqueezy/lemonsqueezy.js')
 const admin = require('firebase-admin')
 const functions = require('firebase-functions')
+const Stripe = require('stripe')
 
-const lemonSqueezySecretKey = functions.config().lemonsqueezy?.secret_key
-let lemonSqueezy = null
+const stripeSecretKey = process.env.STRIPE_SECRET_KEY
+let stripe = null
 
-if (lemonSqueezySecretKey) {
-  lemonSqueezy = new LemonSqueezy(lemonSqueezySecretKey)
-  functions.logger.info('Lemon Squeezy SDK initialized successfully.')
+if (stripeSecretKey) {
+  stripe = Stripe(stripeSecretKey)
+  functions.logger.info('Stripe initialized successfully.')
 } else {
   functions.logger.warn(
-    'Lemon Squeezy secret key is not configured. The payment processing service will be unavailable.',
+    'Stripe secret key is not configured. The payment processing service will be unavailable.',
   )
 }
 
 /**
- * Creates a Lemon Squeezy checkout URL for a user to subscribe to a premium plan.
+ * Creates a Stripe checkout URL for a user to subscribe to a premium plan.
  */
 exports.createCheckout = async (req, res) => {
-  if (!lemonSqueezy) {
+  if (!stripe) {
     functions.logger.error(
-      'Attempted to create a checkout, but Lemon Squeezy is not configured. Please set lemonsqueezy.secret_key in Firebase Functions config.',
+      'Attempted to create a checkout, but Stripe is not configured. Please set stripe.secret_key in Firebase Functions config.',
     )
     return res.status(503).json({
       message: 'The payment service is currently unavailable. Please try again later.',
@@ -28,7 +28,7 @@ exports.createCheckout = async (req, res) => {
   }
 
   try {
-    const { uid } = req.body
+    const { uid, interval } = req.body
 
     if (!uid) {
       return res.status(400).json({ message: 'Missing uid.' })
@@ -37,28 +37,61 @@ exports.createCheckout = async (req, res) => {
     const userRecord = await admin.auth().getUser(uid)
     const email = userRecord.email
 
-    const variantId = functions.config().lemonsqueezy?.premium_variant_id
-    if (!variantId) {
-      functions.logger.error('Lemon Squeezy premium_variant_id is not configured.')
+    const priceId = interval === 'yearly'
+      ? process.env.STRIPE_YEARLY_PRICE_ID
+      : process.env.STRIPE_MONTHLY_PRICE_ID
+
+    if (!priceId) {
+      functions.logger.error(`Stripe price_id for interval '${interval}' is not configured.`)
       return res.status(503).json({
-        message: 'The payment service is not fully configured (missing variant ID).',
+        message: 'The payment service is not fully configured (missing price ID).',
       })
     }
 
-    const checkout = await lemonSqueezy.createCheckout({
-      store: functions.config().lemonsqueezy?.store_id,
-      variant: variantId,
-      custom: {
-        user_id: uid,
-      },
-      checkout_data: {
+    // Attempt to find if user already has a Stripe customer ID in Firestore
+    const userDocRef = admin.firestore().collection('users').doc(uid)
+    const userDoc = await userDocRef.get()
+    let customerId = userDoc.data()?.stripeCustomerId
+
+    // If no customer ID, create a new Stripe customer
+    if (!customerId) {
+      const customer = await stripe.customers.create({
         email,
+        metadata: {
+          firebaseUID: uid,
+        },
+      })
+      customerId = customer.id
+      await userDocRef.set({ stripeCustomerId: customerId }, { merge: true })
+    }
+
+    // Default success/cancel URLs based on the origin or a default
+    const origin = req.headers.origin || 'http://localhost:5173'
+    const successUrl = `${origin}/premium?success=true`
+    const cancelUrl = `${origin}/premium?canceled=true`
+
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      mode: 'subscription',
+      customer: customerId,
+      line_items: [
+        {
+          price: priceId,
+          quantity: 1,
+        },
+      ],
+      success_url: successUrl,
+      cancel_url: cancelUrl,
+      subscription_data: {
+        metadata: {
+          firebaseUID: uid,
+        },
       },
     })
 
-    functions.logger.info(`Checkout created for user ${uid}.`)
+    functions.logger.info(`Checkout session created for user ${uid}.`)
     return res.status(200).json({
-      checkoutUrl: checkout.url,
+      checkoutUrl: session.url,
     })
   } catch (error) {
     functions.logger.error('Error creating checkout:', error)
@@ -66,47 +99,115 @@ exports.createCheckout = async (req, res) => {
   }
 }
 
+const { FieldValue } = require('firebase-admin/firestore')
+
 /**
- * Handles Lemon Squeezy webhooks to update user subscription status.
+ * Handles Stripe webhooks to update user subscription status.
  */
 exports.webhook = async (req, res) => {
-  // This part will be more complex. I need to handle different webhook events.
-  // For now, I will just log the request and return 200.
-  functions.logger.info('Lemon Squeezy webhook received.')
-  // I need to verify the webhook signature here.
-  // I will add that later.
+  const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET
+  let event
 
-  const { event_name, data } = req.body
-
-  if (event_name === 'subscription_created' || event_name === 'subscription_payment_success') {
-    const userId = data.attributes.custom_data?.user_id
-    const customerId = data.attributes.customer_id
-    const subscriptionId = data.id
-
-    if (userId) {
-      const userDocRef = admin.firestore().collection('users').doc(userId)
-      const premiumSince = admin.firestore.FieldValue.serverTimestamp()
-      const premiumUntil = new Date(data.attributes.renews_at)
-
-      await userDocRef.update({
-        isPremium: true,
-        premiumSince,
-        premiumUntil,
-        lemonSqueezyCustomerId: customerId,
-        lemonSqueezySubscriptionId: subscriptionId,
-      })
-      functions.logger.info(`User ${userId} subscribed successfully.`)
+  if (endpointSecret) {
+    // Get the signature from the headers
+    const signature = req.headers['stripe-signature']
+    try {
+      // Use req.rawBody provided by Firebase Functions
+      event = stripe.webhooks.constructEvent(req.rawBody, signature, endpointSecret)
+    } catch (error) {
+      functions.logger.error(`Webhook signature verification failed: ${error.message}`)
+      return res.status(400).send(`Webhook Error: ${error.message}`)
     }
-  } else if (event_name === 'subscription_cancelled' || event_name === 'subscription_expired') {
-    const userId = data.attributes.custom_data?.user_id
-    if (userId) {
-      const userDocRef = admin.firestore().collection('users').doc(userId)
-      await userDocRef.update({
-        isPremium: false,
-        premiumUntil: admin.firestore.FieldValue.delete(),
-      })
-      functions.logger.info(`Subscription for user ${userId} cancelled or expired.`)
+  } else {
+    // Fallback if no endpoint secret is configured (not recommended for production)
+    event = req.body
+  }
+
+  functions.logger.info(`Stripe webhook received: ${event.type}`)
+
+  try {
+    switch (event.type) {
+      case 'checkout.session.completed': {
+        const session = event.data.object
+        if (session.mode === 'subscription') {
+          const subscriptionId = session.subscription
+          const customerId = session.customer
+
+          // Retrieve the subscription to get the metadata
+          const subscription = await stripe.subscriptions.retrieve(subscriptionId)
+          const userId = subscription.metadata.firebaseUID
+
+          if (userId) {
+            const userDocRef = admin.firestore().collection('users').doc(userId)
+            const premiumSince = FieldValue.serverTimestamp()
+            // current_period_end is a Unix timestamp in seconds
+            const premiumUntil = new Date(subscription.current_period_end * 1000)
+
+            await userDocRef.set({
+              isPremium: true,
+              premiumSince,
+              premiumUntil,
+              stripeCustomerId: customerId,
+              stripeSubscriptionId: subscriptionId,
+            }, { merge: true })
+            functions.logger.info(`User ${userId} subscribed successfully.`)
+          } else {
+            functions.logger.warn(`No firebaseUID found in metadata for subscription ${subscriptionId}`)
+          }
+        }
+        break
+      }
+
+      case 'customer.subscription.updated': {
+        const subscription = event.data.object
+        const userId = subscription.metadata.firebaseUID
+
+        if (userId) {
+          const userDocRef = admin.firestore().collection('users').doc(userId)
+
+          if (subscription.status === 'active' || subscription.status === 'trialing') {
+            const premiumUntil = new Date(subscription.current_period_end * 1000)
+            await userDocRef.set({
+              isPremium: true,
+              premiumUntil,
+            }, { merge: true })
+            functions.logger.info(`Subscription updated for user ${userId}.`)
+          } else if (subscription.status === 'canceled' || subscription.status === 'unpaid') {
+            await userDocRef.set({
+              isPremium: false,
+              premiumUntil: FieldValue.delete(),
+            }, { merge: true })
+            functions.logger.info(`Subscription deactivated for user ${userId}.`)
+          }
+        } else {
+          functions.logger.warn(`No firebaseUID found in metadata for updated subscription ${subscription.id}`)
+        }
+        break
+      }
+
+      case 'customer.subscription.deleted': {
+        const subscription = event.data.object
+        const userId = subscription.metadata.firebaseUID
+
+        if (userId) {
+          const userDocRef = admin.firestore().collection('users').doc(userId)
+          await userDocRef.set({
+            isPremium: false,
+            premiumUntil: FieldValue.delete(),
+          }, { merge: true })
+          functions.logger.info(`Subscription deleted for user ${userId}.`)
+        }
+        break
+      }
+
+      default: {
+        // Unhandled event type
+        break
+      }
     }
+  } catch (error) {
+    functions.logger.error('Error handling webhook event:', error.message, error.stack)
+    return res.status(500).send(`Internal Server Error: ${error.message}`)
   }
 
   res.sendStatus(200)

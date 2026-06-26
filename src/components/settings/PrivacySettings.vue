@@ -1,7 +1,7 @@
 <script setup>
   import { ref } from 'vue'
-  import Visibility from '@/components/settings/privacy-tabs/Visibility.vue'
   import Activity from '@/components/settings/privacy-tabs/Activity.vue'
+  import Visibility from '@/components/settings/privacy-tabs/Visibility.vue'
   import { getIcon } from '@/models/icons.js'
   import '../../styles/components/settings/privacy.scss'
   const list = [

@@ -97,7 +97,19 @@
   // Get the number of users the user is following
   const followingCount = computed(() => displayUser.value?.following?.length || 0)
 
+  // Premium status
+  const isPremium = computed(() => displayUser.value?.isPremium)
+  const premiumUntilDate = computed(() => {
+    if (displayUser.value?.premiumUntil) {
+      const seconds = displayUser.value.premiumUntil.seconds
+      if (seconds) return dayjs.unix(seconds).format('MMMM D, YYYY')
+      return dayjs(displayUser.value.premiumUntil).format('MMMM D, YYYY')
+    }
+    return null
+  })
+
   // =================================================================================================
+
   // Lifecycle Hooks
   // =================================================================================================
   // Fetch user activity if no user is passed as a prop
@@ -180,7 +192,16 @@
       <div class="user-main-info w-100">
         <!-- User name and edit button -->
         <div class="user-name-row align-center justify-between">
-          <h2>{{ displayName }}</h2>
+          <div class="d-flex align-center">
+            <h2>{{ displayName }}</h2>
+            <v-chip
+              v-if="isPremium"
+              class="ml-3 font-weight-bold"
+              color="primary"
+              size="small"
+              variant="flat"
+            >✨ Premium</v-chip>
+          </div>
           <div class="d-flex">
             <button v-if="isCurrentUser" class="cancel-btn" @click="openEditDialog">Edit profile</button>
           </div>
@@ -196,6 +217,10 @@
         <div class="user-meta d-flex align-center">
           <div class="d-flex mr-1" v-html="getIcon('calendar', 20, 20)" />
           <span class="join-date">Joined {{ joinDate }}</span>
+        </div>
+        <div v-if="isPremium && premiumUntilDate" class="user-meta d-flex align-center mt-1">
+          <v-icon class="mr-1" color="primary" icon="mdi-star" size="20" />
+          <span class="join-date text-primary">Premium valid until {{ premiumUntilDate }}</span>
         </div>
 
         <!-- User stats -->
@@ -226,7 +251,16 @@
             <span v-else>{{ initials }}</span>
           </div>
           <div class="user-name-row">
-            <h2>{{ displayName }}</h2>
+            <div class="d-flex align-center">
+              <h2>{{ displayName }}</h2>
+              <v-chip
+                v-if="isPremium"
+                class="ml-2 font-weight-bold"
+                color="primary"
+                size="x-small"
+                variant="flat"
+              >✨ Premium</v-chip>
+            </div>
             <p class="user-email">@{{ displayName.replaceAll(' ', '_') }}</p>
           </div>
         </div>
@@ -244,6 +278,10 @@
       <div class="user-meta d-flex align-center my-3">
         <div class="d-flex mr-1" v-html="getIcon('calendar', 20, 20)" />
         <span class="join-date">Joined {{ joinDate }}</span>
+      </div>
+      <div v-if="isPremium && premiumUntilDate" class="user-meta d-flex align-center mb-3">
+        <v-icon class="mr-1" color="primary" icon="mdi-star" size="20" />
+        <span class="join-date text-primary">Premium valid until {{ premiumUntilDate }}</span>
       </div>
       <div class="user-stats">
         <span><strong>{{ followersCount }}</strong> followers</span>

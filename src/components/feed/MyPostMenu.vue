@@ -1,9 +1,9 @@
 <script setup>
-import {computed, ref} from 'vue'
+  import { computed, ref } from 'vue'
   import { useRouter } from 'vue-router'
   import { useToast } from 'vue-toastification'
+  import { useDisplay } from 'vuetify'
   import { usePostStore } from '@/stores/profile/post.js'
-import {useDisplay} from "vuetify";
 
   const props = defineProps({
     post: {
@@ -47,7 +47,14 @@ import {useDisplay} from "vuetify";
   <div>
     <v-menu open-on-hover>
       <template #activator="{ props: menuProps }">
-        <v-btn icon size="small" class="ml-2 ml-sm-0" :density="buttonDensity" v-bind="menuProps" variant="text">
+        <v-btn
+          class="ml-2 ml-sm-0"
+          :density="buttonDensity"
+          icon
+          size="small"
+          v-bind="menuProps"
+          variant="text"
+        >
           <v-icon>mdi-dots-horizontal</v-icon>
         </v-btn>
       </template>

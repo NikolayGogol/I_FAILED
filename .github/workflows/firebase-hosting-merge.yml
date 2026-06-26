@@ -80,6 +80,10 @@ jobs:
           echo "POST_PASSWORD_RESET=${{ vars.POST_PASSWORD_RESET }}" >> functions/.env
           echo "NOTIFICATION_COLLECTION=${{ vars.NOTIFICATION_COLLECTION }}" >> functions/.env
           echo "STATISTIC_COLLECTION=${{ vars.STATISTIC_COLLECTION }}" >> functions/.env
+          echo "STRIPE_SEKRET_KEY=${{ vars.STRIPE_SEKRET_KEY }}" >> functions/.env
+          echo "STRIPE_WEBHOOK_SECRET=${{ vars.STRIPE_WEBHOOK_SECRET }}" >> functions/.env
+          echo "STRIPE_MONTHLY_PRICE_ID=${{ vars.STRIPE_MONTHLY_PRICE_ID }}" >> functions/.env
+          echo "STRIPE_YEARLY_PRICE_ID=${{ vars.STRIPE_YEARLY_PRICE_ID }}" >> functions/.env
 
       - name: Install Function Dependencies
         run: cd functions && npm ci

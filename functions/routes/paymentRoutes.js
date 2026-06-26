@@ -6,10 +6,10 @@ const { createCheckout, webhook } = require('../controllers/paymentController')
  * @swagger
  * /api/create-checkout:
  *   post:
- *     summary: Creates a new Lemon Squeezy checkout for a user.
+ *     summary: Creates a new Stripe checkout for a user.
  *     description: |
  *       This endpoint handles the creation of a premium checkout.
- *       It requires the user's UID.
+ *       It requires the user's UID and the plan interval.
  *     requestBody:
  *       required: true
  *       content:
@@ -21,6 +21,10 @@ const { createCheckout, webhook } = require('../controllers/paymentController')
  *                 type: string
  *                 description: The user's unique ID.
  *                 example: 'some-firebase-uid'
+ *               interval:
+ *                 type: string
+ *                 description: The plan interval (monthly or yearly).
+ *                 example: 'yearly'
  *     responses:
  *       200:
  *         description: Checkout URL created successfully.
@@ -35,9 +39,9 @@ router.post('/create-checkout', createCheckout)
  * @swagger
  * /api/webhook:
  *   post:
- *     summary: Handles Lemon Squeezy webhooks.
+ *     summary: Handles Stripe webhooks.
  *     description: |
- *       This endpoint receives webhooks from Lemon Squeezy to update subscription statuses.
+ *       This endpoint receives webhooks from Stripe to update subscription statuses.
  */
 router.post('/webhook', webhook)
 

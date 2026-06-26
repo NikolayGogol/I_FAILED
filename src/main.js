@@ -6,7 +6,6 @@
 
 // Composables
 import { createApp } from 'vue'
-
 import Toast, { POSITION } from 'vue-toastification'
 
 // Plugins

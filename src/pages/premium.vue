@@ -119,7 +119,7 @@
 
   async function handlePaymentConfirm () {
     isSubscribing.value = true
-    const success = await subscriptionStore.createCheckout()
+    const success = await subscriptionStore.createCheckout(selectedTab.value.value)
     if (!success) {
       toast.error(subscriptionStore.error || 'Failed to process payment.')
       paymentDialog.value = false

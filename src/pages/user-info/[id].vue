@@ -18,12 +18,12 @@
   import AboutAccountModal from '@/components/profile/AboutAccountModal.vue'
   import Activity from '@/components/profile/Activity.vue'
   import UserCard from '@/components/profile/UserCard.vue'
+  import { getIcon } from '@/models/icons.js'
   import { useAuthStore } from '@/stores/auth.js'
   import { usePostMenuStore } from '@/stores/profile/post-menu.js'
   import { useProfileStore } from '@/stores/profile/profile.js'
   import { useUserInfoStore } from '@/stores/user-info.js'
   import '@/styles/pages/profile.scss'
-  import {getIcon} from "@/models/icons.js";
 
   // =================================================================================================
   // Stores & Hooks
@@ -257,7 +257,7 @@
         </template>
       </UserCard>
       <!-- User's content feed -->
-      <div class="content-feed" v-if="!isPrivateContent">
+      <div v-if="!isPrivateContent" class="content-feed">
         <!-- Tabs for posts and activity -->
         <nav class="user-tabs">
           <button
@@ -291,8 +291,8 @@
         <!-- Activity tab content -->
         <activity v-if="activeTabIndex === 1" :user-id="userId" />
       </div>
-      <div class="private-content-warning d-flex flex-column align-center" v-else>
-        <div class="icon" v-html="getIcon('lock', 40, 40)"></div>
+      <div v-else class="private-content-warning d-flex flex-column align-center">
+        <div class="icon" v-html="getIcon('lock', 40, 40)" />
         <h4>This account is private</h4>
         <p class="text-description">Follow this account to see their posts</p>
       </div>

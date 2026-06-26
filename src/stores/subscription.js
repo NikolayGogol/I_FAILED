@@ -11,9 +11,10 @@ export const useSubscriptionStore = defineStore('subscription', () => {
 
   /**
    * Creates a new premium checkout for the current user.
+   * @param {string} interval The plan interval ('monthly' or 'yearly')
    * @returns {Promise<boolean>} True if checkout URL was successfully retrieved, false otherwise.
    */
-  async function createCheckout () {
+  async function createCheckout (interval = 'monthly') {
     loading.value = true
     error.value = null
 
@@ -25,6 +26,7 @@ export const useSubscriptionStore = defineStore('subscription', () => {
 
       const response = await api.post('/create-checkout', {
         uid: user.uid,
+        interval,
       })
 
       if (response.data.checkoutUrl) {

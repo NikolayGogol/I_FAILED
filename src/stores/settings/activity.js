@@ -10,11 +10,11 @@ export const useActivityStore = defineStore('activity', () => {
   const selectedComments = ref('all')
   const isLoading = ref(false)
 
-  function setLoading(value) {
+  function setLoading (value) {
     isLoading.value = value
   }
 
-  async function initializeActivitySettings() {
+  async function initializeActivitySettings () {
     const authStore = useAuthStore()
     if (!authStore.user) {
       return
@@ -36,7 +36,7 @@ export const useActivityStore = defineStore('activity', () => {
     }
   }
 
-  async function updateLikesVisibility(value) {
+  async function updateLikesVisibility (value) {
     const authStore = useAuthStore()
     if (!authStore.user) {
       return
@@ -54,7 +54,7 @@ export const useActivityStore = defineStore('activity', () => {
     }
   }
 
-  async function updateCommentsVisibility(value) {
+  async function updateCommentsVisibility (value) {
     const authStore = useAuthStore()
     if (!authStore.user) {
       return
