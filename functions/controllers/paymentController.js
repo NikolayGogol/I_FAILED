@@ -391,13 +391,21 @@ exports.webhook = async (req, res) => {
             functions.logger.info(`Subscription updated for user ${userId}.`)
             // eslint-disable-next-line
           } else if (subscription.status === 'canceled' || subscription.status === 'unpaid') {
-            await userDocRef.set({
-              payment: {
-                isPremium: false,
-                premiumUntil: FieldValue.delete(),
-              },
-            }, { merge: true })
-            functions.logger.info(`Subscription deactivated for user ${userId}.`)
+            const userDoc = await userDocRef.get()
+            const currentSubId = userDoc.data()?.payment?.stripeSubscriptionId
+            // eslint-disable-next-line
+            if (currentSubId === subscription.id) {
+              await userDocRef.set({
+                payment: {
+                  isPremium: false,
+                  premiumUntil: FieldValue.delete(),
+                },
+              }, { merge: true })
+              functions.logger.info(`Subscription deactivated for user ${userId}.`)
+            } else {
+              // eslint-disable-next-line
+              functions.logger.info(`Ignored deactivation for old subscription ${subscription.id} (user ${userId} has new sub ${currentSubId}).`)
+            }
           }
         } else {
           // eslint-disable-next-line
@@ -412,14 +420,21 @@ exports.webhook = async (req, res) => {
 
         if (userId) {
           const userDocRef = admin.firestore().collection('users').doc(userId)
-          await userDocRef.set({
-            payment: {
-              isPremium: false,
-              premiumUntil: FieldValue.delete(),
-              isCanceled: FieldValue.delete(),
-            },
-          }, { merge: true })
-          functions.logger.info(`Subscription deleted for user ${userId}.`)
+          const userDoc = await userDocRef.get()
+          const currentSubId = userDoc.data()?.payment?.stripeSubscriptionId
+
+          if (currentSubId === subscription.id) {
+            await userDocRef.set({
+              payment: {
+                isPremium: false,
+                premiumUntil: FieldValue.delete(),
+                isCanceled: FieldValue.delete(),
+              },
+            }, { merge: true })
+            functions.logger.info(`Subscription deleted for user ${userId}.`)
+          } else {
+            functions.logger.info(`Ignored deletion for old subscription ${subscription.id} (user ${userId} has new sub ${currentSubId}).`)
+          }
         }
         break
       }

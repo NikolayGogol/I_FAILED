@@ -34,7 +34,6 @@
   const paymentDialog = ref(false)
   const isSubscribing = ref(false)
   const isRenewing = ref(false)
-  const renewDialog = ref(false)
 
   const tabs = [
     {
@@ -155,14 +154,12 @@
 
   async function handleRenewSubscription () {
     isRenewing.value = true
-    const success = await subscriptionStore.renewSubscription(selectedTab.value.value)
+    // User requested to force a brand new subscription instead of silently renewing the old one.
+    const success = await subscriptionStore.createCheckout(selectedTab.value.value)
     isRenewing.value = false
 
-    if (success) {
-      renewDialog.value = false
-      toast.success('Subscription renewed successfully')
-    } else {
-      toast.error(subscriptionStore.error || 'Failed to renew subscription')
+    if (!success) {
+      toast.error(subscriptionStore.error || 'Failed to start checkout')
     }
   }
   function manageSubscription () {
@@ -214,7 +211,7 @@
             size="20"
             width="2"
           />
-          <span v-else>{{ isCanceled ? 'Renew subscription' : 'Upgrade to Premium' }}</span>
+          <span v-else>Upgrade to Premium</span>
         </button>
         <p class="returned">30-day money-back guarantee • Cancel anytime</p>
       </div>

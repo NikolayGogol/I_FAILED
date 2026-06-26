@@ -7,6 +7,7 @@
   import { getIcon } from '@/models/icons.js'
   import { useAuthStore } from '@/stores/auth.js'
   import { useSubscriptionStore } from '@/stores/subscription.js'
+  import { isPremium } from '@/utils/premium.js'
 
   const router = useRouter()
   const authStore = useAuthStore()
@@ -61,21 +62,16 @@
 
   const subscriptionName = computed(() => {
     const status = authStore.user?.payment?.subscriptionStatus
-    const interval = authStore.user?.payment?.planInterval
-
-    if (interval === 'year') {
-      return status === 'trialing' ? 'Yearly Subscription (Trial)' : 'Yearly Subscription'
-    } else if (interval === 'month') {
-      return status === 'trialing' ? 'Monthly Subscription (Trial)' : 'Monthly Subscription'
+    console.log(authStore.user?.payment)
+    if (status === 'trialing') {
+      return 'Free Trial'
+    } else if (authStore.user?.payment?.planInterval === 'year') {
+      return 'Yearly Premium'
+    } else {
+      return 'Monthly Premium'
     }
-
-    return status === 'trialing' ? 'Free Trial' : 'Monthly Subscription'
+    return ''
   })
-
-  /**
-   * Checks if the user is currently on a premium plan.
-   */
-  const isPremium = computed(() => authStore.user?.payment?.isPremium)
 
   /**
    * Checks if the user has canceled their premium subscription.
@@ -94,8 +90,9 @@
     }
     return null
   })
-
-  const planPrice = computed(() => authStore.user?.payment?.planPrice || 'N/A')
+  const planPrice = computed(() => {
+    return authStore.user?.payment?.subscriptionStatus === 'trialing' ? '$0.00' : authStore.user?.payment?.planPrice
+  })
   const cardBrand = computed(() => {
     const brand = authStore.user?.payment?.cardBrand || 'Visa'
     return brand.charAt(0).toUpperCase() + brand.slice(1)
