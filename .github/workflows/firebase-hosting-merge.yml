@@ -10,7 +10,7 @@ on:
 jobs:
   build_frontend:
     runs-on: ubuntu-latest
-    environment: .env.production
+    environment: .env
     steps:
       - uses: actions/checkout@v4
 
@@ -19,7 +19,7 @@ jobs:
         with:
           node-version: 20
 
-      - name: Create Frontend .env.production file
+      - name: Create Frontend .env file
         run: |
           echo "VITE_FIREBASE_API_KEY=${{ vars.VITE_FIREBASE_API_KEY }}" > .env
           echo "VITE_FIREBASE_AUTH_DOMAIN=${{ vars.VITE_FIREBASE_AUTH_DOMAIN }}" >> .env
@@ -51,7 +51,7 @@ jobs:
   deploy:
     needs: build_frontend
     runs-on: ubuntu-latest
-    environment: .env.production
+    environment: .env-functions
     steps:
       - uses: actions/checkout@v4
 
@@ -66,7 +66,7 @@ jobs:
         with:
           node-version: 20
 
-      - name: Create Functions .env.production file
+      - name: Create Functions .env file
         run: |
           mkdir -p functions
           echo "EMAIL_USER=${{ vars.EMAIL_USER }}" > functions/.env
