@@ -46,6 +46,7 @@ declare module 'vue' {
     HelpSettings: typeof import('./src/components/settings/HelpSettings.vue')['default']
     HiddenPosts: typeof import('./src/components/settings/content-activity-tabs/HiddenPosts.vue')['default']
     HidenPosts: typeof import('./src/components/settings/content-activity-tabs/hiden-posts.vue')['default']
+    History: typeof import('./src/components/settings/membership/History.vue')['default']
     ImgComment: typeof import('./src/components/ImgComment.vue')['default']
     Info: typeof import('./src/components/settings/account-tabs/Info.vue')['default']
     LatestTab: typeof import('./src/components/feed/tabs/LatestTab.vue')['default']

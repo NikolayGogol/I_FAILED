@@ -3,6 +3,7 @@
   import { computed, ref } from 'vue'
   import { useRouter } from 'vue-router'
   import { useToast } from 'vue-toastification'
+  import History from '@/components/settings/membership/History.vue'
   import { useAuthStore } from '@/stores/auth.js'
   import { useSubscriptionStore } from '@/stores/subscription.js'
 
@@ -14,6 +15,7 @@
   const showSuccessModal = ref(false)
   const isCanceling = ref(false)
   const isRenewing = ref(false)
+  const activeTab = ref(0)
 
   const everything = [
     { text: 'Advanced analytics on your failures' },
@@ -98,10 +100,12 @@
     return brand.charAt(0).toUpperCase() + brand.slice(1)
   })
   const cardLast4 = computed(() => authStore.user?.cardLast4 || '****')
+
 </script>
 
 <template>
-  <div class="premium-settings-card">
+
+  <div v-if="!activeTab" class="premium-settings-card">
     <template v-if="isPremium">
       <h2 class="title">Membership details</h2>
 
@@ -132,7 +136,7 @@
             <button class="change-link">Change</button>
           </div>
         </div>
-        <div class="detail-row history-row">
+        <div class="detail-row history-row" @click="activeTab = 1">
           <span class="label mb-0">Payment history</span>
           <v-icon color="grey-lighten-1" icon="mdi-chevron-right" />
         </div>
@@ -200,7 +204,6 @@
         </v-card>
       </v-dialog>
     </template>
-
     <template v-else>
       <div class="free-state">
         <h2 class="title mb-4">Premium</h2>
@@ -209,6 +212,7 @@
       </div>
     </template>
   </div>
+  <History v-if="activeTab === 1" @back="activeTab = 0" />
 </template>
 
 <style scoped lang="scss">
