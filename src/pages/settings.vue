@@ -121,7 +121,7 @@
                 <li
                   v-for="tab in tabs"
                   :key="tab.id"
-                  class="menu-item d-flex align-center"
+                  class="menu-item d-flex align-center mb-2"
                   :class="{ active: currentTabId === tab.id }"
                   @click="currentTabId = tab.id"
                 >
