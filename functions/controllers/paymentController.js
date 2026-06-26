@@ -449,10 +449,46 @@ exports.webhook = async (req, res) => {
         break
       }
     }
+
+    res.json({ received: true })
   } catch (error) {
     functions.logger.error('Error handling webhook event:', error.message, error.stack)
-    return res.status(500).send(`Internal Server Error: ${error.message}`)
+    return res.status(400).send(`Webhook Error: ${error.message}`)
   }
+}
 
-  res.sendStatus(200)
+/**
+ * Get payment history for a user
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object.
+ */
+exports.getPaymentHistory = async (req, res) => {
+  try {
+    const { uid } = req.params
+
+    if (!uid) {
+      return res.status(400).json({ error: 'Missing uid parameter.' })
+    }
+
+    const paymentsCollection = process.env.PAYMENTS_COLLECTION || 'payment_history'
+    const snapshot = await admin.firestore()
+      .collection(paymentsCollection)
+      .where('uid', '==', uid)
+      .orderBy('createdAt', 'desc')
+      .get()
+
+    if (snapshot.empty) {
+      return res.status(200).json({ data: [] })
+    }
+
+    const payments = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+    }))
+
+    return res.status(200).json({ data: payments })
+  } catch (error) {
+    functions.logger.error('Error fetching payment history:', error)
+    return res.status(500).json({ error: 'Failed to fetch payment history.' })
+  }
 }

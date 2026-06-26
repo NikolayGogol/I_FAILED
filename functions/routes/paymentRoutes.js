@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router()
-const { createCheckout, webhook, cancelSubscription, renewSubscription } = require('../controllers/paymentController')
+const { createCheckout, webhook, cancelSubscription, renewSubscription, getPaymentHistory } = require('../controllers/paymentController')
 
 /**
  * @swagger
@@ -86,5 +86,27 @@ router.post('/renew-subscription', renewSubscription)
  *       This endpoint receives webhooks from Stripe to update subscription statuses.
  */
 router.post('/webhook', webhook)
+
+/**
+ * @swagger
+ * /api/payment-history/{uid}:
+ *   get:
+ *     summary: Retrieves payment history for a specific user.
+ *     parameters:
+ *       - in: path
+ *         name: uid
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The user's unique ID.
+ *     responses:
+ *       200:
+ *         description: A list of payment history records.
+ *       400:
+ *         description: Missing uid parameter.
+ *       500:
+ *         description: Internal server error.
+ */
+router.get('/payment-history/:uid', getPaymentHistory)
 
 module.exports = router
