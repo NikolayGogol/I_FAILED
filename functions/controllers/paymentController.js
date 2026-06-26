@@ -200,6 +200,32 @@ exports.webhook = async (req, res) => {
         break
       }
 
+      case 'customer.updated': {
+        const customer = event.data.object
+        functions.logger.info(`Customer ${customer.id} was updated.`)
+        break
+      }
+
+      case 'invoice.paid': {
+        const invoice = event.data.object
+        if (invoice.subscription) {
+          functions.logger.info(`Invoice paid for subscription ${invoice.subscription}.`)
+          // Note: Access is generally updated by 'customer.subscription.updated' 
+          // because Stripe extends the subscription's 'current_period_end'.
+        }
+        break
+      }
+
+      case 'invoice.payment_failed': {
+        const invoice = event.data.object
+        if (invoice.subscription) {
+          functions.logger.warn(`Payment failed for invoice ${invoice.id}, subscription ${invoice.subscription}.`)
+          // Note: Stripe will automatically transition the subscription to 'past_due' or 'unpaid'
+          // which will trigger 'customer.subscription.updated' to remove premium access.
+        }
+        break
+      }
+
       default: {
         // Unhandled event type
         break
