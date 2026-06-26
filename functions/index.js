@@ -2,7 +2,7 @@ const cors = require('cors')
 const express = require('express')
 const admin = require('firebase-admin')
 const { onRequest } = require('firebase-functions/v2/https')
-require('dotenv').config() // Load environment variables from .env
+require('dotenv').config() // Load environment variables from .env.local.local
 
 // Initialize Firebase Admin FIRST
 admin.initializeApp()
