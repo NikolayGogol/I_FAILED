@@ -27,20 +27,14 @@ exports.createUser = async (req, res) => {
       const userRecord = await admin.auth().getUserByEmail(email)
       if (userRecord) {
         logger.warn(`Registration attempt for existing email: ${email}`)
-        return res.status(409).json({ error: 'User already exists', message: 'The email address is already in use by another account-tabs.' })
+        return res.status(409).json({ error: 'User already exists', message: 'The email address is already in use by another account.' })
       }
     } catch (error) {
-      // If error.code is 'auth/user-not-found', it means the user does NOT exist, which is good.
-      // If it's any other error, we should probably stop.
       if (error.code !== 'auth/user-not-found') {
         logger.error('Error checking user existence:', error)
         return res.status(500).json({ error: 'Internal Server Error', message: 'Failed to validate user existence.' })
       }
     }
-
-    // 2. CHECK IF USER ALREADY HAS A PENDING REGISTRATION (Optional but recommended)
-    // You might want to prevent spamming verification emails.
-    // For now, we proceed to create a new pending request which overwrites or adds to the collection.
 
     // Generate a secure, random token for email verification
     const verificationToken = crypto.randomBytes(32).toString('hex')
@@ -49,15 +43,13 @@ exports.createUser = async (req, res) => {
     const expiresAtDate = new Date()
     expiresAtDate.setHours(expiresAtDate.getHours() + 24)
 
-    // Create a reference to the pending user document in Firestore
-    // Using a default collection name if the environment variable is not set
     const pendingUsersCollection = process.env.PENDING_USERS || 'pending_users'
     const pendingUserRef = db.collection(pendingUsersCollection).doc(verificationToken)
 
     // Store the user's data in the pending users collection
     await pendingUserRef.set({
       email,
-      password, // Note: Storing passwords in plaintext is not recommended for production. Consider a more secure flow.
+      password,
       displayName,
       whyJoining,
       expiresAt: Timestamp.fromDate(expiresAtDate),
@@ -75,7 +67,7 @@ exports.createUser = async (req, res) => {
       // If email fails, rollback the pending user creation
       await pendingUserRef.delete()
       logger.error('Failed to send verification email. Rolled back pending user creation.', emailError)
-      return res.status(500).json({ error: 'Failed to start registration', message: 'Failed to send email via SendGrid' })
+      return res.status(500).json({ error: 'Failed to start registration', message: 'Failed to send email via Resend' })
     }
 
     // Respond with success and the verification token
