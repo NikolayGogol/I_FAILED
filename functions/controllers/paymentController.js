@@ -416,7 +416,8 @@ exports.webhook = async (req, res) => {
           if (!usersSnapshot.empty) {
             const uid = usersSnapshot.docs[0].id
 
-            await admin.firestore().collection('payments').add({
+            const paymentsCollection = process.env.PAYMENTS_COLLECTION || 'payment_history'
+            await admin.firestore().collection(paymentsCollection).add({
               uid,
               amount: invoice.amount_paid || 0,
               currency: invoice.currency || 'usd',

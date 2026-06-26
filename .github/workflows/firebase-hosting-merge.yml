@@ -84,6 +84,7 @@ jobs:
           echo "STRIPE_WEBHOOK_SECRET=${{ vars.STRIPE_WEBHOOK_SECRET }}" >> functions/.env
           echo "STRIPE_MONTHLY_PRICE_ID=${{ vars.STRIPE_MONTHLY_PRICE_ID }}" >> functions/.env
           echo "STRIPE_YEARLY_PRICE_ID=${{ vars.STRIPE_YEARLY_PRICE_ID }}" >> functions/.env
+          echo "PAYMENTS_COLLECTION=${{ vars.PAYMENTS_COLLECTION }}" >> functions/.env
 
       - name: Install Function Dependencies
         run: cd functions && npm ci

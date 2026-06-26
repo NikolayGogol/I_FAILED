@@ -72,8 +72,10 @@ This project is built with [Vuetify](https://vuetifyjs.com/en/), a UI Library wi
 - [Becoming a sponsor on Patreon](https://www.patreon.com/vuetify)
 - [Becoming a subscriber on Tidelift](https://tidelift.com/subscription/npm/vuetify)
 - [Making a one-time donation with Paypal](https://paypal.me/vuetify)
+- run stripe locally: stripe listen --forward-to http://127.0.0.1:5001/ifailed-25dab/us-central1/api/webhook
 
 ## 📑 License
 [MIT](http://opensource.org/licenses/MIT)
+
 
 Copyright (c) 2016-present Vuetify, LLC
