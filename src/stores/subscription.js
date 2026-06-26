@@ -87,11 +87,41 @@ export const useSubscriptionStore = defineStore('subscription', () => {
     }
   }
 
+  async function openCustomerPortal () {
+    loading.value = true
+    error.value = null
+
+    try {
+      const user = authStore.user
+      if (!user || !user.uid) {
+        throw new Error('No authenticated user found.')
+      }
+
+      const response = await api.post('/customer-portal', { uid: user.uid })
+
+      if (response.data.url) {
+        window.location.href = response.data.url
+        return true
+      } else {
+        error.value = response.data.message || 'Failed to open portal.'
+        return false
+      }
+    } catch (error_) {
+      console.error('Error opening portal:', error_)
+      error.value = error_.response?.data?.message || error_.message || 'An unexpected error occurred.'
+      return false
+    } finally {
+      loading.value = false
+    }
+  }
+
   return {
     loading,
     error,
     createCheckout,
     cancelSubscription,
     renewSubscription,
+    openCustomerPortal,
   }
 })
+

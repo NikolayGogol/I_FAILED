@@ -16,8 +16,8 @@
   const showCancelModal = ref(false)
   const showSuccessModal = ref(false)
   const isCanceling = ref(false)
-  const isRenewing = ref(false)
   const activeTab = ref(0)
+  const isOpeningPortal = ref(false)
 
   const everything = [
     { text: 'Advanced analytics on your failures' },
@@ -53,6 +53,15 @@
    */
   function handleRenewSubscription () {
     router.push('/premium')
+  }
+
+  async function handleOpenPortal () {
+    isOpeningPortal.value = true
+    const success = await subscriptionStore.openCustomerPortal()
+    isOpeningPortal.value = false
+    if (!success) {
+      toast.error(subscriptionStore.error || 'Failed to open billing portal')
+    }
   }
 
   /**
@@ -129,7 +138,10 @@
               <div class="d-flex mr-2" v-html="getIcon('card')" />
               <span class="value">{{ cardBrand }} **{{ cardLast4 }}</span>
             </div>
-            <button class="change-link">Change</button>
+            <button class="change-link" :disabled="subscriptionStore.loading" @click="handleOpenPortal">
+              <v-progress-circular v-if="isOpeningPortal" class="mr-2" indeterminate size="12" width="2" />
+              <span v-else>Change</span>
+            </button>
           </div>
         </div>
         <div class="detail-row history-row" @click="activeTab = 1">

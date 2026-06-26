@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router()
-const { createCheckout, webhook, cancelSubscription, renewSubscription, getPaymentHistory } = require('../controllers/paymentController')
+const { createCheckout, webhook, cancelSubscription, renewSubscription, getPaymentHistory, createCustomerPortal } = require('../controllers/paymentController')
 
 /**
  * @swagger
@@ -76,6 +76,27 @@ router.post('/cancel-subscription', cancelSubscription)
  *         description: Subscription renewed successfully.
  */
 router.post('/renew-subscription', renewSubscription)
+
+/**
+ * @swagger
+ * /api/customer-portal:
+ *   post:
+ *     summary: Creates a Stripe Customer Portal session.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               uid:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Portal URL created successfully.
+ */
+router.post('/customer-portal', createCustomerPortal)
+
 
 /**
  * @swagger
