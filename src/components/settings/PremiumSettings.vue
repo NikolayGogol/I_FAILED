@@ -6,6 +6,7 @@
   import History from '@/components/settings/membership/History.vue'
   import { useAuthStore } from '@/stores/auth.js'
   import { useSubscriptionStore } from '@/stores/subscription.js'
+  import {getIcon} from "@/models/icons.js";
 
   const router = useRouter()
   const authStore = useAuthStore()
@@ -59,8 +60,8 @@
    */
 
   const subscriptionName = computed(() => {
-    const status = authStore.user?.subscriptionStatus
-    const interval = authStore.user?.planInterval
+    const status = authStore.user?.payment?.subscriptionStatus
+    const interval = authStore.user?.payment?.planInterval
 
     if (interval === 'year') {
       return status === 'trialing' ? 'Yearly Subscription (Trial)' : 'Yearly Subscription'
@@ -74,32 +75,32 @@
   /**
    * Checks if the user is currently on a premium plan.
    */
-  const isPremium = computed(() => authStore.user?.isPremium)
+  const isPremium = computed(() => authStore.user?.payment?.isPremium)
 
   /**
    * Checks if the user has canceled their premium subscription.
    * A canceled subscription remains active until the end of the billing period.
    */
-  const isCanceled = computed(() => authStore.user?.isCanceled === true)
+  const isCanceled = computed(() => authStore.user?.payment?.isCanceled === true)
 
   /**
    * Formats the date of the next payment or expiration.
    */
   const premiumUntilDate = computed(() => {
-    if (authStore.user?.premiumUntil) {
-      const seconds = authStore.user.premiumUntil.seconds
+    if (authStore.user?.payment?.premiumUntil) {
+      const seconds = authStore.user.payment.premiumUntil.seconds
       if (seconds) return dayjs.unix(seconds).format('DD.MM.YYYY')
-      return dayjs(authStore.user.premiumUntil).format('DD.MM.YYYY')
+      return dayjs(authStore.user.payment.premiumUntil).format('DD.MM.YYYY')
     }
     return null
   })
 
-  const planPrice = computed(() => authStore.user?.planPrice || '$9.99')
+  const planPrice = computed(() => authStore.user?.payment?.planPrice || '$9.99')
   const cardBrand = computed(() => {
-    const brand = authStore.user?.cardBrand || 'Visa'
+    const brand = authStore.user?.payment?.cardBrand || 'Visa'
     return brand.charAt(0).toUpperCase() + brand.slice(1)
   })
-  const cardLast4 = computed(() => authStore.user?.cardLast4 || '****')
+  const cardLast4 = computed(() => authStore.user?.payment?.cardLast4 || '****')
 
 </script>
 
@@ -130,7 +131,7 @@
           <span class="label mb-0">Payment Method</span>
           <div class="method-info">
             <div class="card-details">
-              <v-icon class="mr-2" color="grey-darken-3" icon="mdi-credit-card-outline" size="20" />
+              <div class="d-flex mr-2" v-html="getIcon('card')"></div>
               <span class="value">{{ cardBrand }} **{{ cardLast4 }}</span>
             </div>
             <button class="change-link">Change</button>

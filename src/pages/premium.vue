@@ -20,10 +20,10 @@
 
   const authStore = useAuthStore()
   const subscriptionStore = useSubscriptionStore()
-  const isCanceled = computed(() => authStore.user?.isCanceled === true)
+  const isCanceled = computed(() => authStore.user?.payment?.isCanceled === true)
   const premiumUntilDate = computed(() => {
-    if (authStore.user?.premiumUntil) {
-      const seconds = authStore.user.premiumUntil.seconds
+    if (authStore.user?.payment?.premiumUntil) {
+      const seconds = authStore.user.payment.premiumUntil.seconds
       if (seconds) return dayjs.unix(seconds).format('DD.MM.YYYY')
     }
     return ''
@@ -342,7 +342,7 @@
         <div class="title">What happens to my anonymous posts if I downgrade?</div>
         <p class="text-description">Your anonymous posts will remain anonymous, but you won't be able to create new ones without Premium.</p>
       </section>
-      <div v-if="!authStore.user?.hasUsedTrial && !isCanceled" class="trial">
+      <div v-if="!authStore.user?.payment?.hasUsedTrial && !isCanceled" class="trial">
         <h1>Try Premium free for 14 days</h1>
         <p>Unlock all premium features and explore the full experience. Cancel anytime during the trial.</p>
         <button class="button" :disabled="isSubscribing" type="button" @click="handleTrialCheckout">

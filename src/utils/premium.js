@@ -7,12 +7,12 @@ import { useAuthStore } from '@/stores/auth'
  */
 export const isPremium = computed(() => {
   const authStore = useAuthStore()
-  return !!authStore.user?.isPremium
+  return !!authStore.user?.payment?.isPremium
 })
 
 export const premiumUntil = computed(() => {
   const authStore = useAuthStore()
-  const dateStr = authStore.user?.premiumUntil
+  const dateStr = authStore.user?.payment?.premiumUntil
   if (!dateStr) {
     return null
   }

@@ -9,11 +9,11 @@
   const paymentStore = usePaymentStore()
 
   const cardBrand = computed(() => {
-    const brand = authStore.user?.cardBrand || 'Visa'
+    const brand = authStore.user?.payment?.cardBrand || 'Visa'
     return brand.charAt(0).toUpperCase() + brand.slice(1)
   })
 
-  const cardLast4 = computed(() => authStore.user?.cardLast4 || '****')
+  const cardLast4 = computed(() => authStore.user?.payment?.cardLast4 || '****')
 
   onMounted(() => {
     if (authStore.user?.uid) {

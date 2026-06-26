@@ -70,6 +70,7 @@
   const displayName = computed(() => displayUser.value?.displayName || 'User')
   // Get the photo URL of the user
   const photoURL = computed(() => displayUser.value?.photoURL)
+  
   // Get the initials of the user for the avatar fallback
   const initials = computed(() => {
     const name = displayName.value
@@ -78,6 +79,7 @@
     if (parts.length === 1) return parts[0].charAt(0).toUpperCase()
     return (parts[0].charAt(0) + (parts[1]?.charAt(0) || '')).toUpperCase()
   })
+
   const failureAgeStore = useFailureAgeStore()
 
   // Format the join date of the user
@@ -98,17 +100,15 @@
   const followingCount = computed(() => displayUser.value?.following?.length || 0)
 
   // Premium status
-  const isPremium = computed(() => displayUser.value?.isPremium)
+  const isPremium = computed(() => displayUser.value?.payment?.isPremium)
   const premiumUntilDate = computed(() => {
-    if (displayUser.value?.premiumUntil) {
-      const seconds = displayUser.value.premiumUntil.seconds
+    if (displayUser.value?.payment?.premiumUntil) {
+      const seconds = displayUser.value.payment.premiumUntil.seconds
       if (seconds) return dayjs.unix(seconds).format('MMMM D, YYYY')
-      return dayjs(displayUser.value.premiumUntil).format('MMMM D, YYYY')
+      return dayjs(displayUser.value.payment.premiumUntil).format('MMMM D, YYYY')
     }
     return null
   })
-
-  // =================================================================================================
 
   // Lifecycle Hooks
   // =================================================================================================
