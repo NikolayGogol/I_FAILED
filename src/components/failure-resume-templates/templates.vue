@@ -1,5 +1,5 @@
 <script setup>
-  import { defineAsyncComponent, shallowRef, computed, onMounted, watch } from 'vue'
+  import { computed, defineAsyncComponent, onMounted, shallowRef, watch } from 'vue'
   import { useAuthStore } from '@/stores/auth.js'
   import { isPremium } from '@/utils/premium.js'
   import defaultTemplate from '../../assets/templates/defaultTemplate.jpg'
@@ -26,8 +26,8 @@
     },
     readOnly: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   })
 
   const activeUser = computed(() => props.displayUser || user)
@@ -86,7 +86,7 @@
     }
   })
 
-  watch(() => props.initialTemplate, (newVal) => {
+  watch(() => props.initialTemplate, newVal => {
     if (newVal !== null) {
       const template = templatesList.find(t => t.value == newVal)
       if (template) {

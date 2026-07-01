@@ -10,14 +10,17 @@
 <script setup>
   import { computed, markRaw, onBeforeMount, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
+  import { useDisplay } from 'vuetify/framework'
   import Discover from '@/components/explore/tabs/Discover.vue'
   import Result from '@/components/explore/tabs/Result.vue'
   import Trending from '@/components/explore/tabs/Trending.vue'
   import Filter from '@/components/feed/Filter.vue'
+  import MobileSlide from '@/components/MobileSlide.vue'
   import { getIcon } from '@/models/icons.js'
   import { useResultsStore } from '@/stores/explore/results.js'
   import { useFilterStore } from '@/stores/main/filter.js'
   import '@/styles/pages/explore.scss'
+  const { smAndDown } = useDisplay()
 
   //
   const tabs = reactive([
@@ -154,7 +157,7 @@
         <v-icon v-else icon="mdi-filter-variant" @click="toggleFilter" />
       </div>
     </div>
-    <v-slide-y-transition>
+    <v-slide-y-transition v-if="!smAndDown">
       <Filter
         v-if="isFilterPanel"
         :refresh-feed="false"
@@ -162,6 +165,16 @@
         @close="isFilterPanel = false"
       />
     </v-slide-y-transition>
+    <template v-else>
+      <MobileSlide v-model="isFilterPanel">
+        <Filter
+          v-if="isFilterPanel"
+          :refresh-feed="false"
+          @apply="applyFilters"
+          @close="isFilterPanel = false"
+        />
+      </MobileSlide>
+    </template>
     <div class="feed-tabs">
       <button
         v-for="tab in tabs"

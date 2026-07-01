@@ -80,29 +80,31 @@
       <div v-for="(post, index) in posts" :key="post.id" class="post">
         <div class="d-flex align-center">
           <div class="position" :style="{ color: colors[index] }">#{{ index+1 }}</div>
-          <div class="d-block ml-6 w-100">
+          <div class="d-block ml-sm-6 w-100">
             <div class="d-flex">
+              <div class="position mr-2 d-block d-sm-none" :style="{ color: colors[index] }">#{{ index+1 }}</div>
               <v-img
                 v-if="post.user?.photoURL"
                 :alt="post.user?.displayName"
-                class="user-avatar"
+                class="user-avatar flex-shrink-0"
                 cover
                 :src="post.user?.photoURL"
               />
-              <div v-else class="avatar" :style="{ backgroundColor: getRandomColor() }">
+              <div v-else class="avatar flex-shrink-0" :style="{ backgroundColor: getRandomColor() }">
                 {{ getInitials(post.user.displayName) }}
               </div>
-              <div class="user-info ml-4 w-100">
+              <div class="user-info ml-4 w-100" style="min-width: 0;">
                 <div class="d-flex align-center justify-space-between w-100">
-                  <div class="d-flex align-center">
-                    <p>{{ post.user.displayName }}</p>
-                    <div class="time ml-2">• {{ timeTransformAgo(post.createdAt) }}</div>
+                  <div class="d-flex align-center" style="min-width: 0; flex: 1;">
+                    <p class="text-truncate">{{ post.user.displayName }}</p>
+                    <div class="time ml-2 flex-shrink-0 text-no-wrap">• {{ timeTransformAgo(post.createdAt) }}</div>
                   </div>
-                  <div class="tag">{{ post.selectedCategories[0].label }}</div>
+                  <div class="tag d-none sm:d-block ml-2 flex-shrink-0">{{ post.selectedCategories[0].label }}</div>
                 </div>
-                <p class="text-description">{{ transformUsername(post.user.userName, post.user.displayName) }}</p>
+                <p class="text-description text-truncate">{{ transformUsername(post.user.userName, post.user.displayName) }}</p>
               </div>
             </div>
+            <div class="tag d-sm-none mt-4 d-inline-block">{{ post.selectedCategories[0].label }}</div>
             <div class="title">{{ post.title }}</div>
             <div class="d-flex footer-panel">
               <div class="d-flex mr-4">
@@ -138,11 +140,11 @@
               <v-img
                 v-if="post.user?.photoURL"
                 :alt="post.user?.displayName"
-                class="user-avatar"
+                class="user-avatar flex-shrink-0"
                 cover
                 :src="post.user?.photoURL"
               />
-              <div v-else class="avatar" :style="{ backgroundColor: getRandomColor() }">
+              <div v-else class="avatar flex-shrink-0" :style="{ backgroundColor: getRandomColor() }">
                 {{ getInitials(post.user.displayName) }}
               </div>
               <div class="user-info ml-4 w-100">

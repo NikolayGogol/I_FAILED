@@ -2,6 +2,15 @@
 @use '../global/fonts' as *;
 
 .explore-page {
+  @include media-down($breakpoint-sm) {
+    padding: 15px;
+    h1 {
+      margin-left: 0 !important;
+      font-weight: 600 !important;
+      font-size: 20px;
+    }
+  }
+
   .feed-tabs {
     display: flex;
     border-bottom: 1px solid $color-border;
@@ -58,6 +67,9 @@
   }
 
   .search-panel {
+    @include media-down($breakpoint-sm) {
+      width: 83% !important;
+    }
     .search-icon {
       top: 50%;
       left: 20px;
@@ -90,6 +102,12 @@
         &:hover {
           background-color: $color-background;
         }
+      }
+    }
+
+    + .submit-btn {
+      @include media-down($breakpoint-sm) {
+        display: none;
       }
     }
   }
@@ -132,6 +150,9 @@
           width: 50px;
           font-size: 24px;
           font-weight: 700;
+          @include media-down($breakpoint-sm) {
+            display: none;
+          }
         }
 
         .user-avatar {

@@ -9,14 +9,14 @@
 <script setup>
   import { storeToRefs } from 'pinia'
   import { computed, nextTick, onBeforeMount, onMounted, provide, ref } from 'vue'
+  import { useRoute } from 'vue-router'
   import { useToast } from 'vue-toastification'
   import Templates from '@/components/failure-resume-templates/templates.vue'
   import { recoveryTimeOptions } from '@/models/categories.js'
   import { getIcon } from '@/models/icons.js'
-  import { useRoute } from 'vue-router'
   import { useAuthStore } from '@/stores/auth.js'
-  import { useUserStore } from '@/stores/user.js'
   import { useProfileStore } from '@/stores/profile/profile.js'
+  import { useUserStore } from '@/stores/user.js'
   import { floatNumber, formatNumber } from '../utils/format-number.js'
   import { lessonCounter } from '../utils/lesson-counter.js'
   import '@/styles/pages/failure-resume.scss'
@@ -35,21 +35,21 @@
   const userStore = useUserStore()
   const initialTemplate = ref(null)
   const displayUser = ref(null)
-  
+
   const isSharedView = computed(() => !!route.query.posts)
 
   const filteredPosts = computed(() => {
     if (isSharedView.value) {
-      const postIds = route.query.posts.split(',')
-      return posts.value.filter(p => postIds.includes(p.id))
+      const postIds = new Set(route.query.posts.split(','))
+      return posts.value.filter(p => postIds.has(p.id))
     }
     return posts.value
   })
 
   const filteredDrafts = computed(() => {
     if (isSharedView.value) {
-      const postIds = route.query.posts.split(',')
-      return drafts.value.filter(p => postIds.includes(p.id))
+      const postIds = new Set(route.query.posts.split(','))
+      return drafts.value.filter(p => postIds.has(p.id))
     }
     return drafts.value
   })
@@ -60,36 +60,36 @@
   onMounted(() => {
     postIsLoading.value = true
     let userId = auth.user.uid
-    
+
     if (route.query.userId) {
       try {
         userId = atob(String(route.query.userId))
-      } catch (e) {
+      } catch {
         userId = route.query.userId // fallback
       }
     }
-    
+
     if (route.query.template !== undefined) {
       initialTemplate.value = Number(route.query.template)
     }
 
-    if (userId !== auth.user.uid) {
+    if (userId === auth.user.uid) {
+      displayUser.value = auth.user
+    } else {
       userStore.getUserById(userId).then(user => {
         if (user) {
           displayUser.value = user
         }
       })
-    } else {
-      displayUser.value = auth.user
     }
 
     profileStore.fetchUserPosts(userId)
       .then(res => {
         posts.value = res
         if (route.query.posts) {
-          const postIds = route.query.posts.split(',')
+          const postIds = new Set(route.query.posts.split(','))
           const allPosts = [...posts.value, ...drafts.value]
-          selectedPosts.value = allPosts.filter(post => postIds.includes(post.id))
+          selectedPosts.value = allPosts.filter(post => postIds.has(post.id))
         }
       })
       .finally(() => {
@@ -231,7 +231,7 @@
       query.append('posts', postIds)
     }
     const url = `${window.location.origin}/failure-resume?${query.toString()}`
-    
+
     navigator.clipboard.writeText(url).then(() => {
       toast.success('Shareable link copied to clipboard!')
     }).catch(() => {
@@ -361,7 +361,13 @@
           </li>
         </ul>
       </div>
-      <Templates :is-exporting="isExporting" :initial-template="initialTemplate" :display-user="displayUser" :read-only="isSharedView" @template-update="templateSelected = $event" />
+      <Templates
+        :display-user="displayUser"
+        :initial-template="initialTemplate"
+        :is-exporting="isExporting"
+        :read-only="isSharedView"
+        @template-update="templateSelected = $event"
+      />
       <div class="wrapper mt-4">
         <div class="d-flex ga-4 ">
           <div
@@ -375,7 +381,7 @@
             />
             {{ templateSelected ? 'Download PDF': 'Generate Preview' }}
           </div>
-          <div class="cancel-btn d-flex align-center justify-center generate-btn" :class="isSharedView ? 'w-100' : 'w-40'" v-if="!isSharedView" @click="generateSharableLink">
+          <div v-if="!isSharedView" class="cancel-btn d-flex align-center justify-center generate-btn" :class="isSharedView ? 'w-100' : 'w-40'" @click="generateSharableLink">
             <div class="d-flex mr-2" v-html="getIcon('share')" />
             Get Shareable Link
           </div>

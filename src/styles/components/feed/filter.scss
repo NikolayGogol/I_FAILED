@@ -9,7 +9,10 @@
   padding: 10px 24px 24px;
   @include media-down($breakpoint-sm) {
     border: none;
-    padding: 0;
+    padding: 16px 16px 32px 16px;
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
+    overflow-x: hidden;
   }
 
   &:after {
@@ -74,6 +77,8 @@
 
   :deep(.v-selection-control-group) {
     flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px;
   }
 
   :deep(.v-selection-control) {
