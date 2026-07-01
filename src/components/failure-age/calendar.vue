@@ -99,7 +99,7 @@
       <v-btn color="primary" density="comfortable" icon="mdi-chevron-right" @click="nextMonth" />
     </div>
     <div class="d-flex justify-center">
-      <ul class="list-week">
+      <ul class="list-week w-100">
         <li>Mon</li>
         <li>Tue</li>
         <li>Wed</li>
@@ -110,7 +110,7 @@
       </ul>
     </div>
     <div class="d-flex justify-center">
-      <div class="calendar-grid mt-2">
+      <div class="calendar-grid mt-2 w-100">
         <div
           v-for="(item, index) in calendarGrid"
           :key="index"

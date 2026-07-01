@@ -228,21 +228,21 @@
       </section>
       <section class="mt-10 px-4">
         <v-row class="ga-4">
-          <v-col class="section px-2 item-card">
+          <v-col class="section px-2 item-card" cols="12" sm="4">
             <div class="icon">
               <img alt="" src="../assets/premium/2.png">
             </div>
             <div class="title">Advanced Analytics</div>
             <p class="text-description">Deep insights into your failure patterns and recovery times</p>
           </v-col>
-          <v-col class="section px-2 item-card">
+          <v-col class="section px-2 item-card" cols="12" sm="4">
             <div class="icon">
               <img alt="" src="../assets/premium/3.png">
             </div>
             <div class="title">Anonymous Posts</div>
             <p class="text-description">Share your biggest failures without revealing your identity</p>
           </v-col>
-          <v-col class="section px-2 item-card">
+          <v-col class="section px-2 item-card" cols="12" sm="4">
             <div class="icon">
               <img alt="" src="../assets/premium/1.png">
             </div>
@@ -349,7 +349,7 @@
     </template>
 
     <template v-else>
-      <div class="premium-active-wrapper pt-10">
+      <div class="premium-active-wrapper pt-sm-10">
         <h1 class="text-center font-weight-bold">👑 You're a Premium Member</h1>
         <p class="text-center text-description mt-2">Thank you for supporting a safer space for growth.</p>
 

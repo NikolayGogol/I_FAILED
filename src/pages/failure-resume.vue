@@ -305,28 +305,24 @@
             <div class="d-flex flex-column align-start" :class="{'ml-6': !isSharedView}">
               <div class="tag">{{ post.selectedCategories[0].label }}</div>
               <div class="title">{{ post.title }}</div>
-              <div v-if="post?.lessonLearned?.cost || post?.lessonLearned?.recoveryTime" class="item-panel">
-                <div v-if="post?.lessonLearned?.cost">💰Cost: {{ formatNumber(post.lessonLearned.cost) }}</div>
-                <div v-if="post?.lessonLearned?.recoveryTime" class="ml-4">⏱️Recovery:
-                  {{ post.lessonLearned.recoveryTime.title }}
-                </div>
-                <div v-if="post?.lessonLearned?.recoveryTime" class="ml-4">📚 {{ lessonCounter(post.lessonLearned) }}
-                  lessons
-                </div>
+              <div v-if="post?.lessonLearned?.cost || post?.lessonLearned?.recoveryTime || post?.lessonLearned" class="item-panel">
+                <div v-if="post?.lessonLearned?.cost">💰 Cost: {{ formatNumber(post.lessonLearned.cost) }}</div>
+                <div v-if="post?.lessonLearned?.recoveryTime">⏱️ Recovery: {{ post.lessonLearned.recoveryTime.title }}</div>
+                <div v-if="post?.lessonLearned">📚 {{ lessonCounter(post.lessonLearned) }} lessons</div>
               </div>
             </div>
           </li>
         </ul>
       </div>
       <div v-if="filteredDrafts.length > 0" class="unpublish-content main-content">
-        <div class="d-flex align-center justify-space-between">
+        <div class="d-flex flex-column flex-sm-row align-start align-sm-center justify-space-between">
           <div class="d-block">
             <h5 class="font-weight-semibold fs-18 text-grey-darken-3">
               {{ isSharedView ? 'Unpublished Failures' : 'Add Unpublished Failures' }}
             </h5>
             <p v-if="!isSharedView" class="text-description">Include failures you haven't shared publicly yet</p>
           </div>
-          <div v-if="!isSharedView" class="cancel-btn" @click="toggleUnpublish = !toggleUnpublish">{{
+          <div v-if="!isSharedView" class="cancel-btn w-100 w-sm-auto mt-4 mt-sm-0" @click="toggleUnpublish = !toggleUnpublish">{{
             !toggleUnpublish ? 'Add' : 'Hide'
           }}
           </div>
@@ -348,14 +344,10 @@
             <div class="d-flex flex-column align-start" :class="{'ml-6': !isSharedView}">
               <div class="tag">{{ post.selectedCategories[0].label }}</div>
               <div class="title">{{ post.title }}</div>
-              <div v-if="post?.lessonLearned?.cost || post?.lessonLearned?.recoveryTime" class="item-panel">
-                <div v-if="post?.lessonLearned?.cost">💰Cost: {{ formatNumber(post.lessonLearned.cost) }}</div>
-                <div v-if="post?.lessonLearned?.recoveryTime" class="ml-4">⏱️Recovery:
-                  {{ post.lessonLearned.recoveryTime.title }}
-                </div>
-                <div v-if="post?.lessonLearned?.recoveryTime" class="ml-4">📚 {{ lessonCounter(post.lessonLearned) }}
-                  lessons
-                </div>
+              <div v-if="post?.lessonLearned?.cost || post?.lessonLearned?.recoveryTime || post?.lessonLearned" class="item-panel">
+                <div v-if="post?.lessonLearned?.cost">💰 Cost: {{ formatNumber(post.lessonLearned.cost) }}</div>
+                <div v-if="post?.lessonLearned?.recoveryTime">⏱️ Recovery: {{ post.lessonLearned.recoveryTime.title }}</div>
+                <div v-if="post?.lessonLearned">📚 {{ lessonCounter(post.lessonLearned) }} lessons</div>
               </div>
             </div>
           </li>
@@ -369,7 +361,7 @@
         @template-update="templateSelected = $event"
       />
       <div class="wrapper mt-4">
-        <div class="d-flex ga-4 ">
+        <div class="d-flex flex-sm-row flex-column ga-4 ">
           <div
             class="submit-btn d-flex justify-center align-center"
             :class="[{disabled: selectedPosts.length === 0 || !templateSelected}, isSharedView ? 'w-100' : 'w-60']"

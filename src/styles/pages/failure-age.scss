@@ -1,6 +1,10 @@
 @use '../settings.scss' as *;
 
 .failure-age-page {
+  @include media-down($breakpoint-sm) {
+    padding: 15px;
+  }
+
   .ages-wrapper {
     background: #F8EBE0;
     background: linear-gradient(130deg, rgba(248, 235, 224, 1) 0%, rgba(233, 248, 227, 1) 100%);
@@ -135,6 +139,9 @@
     padding: 24px;
     border-radius: $radius-xl + 4;
     border: 1px solid $color-border;
+    @include media-down($breakpoint-sm) {
+      padding: 15px;
+    }
   }
 
   .title-section {
@@ -274,6 +281,9 @@
       transform: translateY(-50%);
       left: 0;
       height: 98%;
+      @include media-down($breakpoint-sm) {
+        display: none;
+      }
     }
 
     ul {
@@ -297,11 +307,13 @@
             h5 {
               color: #31953A;
             }
+
             p {
               color: $color-text-secondary;
             }
           }
         }
+
         &.lesson-tag {
           .content-card {
             background-color: #FFF9F0;
@@ -319,6 +331,9 @@
 
         .time-card {
           width: 100px;
+          @include media-down($breakpoint-sm) {
+            width: auto;
+          }
 
           p {
             text-align: right;
@@ -335,6 +350,9 @@
           margin-left: 70px;
           position: relative;
           border-left: 5px solid #C8372B;
+          @include media-down($breakpoint-sm) {
+            margin-left: 40px;
+          }
 
           &:before {
             content: '';
@@ -347,6 +365,9 @@
             left: -40px;
             top: 50%;
             transform: translateY(-50%);
+            @include media-down($breakpoint-sm) {
+              left: -30px;
+            }
           }
 
           .tag {
@@ -542,12 +563,16 @@
       display: grid;
       grid-template-columns: repeat(7, 1fr);
       gap: 10px;
+      max-width: 400px;
+      @include media-down($breakpoint-sm) {
+        gap: 6px;
+      }
     }
 
     .calendar-day,
     .calendar-day-empty {
-      width: 48px;
-      height: 48px;
+      width: 100%;
+      aspect-ratio: 1 / 1;
       border-radius: 6px;
     }
 
@@ -569,13 +594,17 @@
     }
 
     .list-week {
-      display: flex;
-      justify-content: center;
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
       gap: 10px;
+      max-width: 400px;
+      @include media-down($breakpoint-sm) {
+        gap: 6px;
+      }
 
       li {
         list-style: none;
-        width: 48px;
+        width: 100%;
         text-align: center;
         font-size: 14px;
         color: $color-text-quaternary;

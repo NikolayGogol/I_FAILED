@@ -3,6 +3,9 @@
 
 .premium-page {
   padding-bottom: 20px;
+  @include media-down($breakpoint-sm) {
+    padding: 15px;
+  }
 
   .premium-wrapper {
     border-radius: $radius-xl + 4;
@@ -335,11 +338,18 @@
     h1 {
       font-size: 28px;
       color: $color-text-primary;
+      @include media-down($breakpoint-sm) {
+        font-weight: 600;
+        font-size: 20px;
+      }
     }
-    
+
     .text-description {
       color: $color-text-secondary;
       font-size: 16px;
+      @include media-down($breakpoint-sm) {
+        font-size: 12px;
+      }
     }
 
     .benefits-card {
@@ -354,17 +364,17 @@
       .benefits-list {
         li {
           border-bottom: 1px solid $color-border;
-          
+
           &:last-of-type {
             border-bottom: none;
           }
-          
+
           .benefit-text {
             color: $color-text-primary;
             font-size: 14px;
             font-weight: 500;
           }
-          
+
           .active-badge {
             background-color: #E8F5E9;
             color: #2E7D32;
@@ -376,7 +386,7 @@
           }
         }
       }
-      
+
       .manage-btn {
         background-color: transparent;
         color: #D65A1F;
@@ -386,7 +396,7 @@
         font-size: 14px;
         border-radius: $radius-md;
         transition: all 0.3s;
-        
+
         &:hover {
           background-color: rgba(214, 90, 31, 0.05);
         }

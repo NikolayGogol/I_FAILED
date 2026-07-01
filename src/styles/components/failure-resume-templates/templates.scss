@@ -8,10 +8,18 @@
   margin-top: 16px;
 
   ul {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
     margin-top: 16px;
+    
+    @include media-up($breakpoint-sm) {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    
+    @include media-up($breakpoint-md) {
+      grid-template-columns: repeat(4, 1fr);
+    }
 
     li {
       list-style: none;
@@ -32,6 +40,9 @@
 
       img {
         border-radius: $radius-xs;
+        width: 100%;
+        height: auto;
+        display: block;
       }
 
       .name {

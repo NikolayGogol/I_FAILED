@@ -95,7 +95,13 @@
           line-height: 16px;
           color: $color-text-quaternary;
           display: flex;
+          align-items: center;
+          flex-wrap: wrap;
+          gap: 5px;
           margin-top: 8px;
+          div {
+            white-space: nowrap;
+          }
         }
       }
     }
@@ -106,6 +112,9 @@
     border-radius: $radius-xl;
     border: 1px solid $color-border;
     margin-top: 16px;
+    @include media-down($breakpoint-sm) {
+      padding: 15px;
+    }
   }
 
   .templates {
@@ -118,6 +127,9 @@
     border-radius: $radius-xl;
     border: 1px solid $color-border;
     padding: 24px;
+    @include media-down($breakpoint-sm) {
+      padding: 15px;
+    }
   }
 
   .generate-btn {

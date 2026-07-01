@@ -80,3 +80,14 @@
     </div>
   </div>
 </template>
+<style scoped lang="scss">
+@include media-down($breakpoint-sm) {
+  h1 {
+    font-size: 20px;
+    margin-left: 0 !important;
+  }
+  p {
+    font-size: 12px !important;
+  }
+}
+</style>
