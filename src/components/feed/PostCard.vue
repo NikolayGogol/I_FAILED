@@ -17,6 +17,7 @@
   import { floatNumber, formatNumber } from '@/utils/format-number.js'
   import { timeTransformAgo } from '@/utils/time.js'
   import { transformUsername } from '@/utils/transform-username.js'
+  import { lessonCounter } from '../../utils/lesson-counter.js'
   import '@/styles/components/feed/post-card.scss'
 
   dayjs.extend(relativeTime)
@@ -295,6 +296,9 @@
         <div v-if="post.lessonLearned.recoveryTime" class="meta-item">
           <span class="meta-label">⏱️   Recovery:</span>
           <span>{{ post.lessonLearned.recoveryTime?.title }}</span>
+        </div>
+        <div v-if="post?.lessonLearned" class="meta-item">
+          <span class="meta-label">📚  {{ lessonCounter(post.lessonLearned) }} lessons</span>
         </div>
       </div>
     </template>

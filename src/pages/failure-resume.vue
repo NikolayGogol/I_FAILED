@@ -17,6 +17,7 @@
   import { useProfileStore } from '@/stores/profile/profile.js'
   import { floatNumber, formatNumber } from '../utils/format-number.js'
   import '@/styles/pages/failure-resume.scss'
+  import {lessonCounter} from "../utils/lesson-counter.js";
   //
   const profileStore = useProfileStore()
   const auth = useAuthStore()
@@ -211,6 +212,7 @@
               <div v-if="post?.lessonLearned?.cost || post?.lessonLearned?.recoveryTime" class="item-panel">
                 <div v-if="post?.lessonLearned?.cost">💰Cost: {{ formatNumber(post.lessonLearned.cost) }}</div>
                 <div v-if="post?.lessonLearned?.recoveryTime" class="ml-4">⏱️Recovery: {{ post.lessonLearned.recoveryTime.title }}</div>
+                <div v-if="post?.lessonLearned?.recoveryTime" class="ml-4">📚 {{ lessonCounter(post.lessonLearned) }} lessons</div>
               </div>
             </div>
           </li>
@@ -244,6 +246,7 @@
               <div v-if="post?.lessonLearned?.cost || post?.lessonLearned?.recoveryTime" class="item-panel">
                 <div v-if="post?.lessonLearned?.cost">💰Cost: {{ formatNumber(post.lessonLearned.cost) }}</div>
                 <div v-if="post?.lessonLearned?.recoveryTime" class="ml-4">⏱️Recovery: {{ post.lessonLearned.recoveryTime.title }}</div>
+                <div v-if="post?.lessonLearned?.recoveryTime" class="ml-4">📚 {{ lessonCounter(post.lessonLearned) }} lessons</div>
               </div>
             </div>
           </li>

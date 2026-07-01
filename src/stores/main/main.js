@@ -18,6 +18,7 @@ import api from '@/axios.js'
 import { db } from '@/firebase.js'
 import { useAuthStore } from '@/stores/auth.js'
 import { useLatestStore } from '@/stores/feed/latest.js'
+import {lessonCounter} from "@/utils/lesson-counter.js";
 
 // =================================================================================================
 // Constants
@@ -306,8 +307,12 @@ export const useMainStore = defineStore('main', {
         const snapshot = await getCountFromServer(postsRef)
         this.totalPosts = snapshot.data().count
         const q = query(postsRef, where('lessonLearned', '!=', null))
-        const snapshot2 = await getCountFromServer(q)
-        this.lessonsShared = snapshot2.data().count
+        const snapshot2 = await getDocs(q)
+        this.lessonsShared = 0
+        // eslint-disable-next-line unicorn/no-array-for-each
+        snapshot2.forEach(doc => {
+          this.lessonsShared += lessonCounter(doc.data().lessonLearned)
+        })
       } catch (error) {
         console.error('Error fetching total post count:', error)
       }
