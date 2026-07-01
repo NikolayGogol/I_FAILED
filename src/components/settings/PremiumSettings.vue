@@ -22,7 +22,7 @@
 
   const everything = [
     { text: 'Advanced analytics on your failures' },
-    { text: 'Custom "Failure Resume" templates' },
+    { text: 'Custom "Failure Resume" templates.scss' },
     { text: 'Ad-free experience' },
     { text: 'Priority support' },
     { text: '"Verified Resilience" badge' },

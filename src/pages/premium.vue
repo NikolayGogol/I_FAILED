@@ -60,7 +60,7 @@
       text: 'Advanced analytics on your failures',
     },
     {
-      text: 'Custom "Failure Resume" templates',
+      text: 'Custom "Failure Resume" templates.scss',
     },
     {
       text: 'Ad-free experience',
@@ -93,7 +93,7 @@
       premium: getIcon('green-check'),
     },
     {
-      name: 'Custom "Failure Resume" templates',
+      name: 'Custom "Failure Resume" templates.scss',
       free: getIcon('red-cross'),
       premium: getIcon('green-check'),
     },

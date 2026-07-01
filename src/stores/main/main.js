@@ -18,7 +18,7 @@ import api from '@/axios.js'
 import { db } from '@/firebase.js'
 import { useAuthStore } from '@/stores/auth.js'
 import { useLatestStore } from '@/stores/feed/latest.js'
-import {lessonCounter} from "@/utils/lesson-counter.js";
+import { lessonCounter } from '@/utils/lesson-counter.js'
 
 // =================================================================================================
 // Constants
