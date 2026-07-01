@@ -10,21 +10,12 @@
 <script setup>
   import dayjs from 'dayjs'
   import relativeTime from 'dayjs/plugin/relativeTime'
-  import { computed, onBeforeMount, onMounted, ref, watch } from 'vue'
-  import { useRoute, useRouter } from 'vue-router'
-  import { useToast } from 'vue-toastification'
-  import CommentsSection from '@/components/CommentsSection.vue'
-  import PostMenu from '@/components/feed/PostMenu.vue'
-  import { auth } from '@/firebase'
-  import { getIcon } from '@/models/icons.js'
+  import { computed, onMounted, ref } from 'vue'
+  import { useRoute } from 'vue-router'
   import { useAuthStore } from '@/stores/auth'
-  import { useCommentsStore } from '@/stores/comments'
   import { useEditDraftStore } from '@/stores/edit-draft.js'
-  import { usePostCardStore } from '@/stores/post-card.js'
-  import { useSinglePostStore } from '@/stores/single-post/single-post.js'
   import { useUserStore } from '@/stores/user.js'
-  import { floatNumber, formatNumber } from '@/utils/format-number.js'
-  import { stripHtml } from '@/utils/html.js'
+  import { formatNumber } from '@/utils/format-number.js'
   import { timeTransformAgo } from '@/utils/time.js'
   import { transformUsername } from '@/utils/transform-username.js'
   import 'vue3-emoji-picker/css'
@@ -40,13 +31,11 @@
 
   // Vue and Vue Router setup
   const route = useRoute()
-  const router = useRouter()
   const { getDraftById } = useEditDraftStore()
 
   const authStore = useAuthStore()
   // Component state
   const post = ref(null)
-  const isAuth = computed(() => !!authStore.user)
   // Initialize component on mount
   onMounted(() => {
     const postId = route.params.id || props.id
@@ -72,6 +61,10 @@
    */
   function init (postId) {
     getDraftById(postId).then(res => {
+      if (res?.uid !== authStore?.user?.uid) {
+        router.push('/drafts')
+        return
+      }
       post.value = res
       userStore.getUserById(res.uid)
         .then(res => {
