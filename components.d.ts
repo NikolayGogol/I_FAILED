@@ -31,6 +31,8 @@ declare module 'vue' {
     Discover: typeof import('./src/components/explore/tabs/Discover.vue')['default']
     DobModal: typeof import('./src/components/failure-age/dob-modal.vue')['default']
     DoNotDisturb: typeof import('./src/components/settings/notify-tabs/DoNotDisturb.vue')['default']
+    DraftCard: typeof import('./src/components/profile/DraftCard.vue')['default']
+    EditPostForm: typeof import('./src/components/EditPostForm.vue')['default']
     Email: typeof import('./src/components/settings/notify-tabs/Email.vue')['default']
     Emotial: typeof import('./src/components/failure-age/emotial.vue')['default']
     FacebookLoginButton: typeof import('./src/components/FacebookLoginButton.vue')['default']

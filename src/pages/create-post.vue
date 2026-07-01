@@ -10,22 +10,19 @@
 <script setup>
   import { QuillEditor } from '@vueup/vue-quill'
   import { computed, ref } from 'vue'
-  import { useRoute, useRouter } from 'vue-router'
+  import { useRouter } from 'vue-router'
   import { useToast } from 'vue-toastification'
   import AdditionalInfoPost from '@/components/AdditionalInfoPost.vue'
   import FormInput from '@/components/FormInput.vue'
   import PrivacyPosting from '@/components/PrivacyPosting.vue'
   import { categories } from '@/models/categories.js'
   import { useCreatePostStore } from '@/stores/create-post.js'
-  import { useUpdatePostStore } from '@/stores/update-post.js'
   import { stripHtml } from '@/utils/html.js'
   import '@vueup/vue-quill/dist/vue-quill.snow.css'
   import '@/styles/pages/create-post.scss'
 
   const router = useRouter()
-  const route = useRoute()
   const store = useCreatePostStore()
-  const updatePostStore = useUpdatePostStore()
   const toast = useToast()
   const inputLength = 100
   const quillLength = 5000
@@ -49,30 +46,25 @@
     if (!isFormValid.value) return
     isLoading.value = true
     const { success } = await store.createPost()
-    isLoading.value = false
+
     if (success) {
-      router.push('/post-success-created')
+      isLoading.value = false
       sessionStorage.setItem('post-success-created', 'true')
+      await router.push('/post-success-created')
     } else {
+      isLoading.value = false
       // Handle error, maybe show a notification
       console.error('Failed to create post')
     }
   }
-
-  async function updatePost () {
+  async function saveAsDraft () {
     if (!isFormValid.value) return
-    isLoading.value = true
-    const { success } = await updatePostStore.updatePost(route.params.id, store.$state)
-    isLoading.value = false
+    const { success } = await store.saveToDraft()
     if (success) {
-      toast.info('Post successfully updated')
-      store.resetState()
-      router.push('/')
-    } else {
-      toast.error('Something went wrong')
+      toast.info('Post saved successfully')
+      await router.push('/')
     }
   }
-
 </script>
 
 <template>
@@ -138,21 +130,18 @@
       <additional-info-post class="my-3" />
       <v-divider />
       <PrivacyPosting />
-      <div class="d-flex mt-6">
+      <div class="d-flex align-center justify-space-between mt-6">
         <v-btn
-          v-if="!route?.params?.id"
           color="primary"
           :disabled="!isFormValid"
           :loading="isLoading"
           @click="submitPost"
         >Post</v-btn>
-        <v-btn
-          v-else
-          color="primary"
-          :disabled="!isFormValid"
-          :loading="isLoading"
-          @click="updatePost"
-        >Update Post</v-btn>
+        <p
+          class="text-primary fs-14 font-weight-semibold cursor-pointer text-decoration-underline"
+          :class="{'opacity-60': !isFormValid, 'cursor-not-allowed': !isFormValid}"
+          @click="saveAsDraft()"
+        >Save as draft</p>
       </div>
     </div>
   </div>

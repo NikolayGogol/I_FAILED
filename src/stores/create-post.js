@@ -16,6 +16,7 @@ import { noAvatar } from '@/models/no-data.js'
 import { useAuthStore } from '@/stores/auth.js'
 
 const collection_db = import.meta.env.VITE_POST_COLLECTION
+const VITE_DRAFT_COLLECTION = import.meta.env.VITE_DRAFT_COLLECTION
 const VITE_USERS_COLLECTION = import.meta.env.VITE_USERS_COLLECTION
 const collection_db_scheduled = import.meta.env.VITE_POST_COLLECTION_SCEDULED
 //
@@ -80,8 +81,35 @@ export const useCreatePostStore = defineStore('createPost', {
       const scheduleDate = this.scheduleDate
       const isScheduled = !!scheduleDate
 
+      const getFieldsWithValues = obj => {
+        if (!obj) {
+          return null
+        }
+        const cleaned = Object.fromEntries(
+          // eslint-disable-next-line
+          Object.entries(obj).filter(([_, value]) => {
+            if (typeof value === 'boolean') {
+              return true
+            }
+            if (Array.isArray(value)) {
+              return value.length > 0
+            }
+            if (typeof value === 'string') {
+              const stripped = value.replace(/(<([^>]+)>)/gi, '').trim()
+              if (!stripped) {
+                return false
+              }
+            }
+            return value !== null && value !== undefined && value !== ''
+          }),
+        )
+        return Object.keys(cleaned).length > 0 ? cleaned : null
+      }
+
       const postData = {
-        selectedCategories: this.selectedCategories ? [this.selectedCategories] : [],
+        selectedCategories: Array.isArray(this.selectedCategories)
+          ? this.selectedCategories
+          : (this.selectedCategories ? [this.selectedCategories] : []),
         title: this.title,
         whatHappened: this.whatHappened,
         whenHappened: this.whenHappened,
@@ -95,6 +123,9 @@ export const useCreatePostStore = defineStore('createPost', {
         allowComments: this.allowComments,
         enableTriggerWarning: this.enableTriggerWarning,
         triggerTags: this.triggerTags,
+
+        ...(getFieldsWithValues(this.lessonLearned) && { lessonLearned: getFieldsWithValues(this.lessonLearned) }),
+
         createdAt: serverTimestamp(),
         status: isScheduled ? 'scheduled' : 'published',
         scheduledAt: isScheduled ? new Date(scheduleDate) : null,
@@ -127,6 +158,126 @@ export const useCreatePostStore = defineStore('createPost', {
           const uploadPromises = this.images.map(async imageObject => {
             const thumbFile = imageObject.thumb
             const fullFile = imageObject.full
+
+            if (typeof thumbFile === 'string' && typeof fullFile === 'string') {
+              return { thumb: thumbFile, full: fullFile, name: imageObject.name }
+            }
+
+            if (!thumbFile || !fullFile) {
+              return null // Return null to be filtered out later
+            }
+
+            const timestamp = Date.now()
+            const thumbStorageRef = ref(storage, `posts/${postId}/${timestamp}_${imageObject.name}_thumb`)
+            const fullStorageRef = ref(storage, `posts/${postId}/${timestamp}_${imageObject.name}_full`)
+
+            // Upload both files concurrently
+            const thumbUploadTask = uploadBytes(thumbStorageRef, thumbFile).then(snapshot => getDownloadURL(snapshot.ref))
+            const fullUploadTask = uploadBytes(fullStorageRef, fullFile).then(snapshot => getDownloadURL(snapshot.ref))
+
+            const [thumbUrl, fullUrl] = await Promise.all([thumbUploadTask, fullUploadTask])
+
+            return { thumb: thumbUrl, full: fullUrl, name: imageObject.name }
+          })
+
+          const resolvedImageObjects = await Promise.all(uploadPromises)
+          imageObjects = resolvedImageObjects.filter(obj => obj !== null)
+        }
+
+        if (imageObjects.length > 0) {
+          await updateDoc(docRef, { images: imageObjects })
+        }
+
+        this.resetState()
+        return { success: true, postId }
+      } catch (error) {
+        console.error('Error creating post:', error)
+        return { success: false, error: error.message }
+      }
+    },
+    async saveToDraft () {
+      const authStore = useAuthStore()
+      if (!authStore.user) {
+        return { success: false, error: 'User is not authenticated.' }
+      }
+      const scheduleDate = this.scheduleDate
+      const isScheduled = !!scheduleDate
+
+      const getFieldsWithValues = obj => {
+        if (!obj) {
+          return null
+        }
+        const cleaned = Object.fromEntries(
+          // eslint-disable-next-line
+          Object.entries(obj).filter(([_, value]) => {
+            if (typeof value === 'boolean') {
+              return true
+            }
+            if (Array.isArray(value)) {
+              return value.length > 0
+            }
+            if (typeof value === 'string') {
+              const stripped = value.replace(/(<([^>]+)>)/gi, '').trim()
+              if (!stripped) {
+                return false
+              }
+            }
+            return value !== null && value !== undefined && value !== ''
+          }),
+        )
+        return Object.keys(cleaned).length > 0 ? cleaned : null
+      }
+
+      const postData = {
+        selectedCategories: Array.isArray(this.selectedCategories)
+          ? this.selectedCategories
+          : (this.selectedCategories ? [this.selectedCategories] : []),
+        title: this.title,
+        whatHappened: this.whatHappened,
+        whenHappened: this.whenHappened,
+        whatWentWrong: this.whatWentWrong,
+        howDidItFeel: this.howDidItFeel,
+        emotionTags: this.emotionTags,
+        tags: this.tags,
+        images: [], // Placeholder
+        isAnonymous: this.isAnonymous,
+        visibility: this.visibility,
+        allowComments: this.allowComments,
+        enableTriggerWarning: this.enableTriggerWarning,
+        triggerTags: this.triggerTags,
+        ...(getFieldsWithValues(this.lessonLearned) && { lessonLearned: getFieldsWithValues(this.lessonLearned) }),
+        createdAt: serverTimestamp(),
+        status: 'draft',
+        scheduledAt: isScheduled ? new Date(scheduleDate) : null,
+        publishedAt: null,
+        uid: authStore.user.uid,
+        user: {
+          displayName: this.isAnonymous ? 'Anonymous' : authStore.user.displayName,
+          photoURL: this.isAnonymous ? noAvatar : authStore.user.photoURL,
+          email: authStore.user.email,
+        },
+        likes: 0,
+        comments: 0,
+        views: 0,
+        likedBy: [],
+      }
+
+      try {
+        const targetCollection = VITE_DRAFT_COLLECTION || 'drafts'
+        const docRef = await addDoc(collection(db, targetCollection), postData)
+        const postId = docRef.id
+
+        // No postCount increment for drafts
+
+        let imageObjects = []
+        if (this.images && this.images.length > 0) {
+          const uploadPromises = this.images.map(async imageObject => {
+            const thumbFile = imageObject.thumb
+            const fullFile = imageObject.full
+
+            if (typeof thumbFile === 'string' && typeof fullFile === 'string') {
+              return { thumb: thumbFile, full: fullFile, name: imageObject.name }
+            }
 
             if (!thumbFile || !fullFile) {
               return null // Return null to be filtered out later

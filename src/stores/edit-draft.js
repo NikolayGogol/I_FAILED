@@ -1,33 +1,45 @@
-import { deleteDoc, doc, getDoc, serverTimestamp, updateDoc } from 'firebase/firestore'
+import { deleteDoc, doc, getDoc, updateDoc } from 'firebase/firestore'
 import { deleteObject } from 'firebase/storage'
 import { defineStore } from 'pinia'
 import { db, getDownloadURL, ref, storage, uploadBytes } from '@/firebase'
 import { noAvatar } from '@/models/no-data.js'
 import { useAuthStore } from '@/stores/auth.js'
 
-const collection_db = import.meta.env.VITE_POST_COLLECTION
-const collection_db_scheduled = import.meta.env.VITE_POST_COLLECTION_SCEDULED
+const VITE_DRAFT_COLLECTION = import.meta.env.VITE_DRAFT_COLLECTION
 
-export const useUpdatePostStore = defineStore('updatePost', {
+export const useEditDraftStore = defineStore('editDraft', {
   actions: {
-    async deletePostDocumentOnly (docId) {
+    async getDraftById (id) {
       try {
-        const postRef = doc(db, collection_db, docId)
-        await deleteDoc(postRef)
+        const targetCollection = VITE_DRAFT_COLLECTION || 'drafts'
+        const docRef = doc(db, targetCollection, id)
+        const docSnap = await getDoc(docRef)
+        return docSnap.exists() ? { id: docSnap.id, ...docSnap.data() } : 'Draft not found.'
+      } catch (error) {
+        console.error('Error fetching draft:', error)
+        return 'Failed to load the draft.'
+      }
+    },
+
+    async deleteDraft (id) {
+      try {
+        const targetCollection = VITE_DRAFT_COLLECTION || 'drafts'
+        const docRef = doc(db, targetCollection, id)
+        await deleteDoc(docRef)
         return { success: true }
       } catch (error) {
-        console.error('Error deleting post document:', error)
+        console.error('Error deleting draft:', error)
         return { success: false, error: error.message }
       }
     },
-    // eslint-disable-next-line complexity
-    async updatePost (docId, payload = {}) {
+
+    async updateDraft (docId, payload = {}) {
       const authStore = useAuthStore()
       if (!authStore.user) {
         return { success: false, error: 'User is not authenticated.' }
       }
       if (!docId) {
-        return { success: false, error: 'Missing post id.' }
+        return { success: false, error: 'Missing draft id.' }
       }
 
       const toFirestoreDate = value => {
@@ -61,8 +73,6 @@ export const useUpdatePostStore = defineStore('updatePost', {
         if (typeof imageValue !== 'string' || imageValue.length === 0) {
           return null
         }
-
-        // Common case: Firebase Storage download URL.
         if (imageValue.startsWith('http')) {
           const match = imageValue.match(/\/o\/([^?]+)/)
           if (!match) {
@@ -72,8 +82,6 @@ export const useUpdatePostStore = defineStore('updatePost', {
           const decodedPath = decodeURIComponent(encodedPath.replace(/\+/g, '%20'))
           return ref(storage, decodedPath)
         }
-
-        // Fallback: assume it's already a storage path like `posts/<...>/<file>`.
         if (imageValue.includes('/')) {
           try {
             return ref(storage, imageValue)
@@ -81,37 +89,23 @@ export const useUpdatePostStore = defineStore('updatePost', {
             return null
           }
         }
-
         return null
       }
 
       try {
-        const publishedRef = doc(db, collection_db, docId)
-        const publishedSnap = await getDoc(publishedRef)
+        const targetCollection = VITE_DRAFT_COLLECTION || 'drafts'
+        const docRef = doc(db, targetCollection, docId)
+        const docSnap = await getDoc(docRef)
 
-        let docRef = publishedRef
-        let existingData = publishedSnap.exists() ? publishedSnap.data() : null
-
-        if (!existingData) {
-          const scheduledRef = doc(db, collection_db_scheduled, docId)
-          const scheduledSnap = await getDoc(scheduledRef)
-          if (scheduledSnap.exists()) {
-            docRef = scheduledRef
-            existingData = scheduledSnap.data()
-          }
+        if (!docSnap.exists()) {
+          return { success: false, error: 'Draft not found.' }
         }
 
-        if (!existingData) {
-          return { success: false, error: 'Post not found.' }
-        }
-
+        const existingData = docSnap.data()
         const existingImages = Array.isArray(existingData.images) ? existingData.images : []
 
-        // Prefer `scheduleDate` because UI edits this field via DatePicker.
-        // `scheduleDate` may be explicitly `null` to indicate "unschedule".
         const scheduleDateRaw = payload.scheduleDate === undefined ? (payload.scheduledAt ?? null) : payload.scheduleDate
         const isScheduled = !!scheduleDateRaw
-
         const scheduledAtRaw = isScheduled ? toFirestoreDate(scheduleDateRaw) : null
         const scheduledAt = scheduledAtRaw && Number.isNaN(scheduledAtRaw.getTime()) ? null : scheduledAtRaw
 
@@ -125,17 +119,9 @@ export const useUpdatePostStore = defineStore('updatePost', {
           const thumbIsFile = isBlobLike(thumbVal)
           const fullIsFile = isBlobLike(fullVal)
 
-          // Case 1: both are stored URLs.
-          if (
-            typeof thumbVal === 'string'
-            && typeof fullVal === 'string'
-            && !thumbIsFile
-            && !fullIsFile
-          ) {
+          if (typeof thumbVal === 'string' && typeof fullVal === 'string' && !thumbIsFile && !fullIsFile) {
             return { thumb: thumbVal, full: fullVal, name, isNew: false }
           }
-
-          // If neither side is a file/blob, we can't upload.
           if (!thumbIsFile && !fullIsFile) {
             return null
           }
@@ -169,8 +155,6 @@ export const useUpdatePostStore = defineStore('updatePost', {
           }
 
           await Promise.all(uploads)
-
-          // Require both URLs.
           if (!thumbUrl || !fullUrl) {
             return null
           }
@@ -222,7 +206,6 @@ export const useUpdatePostStore = defineStore('updatePost', {
           emotionTags: payload.emotionTags,
           tags: payload.tags,
           images: normalizedImages,
-
           isAnonymous: payload.isAnonymous,
           visibility: payload.visibility,
           allowComments: payload.allowComments,
@@ -231,11 +214,10 @@ export const useUpdatePostStore = defineStore('updatePost', {
 
           ...(getFieldsWithValues(payload.lessonLearned) && { lessonLearned: getFieldsWithValues(payload.lessonLearned) }),
 
-          status: isScheduled ? 'scheduled' : 'published',
+          status: 'draft',
           scheduledAt: isScheduled ? scheduledAt : null,
-          publishedAt: isScheduled ? null : (existingData.publishedAt ?? serverTimestamp()),
+          publishedAt: null,
 
-          // Keep immutable counters/metadata (likes/comments/views/createdAt) intact.
           uid: existingData.uid ?? authStore.user.uid,
           user: {
             displayName: payload.isAnonymous ? 'Anonymous' : authStore.user.displayName,
@@ -255,14 +237,12 @@ export const useUpdatePostStore = defineStore('updatePost', {
           const oldThumb = oldImg?.thumb
           const oldFull = oldImg?.full
 
-          // Delete old thumb/full independently if they are not present anymore.
           if (oldThumb && !keepThumbs.has(oldThumb)) {
             const r = getStorageRefFromPossibleImageValue(oldThumb)
             if (r) {
               deleteRefs.push(r)
             }
           }
-
           if (oldFull && !keepFulls.has(oldFull)) {
             const r = getStorageRefFromPossibleImageValue(oldFull)
             if (r) {
@@ -278,7 +258,7 @@ export const useUpdatePostStore = defineStore('updatePost', {
 
         return { success: true, postId: docId }
       } catch (error) {
-        console.error('Error updating post:', error)
+        console.error('Error updating draft:', error)
         return { success: false, error: error.message }
       }
     },

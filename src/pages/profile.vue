@@ -22,7 +22,7 @@
   const profileStore = useProfileStore()
 
   const { user } = storeToRefs(authStore)
-  const { posts, loading, error, userActivity } = storeToRefs(profileStore)
+  const { posts, drafts, loading, error, userActivity } = storeToRefs(profileStore)
   const router = useRouter()
   const activeTabIndex = ref(0)
   onMounted(() => {
@@ -84,6 +84,10 @@
             You haven't posted anything yet.
           </div>
           <div v-else class="profile-posts">
+            <div v-if="drafts.length > 0" class="d-flex align-center">
+              <p class="fs-16 text-grey-darken-3 font-weight-semibold">Drafts: {{ drafts.length }}</p>
+              <router-link class="text-primary ml-6 cursor-pointer fs-14 font-weight-semibold" to="drafts">Open</router-link>
+            </div>
             <PostCard
               v-for="post in posts"
               :key="post.id"

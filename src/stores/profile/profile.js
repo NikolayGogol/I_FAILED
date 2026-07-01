@@ -23,6 +23,7 @@ import { isDoNotDisturbActive } from '@/stores/single-post/single-post.js'
 import { useUserStore } from '@/stores/user.js'
 import { findSwitch } from '@/utils/find-switch.js'
 const VITE_POST_COLLECTION = import.meta.env.VITE_POST_COLLECTION
+const VITE_DRAFT_COLLECTION = import.meta.env.VITE_DRAFT_COLLECTION
 const VITE_USERS_COLLECTION = import.meta.env.VITE_USERS_COLLECTION
 const VITE_COMMENTS = import.meta.env.VITE_COMMENTS
 const VITE_NOTIFICATION_COLLECTION = import.meta.env.VITE_NOTIFICATION_COLLECTION
@@ -33,6 +34,7 @@ const VITE_NOTIFICATION_COLLECTION = import.meta.env.VITE_NOTIFICATION_COLLECTIO
 export const useProfileStore = defineStore('profile', {
   state: () => ({
     posts: [],
+    drafts: [],
     loading: false,
     error: null,
     userActivity: {
@@ -51,12 +53,17 @@ export const useProfileStore = defineStore('profile', {
       this.loading = true
       this.error = null
       this.posts = []
+      this.drafts = []
 
       try {
         const postsRef = collection(db, VITE_POST_COLLECTION)
+        const postsRefDraft = collection(db, VITE_DRAFT_COLLECTION)
         const q = query(postsRef, where('uid', '==', userId), orderBy('createdAt', 'desc'))
+        const qDraft = query(postsRefDraft, where('uid', '==', userId), orderBy('createdAt', 'desc'))
         const querySnapshot = await getDocs(q)
+        const querySnapshotDraft = await getDocs(qDraft)
         const posts = []
+        const drafts = []
         const authStore = useAuthStore()
         const user = authStore.user
         // eslint-disable-next-line
@@ -84,6 +91,11 @@ export const useProfileStore = defineStore('profile', {
           // }
           posts.push(post)
         }
+        for (const doc of querySnapshotDraft.docs) {
+          const postDraft = { id: doc.id, ...doc.data() }
+          drafts.push(postDraft)
+        }
+        this.drafts = drafts
         this.posts = posts
         return this.posts
       } catch (error) {

@@ -1,0 +1,104 @@
+@use '../../settings.scss' as *;
+
+.draft-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px;
+  background-color: $color-surface;
+  border: 1px solid $color-border;
+  border-radius: $radius-xl;
+  margin-bottom: 16px;
+
+  .draft-card-left {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    .draft-category {
+      display: inline-block;
+      align-self: flex-start;
+      background-color: #FCEFE6;
+      color: #B95F37;
+      padding: 4px 12px;
+      border-radius: $radius-full;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .draft-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: $color-text-primary;
+      margin: 0;
+    }
+
+    .draft-meta {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+
+      .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+
+        .meta-icon {
+          font-size: 14px;
+        }
+
+        .meta-text {
+          font-size: 14px;
+          color: $color-text-secondary;
+        }
+      }
+    }
+  }
+
+  .draft-card-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 12px;
+
+    .draft-actions {
+      display: flex;
+      gap: 12px;
+
+      button {
+        padding: 10px 24px;
+        border-radius: $radius-md;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+
+        &.btn-edit {
+          background-color: #D65A1F;
+          color: white;
+          border: 1px solid #D65A1F;
+
+          &:hover {
+            opacity: 0.9;
+          }
+        }
+
+        &.btn-delete {
+          background-color: transparent;
+          color: #C8372B;
+          border: 1px solid $color-border;
+
+          &:hover {
+            background-color: #FFF5F5;
+            border-color: #C8372B;
+          }
+        }
+      }
+    }
+
+    .draft-date {
+      font-size: 12px;
+      color: $color-text-secondary;
+    }
+  }
+}

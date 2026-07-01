@@ -12,18 +12,18 @@
   import EditPostForm from '@/components/EditPostForm.vue'
   import { useAuthStore } from '@/stores/auth.js'
   import { useCreatePostStore } from '@/stores/create-post.js'
-  import { useSinglePostStore } from '@/stores/single-post/single-post.js'
+  import { useEditDraftStore } from '@/stores/edit-draft.js'
   //
   const route = useRoute()
   const router = useRouter()
-  const singlePostStore = useSinglePostStore()
+  const editDraftStore = useEditDraftStore()
   const createPostStore = useCreatePostStore()
   const auth = useAuthStore()
   //
   onMounted(() => {
     const id = route.params.id
     if (id) {
-      singlePostStore.getPostById(id)
+      editDraftStore.getDraftById(id)
         .then(res => {
           if (auth.user.uid !== res.uid) {
             router.go(-1)
@@ -73,7 +73,7 @@
           createPostStore.emotionTags = res.emotionTags
           createPostStore.tags = res.tags
           if (res.enableTriggerWarning) {
-            createPostStore.triggerTags = res.triggerTags
+            createPostStore.triggerTags = res.triggerTags || []
           }
           if (res.lessonLearned) {
             createPostStore.lessonLearned = {
@@ -91,7 +91,7 @@
 </script>
 
 <template>
-  <EditPostForm :is-draft="false" />
+  <EditPostForm :is-draft="true" />
 </template>
 
 <style scoped lang="scss">
