@@ -112,4 +112,19 @@
     padding: 24px;
     margin-top: 16px;
   }
+
+  .wrapper {
+    background-color: $color-surface;
+    border-radius: $radius-xl;
+    border: 1px solid $color-border;
+    padding: 24px;
+  }
+
+  .generate-btn {
+    svg {
+      * {
+        stroke: $color-primary;
+      }
+    }
+  }
 }

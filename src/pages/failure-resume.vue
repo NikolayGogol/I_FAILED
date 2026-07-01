@@ -1,9 +1,9 @@
 <route lang="json">
 {
-"meta": {
-"layout": "MainLayout",
-"auth": true
-}
+  "meta": {
+    "layout": "MainLayout",
+    "auth": true
+  }
 }
 </route>
 <script setup>
@@ -13,7 +13,9 @@
   import Templates from '@/components/failure-resume-templates/templates.vue'
   import { recoveryTimeOptions } from '@/models/categories.js'
   import { getIcon } from '@/models/icons.js'
+  import { useRoute } from 'vue-router'
   import { useAuthStore } from '@/stores/auth.js'
+  import { useUserStore } from '@/stores/user.js'
   import { useProfileStore } from '@/stores/profile/profile.js'
   import { floatNumber, formatNumber } from '../utils/format-number.js'
   import { lessonCounter } from '../utils/lesson-counter.js'
@@ -29,15 +31,66 @@
   const templateSelected = ref(null)
   const toast = useToast()
   const { drafts } = storeToRefs(profileStore)
+  const route = useRoute()
+  const userStore = useUserStore()
+  const initialTemplate = ref(null)
+  const displayUser = ref(null)
+  
+  const isSharedView = computed(() => !!route.query.posts)
+
+  const filteredPosts = computed(() => {
+    if (isSharedView.value) {
+      const postIds = route.query.posts.split(',')
+      return posts.value.filter(p => postIds.includes(p.id))
+    }
+    return posts.value
+  })
+
+  const filteredDrafts = computed(() => {
+    if (isSharedView.value) {
+      const postIds = route.query.posts.split(',')
+      return drafts.value.filter(p => postIds.includes(p.id))
+    }
+    return drafts.value
+  })
   //
   onBeforeMount(() => {
     removeScript('https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js')
   })
   onMounted(() => {
     postIsLoading.value = true
-    profileStore.fetchUserPosts(auth.user.uid)
+    let userId = auth.user.uid
+    
+    if (route.query.userId) {
+      try {
+        userId = atob(String(route.query.userId))
+      } catch (e) {
+        userId = route.query.userId // fallback
+      }
+    }
+    
+    if (route.query.template !== undefined) {
+      initialTemplate.value = Number(route.query.template)
+    }
+
+    if (userId !== auth.user.uid) {
+      userStore.getUserById(userId).then(user => {
+        if (user) {
+          displayUser.value = user
+        }
+      })
+    } else {
+      displayUser.value = auth.user
+    }
+
+    profileStore.fetchUserPosts(userId)
       .then(res => {
         posts.value = res
+        if (route.query.posts) {
+          const postIds = route.query.posts.split(',')
+          const allPosts = [...posts.value, ...drafts.value]
+          selectedPosts.value = allPosts.filter(post => postIds.includes(post.id))
+        }
       })
       .finally(() => {
         postIsLoading.value = false
@@ -63,7 +116,7 @@
   const allSelected = computed(() => selectedPosts.value.length === posts.value.length && posts.value.length > 0)
 
   function selectAll () {
-    selectedPosts.value = allSelected.value ? [] : [...posts.value]
+    selectedPosts.value = allSelected.value ? [] : [...filteredPosts.value, ...filteredDrafts.value]
   }
 
   const recoveryTime = computed(() => {
@@ -165,6 +218,26 @@
       window.scrollTo(0, currentScroll)
     }
   }
+  function generateSharableLink () {
+    const query = new URLSearchParams()
+    if (auth.user?.uid) {
+      query.append('userId', btoa(auth.user.uid))
+    }
+    if (templateSelected.value) {
+      query.append('template', templateSelected.value.value)
+    }
+    if (selectedPosts.value.length > 0) {
+      const postIds = selectedPosts.value.map(p => p.id).join(',')
+      query.append('posts', postIds)
+    }
+    const url = `${window.location.origin}/failure-resume?${query.toString()}`
+    
+    navigator.clipboard.writeText(url).then(() => {
+      toast.success('Shareable link copied to clipboard!')
+    }).catch(() => {
+      toast.error('Failed to copy link')
+    })
+  }
 </script>
 <template>
   <div class="failure-resume-page">
@@ -208,19 +281,20 @@
     <v-progress-linear v-if="postIsLoading" class="mt-9" color="primary" indeterminate />
     <template v-else>
       <div class="main-content mt-4 pa-4">
-        <div class="d-flex justify-space-between mb-3">
+        <div v-if="!isSharedView" class="d-flex justify-space-between mb-3">
           <h4>Select Failures to Include</h4>
           <p class="cursor-pointer text-primary fs-14" @click="selectAll">{{
             allSelected ? 'Deselect All' : 'Select All'
           }}</p>
         </div>
+        <h4 v-else class="mb-3">Selected Failures</h4>
         <ul>
           <li
-            v-for="post in posts"
+            v-for="post in filteredPosts"
             :key="post.id"
             :class="{selected: selectedPosts.some(p => p.id === post.id)}"
           >
-            <div class="d-block">
+            <div v-if="!isSharedView" class="d-block">
               <v-checkbox
                 v-model="selectedPosts"
                 color="primary"
@@ -228,7 +302,7 @@
                 :value="post"
               />
             </div>
-            <div class="d-flex flex-column align-start ml-6">
+            <div class="d-flex flex-column align-start" :class="{'ml-6': !isSharedView}">
               <div class="tag">{{ post.selectedCategories[0].label }}</div>
               <div class="title">{{ post.title }}</div>
               <div v-if="post?.lessonLearned?.cost || post?.lessonLearned?.recoveryTime" class="item-panel">
@@ -244,24 +318,26 @@
           </li>
         </ul>
       </div>
-      <div v-if="drafts.length > 0" class="unpublish-content main-content">
+      <div v-if="filteredDrafts.length > 0" class="unpublish-content main-content">
         <div class="d-flex align-center justify-space-between">
           <div class="d-block">
-            <h5 class="font-weight-semibold fs-18 text-grey-darken-3">Add Unpublished Failures</h5>
-            <p class="text-description">Include failures you haven't shared publicly yet</p>
+            <h5 class="font-weight-semibold fs-18 text-grey-darken-3">
+              {{ isSharedView ? 'Unpublished Failures' : 'Add Unpublished Failures' }}
+            </h5>
+            <p v-if="!isSharedView" class="text-description">Include failures you haven't shared publicly yet</p>
           </div>
-          <div class="cancel-btn" @click="toggleUnpublish = !toggleUnpublish">{{
+          <div v-if="!isSharedView" class="cancel-btn" @click="toggleUnpublish = !toggleUnpublish">{{
             !toggleUnpublish ? 'Add' : 'Hide'
           }}
           </div>
         </div>
-        <ul v-if="toggleUnpublish" class="mt-6">
+        <ul v-if="isSharedView || toggleUnpublish" class="mt-6">
           <li
-            v-for="post in drafts"
+            v-for="post in filteredDrafts"
             :key="post.id"
             :class="{selected: selectedPosts.some(p => p.id === post.id)}"
           >
-            <div class="d-block">
+            <div v-if="!isSharedView" class="d-block">
               <v-checkbox
                 v-model="selectedPosts"
                 color="primary"
@@ -269,7 +345,7 @@
                 :value="post"
               />
             </div>
-            <div class="d-flex flex-column align-start ml-6">
+            <div class="d-flex flex-column align-start" :class="{'ml-6': !isSharedView}">
               <div class="tag">{{ post.selectedCategories[0].label }}</div>
               <div class="title">{{ post.title }}</div>
               <div v-if="post?.lessonLearned?.cost || post?.lessonLearned?.recoveryTime" class="item-panel">
@@ -285,20 +361,28 @@
           </li>
         </ul>
       </div>
-      <Templates :is-exporting="isExporting" @template-update="templateSelected = $event" />
-      <div
-        class="submit-btn d-flex justify-center align-center mt-4"
-        :class="{disabled: selectedPosts.length === 0 || !templateSelected}"
-        @click="exportToPDF"
-      >
-        <div
-          class="d-flex mr-3"
-          v-html="getIcon('file')"
-        />
-        {{ templateSelected ? 'Download PDF': 'Generate Preview' }}
+      <Templates :is-exporting="isExporting" :initial-template="initialTemplate" :display-user="displayUser" :read-only="isSharedView" @template-update="templateSelected = $event" />
+      <div class="wrapper mt-4">
+        <div class="d-flex ga-4 ">
+          <div
+            class="submit-btn d-flex justify-center align-center"
+            :class="[{disabled: selectedPosts.length === 0 || !templateSelected}, isSharedView ? 'w-100' : 'w-60']"
+            @click="exportToPDF"
+          >
+            <div
+              class="d-flex mr-3"
+              v-html="getIcon('file')"
+            />
+            {{ templateSelected ? 'Download PDF': 'Generate Preview' }}
+          </div>
+          <div class="cancel-btn d-flex align-center justify-center generate-btn" :class="isSharedView ? 'w-100' : 'w-40'" v-if="!isSharedView" @click="generateSharableLink">
+            <div class="d-flex mr-2" v-html="getIcon('share')" />
+            Get Shareable Link
+          </div>
+        </div>
+        <p v-if="!isSharedView && selectedPosts.length === 0" class="text-description text-center mt-2">Select at least one failure to generate your resume</p>
+        <p v-else-if="!isSharedView" class="text-description text-center mt-2">Ready to generate resume with {{ selectedPosts.length }} failures</p>
       </div>
-      <p v-if="selectedPosts.length === 0" class="text-description text-center mt-2">Select at least one failure to generate your resume</p>
-      <p v-else class="text-description text-center mt-2">Ready to generate resume with {{ selectedPosts.length }} failures</p>
     </template>
   </div>
 </template>

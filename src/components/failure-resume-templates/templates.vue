@@ -1,5 +1,5 @@
 <script setup>
-  import { defineAsyncComponent, shallowRef } from 'vue'
+  import { defineAsyncComponent, shallowRef, computed, onMounted, watch } from 'vue'
   import { useAuthStore } from '@/stores/auth.js'
   import { isPremium } from '@/utils/premium.js'
   import defaultTemplate from '../../assets/templates/defaultTemplate.jpg'
@@ -11,12 +11,26 @@
   //
   const user = useAuthStore().user
   const emit = defineEmits(['template-update'])
-  defineProps({
+  const props = defineProps({
     isExporting: {
       type: Boolean,
       default: false,
     },
+    initialTemplate: {
+      type: [Number, String],
+      default: null,
+    },
+    displayUser: {
+      type: Object,
+      default: () => null,
+    },
+    readOnly: {
+      type: Boolean,
+      default: false
+    }
   })
+
+  const activeUser = computed(() => props.displayUser || user)
   const templatesList = [
     {
       value: 0,
@@ -61,10 +75,30 @@
     selectedTemplate.value = item
     emit('template-update', item)
   }
+
+  onMounted(() => {
+    if (props.initialTemplate !== null) {
+      const template = templatesList.find(t => t.value == props.initialTemplate)
+      if (template) {
+        selectedTemplate.value = template
+        emit('template-update', template)
+      }
+    }
+  })
+
+  watch(() => props.initialTemplate, (newVal) => {
+    if (newVal !== null) {
+      const template = templatesList.find(t => t.value == newVal)
+      if (template) {
+        selectedTemplate.value = template
+        emit('template-update', template)
+      }
+    }
+  })
 </script>
 
 <template>
-  <div class="templates-wrapper">
+  <div v-if="!readOnly" class="templates-wrapper">
     <div class="header">
       <h5 class="font-weight-semibold fs-18 text-grey-darken-3">Resume templates</h5>
       <p class="text-description">Choose a template to get personalised resume</p>
@@ -89,8 +123,8 @@
   <div v-if="selectedTemplate" class="bg">
     <component
       :is="selectedTemplate.component"
-      :display-name="user.displayName"
-      :user-name="user.userName"
+      :display-name="activeUser?.displayName"
+      :user-name="activeUser?.userName"
     />
   </div>
 </template>

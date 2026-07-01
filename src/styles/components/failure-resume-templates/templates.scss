@@ -433,7 +433,10 @@
             }
 
             p {
-              color: #9CA3AF;
+              color: #9CA3AF !important;
+              * {
+                color: #9CA3AF !important;
+              }
             }
           }
         }
@@ -497,14 +500,21 @@
         .list {
           background-color: #D4EDD9;
           display: flex;
-          flex-wrap: wrap;
+          flex-wrap: nowrap;
+          gap: 8px;
           border-radius: $radius-sm;
-          padding: $spacing-md;
+          padding: 12px;
           margin-top: 24px;
+          overflow-x: auto;
 
           li {
             list-style: none;
-            width: 25%;
+            flex: 1 1 0;
+
+            .wrapper {
+              height: 100%;
+              padding: 10px;
+            }
 
             .label {
               color: #5A8A6E;
@@ -512,6 +522,7 @@
               margin-bottom: 0;
               display: flex;
               align-items: center;
+              white-space: nowrap;
 
               &:before {
                 content: '';
