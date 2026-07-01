@@ -6,6 +6,7 @@
   import { useProfileStore } from '@/stores/profile/profile.js'
   import { formatNumber } from '@/utils/format-number.js'
   import { timeTransformAgo } from '@/utils/time.js'
+  import { lessonCounter } from '../../utils/lesson-counter.js'
   import '@/styles/components/profile/draft-card.scss'
   const router = useRouter()
   const props = defineProps({
@@ -49,6 +50,9 @@
         <div v-if="card.lessonLearned.recoveryTime?.title " class="meta-item">
           <span class="meta-icon">⏱️</span>
           <span class="meta-text">Recovery: {{ card.lessonLearned.recoveryTime?.title }}</span>
+        </div>
+        <div v-if="lessonCounter(card.lessonLearned)" class="meta-item">
+          <span class="meta-text">📚 {{ lessonCounter(card.lessonLearned) }} lessons</span>
         </div>
       </div>
     </div>

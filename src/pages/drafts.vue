@@ -12,7 +12,7 @@
   import DraftCard from '@/components/profile/DraftCard.vue'
   import { useAuthStore } from '@/stores/auth.js'
   import { useProfileStore } from '@/stores/profile/profile.js'
-
+  import '@/styles/pages/draft.scss'
   const profileStore = useProfileStore()
   const authStore = useAuthStore()
   const { drafts, loading } = storeToRefs(profileStore)
@@ -33,9 +33,9 @@
     <div v-if="loading" class="d-flex justify-center my-6">
       <v-progress-circular color="primary" indeterminate />
     </div>
-    <template v-else-if="drafts.length > 0">
+    <div v-else-if="drafts.length > 0" class="mt-4 mt-sm-0">
       <DraftCard v-for="(card, index) in drafts" :key="index" :card="card" />
-    </template>
+    </div>
     <div v-else class="d-flex flex-column align-center justify-center py-16 text-grey">
       <v-icon class="mb-4" color="grey-lighten-1" icon="mdi-text-box-remove-outline" size="64" />
       <h3 class="text-h6 font-weight-medium text-grey-darken-1">No drafts yet</h3>
@@ -44,3 +44,11 @@
 
   </div>
 </template>
+<style scoped lang="scss">
+@include media-down($breakpoint-sm) {
+  h1 {
+    font-weight: 600 !important;
+    font-size: 20px;
+  }
+}
+</style>

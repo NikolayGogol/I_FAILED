@@ -1,0 +1,5 @@
+.drafts-wrapper {
+  @include media-down($breakpoint-sm) {
+    padding: 15px;
+  }
+}
