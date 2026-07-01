@@ -36,7 +36,7 @@
     store.triggerTags.splice(index, 1)
   }
   const anonymousPost = computed(() => {
-    return isPremium.value ? false : isAnonymousCounter.value >= 3;
+    return isPremium.value ? false : isAnonymousCounter.value >= 3
   })
 </script>
 

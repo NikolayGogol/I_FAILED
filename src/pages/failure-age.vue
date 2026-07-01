@@ -18,8 +18,8 @@
   import Growth from '@/components/failure-age/growth.vue'
   import ThemeChart from '@/components/failure-age/theme-chart.vue'
   import Timeline from '@/components/failure-age/timeline.vue'
+  import { isPremium } from '@/utils/premium.js'
   import '@/styles/pages/failure-age.scss'
-  import {isPremium} from "@/utils/premium.js";
   //
   const tabs = [
     {
@@ -49,12 +49,12 @@
         {{ tab.label }}
       </li>
     </ul>
+    <div v-if="selectedTab.value === 0" class="tab-content">
+      <growth />
+      <achievement class="mt-4" />
+      <timeline class="mt-4" />
+    </div>
     <template v-if="isPremium">
-      <div v-if="selectedTab.value === 0" class="tab-content">
-        <growth />
-        <achievement class="mt-4" />
-        <timeline class="mt-4" />
-      </div>
       <div v-if="selectedTab.value === 1" class="tab-content">
         <dashboard />
         <grow-chart class="mt-4" />
@@ -69,7 +69,7 @@
         <calendar class="mt-4" />
       </div>
     </template>
-    <div v-else class="premium-upsell mt-8">
+    <div v-else-if="selectedTab.value === 1 && !isPremium" class="premium-upsell mt-8">
       <h3 class="upsell-title">Unlock Growth Insights with Premium</h3>
       <p class="upsell-desc">
         Join thousands of members who are turning failures into growth

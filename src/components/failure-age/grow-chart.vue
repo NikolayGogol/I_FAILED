@@ -135,7 +135,7 @@
       },
       max: 100,
       labels: {
-        formatter: (val) => Math.round(val),
+        formatter: val => Math.round(val),
       },
     },
     fill: {
