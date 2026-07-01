@@ -19,6 +19,7 @@
   import ThemeChart from '@/components/failure-age/theme-chart.vue'
   import Timeline from '@/components/failure-age/timeline.vue'
   import '@/styles/pages/failure-age.scss'
+  import {isPremium} from "@/utils/premium.js";
   //
   const tabs = [
     {
@@ -48,23 +49,34 @@
         {{ tab.label }}
       </li>
     </ul>
-    <div v-if="selectedTab.value === 0" class="tab-content">
-      <growth />
-      <achievement class="mt-4" />
-      <timeline class="mt-4" />
-    </div>
-    <div v-if="selectedTab.value === 1" class="tab-content">
-      <dashboard />
-      <grow-chart class="mt-4" />
-      <v-row class="mt-4">
-        <v-col cols="12" sm="6">
-          <theme-chart />
-        </v-col>
-        <v-col cols="12" sm="6">
-          <emotial />
-        </v-col>
-      </v-row>
-      <calendar class="mt-4" />
+    <template v-if="isPremium">
+      <div v-if="selectedTab.value === 0" class="tab-content">
+        <growth />
+        <achievement class="mt-4" />
+        <timeline class="mt-4" />
+      </div>
+      <div v-if="selectedTab.value === 1" class="tab-content">
+        <dashboard />
+        <grow-chart class="mt-4" />
+        <v-row class="mt-4">
+          <v-col cols="12" sm="6">
+            <theme-chart />
+          </v-col>
+          <v-col cols="12" sm="6">
+            <emotial />
+          </v-col>
+        </v-row>
+        <calendar class="mt-4" />
+      </div>
+    </template>
+    <div v-else class="premium-upsell mt-8">
+      <h3 class="upsell-title">Unlock Growth Insights with Premium</h3>
+      <p class="upsell-desc">
+        Join thousands of members who are turning failures into growth
+      </p>
+      <button class="upsell-btn" @click="$router.push('/premium')">
+        Start Your Premium Journey
+      </button>
     </div>
   </div>
 </template>

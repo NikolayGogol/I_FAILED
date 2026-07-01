@@ -607,4 +607,47 @@
   .grow-chart {
 
   }
+
+  .premium-upsell {
+    background-color: $color-surface;
+    border: 1px solid $color-border;
+    border-radius: $radius-xl;
+    padding: 60px 32px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: $spacing-xl;
+    box-shadow: $shadow-sm;
+
+    .upsell-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: $color-text-primary;
+      margin-bottom: $spacing-sm;
+    }
+
+    .upsell-desc {
+      font-size: 14px;
+      color: $color-text-secondary;
+      margin-bottom: $spacing-lg;
+    }
+
+    .upsell-btn {
+      background: linear-gradient(90deg, #D65A1F 0%, #C8372B 100%);
+      color: white;
+      border: none;
+      padding: 12px 32px;
+      border-radius: $radius-md;
+      font-weight: 600;
+      font-size: 16px;
+      cursor: pointer;
+      transition: opacity 0.2s;
+
+      &:hover {
+        opacity: 0.9;
+      }
+    }
+  }
 }
