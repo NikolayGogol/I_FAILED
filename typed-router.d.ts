@@ -23,6 +23,7 @@ declare module 'vue-router/auto-routes' {
     '/check-inbox': RouteRecordInfo<'/check-inbox', '/check-inbox', Record<never, never>, Record<never, never>>,
     '/congrats': RouteRecordInfo<'/congrats', '/congrats', Record<never, never>, Record<never, never>>,
     '/create-post': RouteRecordInfo<'/create-post', '/create-post', Record<never, never>, Record<never, never>>,
+    '/draft-preview/[id]': RouteRecordInfo<'/draft-preview/[id]', '/draft-preview/:id', { id: ParamValue<true> }, { id: ParamValue<false> }>,
     '/drafts': RouteRecordInfo<'/drafts', '/drafts', Record<never, never>, Record<never, never>>,
     '/edit-draft/[id]': RouteRecordInfo<'/edit-draft/[id]', '/edit-draft/:id', { id: ParamValue<true> }, { id: ParamValue<false> }>,
     '/edit-post/[id]': RouteRecordInfo<'/edit-post/[id]', '/edit-post/:id', { id: ParamValue<true> }, { id: ParamValue<false> }>,
@@ -79,6 +80,10 @@ declare module 'vue-router/auto-routes' {
     }
     'src/pages/create-post.vue': {
       routes: '/create-post'
+      views: never
+    }
+    'src/pages/draft-preview/[id].vue': {
+      routes: '/draft-preview/[id]'
       views: never
     }
     'src/pages/drafts.vue': {

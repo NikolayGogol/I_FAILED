@@ -7,9 +7,11 @@
 }
 </route>
 <script setup>
+  import { storeToRefs } from 'pinia'
   import { computed, nextTick, onBeforeMount, onMounted, ref } from 'vue'
   import { useToast } from 'vue-toastification'
   import { recoveryTimeOptions } from '@/models/categories.js'
+  import { getIcon } from '@/models/icons.js'
   import id from '@/pages/post/[id].vue'
   import { useAuthStore } from '@/stores/auth.js'
   import { useProfileStore } from '@/stores/profile/profile.js'
@@ -22,8 +24,9 @@
   const selectedPosts = ref([])
   const isExporting = ref(false)
   const postIsLoading = ref(false)
+  const toggleUnpublish = ref(false)
   const toast = useToast()
-
+  const { drafts } = storeToRefs(profileStore)
   //
   onBeforeMount(() => {
     removeScript('https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js')
@@ -136,6 +139,7 @@
 </script>
 <template>
   <div class="failure-resume-page">
+
     <div v-if="isExporting" class="overlay">
       <h3 class="mb-5">Generating PDF</h3>
       <v-progress-linear color="primary" indeterminate />
@@ -212,11 +216,47 @@
           </li>
         </ul>
       </div>
+      <div v-if="drafts.length > 0" class="unpublish-content main-content">
+        <div class="d-flex align-center justify-space-between">
+          <div class="d-block">
+            <h5 class="font-weight-semibold fs-18 text-grey-darken-3">Add Unpublished Failures</h5>
+            <p class="text-description">Include failures you haven't shared publicly yet</p>
+          </div>
+          <div class="cancel-btn" @click="toggleUnpublish = !toggleUnpublish">{{ !toggleUnpublish ? 'Add' : 'Hide' }}</div>
+        </div>
+        <ul v-if="toggleUnpublish" class="mt-6">
+          <li
+            v-for="post in drafts"
+            :key="post.id"
+            :class="{selected: selectedPosts.includes(post.id)}"
+          >
+            <div class="d-block">
+              <v-checkbox
+                v-model="selectedPosts"
+                color="primary"
+                hide-details
+                :value="post.id"
+              />
+            </div>
+            <div class="d-flex flex-column align-start ml-6">
+              <div class="tag">{{ post.selectedCategories[0].label }}</div>
+              <div class="title">{{ post.title }}</div>
+              <div v-if="post?.lessonLearned?.cost || post?.lessonLearned?.recoveryTime" class="item-panel">
+                <div v-if="post?.lessonLearned?.cost">💰Cost: {{ formatNumber(post.lessonLearned.cost) }}</div>
+                <div v-if="post?.lessonLearned?.recoveryTime" class="ml-4">⏱️Recovery: {{ post.lessonLearned.recoveryTime.title }}</div>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
       <div
         v-if="selectedPosts.length > 0"
-        class="submit-btn mt-4"
+        class="submit-btn d-flex justify-center align-center mt-4"
         @click="exportToPDF"
-      >Export PDF</div>
+      >
+        <div class="d-flex mr-3" v-html="getIcon('file')" />
+        Generate Preview</div>
+      <p class="text-description text-center mt-2">Select at least one failure to generate your resume</p>
     </template>
   </div>
 </template>

@@ -4,8 +4,8 @@
   import ConfirmationModal from '@/components/ConfirmationModal.vue'
   import { useEditDraftStore } from '@/stores/edit-draft.js'
   import { useProfileStore } from '@/stores/profile/profile.js'
-  import { timeTransformAgo } from '@/utils/time.js'
   import { formatNumber } from '@/utils/format-number.js'
+  import { timeTransformAgo } from '@/utils/time.js'
   import '@/styles/components/profile/draft-card.scss'
   const router = useRouter()
   const props = defineProps({
@@ -40,13 +40,13 @@
   <div v-if="card" class="draft-card">
     <div class="draft-card-left">
       <span class="draft-category">{{ card.selectedCategories[0]?.label }}</span>
-      <h3 class="draft-title">{{ card.title }}</h3>
-      <div class="draft-meta">
-        <div v-if="card.lessonLearned" class="meta-item">
+      <h3 class="draft-title cursor-pointer" @click="router.push('/draft-preview/' + card.id)">{{ card.title }}</h3>
+      <div v-if="card.lessonLearned" class="draft-meta">
+        <div v-if="card.lessonLearned?.cost" class="meta-item">
           <span class="meta-icon">💰</span>
           <span class="meta-text">Cost: {{ formatNumber(card.lessonLearned?.cost || 0) }}</span>
         </div>
-        <div class="meta-item">
+        <div v-if="card.lessonLearned.recoveryTime?.title " class="meta-item">
           <span class="meta-icon">⏱️</span>
           <span class="meta-text">Recovery: {{ card.lessonLearned.recoveryTime?.title }}</span>
         </div>
