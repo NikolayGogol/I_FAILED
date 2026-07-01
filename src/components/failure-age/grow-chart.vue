@@ -76,7 +76,8 @@
   })
 
   const userEngagementPercentage = computed(() => {
-    return (userEngagement.value * 100) / communityEngagement.value
+    if (!communityEngagement.value) return 0
+    return Math.round((userEngagement.value * 100) / communityEngagement.value)
   })
   const communityEngagementPercentage = computed(() => {
     if (communityEngagement.value > 0) {
@@ -85,7 +86,8 @@
     return 0
   })
   const userResiliencePercentage = computed(() => {
-    return (userResilience.value * 100) / communityResilience.value
+    if (!communityResilience.value) return 0
+    return Math.round((userResilience.value * 100) / communityResilience.value)
   })
   const communityResiliencePercentage = computed(() => {
     if (communityResilience.value > 0) {
@@ -132,6 +134,9 @@
         text: 'Percentage (%)',
       },
       max: 100,
+      labels: {
+        formatter: (val) => Math.round(val),
+      },
     },
     fill: {
       opacity: 1,
