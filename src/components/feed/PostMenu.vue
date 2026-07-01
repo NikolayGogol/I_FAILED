@@ -229,7 +229,7 @@
           <div class="cancel-btn" @click="showBlockDialog = false">Cancel</div>
         </v-col>
         <v-col>
-          <div class="submit-btn" :disabled="isBlocking" @click="confirmBlock">
+          <div class="submit-btn" :class="{'opacity-60 pointer-events-none': isBlocking}" @click="confirmBlock">
             <v-progress-circular
               v-if="isBlocking"
               class="mr-2"
@@ -244,9 +244,3 @@
     </div>
   </v-dialog>
 </template>
-<style scoped lang="scss">
-:deep(.v-list-item__content) {
-  display: flex;
-  align-items: center;
-}
-</style>

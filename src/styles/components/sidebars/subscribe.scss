@@ -1,0 +1,45 @@
+@use 'sass:color' as c;
+@use '@/styles/settings.scss' as *;
+
+.subscribe-card {
+  background: linear-gradient(135deg, #F8EBE0 0%, #E9F8E3 100%);
+  border: 1px solid #F6D5AC;
+  border-radius: $radius-xl;
+  padding: $spacing-md-lg $spacing-md-lg;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md-sm;
+  box-sizing: border-box;
+}
+
+.subscribe-title {
+  color: $color-text-primary;
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.subscribe-desc {
+  color: $color-text-primary;
+  font-size: 15px;
+  line-height: $line-height-relaxed;
+  margin: 0;
+}
+
+.subscribe-btn {
+  background-color: $color-primary;
+  color: $color-surface;
+  border: none;
+  border-radius: $radius-sm;
+  padding: $spacing-sm-md $spacing-lg;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  align-self: flex-start;
+  transition: background-color 0.2s ease;
+  margin-top: $spacing-xs;
+
+  &:hover {
+    background-color: c.adjust($color-primary, $lightness: -5%);
+  }
+}

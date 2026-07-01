@@ -141,13 +141,5 @@
 </template>
 
 <style scoped lang="scss">
-.position-relative {
-  position: relative;
-}
-.top-0 {
-  top: -10px;
-}
-.right-0 {
-  right: -10px;
-}
+@use "@/styles/components/ImgComment.scss";
 </style>

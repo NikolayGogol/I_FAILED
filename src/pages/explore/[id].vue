@@ -128,7 +128,5 @@
 </template>
 
 <style scoped lang="scss">
-.category-page {
-  padding: 20px;
-}
+@use "@/styles/pages/explore/_id.scss";
 </style>

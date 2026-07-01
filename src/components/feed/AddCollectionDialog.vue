@@ -142,10 +142,3 @@
   </v-card>
 
 </template>
-
-<style scoped lang="scss">
-.list {
-  max-height: 350px;
-  overflow-y: auto;
-}
-</style>

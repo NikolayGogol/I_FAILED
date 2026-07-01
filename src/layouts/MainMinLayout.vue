@@ -44,27 +44,3 @@
     </v-main>
   </v-app>
 </template>
-
-<style lang="scss" scoped>
-.main-container {
-  max-width: 1440px;
-  margin: 0 auto;
-}
-
-.sticky-sidebar {
-  position: sticky;
-  top: 15px;
-  height: 100vh;
-  //height: calc(100vh - 80px);
-  overflow-y: auto;
-
-  /* Hide scrollbar for Chrome, Safari and Opera */
-  &::-webkit-scrollbar {
-    display: none;
-  }
-
-  /* Hide scrollbar for IE, Edge and Firefox */
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
-}
-</style>

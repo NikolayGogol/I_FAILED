@@ -71,7 +71,5 @@
 </template>
 
 <style scoped lang="scss">
-:deep(.v-list-item__content) {
-  display: flex;
-}
+@use "@/styles/components/notifications/NotifyMenu.scss";
 </style>

@@ -97,7 +97,6 @@ router.post('/renew-subscription', renewSubscription)
  */
 router.post('/customer-portal', createCustomerPortal)
 
-
 /**
  * @swagger
  * /api/webhook:

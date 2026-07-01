@@ -94,20 +94,3 @@
   </div>
 
 </template>
-
-<style scoped lang="scss">
-:deep(.v-selection-control-group) {
-  flex-direction: row;
-}
-
-:deep(.v-selection-control) {
-  flex: unset;
-}
-.radio {
-  &:deep(label) {
-    color: #1C1C1B;
-    font-size: 12px;
-  }
-}
-
-</style>

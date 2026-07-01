@@ -81,41 +81,5 @@
 </template>
 
 <style scoped lang="scss">
-.history-container {
-  padding: 24px 0;
-}
-
-.header {
-  span {
-    font-size: 16px;
-    font-weight: 500;
-  }
-}
-
-.history-table {
-  width: 100%;
-}
-
-.table-header, .table-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  padding: 16px 8px;
-}
-
-.table-header {
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.table-row {
-  border-bottom: 1px solid #f0f0f0;
-
-  &:last-child {
-    border-bottom: none;
-  }
-}
-
-.col-date, .col-method, .col-amount {
-  display: flex;
-  align-items: center;
-}
+@use "@/styles/components/settings/membership/history.scss";
 </style>

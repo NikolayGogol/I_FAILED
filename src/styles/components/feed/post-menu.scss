@@ -44,3 +44,8 @@
   font-size: $font-size-sm;
   line-height: $line-height-relaxed;
 }
+
+:deep(.v-list-item__content) {
+  display: flex;
+  align-items: center;
+}

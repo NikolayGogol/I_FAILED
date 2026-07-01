@@ -162,7 +162,7 @@
 
   function renderCommentText (text) {
     if (!text) return ''
-    return text.replace(/@\[([^\]]+)\]\(([^)]+)\)/g, '<a href="/user-info/$2" class="font-weight-bold text-primary">@$1</a>')
+    return text.replace(/@\[([^\]]+)]\(([^)]+)\)/g, '<a href="/user-info/$2" class="font-weight-bold text-primary">@$1</a>')
   }
 
   function cancelEdit () {
@@ -621,13 +621,6 @@
   </div>
 </template>
 
-<style scoped>
-.mobile-username {
-  display: inline-block;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 120px;
-  vertical-align: text-bottom;
-}
+<style scoped lang="scss">
+@use "@/styles/components/comments-section.scss";
 </style>

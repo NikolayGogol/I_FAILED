@@ -169,7 +169,7 @@
 
     <v-form class="verify-form-fields" @submit.prevent="handleVerify">
       <div class="otp-inputs d-flex justify-center ga-3 w-100">
-        <div v-for="(digit, index) in 6" :key="index" class="otp-field-wrapper">
+        <div v-for="(_, index) in 6" :key="index" class="otp-field-wrapper">
           <input
             :ref="el => { if (el) inputRefs[index] = el }"
             v-model="code[index]"
@@ -214,30 +214,5 @@
 </template>
 
 <style scoped lang="scss">
-/* We can add scoped styles here or keep using the imported scss */
-.otp-inputs {
-  margin-bottom: 24px;
-}
-
-.otp-field-wrapper {
-  width: 48px;
-  height: 48px;
-}
-
-.otp-input {
-  width: 100%;
-  height: 100%;
-  border: 1px solid #DCDCD8;
-  border-radius: 8px;
-  text-align: center;
-  font-size: 1.25rem;
-  font-weight: 600;
-  outline: none;
-  transition: border-color 0.2s;
-
-  &:focus {
-    border-color: #D65A1F; /* Primary color */
-    border-width: 2px;
-  }
-}
+@use "@/styles/pages/otp.scss";
 </style>

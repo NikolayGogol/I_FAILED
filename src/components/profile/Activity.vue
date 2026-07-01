@@ -47,9 +47,6 @@
   </div>
 </template>
 
-<style scoped>
-.activity-container {
-  max-width: 800px;
-  margin: 0 auto;
-}
+<style scoped lang="scss">
+@use "@/styles/components/profile/activity.scss";
 </style>

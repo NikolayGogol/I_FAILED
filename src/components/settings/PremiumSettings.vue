@@ -4,6 +4,7 @@
   import { useRouter } from 'vue-router'
   import { useToast } from 'vue-toastification'
   import History from '@/components/settings/membership/History.vue'
+  import Subscribe from '@/components/sidebars/Subscribe.vue'
   import { getIcon } from '@/models/icons.js'
   import { useAuthStore } from '@/stores/auth.js'
   import { useSubscriptionStore } from '@/stores/subscription.js'
@@ -139,7 +140,13 @@
               <span class="value">{{ cardBrand }} **{{ cardLast4 }}</span>
             </div>
             <button class="change-link" :disabled="subscriptionStore.loading" @click="handleOpenPortal">
-              <v-progress-circular v-if="isOpeningPortal" class="mr-2" indeterminate size="12" width="2" />
+              <v-progress-circular
+                v-if="isOpeningPortal"
+                class="mr-2"
+                indeterminate
+                size="12"
+                width="2"
+              />
               <span v-else>Change</span>
             </button>
           </div>
@@ -213,11 +220,16 @@
       </v-dialog>
     </template>
     <template v-else>
-      <div class="free-state">
-        <h2 class="title mb-4">Premium</h2>
-        <p class="mb-6 text-grey-darken-1">You are currently on the Free plan.</p>
-        <button class="upgrade-btn" @click="$router.push('/premium')">Upgrade to Premium</button>
+      <h2 class="title">Membership details</h2>
+
+      <div class="subscription-header mb-6">
+        <div class="logo-circle pa-2">
+          <v-img src="../../assets/Logo.png" />
+        </div>
+        <span class="subscription-name">Free Plan</span>
       </div>
+
+      <Subscribe />
     </template>
   </div>
   <History v-if="activeTab === 1" @back="activeTab = 0" />

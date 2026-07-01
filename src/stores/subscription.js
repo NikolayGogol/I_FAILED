@@ -11,6 +11,7 @@ export const useSubscriptionStore = defineStore('subscription', () => {
   /**
    * Creates a new premium checkout for the current user.
    * @param {string} interval The plan interval ('monthly' or 'yearly')
+   * @param isTrial
    * @returns {Promise<boolean>} True if checkout URL was successfully retrieved, false otherwise.
    */
   async function createCheckout (interval = 'monthly', isTrial = false) {
@@ -20,7 +21,8 @@ export const useSubscriptionStore = defineStore('subscription', () => {
     try {
       const user = authStore.user
       if (!user || !user.uid) {
-        throw new Error('No authenticated user found.')
+        error.value = 'No authenticated user found.'
+        return false
       }
 
       const response = await api.post('/create-checkout', {
@@ -52,7 +54,8 @@ export const useSubscriptionStore = defineStore('subscription', () => {
     try {
       const user = authStore.user
       if (!user || !user.uid) {
-        throw new Error('No authenticated user found.')
+        error.value = 'No authenticated user found.'
+        return false
       }
 
       await api.post('/cancel-subscription', { uid: user.uid })
@@ -73,7 +76,8 @@ export const useSubscriptionStore = defineStore('subscription', () => {
     try {
       const user = authStore.user
       if (!user || !user.uid) {
-        throw new Error('No authenticated user found.')
+        error.value = 'No authenticated user found.'
+        return false
       }
 
       await api.post('/renew-subscription', { uid: user.uid, interval })
@@ -94,7 +98,8 @@ export const useSubscriptionStore = defineStore('subscription', () => {
     try {
       const user = authStore.user
       if (!user || !user.uid) {
-        throw new Error('No authenticated user found.')
+        error.value = 'No authenticated user found.'
+        return false
       }
 
       const response = await api.post('/customer-portal', { uid: user.uid })
@@ -124,4 +129,3 @@ export const useSubscriptionStore = defineStore('subscription', () => {
     openCustomerPortal,
   }
 })
-

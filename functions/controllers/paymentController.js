@@ -255,7 +255,6 @@ exports.createCustomerPortal = async (req, res) => {
   }
 }
 
-
 /**
  * Handles Stripe webhooks to update user subscription status.
  */
@@ -478,26 +477,24 @@ exports.webhook = async (req, res) => {
       case 'customer.updated': {
         const customer = event.data.object
         functions.logger.info(`Customer ${customer.id} was updated.`)
-        
+
         // If the customer has a default payment method, fetch it to update the database
         if (customer.invoice_settings && customer.invoice_settings.default_payment_method) {
           try {
             const paymentMethod = await stripe.paymentMethods.retrieve(customer.invoice_settings.default_payment_method)
-            
+
             // Find the user by stripeCustomerId
-            const snapshot = await admin.firestore().collection('users')
-              .where('payment.stripeCustomerId', '==', customer.id)
-              .get()
-              
+            const snapshot = await admin.firestore().collection('users').where('payment.stripeCustomerId', '==', customer.id).get()
+
             if (!snapshot.empty) {
               const userId = snapshot.docs[0].id
-              
+
               if (paymentMethod.card) {
                 await admin.firestore().collection('users').doc(userId).set({
                   payment: {
                     cardBrand: paymentMethod.card.brand,
-                    cardLast4: paymentMethod.card.last4
-                  }
+                    cardLast4: paymentMethod.card.last4,
+                  },
                 }, { merge: true })
                 functions.logger.info(`Updated card details for user ${userId} to ${paymentMethod.card.brand} **${paymentMethod.card.last4}.`)
               }

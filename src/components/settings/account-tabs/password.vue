@@ -93,24 +93,6 @@
   </div>
 </template>
 
-<style scoped>
-.alert {
-  padding: 1rem;
-  margin-bottom: 1rem;
-  border-radius: 4px;
-}
-.alert-danger {
-  background-color: #f8d7da;
-  color: #721c24;
-  border: 1px solid #f5c6cb;
-}
-.alert-success {
-  background-color: #d4edda;
-  color: #155724;
-  border: 1px solid #c3e6cb;
-}
-.submit-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
+<style scoped lang="scss">
+@use "@/styles/components/settings/account-tabs/password.scss";
 </style>
