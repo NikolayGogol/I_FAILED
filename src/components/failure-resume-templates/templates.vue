@@ -1,6 +1,7 @@
 <script setup>
   import { defineAsyncComponent, shallowRef } from 'vue'
   import { useAuthStore } from '@/stores/auth.js'
+  import { isPremium } from '@/utils/premium.js'
   import defaultTemplate from '../../assets/templates/defaultTemplate.jpg'
   import ForestThumbnail from '../../assets/templates/ForestThumbnail.jpg'
   import MidnightThumbnail from '../../assets/templates/MidnightThumbnail.jpg'
@@ -22,35 +23,41 @@
       label: 'Default',
       img: defaultTemplate,
       component: defineAsyncComponent(() => import('./defaultTemp.vue')),
+      disabled: false,
     },
     {
       value: 1,
       label: 'Rose Gold',
       img: RoseGoldThumbnail,
       component: defineAsyncComponent(() => import('./roseTemp.vue')),
+      disabled: !isPremium.value,
     },
     {
       value: 2,
       label: 'Midnight',
       img: MidnightThumbnail,
       component: defineAsyncComponent(() => import('./midnightTemp.vue')),
+      disabled: !isPremium.value,
     },
     {
       value: 3,
       label: 'Forest',
       img: ForestThumbnail,
       component: defineAsyncComponent(() => import('./forestTemp.vue')),
+      disabled: !isPremium.value,
     },
     {
       value: 4,
       label: 'Slate',
       img: Slate,
       component: defineAsyncComponent(() => import('./slateTemp.vue')),
+      disabled: !isPremium.value,
     },
   ]
   const selectedTemplate = shallowRef(null)
   //
   function selectTemplate (item) {
+    if (item.disabled) return
     selectedTemplate.value = item
     emit('template-update', item)
   }
@@ -66,7 +73,10 @@
       <li
         v-for="(item, index) in templatesList"
         :key="index"
-        :class="{'active': selectedTemplate?.value === item.value}"
+        :class="[
+          {'active': selectedTemplate?.value === item.value},
+          {'disabled': item.disabled}
+        ]"
         @click="selectTemplate(item)"
       >
         <div class="d-block">

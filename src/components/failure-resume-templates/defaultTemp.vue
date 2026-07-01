@@ -35,7 +35,7 @@
 <template>
   <div class="resume-template-wrapper default-template">
     <div class="title">Failure Resume</div>
-    <p class="text-description text-center">{{ displayName }} <span>•</span> {{ userName }}</p>
+    <p class="text-description text-center">{{ displayName }} <span v-if="userName.length > 0">•</span> {{ userName }}</p>
     <div class="header">
       <h6 class="fs-16 font-weight-semibold text-grey-darken-3">Failure Experience Summary</h6>
       <ul>
@@ -71,6 +71,8 @@
           </p>
         </li>
       </ul>
+    </template>
+    <template v-if="grow.length > 0">
       <div class="fs-16 font-weight-semibold text-grey-darken-3 mt-6">Growth Timeline</div>
       <ul class="grow-items">
         <li v-for="(item, index) in grow" :key="index" class="mb-6">
@@ -78,6 +80,8 @@
           <p v-if="lessonCounter(item.lessonLearned)" class="text-description">Major failure occurred, learned {{ lessonCounter(item.lessonLearned) }} key lessons</p>
         </li>
       </ul>
+    </template>
+    <template v-if="keyLessonsTemplate(data).length > 0">
       <div class="fs-16 font-weight-semibold text-grey-darken-3">Key Lessons Learned</div>
       <ul class="key-items">
         <li v-for="(item, index) in keyLessonsTemplate(data)" :key="index" class="mb-6">
@@ -88,6 +92,7 @@
         </li>
       </ul>
     </template>
+
   </div>
 </template>
 
