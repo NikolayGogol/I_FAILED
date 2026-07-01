@@ -1,17 +1,30 @@
 <script setup>
 
-  import { computed, ref } from 'vue'
+  import { computed, onMounted, ref } from 'vue'
   import DatePickerInput from '@/components/DatePickerInput.vue'
   import FormInput from '@/components/FormInput.vue'
   import { visibilityList } from '@/models/categories.js'
+  import { useAuthStore } from '@/stores/auth.js'
   import { useCreatePostStore } from '@/stores/create-post.js'
+  import { useProfileStore } from '@/stores/profile/profile.js'
+  import { isPremium } from '@/utils/premium.js'
   //
   const store = useCreatePostStore()
   const triggerText = ref('')
   const currentDate = computed(() => new Date())
-
+  const { fetchUserPosts } = useProfileStore()
+  const authStore = useAuthStore()
+  const isAnonymousCounter = ref(0)
   //
-
+  onMounted(() => {
+    if (authStore.user?.uid) {
+      fetchUserPosts(authStore.user.uid)
+        .then(posts => {
+          isAnonymousCounter.value = posts.filter(post => post.isAnonymous).length
+        })
+    }
+  })
+  //
   function addTag () {
     if (triggerText.value && !store.triggerTags.includes(triggerText.value)) {
       store.triggerTags.push(triggerText.value)
@@ -22,6 +35,9 @@
   function removeTag (index) {
     store.triggerTags.splice(index, 1)
   }
+  const anonymousPost = computed(() => {
+    return isPremium.value ? false : isAnonymousCounter.value >= 3;
+  })
 </script>
 
 <template>
@@ -35,9 +51,18 @@
       v-model="store.isAnonymous"
       color="primary"
       density="compact"
+      :disabled="anonymousPost"
       hide-details
       inset
+      :readonly="anonymousPost"
     />
+  </div>
+  <div v-if="!isPremium" class="d-flex align-center justify-space-between mt-2">
+    <span class="text-description fs-12">
+      <b class="text-grey-darken-3">{{ isAnonymousCounter }}/3</b>
+      anonymous posts left
+    </span>
+    <router-link class="text-primary fs-14" to="/premium">Buy premium</router-link>
   </div>
   <div class="form-group my-4">
     <label class="form-label mt-1">Visibility</label>
